@@ -1,0 +1,69 @@
+#-------------------------------------------------------------------------------
+# ============LICENSE_START==================================================
+# * org.onap.dmaap
+# * ===========================================================================
+# * Copyright © 2017 AT&T Intellectual Property. All rights reserved.
+# * ===========================================================================
+# * Licensed under the Apache License, Version 2.0 (the "License");
+# * you may not use this file except in compliance with the License.
+# * You may obtain a copy of the License at
+# * 
+#  *      http://www.apache.org/licenses/LICENSE-2.0
+# * 
+#  * Unless required by applicable law or agreed to in writing, software
+# * distributed under the License is distributed on an "AS IS" BASIS,
+# * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# * See the License for the specific language governing permissions and
+# * limitations under the License.
+# * ============LICENSE_END====================================================
+# *
+# * ECOMP is a trademark and service mark of AT&T Intellectual Property.
+# *
+#-------------------------------------------------------------------------------
+version: '2'
+services: 
+  datarouter-prov:
+    image: attos/datarouter-prov
+    container_name: datarouter-prov
+    hostname: prov.datarouternew.com
+    ports:
+     - "8443:8443"
+     - "8080:8080"  
+#    volumes:
+#     - ./prov_data/proserver.properties:/opt/app/datartr/etc/proserver.properties
+#     - ./prov_data/datarouter-prov-jar-with-dependencies.jar:/opt/app/datartr/lib/datarouter-prov-jar-with-dependencies.jar
+#      - ./prov_data/addSubscriber.txt:/opt/app/datartr/addSubscriber.txt
+#      - ./prov_data/addFeed3.txt:/opt/app/datartr/addFeed3.txt
+    entrypoint: ["bash", "-c", "sleep 10; /bin/sh -c ./startup.sh"]
+    depends_on:
+      - mysql_container
+    extra_hosts:
+      - "node.datarouternew.com:172.18.0.4"
+
+    
+  datarouter-node:
+    image: attos/datarouter-node
+    container_name: datarouter-node
+    hostname: node.datarouternew.com
+    ports:
+     - "9443:8443"
+     - "9090:8080"
+#    volumes:
+#     - ./node_data/node.properties:/opt/app/datartr/etc/node.properties
+    entrypoint: ["bash", "-c", "sleep 15; /bin/sh -c ./startup.sh"]    
+    depends_on:
+      - datarouter-prov
+    extra_hosts:
+      - "prov.datarouternew.com:172.18.0.3"
+      
+  mysql_container:
+    image: mysql/mysql-server:5.6
+    container_name: mysql
+    ports:
+     - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: att2017
+    volumes:
+    - ./database:/tmp/database
+    - ./database:/docker-entrypoint-initdb.d
+    
