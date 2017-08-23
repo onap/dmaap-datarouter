@@ -45,8 +45,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.junit.After;
 import org.junit.Before;
-
-import com.att.research.datarouter.provisioning.FeedServlet;
+import org.onap.dmaap.datarouter.provisioning.FeedServlet;
 
 public class testBase {
 	/** The properties file to read the DB properties from */

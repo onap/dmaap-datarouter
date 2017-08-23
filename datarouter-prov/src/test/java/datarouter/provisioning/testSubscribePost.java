@@ -43,9 +43,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import com.att.research.datarouter.provisioning.FeedServlet;
-import com.att.research.datarouter.provisioning.SubscribeServlet;
+import org.onap.dmaap.datarouter.provisioning.FeedServlet;
+import org.onap.dmaap.datarouter.provisioning.SubscribeServlet;
 
 public class testSubscribePost extends testBase {
 	private int feednum = 0;
