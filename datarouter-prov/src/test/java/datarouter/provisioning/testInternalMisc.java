@@ -36,8 +36,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONTokener;
 import org.junit.Test;
-
-import com.att.research.datarouter.provisioning.FeedServlet;
+import org.onap.dmaap.datarouter.provisioning.FeedServlet;
 
 public class testInternalMisc extends testBase {
 	@Test

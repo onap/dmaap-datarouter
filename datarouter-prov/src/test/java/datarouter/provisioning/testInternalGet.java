@@ -37,9 +37,8 @@ import org.json.JSONTokener;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import com.att.research.datarouter.provisioning.FeedServlet;
-import com.att.research.datarouter.provisioning.beans.Parameters;
+import org.onap.dmaap.datarouter.provisioning.FeedServlet;
+import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 
 public class testInternalGet extends testBase {
 	@BeforeClass

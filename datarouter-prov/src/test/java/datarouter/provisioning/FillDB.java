@@ -44,8 +44,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import com.att.research.datarouter.provisioning.FeedServlet;
+import org.onap.dmaap.datarouter.provisioning.FeedServlet;
 
 public class FillDB {
 	public static void main(String[] args)

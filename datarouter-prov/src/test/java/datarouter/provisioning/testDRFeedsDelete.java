@@ -34,8 +34,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
-
-import com.att.research.datarouter.provisioning.FeedServlet;
+import org.onap.dmaap.datarouter.provisioning.FeedServlet;
 
 public class testDRFeedsDelete extends testBase {
 	@Test

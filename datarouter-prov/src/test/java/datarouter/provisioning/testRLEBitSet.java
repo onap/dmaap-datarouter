@@ -28,8 +28,7 @@ import static org.junit.Assert.fail;
 import java.util.Iterator;
 
 import org.junit.Test;
-
-import com.att.research.datarouter.provisioning.utils.RLEBitSet;
+import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
 
 public class testRLEBitSet {
 	@Test

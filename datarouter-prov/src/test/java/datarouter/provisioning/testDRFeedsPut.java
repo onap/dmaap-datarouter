@@ -34,8 +34,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
-
-import com.att.research.datarouter.provisioning.FeedServlet;
+import org.onap.dmaap.datarouter.provisioning.FeedServlet;
 
 public class testDRFeedsPut extends testBase {
 	@Test

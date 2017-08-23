@@ -1,0 +1,121 @@
+<!--
+  ============LICENSE_START==================================================
+  * org.onap.dmaap
+  * ===========================================================================
+  * Copyright © 2017 AT&T Intellectual Property. All rights reserved.
+  * ===========================================================================
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  * 
+   *      http://www.apache.org/licenses/LICENSE-2.0
+  * 
+   * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  * ============LICENSE_END====================================================
+  *
+  * ECOMP is a trademark and service mark of AT&T Intellectual Property.
+  *
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.onap.dmaap.datarouter</groupId>
+  <artifactId>parent</artifactId>
+  <name>datarouter</name>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <url>https://github.com/att/DMAAP_DATAROUTER</url>
+    <licenses>
+		<license>
+		<name>BSD License</name>
+		<url> </url>
+		</license>
+	</licenses>
+  
+  <parent>
+	<groupId>org.onap.oparent</groupId>
+	<artifactId>oparent</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+  </parent>
+	
+  <properties>
+  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<nexusproxy>https://nexus.onap.org</nexusproxy>
+		<snapshotNexusPath>/content/repositories/snapshots/</snapshotNexusPath>
+		<releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
+		<stagingNexusPath>/content/repositories/staging/</stagingNexusPath>
+		<sitePath>/content/sites/site/org/onap/datarouter/${project.artifactId}/${project.version}</sitePath>
+	</properties>
+	
+	
+  <modules>
+  <module>datarouter-prov</module>
+  <module>datarouter-node</module>
+  </modules>
+  
+  <build>
+  <plugins>
+  <plugin>
+		<groupId>org.sonatype.plugins</groupId>
+		<artifactId>nexus-staging-maven-plugin</artifactId>
+		<version>1.6.7</version>
+		<extensions>true</extensions>
+			<configuration>
+				<nexusUrl>${nexusproxy}</nexusUrl>
+				<stagingProfileId>176c31dfe190a</stagingProfileId>
+				<serverId>ecomp-staging</serverId>
+			</configuration>
+	</plugin>
+	</plugins>
+  </build>
+ <distributionManagement>
+		<repository>
+			<id>ecomp-releases</id>
+			<name>AAF Release Repository</name>
+			<url>${nexusproxy}${releaseNexusPath}</url>
+		</repository>
+		<snapshotRepository>
+			<id>ecomp-snapshots</id>
+			<name>AAF Snapshot Repository</name>
+			<url>${nexusproxy}${snapshotNexusPath}</url>
+		</snapshotRepository>
+		<site>
+			<id>ecomp-site</id>
+			<url>dav:${nexusproxy}${sitePath}</url>
+		</site>
+	</distributionManagement>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>onap-plugin-snapshots</id>
+            <url>https://nexus.onap.org/content/repositories/snapshots/</url>
+        </pluginRepository>
+    </pluginRepositories>
+	
+<repositories>
+		<repository>
+			<id>central</id>
+			<name>Maven 2 repository 2</name>
+			<url>http://repo2.maven.org/maven2/</url>
+		</repository>
+		<repository>
+            <id>onap-jar-snapshots</id>
+            <url>https://nexus.onap.org/content/repositories/snapshots</url>
+        </repository>
+		<repository>
+			<id>spring-repo</id>
+			<name>Spring repo</name>
+			<url>https://artifacts.alfresco.com/nexus/content/repositories/public/</url>
+		</repository>
+		<repository>
+			<id>repository.jboss.org-public</id>
+			<name>JBoss.org Maven repository</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public</url>
+		</repository>
+	</repositories>  
+</project>

@@ -21,14 +21,18 @@
   *
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-
-	<groupId>com.att.datarouter-node</groupId>
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	  <modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.onap.dmaap.datarouter</groupId>
+		<artifactId>parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+	
+ 
 	<artifactId>datarouter-node</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
-
 	<name>datarouter-node</name>
 	<url>https://github.com/att/DMAAP_DATAROUTER</url>
     <licenses>
@@ -44,9 +48,13 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<dockerLocation>${basedir}/target/</dockerLocation>
-		<docker.registry>hub.docker.com</docker.registry>
+		<nexusproxy>https://nexus.onap.org</nexusproxy>
+		<snapshotNexusPath>/content/repositories/snapshots/</snapshotNexusPath>
+		<releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
+		<stagingNexusPath>/content/repositories/staging/</stagingNexusPath>
+		<sitePath>/content/sites/site/${project.groupId}/${project.artifactId}/${project.version}</sitePath>
 	</properties>
-
+	
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -221,7 +229,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.att.research.datarouter.node.NodeMain</mainClass>
+							<mainClass>org.onap.datarouter.node.NodeMain</mainClass>
 
 						</manifest>
 					</archive>
@@ -243,7 +251,7 @@
 
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>com.att.research.datarouter.node.NodeMain</mainClass>
+							<mainClass>org.onap.datarouter.node.NodeMain</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -389,35 +397,7 @@
 			  </goals>
 			</execution>
 		      </executions>
-		    </plugin>
-	
-
-	<plugin>
-	    <groupId>org.apache.maven.plugins</groupId>
-	    <artifactId>maven-gpg-plugin</artifactId>
-	    <version>1.5</version>
-	    <executions>
-		<execution>
-		    <id>sign-artifacts</id>
-		    <phase>verify</phase>
-		    <goals>
-			<goal>sign</goal>
-		    </goals>
-		</execution>
-	    </executions>
-	  </plugin> 
-			
-		<plugin>
-			<groupId>org.sonatype.plugins</groupId>
-			<artifactId>nexus-staging-maven-plugin</artifactId>
-			<version>1.6.7</version>
-			<extensions>true</extensions>
-			<configuration>
-			<serverId>ossrhdme</serverId>
-			<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-			<autoReleaseAfterClose>true</autoReleaseAfterClose>
-			</configuration>
-		</plugin>
+		    </plugin>	
 			
 		<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -430,43 +410,53 @@
 				  </formats>
 				</configuration>
 			</plugin>
-				
-        <plugin>
-               <groupId>com.blackducksoftware.integration</groupId>
-               <artifactId>hub-maven-plugin</artifactId>
-               <version>1.0.4</version>
-                  <inherited>false</inherited>
-               <configuration>
-                  <target>${project.basedir}</target>
-               </configuration>
-              <executions>
-              <execution>
-                 <id>create-bdio-file</id>
-                 <phase>package</phase>
-              <goals>
-               <goal>createHubOutput</goal>
-              </goals>
-             </execution>
-            </executions>
-        </plugin>
+
 		</plugins>
 	</build>
-	
-	<distributionManagement>
-    		<snapshotRepository>
-      			<id>ossrhdme</id>
-      			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    		</snapshotRepository>
-    		<repository>
-      			<id>ossrhdme</id>
-      			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    		</repository>
+<distributionManagement>
+		<repository>
+			<id>ecomp-releases</id>
+			<name>AAF Release Repository</name>
+			<url>${nexusproxy}${releaseNexusPath}</url>
+		</repository>
+		<snapshotRepository>
+			<id>ecomp-snapshots</id>
+			<name>AAF Snapshot Repository</name>
+			<url>${nexusproxy}${snapshotNexusPath}</url>
+		</snapshotRepository>
+		<site>
+			<id>ecomp-site</id>
+			<url>dav:${nexusproxy}${sitePath}</url>
+		</site>
 	</distributionManagement>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>onap-plugin-snapshots</id>
+            <url>https://nexus.onap.org/content/repositories/snapshots/</url>
+        </pluginRepository>
+    </pluginRepositories>
+	<repositories>
+		<repository>
+			<id>central</id>
+			<name>Maven 2 repository 2</name>
+			<url>http://repo2.maven.org/maven2/</url>
+		</repository>
+		<repository>
+            <id>onap-jar-snapshots</id>
+            <url>https://nexus.onap.org/content/repositories/snapshots</url>
+        </repository>
+		<repository>
+			<id>spring-repo</id>
+			<name>Spring repo</name>
+			<url>https://artifacts.alfresco.com/nexus/content/repositories/public/</url>
+		</repository>
+		<repository>
+			<id>repository.jboss.org-public</id>
+			<name>JBoss.org Maven repository</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public</url>
+		</repository>
+	</repositories>
 	
-	<scm>
-		<connection>https://github.com/att/DMAAP_DATAROUTER.git</connection>
-		<developerConnection>${project.scm.connection}</developerConnection>
-		<url>https://github.com/att/DMAAP_DATAROUTER/tree/master</url>
-	</scm>
+
 	
 </project>
