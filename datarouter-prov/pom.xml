@@ -335,7 +335,7 @@
 				<artifactId>docker-maven-plugin</artifactId>
 				<version>0.4.11</version>
 				<configuration>
-					<imageName>datarouter-prov</imageName>
+					<imageName>onap/dmaap/datarouter-prov</imageName>
 					<dockerDirectory>${dockerLocation}</dockerDirectory>
 					<serverId>docker-hub</serverId>
 					<registryUrl>https://${docker.registry}</registryUrl>
