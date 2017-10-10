@@ -29,12 +29,7 @@
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <url>https://github.com/att/DMAAP_DATAROUTER</url>
-    <licenses>
-		<license>
-		<name>BSD License</name>
-		<url> </url>
-		</license>
-	</licenses>
+ 
   
   <parent>
 	<groupId>org.onap.oparent</groupId>
