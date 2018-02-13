@@ -43,6 +43,14 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<dockerLocation>${basedir}/target/</dockerLocation>
+		<sonar.language>java</sonar.language>
+			<sonar.skip>false</sonar.skip>
+		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+		<sonar.surefire.reportsPath>${project.build.directory}/surefire-reports</sonar.surefire.reportsPath>
+		<sonar.jacoco.reportPath>${project.build.directory}/coverage-reports/jacoco.exec</sonar.jacoco.reportPath>
+		<sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
+		<sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
+		<sonar.projectVersion>${project.version}</sonar.projectVersion>
 		<nexusproxy>https://nexus.onap.org</nexusproxy>
 		<snapshotNexusPath>/content/repositories/snapshots/</snapshotNexusPath>
 		<releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
@@ -405,18 +413,93 @@
 				  </formats>
 				</configuration>
 			</plugin>
+<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.7</version>
+				<extensions>true</extensions>
+				<configuration>
+					<nexusUrl>${nexusproxy}</nexusUrl>
+					<stagingProfileId>176c31dfe190a</stagingProfileId>
+					<serverId>ecomp-staging</serverId>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${jacoco.version}</version>
+          <configuration>
+            <excludes>
+              <exclude>**/gen/**</exclude>
+              <exclude>**/generated-sources/**</exclude>
+              <exclude>**/yang-gen/**</exclude>
+              <exclude>**/pax/**</exclude>
+            </excludes>
+          </configuration>
+          <executions>
 
+            <execution>
+              <id>pre-unit-test</id>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+              <configuration>
+                <destFile>${project.build.directory}/code-coverage/jacoco-ut.exec</destFile>
+                <propertyName>surefireArgLine</propertyName>
+              </configuration>
+            </execution>
+            
+       
+            <execution>
+              <id>post-unit-test</id>
+              <phase>test</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+              <configuration>
+                <dataFile>${project.build.directory}/code-coverage/jacoco-ut.exec</dataFile>
+                <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+              </configuration>
+            </execution>
+            <execution>
+              <id>pre-integration-test</id>
+              <phase>pre-integration-test</phase>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+              <configuration>
+                <destFile>${project.build.directory}/code-coverage/jacoco-it.exec</destFile>
+
+                <propertyName>failsafeArgLine</propertyName>
+              </configuration>
+            </execution>
+
+       
+            <execution>
+              <id>post-integration-test</id>
+              <phase>post-integration-test</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+              <configuration>
+                <dataFile>${project.build.directory}/code-coverage/jacoco-it.exec</dataFile>
+                <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
 		</plugins>
 	</build>
 <distributionManagement>
 		<repository>
 			<id>ecomp-releases</id>
-			<name>AAF Release Repository</name>
+			<name>DR Release Repository</name>
 			<url>${nexusproxy}${releaseNexusPath}</url>
 		</repository>
 		<snapshotRepository>
 			<id>ecomp-snapshots</id>
-			<name>AAF Snapshot Repository</name>
+			<name>DR Snapshot Repository</name>
 			<url>${nexusproxy}${snapshotNexusPath}</url>
 		</snapshotRepository>
 		<site>
@@ -430,27 +513,6 @@
             <url>https://nexus.onap.org/content/repositories/snapshots/</url>
         </pluginRepository>
     </pluginRepositories>
-	<repositories>
-		<repository>
-			<id>central</id>
-			<name>Maven 2 repository 2</name>
-			<url>http://repo2.maven.org/maven2/</url>
-		</repository>
-		<repository>
-            <id>onap-jar-snapshots</id>
-            <url>https://nexus.onap.org/content/repositories/snapshots</url>
-        </repository>
-		<repository>
-			<id>spring-repo</id>
-			<name>Spring repo</name>
-			<url>https://artifacts.alfresco.com/nexus/content/repositories/public/</url>
-		</repository>
-		<repository>
-			<id>repository.jboss.org-public</id>
-			<name>JBoss.org Maven repository</name>
-			<url>https://repository.jboss.org/nexus/content/groups/public</url>
-		</repository>
-	</repositories>
 	
 
 	
