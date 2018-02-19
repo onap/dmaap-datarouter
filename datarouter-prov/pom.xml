@@ -54,8 +54,7 @@
 		<stagingNexusPath>/content/repositories/staging/</stagingNexusPath>
 		<sitePath>/content/sites/site/${project.groupId}/${project.artifactId}/${project.version}</sitePath>
 	</properties>
-	<dependencies>
-		
+	 <dependencies>
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>

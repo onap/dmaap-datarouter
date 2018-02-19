@@ -40,9 +40,9 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
-import org.json.LOGJSONObject;
 import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
 
 /**
  * This Servlet handles requests to the &lt;Statistics API&gt; and  &lt;Statistics consilidated resultset&gt;,

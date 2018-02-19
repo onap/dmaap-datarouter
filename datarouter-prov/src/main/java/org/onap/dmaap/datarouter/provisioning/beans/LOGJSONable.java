@@ -24,7 +24,7 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
-import org.json.LOGJSONObject;
+import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
 
 /**
  * An object that can be represented as a {@link JSONObject}.
