@@ -39,7 +39,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.LOGJSONObject;
 import org.onap.dmaap.datarouter.provisioning.beans.DeliveryRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.ExpiryRecord;
@@ -48,6 +47,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.PublishRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.eelf.EelfMsgs;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;

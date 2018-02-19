@@ -30,7 +30,8 @@ import java.sql.Types;
 import java.text.ParseException;
 import java.util.LinkedHashMap;
 
-import org.json.LOGJSONObject;
+import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
+
 
 /**
  * The representation of a Publish Record, as retrieved from the DB.
