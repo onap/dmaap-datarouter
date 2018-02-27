@@ -26,7 +26,7 @@
   <groupId>org.onap.dmaap.datarouter</groupId>
   <artifactId>parent</artifactId>
   <name>dmaap-datarouter</name>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <url>https://github.com/att/DMAAP_DATAROUTER</url>
  
@@ -34,7 +34,7 @@
   <parent>
 	<groupId>org.onap.oparent</groupId>
 	<artifactId>oparent</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>0.1.1</version>
   </parent>
 	
   <properties>
