@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a93c517_87cd0e89",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/reports/VolumeReportTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 3433
+      },
+      "writtenOn": "2018-03-26T08:17:47Z",
+      "side": 1,
+      "message": "What is the value for such tests?\nIf NullPointerException is thrown then it\u0027s mean that this is error situation, not desirable",
+      "range": {
+        "startLine": 39,
+        "startChar": 44,
+        "endLine": 39,
+        "endChar": 45
+      },
+      "revId": "0c1bbfc699bb414c09de7186c2c1d8e06e5bafb6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
