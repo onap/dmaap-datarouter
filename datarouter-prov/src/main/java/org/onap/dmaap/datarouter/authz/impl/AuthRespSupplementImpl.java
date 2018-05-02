@@ -46,7 +46,7 @@ public class AuthRespSupplementImpl implements AuthorizationResponseSupplement {
 	 */
 	AuthRespSupplementImpl (String id, Map<String, String> attributes) {
 		this.id = id;
-		this.attributes = new HashMap<String,String>(attributes);
+		this.attributes = new HashMap<>(attributes);
 	}
 
 	/** Return the identifier for the supplementary information element.
