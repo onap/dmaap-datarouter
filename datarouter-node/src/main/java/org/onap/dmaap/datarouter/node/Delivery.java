@@ -229,6 +229,7 @@ public class Delivery {
 				try {
 					wait(nextcheck + 500 - now);
 				} catch (Exception e) {
+					logger.error("Exception Occur :" + e);
 				}
 				now = System.currentTimeMillis();
 			}
