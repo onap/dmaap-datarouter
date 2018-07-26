@@ -30,7 +30,7 @@ import java.util.TimerTask;
 
 /**
  * This class provides a {@link TimerTask} that purges old logfiles
- * (older than the number of days specified by the com.att.research.datarouter.provserver.logretention property).
+ * (older than the number of days specified by the org.onap.dmaap.datarouter.provserver.logretention property).
  * @author Robert Eby
  * @version $Id: PurgeLogDirTask.java,v 1.2 2013/07/05 13:48:05 eby Exp $
  */
@@ -42,8 +42,8 @@ public class PurgeLogDirTask extends TimerTask {
 
 	public PurgeLogDirTask() {
 		Properties p = (new DB()).getProperties();
-		logdir   = p.getProperty("com.att.research.datarouter.provserver.accesslog.dir");
-		String s = p.getProperty("com.att.research.datarouter.provserver.logretention", "30");
+		logdir   = p.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
+		String s = p.getProperty("org.onap.dmaap.datarouter.provserver.logretention", "30");
 		long n = 30;
 		try {
 			n = Long.parseLong(s);

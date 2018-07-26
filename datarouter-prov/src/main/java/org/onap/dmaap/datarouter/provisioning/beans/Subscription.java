@@ -213,7 +213,7 @@ public class Subscription extends Syncable {
 			
 			//Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
 			Properties p = (new DB()).getProperties();
-			if(p.get("com.att.research.datarouter.provserver.https.relaxation").toString().equals("false") && !jo.has("sync")) {
+			if(p.get("org.onap.dmaap.datarouter.provserver.https.relaxation").toString().equals("false") && !jo.has("sync")) {
 				if (!url.startsWith("https://"))
 					throw new InvalidObjectException("delivery URL is not HTTPS");
 			}

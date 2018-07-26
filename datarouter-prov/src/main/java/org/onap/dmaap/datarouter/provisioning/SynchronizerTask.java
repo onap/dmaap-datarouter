@@ -130,7 +130,7 @@ public class SynchronizerTask extends TimerTask {
 	private SynchronizerTask() {
 		logger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
 		rolex = new Timer();
-		spooldir = (new DB()).getProperties().getProperty("com.att.research.datarouter.provserver.spooldir");
+		spooldir = (new DB()).getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
 		state = UNKNOWN;
 		doFetch = true;		// start off with a fetch
 		nextsynctime = 0;
@@ -172,7 +172,7 @@ public class SynchronizerTask extends TimerTask {
 			// Run once every 5 seconds to check DNS, etc.
 			long interval = 0;
 			try {
-				String s = props.getProperty("com.att.research.datarouter.provserver.sync_interval", "5000");
+				String s = props.getProperty("org.onap.dmaap.datarouter.provserver.sync_interval", "5000");
 				interval = Long.parseLong(s);
 			} catch (NumberFormatException e) {
 				interval = 5000L;

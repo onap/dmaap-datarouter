@@ -20,10 +20,10 @@
 # * ECOMP is a trademark and service mark of AT&T Intellectual Property.
 # *
 #-------------------------------------------------------------------------------
-version: '2'
+version: '2.1'
 services: 
   datarouter-prov:
-    image: attos/datarouter-prov
+    image: onap/dmaap/datarouter-prov
     container_name: datarouter-prov
     hostname: prov.datarouternew.com
     ports:
@@ -36,13 +36,13 @@ services:
 #      - ./prov_data/addFeed3.txt:/opt/app/datartr/addFeed3.txt
     entrypoint: ["bash", "-c", "sleep 10; /bin/sh -c ./startup.sh"]
     depends_on:
-      - mysql_container
+      mysql_container:
+        condition: service_healthy
     extra_hosts:
       - "node.datarouternew.com:172.18.0.4"
-
     
   datarouter-node:
-    image: attos/datarouter-node
+    image: onap/dmaap/datarouter-node
     container_name: datarouter-node
     hostname: node.datarouternew.com
     ports:
@@ -60,10 +60,10 @@ services:
     image: mysql/mysql-server:5.6
     container_name: mysql
     ports:
-     - "3306:3306"
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: att2017
     volumes:
-    - ./database:/tmp/database
-    - ./database:/docker-entrypoint-initdb.d
+      - ./database:/tmp/database
+      - ./database:/docker-entrypoint-initdb.d
     

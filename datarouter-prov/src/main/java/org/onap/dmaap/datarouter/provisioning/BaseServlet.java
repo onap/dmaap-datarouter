@@ -484,11 +484,11 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
 	private void checkHttpsRelaxation() {
 		if(mailSendFlag == false) {
 			Properties p = (new DB()).getProperties();
-			intlogger.info("HTTPS relaxatio: "+p.get("com.att.research.datarouter.provserver.https.relaxation"));
+			intlogger.info("HTTPS relaxatio: "+p.get("org.onap.dmaap.datarouter.provserver.https.relaxation"));
 			
-			if(p.get("com.att.research.datarouter.provserver.https.relaxation").equals("true")) {
+			if(p.get("org.onap.dmaap.datarouter.provserver.https.relaxation").equals("true")) {
 			    try {
-			    	  notifyPSTeam(p.get("com.att.research.datarouter.provserver.https.relax.notify").toString());
+			    	  notifyPSTeam(p.get("org.onap.dmaap.datarouter.provserver.https.relax.notify").toString());
 			    } 
 				catch (Exception e) {
 				    e.printStackTrace();
