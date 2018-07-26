@@ -1,3 +1,4 @@
+#!/bin/bash
 LIB=/opt/app/datartr/lib
 ETC=/opt/app/datartr/etc
 echo "this is LIB" $LIB
@@ -8,7 +9,7 @@ CLASSPATH=$ETC
 for FILE in `find $LIB -name *.jar`; do
   CLASSPATH=$CLASSPATH:$FILE
 done
-java -classpath $CLASSPATH  com.att.research.datarouter.provisioning.Main
+java -classpath $CLASSPATH  org.onap.dmaap.datarouter.provisioning.Main
 
 runner_file="$LIB/datarouter-prov-jar-with-dependencies.jar"
 echo "Starting using" $runner_file

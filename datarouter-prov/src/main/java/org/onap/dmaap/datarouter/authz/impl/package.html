@@ -2,7 +2,7 @@
 # ============LICENSE_START==================================================
 # * org.onap.dmaap
 # * ===========================================================================
-# * Copyright © 2017 AT&T Intellectual Property. All rights reserved.
+# * Copyright ï¿½ 2017 AT&T Intellectual Property. All rights reserved.
 # * ===========================================================================
 # * Licensed under the Apache License, Version 2.0 (the "License");
 # * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 <body>
 <p>
 This package provides an implementation of the authorization-related interfaces 
-defined by the <code>com.att.research.datarouter.authz</code> package, intended for
+defined by the <code>org.onap.dmaap.datarouter.authz</code> package, intended for
 use with the provisioning server for Data Router Release 1.   In DR R1, we do not
 have an external policy engine, so this implementation performs the authorization
 locally.
@@ -35,7 +35,7 @@ locally.
 <p>
 In order to perform the authorization, this package needs access to provisioning data 
 about feeds and subscriptions.  This package defines an interface
-(<code>com.att.research.datarouter.authz.impl.ProvDataProvider</code>) through which it
+(<code>org.onap.dmaap.datarouter.authz.impl.ProvDataProvider</code>) through which it
 expects to get this data.   The provisioning server code must provide an implementation
 of this interface.
 </p>
@@ -43,14 +43,14 @@ of this interface.
 A software component that wishes to use this implementation must:
 <ul>
 <li>Provide an implementation of the 
-<code>com.att.research.datarouter.authz.impl.ProvDataProvider</code>
+<code>org.onap.dmaap.datarouter.authz.impl.ProvDataProvider</code>
 interface.
 </li>
 <li>
 Create an instance of the <code>ProvDataProvider</code> implementation.
 <li>
 Create an instance of the
-<code>com.att.research.datarouter.authz.impl.ProvAuthorizer</code>
+<code>org.onap.dmaap.datarouter.authz.impl.ProvAuthorizer</code>
 class defined in this package, passing it an instance of the <code>ProvDataProvider</code>
 implementation.
 </li>

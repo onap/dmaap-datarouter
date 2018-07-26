@@ -1,24 +1,32 @@
 cat <<!EOF
+# ============LICENSE_START=======================================================
+# org.onap.dmaap
+# ================================================================================
+# Copyright © 2018 AT&T Intellectual Property. All rights reserved.
+# ================================================================================
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#                        AT&T - PROPRIETARY
-#          THIS FILE CONTAINS PROPRIETARY INFORMATION OF
-#        AT&T AND IS NOT TO BE DISCLOSED OR USED EXCEPT IN
-#             ACCORDANCE WITH APPLICABLE AGREEMENTS.
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
-#          Copyright (c) 2013 AT&T Knowledge Ventures
-#              Unpublished and Not for Publication
-#                     All Rights Reserved
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============LICENSE_END=========================================================
 #
-# CVS: $Id: log4j.properties.tmpl,v 1.4 2014/01/13 19:44:57 eby Exp $
-#
+# ECOMP is a trademark and service mark of AT&T Intellectual Property.
+
 
 log4j.rootLogger=info
 
 #
 # Logger used for provisioning events
 #
-log4j.logger.com.att.research.datarouter.provisioning.events=info, eventlog
-log4j.additivity.com.att.research.datarouter.provisioning.events=false
+log4j.logger.org.onap.dmaap.datarouter.provisioning.events=info, eventlog
+log4j.additivity.org.onap.dmaap.datarouter.provisioning.events=false
 
 log4j.appender.eventlog=org.apache.log4j.DailyRollingFileAppender
 log4j.appender.eventlog.file=${DRTR_PROV_LOGS:-/opt/app/datartr/logs}/provevent.log
@@ -30,8 +38,8 @@ log4j.appender.eventlog.layout.ConversionPattern=%d %-5p [%t] - %m%n
 #
 # Logger used for internal provisioning server events
 #
-log4j.logger.com.att.research.datarouter.provisioning.internal=debug, intlog
-log4j.additivity.com.att.research.datarouter.provisioning.internal=false
+log4j.logger.org.onap.dmaap.datarouter.provisioning.internal=debug, intlog
+log4j.additivity.org.onap.dmaap.datarouter.provisioning.internal=false
 
 log4j.appender.intlog=org.apache.log4j.DailyRollingFileAppender
 log4j.appender.intlog.file=${DRTR_PROV_LOGS:-/opt/app/datartr/logs}/provint.log
@@ -43,8 +51,8 @@ log4j.appender.intlog.layout.ConversionPattern=%d %-5p [%t] - %m%n
 #
 # Logger used for policy engine
 #
-log4j.logger.com.att.research.datarouter.authz.impl.ProvAuthorizer=debug, pelog
-log4j.additivity.com.att.research.datarouter.authz.impl.ProvAuthorizer=false
+log4j.logger.org.onap.dmaap.datarouter.authz.impl.ProvAuthorizer=debug, pelog
+log4j.additivity.org.onap.dmaap.datarouter.authz.impl.ProvAuthorizer=false
 
 log4j.appender.pelog=org.apache.log4j.DailyRollingFileAppender
 log4j.appender.pelog.file=${DRTR_PROV_LOGS:-/opt/app/datartr/logs}/policyengine.log

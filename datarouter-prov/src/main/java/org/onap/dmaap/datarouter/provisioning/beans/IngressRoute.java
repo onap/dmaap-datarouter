@@ -302,7 +302,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
 
 	/**
 	 *	Compare IP addresses as byte arrays to a subnet specified as a CIDR.
-	 *  Taken from com.att.research.datarouter.node.SubnetMatcher and modified somewhat.
+	 *  Taken from org.onap.dmaap.datarouter.node.SubnetMatcher and modified somewhat.
 	 */
 	public class SubnetMatcher {
 		private byte[]	sn;

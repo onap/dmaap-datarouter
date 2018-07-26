@@ -107,7 +107,7 @@ public class LogfileLoader extends Thread {
 	private LogfileLoader() {
 		this.logger   = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
 		this.db       = new DB();
-		this.spooldir = db.getProperties().getProperty("com.att.research.datarouter.provserver.spooldir");
+		this.spooldir = db.getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
 		this.set_start = getIdRange();
 		this.set_end   = set_start + SET_SIZE - 1;
 		this.seq_set  = new RLEBitSet();

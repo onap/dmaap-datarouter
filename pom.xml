@@ -20,161 +20,145 @@
   * ECOMP is a trademark and service mark of AT&T Intellectual Property.
   *
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.onap.dmaap.datarouter</groupId>
-  <artifactId>parent</artifactId>
-  <name>dmaap-datarouter</name>
-  <version>1.0.1-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <url>https://github.com/att/DMAAP_DATAROUTER</url>
- 
-  
-  <parent>
-	<groupId>org.onap.oparent</groupId>
-	<artifactId>oparent</artifactId>
-	<version>0.1.1</version>
-  </parent>
-	
-  <properties>
-  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<sonar.language>java</sonar.language>
-			<sonar.skip>false</sonar.skip>
-		<sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-		<sonar.surefire.reportsPath>${project.build.directory}/surefire-reports</sonar.surefire.reportsPath>
-		<sonar.jacoco.reportPath>${project.build.directory}/coverage-reports/jacoco.exec</sonar.jacoco.reportPath>
-		<sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
-		<sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
-		<sonar.projectVersion>${project.version}</sonar.projectVersion>
-		<nexusproxy>https://nexus.onap.org</nexusproxy>
-		<snapshotNexusPath>/content/repositories/snapshots/</snapshotNexusPath>
-		<releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
-		<stagingNexusPath>/content/repositories/staging/</stagingNexusPath>
-		<sitePath>/content/sites/site/org/onap/datarouter/${project.artifactId}/${project.version}</sitePath>
-	</properties>
-	
-	
-  <modules>
-  <module>datarouter-prov</module>
-  <module>datarouter-node</module>
-  </modules>
-  
-  <build>
-  <plugins>
-  <plugin>
-		<groupId>org.sonatype.plugins</groupId>
-		<artifactId>nexus-staging-maven-plugin</artifactId>
-		<version>1.6.7</version>
-		<extensions>true</extensions>
-			<configuration>
-				<nexusUrl>${nexusproxy}</nexusUrl>
-				<stagingProfileId>176c31dfe190a</stagingProfileId>
-				<serverId>ecomp-staging</serverId>
-			</configuration>
-	</plugin>
-	
-	<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.7</version>
-				<extensions>true</extensions>
-				<configuration>
-					<nexusUrl>${nexusproxy}</nexusUrl>
-					<stagingProfileId>176c31dfe190a</stagingProfileId>
-					<serverId>ecomp-staging</serverId>
-				</configuration>
-			</plugin>
-			
-			<plugin>
-          <groupId>org.jacoco</groupId>
-          <artifactId>jacoco-maven-plugin</artifactId>
-          <version>${jacoco.version}</version>
-          <configuration>
-            <excludes>
-              <exclude>**/gen/**</exclude>
-              <exclude>**/generated-sources/**</exclude>
-              <exclude>**/yang-gen/**</exclude>
-              <exclude>**/pax/**</exclude>
-            </excludes>
-          </configuration>
-          <executions>
-
-            <execution>
-              <id>pre-unit-test</id>
-              <goals>
-                <goal>prepare-agent</goal>
-              </goals>
-              <configuration>
-                <destFile>${project.build.directory}/code-coverage/jacoco-ut.exec</destFile>
-                <propertyName>surefireArgLine</propertyName>
-              </configuration>
-            </execution>
-            
-       
-            <execution>
-              <id>post-unit-test</id>
-              <phase>test</phase>
-              <goals>
-                <goal>report</goal>
-              </goals>
-              <configuration>
-                <dataFile>${project.build.directory}/code-coverage/jacoco-ut.exec</dataFile>
-                <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
-              </configuration>
-            </execution>
-            <execution>
-              <id>pre-integration-test</id>
-              <phase>pre-integration-test</phase>
-              <goals>
-                <goal>prepare-agent</goal>
-              </goals>
-              <configuration>
-                <destFile>${project.build.directory}/code-coverage/jacoco-it.exec</destFile>
-
-                <propertyName>failsafeArgLine</propertyName>
-              </configuration>
-            </execution>
-
-       
-            <execution>
-              <id>post-integration-test</id>
-              <phase>post-integration-test</phase>
-              <goals>
-                <goal>report</goal>
-              </goals>
-              <configuration>
-                <dataFile>${project.build.directory}/code-coverage/jacoco-it.exec</dataFile>
-                <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-	</plugins>
-  </build>
- <distributionManagement>
-		<repository>
-			<id>ecomp-releases</id>
-			<name>DR Release Repository</name>
-			<url>${nexusproxy}${releaseNexusPath}</url>
-		</repository>
-		<snapshotRepository>
-			<id>ecomp-snapshots</id>
-			<name>DR Snapshot Repository</name>
-			<url>${nexusproxy}${snapshotNexusPath}</url>
-		</snapshotRepository>
-		<site>
-			<id>ecomp-site</id>
-			<url>dav:${nexusproxy}${sitePath}</url>
-		</site>
-	</distributionManagement>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.onap.dmaap.datarouter</groupId>
+    <artifactId>parent</artifactId>
+    <name>dmaap-datarouter</name>
+    <version>1.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <url>https://github.com/att/DMAAP_DATAROUTER</url>
+    <parent>
+        <groupId>org.onap.oparent</groupId>
+        <artifactId>oparent</artifactId>
+        <version>0.1.1</version>
+    </parent>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <sonar.language>java</sonar.language>
+        <sonar.skip>false</sonar.skip>
+        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+        <sonar.surefire.reportsPath>${project.build.directory}/surefire-reports</sonar.surefire.reportsPath>
+        <sonar.jacoco.reportPath>${project.build.directory}/coverage-reports/jacoco.exec</sonar.jacoco.reportPath>
+        <sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
+        <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
+        <sonar.projectVersion>${project.version}</sonar.projectVersion>
+        <nexusproxy>https://nexus.onap.org</nexusproxy>
+        <snapshotNexusPath>/content/repositories/snapshots/</snapshotNexusPath>
+        <releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
+        <stagingNexusPath>/content/repositories/staging/</stagingNexusPath>
+        <sitePath>/content/sites/site/org/onap/datarouter/${project.artifactId}/${project.version}</sitePath>
+    </properties>
+    <modules>
+        <module>datarouter-prov</module>
+        <module>datarouter-node</module>
+    </modules>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <nexusUrl>${nexusproxy}</nexusUrl>
+                    <stagingProfileId>176c31dfe190a</stagingProfileId>
+                    <serverId>ecomp-staging</serverId>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <nexusUrl>${nexusproxy}</nexusUrl>
+                    <stagingProfileId>176c31dfe190a</stagingProfileId>
+                    <serverId>ecomp-staging</serverId>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/gen/**</exclude>
+                        <exclude>**/generated-sources/**</exclude>
+                        <exclude>**/yang-gen/**</exclude>
+                        <exclude>**/pax/**</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>pre-unit-test</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <destFile>${project.build.directory}/code-coverage/jacoco-ut.exec</destFile>
+                            <propertyName>surefireArgLine</propertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/code-coverage/jacoco-ut.exec</dataFile>
+                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pre-integration-test</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <destFile>${project.build.directory}/code-coverage/jacoco-it.exec</destFile>
+                            <propertyName>failsafeArgLine</propertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>post-integration-test</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/code-coverage/jacoco-it.exec</dataFile>
+                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <distributionManagement>
+        <repository>
+            <id>ecomp-releases</id>
+            <name>DR Release Repository</name>
+            <url>${nexusproxy}${releaseNexusPath}</url>
+        </repository>
+        <snapshotRepository>
+            <id>ecomp-snapshots</id>
+            <name>DR Snapshot Repository</name>
+            <url>${nexusproxy}${snapshotNexusPath}</url>
+        </snapshotRepository>
+        <site>
+            <id>ecomp-site</id>
+            <url>dav:${nexusproxy}${sitePath}</url>
+        </site>
+    </distributionManagement>
     <pluginRepositories>
         <pluginRepository>
             <id>onap-plugin-snapshots</id>
             <url>https://nexus.onap.org/content/repositories/snapshots/</url>
         </pluginRepository>
     </pluginRepositories>
-  
 </project>

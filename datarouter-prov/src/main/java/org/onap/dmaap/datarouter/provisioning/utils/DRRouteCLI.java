@@ -113,8 +113,8 @@ public class DRRouteCLI {
 		this.httpclient = new DefaultHttpClient();
 
 		Properties p = (new DB()).getProperties();
-		String truststore_file = p.getProperty("com.att.research.datarouter.provserver.truststore.path");
-		String truststore_pw   = p.getProperty("com.att.research.datarouter.provserver.truststore.password");
+		String truststore_file = p.getProperty("org.onap.dmaap.datarouter.provserver.truststore.path");
+		String truststore_pw   = p.getProperty("org.onap.dmaap.datarouter.provserver.truststore.password");
 
 		KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 		if (truststore_file == null || truststore_file.equals("")) {

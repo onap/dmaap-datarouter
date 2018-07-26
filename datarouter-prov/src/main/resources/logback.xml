@@ -301,7 +301,7 @@
    <appender name="jettylog"
     class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${logDirectory}/${jettyLogName}.log</file>
-	 <filter class="com.att.research.datarouter.provisioning.eelf.JettyFilter" />
+	 <filter class="org.onap.dmaap.datarouter.provisioning.eelf.JettyFilter" />
     <rollingPolicy
       class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
       <fileNamePattern>${logDirectory}/${jettyLogName}.%i.log.zip

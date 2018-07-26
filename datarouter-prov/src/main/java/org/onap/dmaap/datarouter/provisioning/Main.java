@@ -82,11 +82,11 @@ import org.onap.dmaap.datarouter.provisioning.utils.ThrottleFilter;
 public class Main {
 	/** The truststore to use if none is specified */
 	public static final String DEFAULT_TRUSTSTORE           = "/opt/java/jdk/jdk180/jre/lib/security/cacerts";
-	public static final String KEYSTORE_TYPE_PROPERTY       = "com.att.research.datarouter.provserver.keystore.type";
-	public static final String KEYSTORE_PATH_PROPERTY       = "com.att.research.datarouter.provserver.keystore.path";
-	public static final String KEYSTORE_PASSWORD_PROPERTY   = "com.att.research.datarouter.provserver.keystore.password";
-	public static final String TRUSTSTORE_PATH_PROPERTY     = "com.att.research.datarouter.provserver.truststore.path";
-	public static final String TRUSTSTORE_PASSWORD_PROPERTY = "com.att.research.datarouter.provserver.truststore.password";
+	public static final String KEYSTORE_TYPE_PROPERTY       = "org.onap.dmaap.datarouter.provserver.keystore.type";
+	public static final String KEYSTORE_PATH_PROPERTY       = "org.onap.dmaap.datarouter.provserver.keystore.path";
+	public static final String KEYSTORE_PASSWORD_PROPERTY   = "org.onap.dmaap.datarouter.provserver.keystore.password";
+	public static final String TRUSTSTORE_PATH_PROPERTY     = "org.onap.dmaap.datarouter.provserver.truststore.path";
+	public static final String TRUSTSTORE_PASSWORD_PROPERTY = "org.onap.dmaap.datarouter.provserver.truststore.password";
 
 	/** The one and only {@link Server} instance in this JVM */
 	private static Server server;
@@ -108,8 +108,8 @@ public class Main {
 
 		// Get properties
 		Properties p = (new DB()).getProperties();
-		int http_port  = Integer.parseInt(p.getProperty("com.att.research.datarouter.provserver.http.port", "8080"));
-		int https_port = Integer.parseInt(p.getProperty("com.att.research.datarouter.provserver.https.port", "8443"));
+		int http_port  = Integer.parseInt(p.getProperty("org.onap.dmaap.datarouter.provserver.http.port", "8080"));
+		int https_port = Integer.parseInt(p.getProperty("org.onap.dmaap.datarouter.provserver.https.port", "8443"));
 
 		// HTTP connector
 		SelectChannelConnector http = new SelectChannelConnector();
@@ -138,7 +138,7 @@ public class Main {
 		cf.setKeyStoreType(p.getProperty(KEYSTORE_TYPE_PROPERTY, "jks"));
 		cf.setKeyStorePath(p.getProperty(KEYSTORE_PATH_PROPERTY));
 		cf.setKeyStorePassword(p.getProperty(KEYSTORE_PASSWORD_PROPERTY));
-		cf.setKeyManagerPassword(p.getProperty("com.att.research.datarouter.provserver.keymanager.password"));
+		cf.setKeyManagerPassword(p.getProperty("org.onap.dmaap.datarouter.provserver.keymanager.password"));
 		String ts = p.getProperty(TRUSTSTORE_PATH_PROPERTY);
 		if (ts != null && ts.length() > 0) {
 			System.out.println("@@ TS -> "+ts);
@@ -173,7 +173,7 @@ public class Main {
 
 		// Request log configuration
 		NCSARequestLog nrl = new NCSARequestLog();
-		nrl.setFilename(p.getProperty("com.att.research.datarouter.provserver.accesslog.dir") + "/request.log.yyyy_mm_dd");
+		nrl.setFilename(p.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir") + "/request.log.yyyy_mm_dd");
 		nrl.setFilenameDateFormat("yyyyMMdd");
 		nrl.setRetainDays(90);
 		nrl.setAppend(true);
