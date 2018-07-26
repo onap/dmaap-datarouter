@@ -2,7 +2,7 @@
 # ============LICENSE_START==================================================
 # * org.onap.dmaap
 # * ===========================================================================
-# * Copyright © 2017 AT&T Intellectual Property. All rights reserved.
+# * Copyright ï¿½ 2017 AT&T Intellectual Property. All rights reserved.
 # * ===========================================================================
 # * Licensed under the Apache License, Version 2.0 (the "License");
 # * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ URLs are from the document <b>URLs for DR Release 1</b> <i>Version 1.2</i>.
 <tr>
 	<td class="colFirst" class="colOne">/</td>
 	<td class="colOne" class="colOne">&lt;drFeedsUrl&gt;</td>
-	<td class="colLast" class="colOne">{@link com.att.research.datarouter.provisioning.DRFeedsServlet}</td>
+	<td class="colLast" class="colOne">{@link org.onap.dmaap.datarouter.provisioning.DRFeedsServlet}</td>
 	<td class="colLast" class="colOne" style="background-color: pink">DELETE</td>
 	<td class="colLast" class="colOne" style="background-color: lightgreen">GET</td>
 	<td class="colLast" class="colOne" style="background-color: lightgreen">POST</td>
@@ -48,7 +48,7 @@ URLs are from the document <b>URLs for DR Release 1</b> <i>Version 1.2</i>.
 <tr class="altColor">
 	<td class="colFirst" class="colOne">/feed/feedid</td>
 	<td class="colOne" class="colOne">&lt;feedUrl&gt;</td>
-	<td class="colLast" class="colOne">{@link com.att.research.datarouter.provisioning.FeedServlet}</td>
+	<td class="colLast" class="colOne">{@link org.onap.dmaap.datarouter.provisioning.FeedServlet}</td>
 	<td class="colLast" style="background-color: lightgreen">DELETE</td>
 	<td class="colLast" style="background-color: lightgreen">GET</td>
 	<td class="colLast" style="background-color: pink">POST</td>
@@ -57,7 +57,7 @@ URLs are from the document <b>URLs for DR Release 1</b> <i>Version 1.2</i>.
 <tr>
 	<td class="colFirst">/publish/feedid</td>
 	<td class="colOne">&lt;publishUrl&gt;</td>
-	<td class="colLast">{@link com.att.research.datarouter.provisioning.PublishServlet}</td>
+	<td class="colLast">{@link org.onap.dmaap.datarouter.provisioning.PublishServlet}</td>
 	<td class="colLast" style="background-color: lightgreen">DELETE</td>
 	<td class="colLast" style="background-color: lightgreen">GET</td>
 	<td class="colLast" style="background-color: lightgreen">POST</td>
@@ -66,7 +66,7 @@ URLs are from the document <b>URLs for DR Release 1</b> <i>Version 1.2</i>.
 <tr class="altColor">
 	<td class="colFirst">/subscribe/feedid</td>
 	<td class="colOne">&lt;subscribeUrl&gt;</td>
-	<td class="colLast">{@link com.att.research.datarouter.provisioning.SubscribeServlet}</td>
+	<td class="colLast">{@link org.onap.dmaap.datarouter.provisioning.SubscribeServlet}</td>
 	<td class="colLast" style="background-color: pink">DELETE</td>
 	<td class="colLast" style="background-color: lightgreen">GET</td>
 	<td class="colLast" style="background-color: lightgreen">POST</td>
@@ -75,7 +75,7 @@ URLs are from the document <b>URLs for DR Release 1</b> <i>Version 1.2</i>.
 <tr>
 	<td class="colFirst">/feedlog/feedid</td>
 	<td class="colOne">&lt;feedLogUrl&gt;</td>
-	<td class="colLast">{@link com.att.research.datarouter.provisioning.FeedLogServlet}</td>
+	<td class="colLast">{@link org.onap.dmaap.datarouter.provisioning.FeedLogServlet}</td>
 	<td class="colLast" style="background-color: pink">DELETE</td>
 	<td class="colLast" style="background-color: lightgreen">GET</td>
 	<td class="colLast" style="background-color: pink">POST</td>
@@ -84,7 +84,7 @@ URLs are from the document <b>URLs for DR Release 1</b> <i>Version 1.2</i>.
 <tr class="altColor">
 	<td class="colFirst">/subs/subid</td>
 	<td class="colOne">&lt;subscriptionUrl&gt;</td>
-	<td class="colLast">{@link com.att.research.datarouter.provisioning.SubscriptionServlet}</td>
+	<td class="colLast">{@link org.onap.dmaap.datarouter.provisioning.SubscriptionServlet}</td>
 	<td class="colLast" style="background-color: lightgreen">DELETE</td>
 	<td class="colLast" style="background-color: lightgreen">GET</td>
 	<td class="colLast" style="background-color: lightgreen">POST</td>
@@ -93,7 +93,7 @@ URLs are from the document <b>URLs for DR Release 1</b> <i>Version 1.2</i>.
 <tr>
 	<td class="colFirst">/sublog/subid</td>
 	<td class="colOne">&lt;subLogUrl&gt;</td>
-	<td class="colLast">{@link com.att.research.datarouter.provisioning.SubLogServlet}</td>
+	<td class="colLast">{@link org.onap.dmaap.datarouter.provisioning.SubLogServlet}</td>
 	<td class="colLast" style="background-color: pink">DELETE</td>
 	<td class="colLast" style="background-color: lightgreen">GET</td>
 	<td class="colLast" style="background-color: pink">POST</td>
@@ -102,7 +102,7 @@ URLs are from the document <b>URLs for DR Release 1</b> <i>Version 1.2</i>.
 <tr class="altColor">
 	<td class="colFirst">/internal/*</td>
 	<td class="colOne">&lt;internalUrl&gt;</td>
-	<td class="colLast">{@link com.att.research.datarouter.provisioning.InternalServlet}</td>
+	<td class="colLast">{@link org.onap.dmaap.datarouter.provisioning.InternalServlet}</td>
 	<td class="colLast" style="background-color: lightgreen">DELETE</td>
 	<td class="colLast" style="background-color: lightgreen">GET</td>
 	<td class="colLast" style="background-color: lightgreen">POST</td>
@@ -111,7 +111,7 @@ URLs are from the document <b>URLs for DR Release 1</b> <i>Version 1.2</i>.
 <tr>
 	<td class="colFirst">/internal/route/*</td>
 	<td class="colOne">&lt;routeUrl&gt;</td>
-	<td class="colLast">{@link com.att.research.datarouter.provisioning.RouteServlet}</td>
+	<td class="colLast">{@link org.onap.dmaap.datarouter.provisioning.RouteServlet}</td>
 	<td class="colLast" style="background-color: lightgreen">DELETE</td>
 	<td class="colLast" style="background-color: lightgreen">GET</td>
 	<td class="colLast" style="background-color: lightgreen">POST</td>

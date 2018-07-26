@@ -177,7 +177,7 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
-			<version>4.2.2</version>
+			<version>4.4</version>
 		</dependency>
 
 		<dependency>
@@ -253,13 +253,6 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>org.onap.datarouter.node.NodeMain</mainClass>
-
-						</manifest>
-					</archive>
-
 					<source>1.8</source>
 					<target>1.8</target>
 				</configuration>

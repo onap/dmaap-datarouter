@@ -23,4 +23,4 @@ export CLASSPATH JAVA_HOME JAVA_OPTS TZ PATH
 
 $JAVA_HOME/bin/java \
 	-Dlog4j.configuration=file:///opt/app/datartr/etc/log4j.drroute.properties \
-	com.att.research.datarouter.provisioning.utils.DRRouteCLI $*
+	org.onap.dmaap.datarouter.provisioning.utils.DRRouteCLI $*

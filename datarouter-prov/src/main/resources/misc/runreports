@@ -18,7 +18,7 @@ umask 0022
 
 JAVA_HOME=/opt/java/jdk/jdk180
 JAVA_OPTS="-Xms1G -Xmx4G"
-JAVA_CLASS=com.att.research.datarouter.reports.Report
+JAVA_CLASS=org.onap.dmaap.datarouter.reports.Report
 TZ=GMT0
 PATH=$JAVA_HOME/bin:/bin:/usr/bin
 CLASSPATH=`echo /opt/app/datartr/etc /opt/app/datartr/lib/*.jar | tr ' ' ':'`

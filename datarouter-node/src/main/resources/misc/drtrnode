@@ -44,7 +44,7 @@ start() {
 	chmod 755 /opt/app/datartr/spool/s
 
 	rm -f /opt/app/datartr/etc/SHUTDOWN
-	nohup java com.att.research.datarouter.node.NodeMain </dev/null >/dev/null 2>&1 &
+	nohup java org.onap.dmaap.datarouter.node.NodeMain </dev/null >/dev/null 2>&1 &
 	sleep 5
 	PIDS=`pids`
 	if [ "$PIDS" = "" ]

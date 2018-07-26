@@ -83,12 +83,12 @@ public class DB {
 			InputStream inStream = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE);
 			try {
 				props.load(inStream);
-				DB_DRIVER   = (String) props.get("com.att.research.datarouter.db.driver");
-				DB_URL      = (String) props.get("com.att.research.datarouter.db.url");
-				DB_LOGIN    = (String) props.get("com.att.research.datarouter.db.login");
-				DB_PASSWORD = (String) props.get("com.att.research.datarouter.db.password");
-				HTTPS_PORT = (String) props.get("com.att.research.datarouter.provserver.https.port");
-				HTTP_PORT = (String) props.get("com.att.research.datarouter.provserver.http.port");
+				DB_DRIVER   = (String) props.get("org.onap.dmaap.datarouter.db.driver");
+				DB_URL      = (String) props.get("org.onap.dmaap.datarouter.db.url");
+				DB_LOGIN    = (String) props.get("org.onap.dmaap.datarouter.db.login");
+				DB_PASSWORD = (String) props.get("org.onap.dmaap.datarouter.db.password");
+				HTTPS_PORT = (String) props.get("org.onap.dmaap.datarouter.provserver.https.port");
+				HTTP_PORT = (String) props.get("org.onap.dmaap.datarouter.provserver.http.port");
 				Class.forName(DB_DRIVER);
 			} catch (IOException e) {
 				intlogger.fatal("PROV9003 Opening properties: "+e.getMessage());
@@ -671,13 +671,13 @@ public class DB {
 	}
 	/**
 	 * Initialize the tables by running the initialization scripts located in the directory specified
-	 * by the property <i>com.att.research.datarouter.provserver.dbscripts</i>.  Scripts have names of
+	 * by the property <i>org.onap.dmaap.datarouter.provserver.dbscripts</i>.  Scripts have names of
 	 * the form mysql_init_NNNN.
 	 * @param c a DB connection
 	 * @param n the number of the mysql_init_NNNN script to run
 	 */
 	private void runInitScript(Connection c, int n) {
-		String scriptdir = (String) props.get("com.att.research.datarouter.provserver.dbscripts");
+		String scriptdir = (String) props.get("org.onap.dmaap.datarouter.provserver.dbscripts");
 		StringBuilder sb = new StringBuilder();
 		try {
 			String scriptfile = String.format("%s/mysql_init_%04d", scriptdir, n);

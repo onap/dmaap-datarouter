@@ -17,8 +17,8 @@ log4j.rootLogger=info
 #
 # Logger used for provisioning events
 #
-log4j.logger.com.att.research.datarouter.provisioning.events=info, eventlog
-log4j.additivity.com.att.research.datarouter.provisioning.events=false
+log4j.logger.org.onap.dmaap.datarouter.provisioning.events=info, eventlog
+log4j.additivity.org.onap.dmaap.datarouter.provisioning.events=false
 
 log4j.appender.eventlog=org.apache.log4j.DailyRollingFileAppender
 log4j.appender.eventlog.file=${DRTR_PROV_LOGS:-/opt/app/datartr/logs}/provevent.log
@@ -30,8 +30,8 @@ log4j.appender.eventlog.layout.ConversionPattern=%d %-5p [%t] - %m%n
 #
 # Logger used for internal provisioning server events
 #
-log4j.logger.com.att.research.datarouter.provisioning.internal=debug, intlog
-log4j.additivity.com.att.research.datarouter.provisioning.internal=false
+log4j.logger.org.onap.dmaap.datarouter.provisioning.internal=debug, intlog
+log4j.additivity.org.onap.dmaap.datarouter.provisioning.internal=false
 
 log4j.appender.intlog=org.apache.log4j.DailyRollingFileAppender
 log4j.appender.intlog.file=${DRTR_PROV_LOGS:-/opt/app/datartr/logs}/provint.log
@@ -43,8 +43,8 @@ log4j.appender.intlog.layout.ConversionPattern=%d %-5p [%t] - %m%n
 #
 # Logger used for policy engine
 #
-log4j.logger.com.att.research.datarouter.authz.impl.ProvAuthorizer=debug, pelog
-log4j.additivity.com.att.research.datarouter.authz.impl.ProvAuthorizer=false
+log4j.logger.org.onap.dmaap.datarouter.authz.impl.ProvAuthorizer=debug, pelog
+log4j.additivity.org.onap.dmaap.datarouter.authz.impl.ProvAuthorizer=false
 
 log4j.appender.pelog=org.apache.log4j.DailyRollingFileAppender
 log4j.appender.pelog.file=${DRTR_PROV_LOGS:-/opt/app/datartr/logs}/policyengine.log

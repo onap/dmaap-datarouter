@@ -60,7 +60,7 @@ start() {
 		exit 0
 	fi
 	echo '0 1 * * * /opt/app/datartr/bin/runreports' | crontab
-	nohup java $JAVA_OPTS com.att.research.datarouter.provisioning.Main </dev/null &
+	nohup java $JAVA_OPTS org.onap.dmaap.datarouter.provisioning.Main </dev/null &
 	sleep 5
 	PIDS=`pids`
 	if [ "$PIDS" = "" ]

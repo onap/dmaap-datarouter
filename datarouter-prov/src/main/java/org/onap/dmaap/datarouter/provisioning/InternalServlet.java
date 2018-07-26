@@ -256,7 +256,7 @@ public class InternalServlet extends ProxyServlet {
 		}
 		if (path.startsWith("/logs/")) {
 			Properties p = (new DB()).getProperties();
-			String logdir = p.getProperty("com.att.research.datarouter.provserver.accesslog.dir");
+			String logdir = p.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
 			String logfile = path.substring(6);
 			if (logdir != null && logfile != null && logfile.indexOf('/') < 0) {
 				File log = new File(logdir + "/" + logfile);
@@ -399,7 +399,7 @@ public class InternalServlet extends ProxyServlet {
 				eventlogger.info(elr);
 				return;
 			}
-			String spooldir = (new DB()).getProperties().getProperty("com.att.research.datarouter.provserver.spooldir");
+			String spooldir = (new DB()).getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
 			String spoolname = String.format("%d-%d-", System.currentTimeMillis(), Thread.currentThread().getId());
 			synchronized (logseq) {
 				// perhaps unnecessary, but it helps make the name unique
@@ -487,7 +487,7 @@ public class InternalServlet extends ProxyServlet {
 	private JSONArray generateLogfileList() {
 		JSONArray ja = new JSONArray();
 		Properties p = (new DB()).getProperties();
-		String s = p.getProperty("com.att.research.datarouter.provserver.accesslog.dir");
+		String s = p.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
 		if (s != null) {
 			String[] dirs = s.split(",");
 			for (String dir : dirs) {
