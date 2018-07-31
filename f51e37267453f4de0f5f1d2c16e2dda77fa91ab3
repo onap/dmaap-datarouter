@@ -1,0 +1,188 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9a6a9dd7_6c823f54",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-07-31T15:46:52Z",
+      "side": 1,
+      "message": "These are listed under docker profile below also. Can they be removed from here?",
+      "range": {
+        "startLine": 54,
+        "startChar": 2,
+        "endLine": 55,
+        "endChar": 44
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_0c9383a4",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-07-31T15:46:52Z",
+      "side": 1,
+      "message": "Can you just replace instances of ${datarouter.node.image.version} with ${project.version} and remove this line?",
+      "range": {
+        "startLine": 57,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 83
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_2c41a70b",
+        "filename": "datarouter-prov/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-07-31T15:46:52Z",
+      "side": 1,
+      "message": "Maybe just move this line to line 55 so all docker-related entries are together.",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 74
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_6c379fb1",
+        "filename": "datarouter-prov/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-07-31T15:46:52Z",
+      "side": 1,
+      "message": "Remove from here if \u003cprofiles\u003e entry covers this.",
+      "range": {
+        "startLine": 55,
+        "startChar": 7,
+        "endLine": 56,
+        "endChar": 50
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_cc510bda",
+        "filename": "datarouter-prov/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-07-31T15:46:52Z",
+      "side": 1,
+      "message": "I think this line should be removed.",
+      "range": {
+        "startLine": 346,
+        "startChar": 0,
+        "endLine": 346,
+        "endChar": 73
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_6c055fc1",
+        "filename": "pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-07-31T15:46:52Z",
+      "side": 1,
+      "message": "I think this is not used and can be removed.",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 58
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_0c6f0394",
+        "filename": "pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-07-31T15:46:52Z",
+      "side": 1,
+      "message": "I think these are not used and can be removed.",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 49
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_ecf88fc6",
+        "filename": "pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-07-31T15:46:52Z",
+      "side": 1,
+      "message": "Not your code but this is a duplicate of the previous plugin snippet - be good to remove.",
+      "range": {
+        "startLine": 87,
+        "startChar": 11,
+        "endLine": 97,
+        "endChar": 21
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
