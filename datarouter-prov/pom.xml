@@ -33,24 +33,13 @@
     <name>datarouter-prov</name>
     <url>https://github.com/att/DMAAP_DATAROUTER</url>
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <docker.location>${basedir}/target/</docker.location>
         <sonar.language>java</sonar.language>
         <sonar.skip>false</sonar.skip>
-        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
-        <sonar.surefire.reportsPath>${project.build.directory}/surefire-reports</sonar.surefire.reportsPath>
-        <sonar.jacoco.reportPath>${project.build.directory}/coverage-reports/jacoco.exec</sonar.jacoco.reportPath>
-        <sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec
-        </sonar.jacoco.itReportPath>
         <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
-        <sonar.projectVersion>${project.version}</sonar.projectVersion>
-        <nexusproxy>https://nexus.onap.org</nexusproxy>
-        <snapshotNexusPath>/content/repositories/snapshots/</snapshotNexusPath>
-        <releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
-        <stagingNexusPath>/content/repositories/staging/</stagingNexusPath>
         <sitePath>/content/sites/site/${project.groupId}/${project.artifactId}/${project.version}</sitePath>
+
+        <docker.location>${basedir}/target/${artifactId}</docker.location>
+        <datarouter.prov.image.name>onap/dmaap/datarouter-prov</datarouter.prov.image.name>
     </properties>
     <dependencies>
         <dependency>
@@ -229,6 +218,18 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <properties>
+                <skip.docker.build>false</skip.docker.build>
+                <skip.docker.tag>false</skip.docker.tag>
+                <skip.docker.push>false</skip.docker.push>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <finalName>datarouter-prov</finalName>
         <resources>
@@ -299,22 +300,94 @@
                 </configuration>
                 <version>3.6.0</version>
             </plugin>
+
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.4.11</version>
+                <version>${docker.maven.plugin.version}</version>
                 <configuration>
-                    <imageName>onap/dmaap/datarouter-prov</imageName>
+                    <skipDockerBuild>false</skipDockerBuild>
+                    <imageName>${datarouter.prov.image.name}</imageName>
                     <dockerDirectory>${docker.location}</dockerDirectory>
                     <serverId>docker-hub</serverId>
-                    <registryUrl>https://${docker.registry}</registryUrl>
                     <imageTags>
                         <imageTag>${project.version}</imageTag>
                         <imageTag>latest</imageTag>
                     </imageTags>
                     <forceTags>true</forceTags>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${docker.location}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>**/**</include>
+                        </resource>
+                    </resources>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>build-image</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                        <configuration>
+                            <skipDockerBuild>${skip.docker.build}</skipDockerBuild>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>tag-image-project-version</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>tag</goal>
+                        </goals>
+                        <configuration>
+                            <image>${datarouter.prov.image.name}</image>
+                            <newName>${onap.nexus.dockerregistry.daily}/${datarouter.prov.image.name}:${project.version}</newName>
+                            <skipDockerTag>${skip.docker.push}</skipDockerTag>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>tag-image-latest</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>tag</goal>
+                        </goals>
+                        <configuration>
+                            <image>${datarouter.prov.image.name}</image>
+                            <newName>${onap.nexus.dockerregistry.daily}/${datarouter.prov.image.name}:latest</newName>
+                            <skipDockerTag>${skip.docker.push}</skipDockerTag>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>push-image-latest</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                        <configuration>
+                            <imageName>${onap.nexus.dockerregistry.daily}/${datarouter.prov.image.name}:${project.version}</imageName>
+                            <skipDockerPush>${skip.docker.push}</skipDockerPush>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>push-image</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                        <configuration>
+                            <imageName>${onap.nexus.dockerregistry.daily}/${datarouter.prov.image.name}:latest</imageName>
+                            <skipDockerPush>${skip.docker.push}</skipDockerPush>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
+
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.7</version>
@@ -473,6 +546,7 @@
                         <format>html</format>
                         <format>xml</format>
                     </formats>
+                    <check/>
                 </configuration>
             </plugin>
             <plugin>
@@ -481,7 +555,7 @@
                 <version>1.6.7</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <nexusUrl>${nexusproxy}</nexusUrl>
+                    <nexusUrl>${onap.nexus.dockerregistry.daily}</nexusUrl>
                     <stagingProfileId>176c31dfe190a</stagingProfileId>
                     <serverId>ecomp-staging</serverId>
                 </configuration>
@@ -550,22 +624,22 @@
         <repository>
             <id>ecomp-releases</id>
             <name>DR Release Repository</name>
-            <url>${nexusproxy}${releaseNexusPath}</url>
+            <url>${onap.nexus.url}${releaseNexusPath}</url>
         </repository>
         <snapshotRepository>
             <id>ecomp-snapshots</id>
             <name>DR Snapshot Repository</name>
-            <url>${nexusproxy}${snapshotNexusPath}</url>
+            <url>${onap.nexus.url}${snapshotNexusPath}</url>
         </snapshotRepository>
         <site>
             <id>ecomp-site</id>
-            <url>dav:${nexusproxy}${sitePath}</url>
+            <url>dav:${onap.nexus.url}${sitePath}</url>
         </site>
     </distributionManagement>
     <pluginRepositories>
         <pluginRepository>
             <id>onap-plugin-snapshots</id>
-            <url>https://nexus.onap.org/content/repositories/snapshots/</url>
+            <url>${onap.nexus.url}${snapshotNexusPath}</url>
         </pluginRepository>
     </pluginRepositories>
 </project>
