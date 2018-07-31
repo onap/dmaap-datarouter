@@ -31,7 +31,7 @@
     <parent>
         <groupId>org.onap.oparent</groupId>
         <artifactId>oparent</artifactId>
-        <version>0.1.1</version>
+        <version>1.1.0</version>
     </parent>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -50,6 +50,14 @@
         <releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
         <stagingNexusPath>/content/repositories/staging/</stagingNexusPath>
         <sitePath>/content/sites/site/org/onap/dmaap/datarouter/${project.artifactId}/${project.version}</sitePath>
+
+        <!-- docker image -->
+        <docker.image>onap/dmaap/datarouter</docker.image>
+        <docker.maven.plugin.version>1.0.0</docker.maven.plugin.version>
+        <nexusproxy>https://nexus.onap.org</nexusproxy>
+        <docker.push.registry>nexus3.onap.org:10003</docker.push.registry>
+        <skip.docker.build>true</skip.docker.build>
+        <skip.docker.push>true</skip.docker.push>
     </properties>
     <modules>
         <module>datarouter-prov</module>
@@ -57,6 +65,14 @@
     </modules>
     <build>
         <plugins>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>${docker.maven.plugin.version}</version>
+                <configuration>
+                    <skipDockerBuild>true</skipDockerBuild>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
