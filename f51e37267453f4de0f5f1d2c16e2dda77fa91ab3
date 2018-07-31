@@ -25,6 +25,29 @@
     },
     {
       "key": {
+        "uuid": "9a6a9dd7_cca90b7d",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-07-31T16:50:47Z",
+      "side": 1,
+      "message": "This is already defined in the top level parent. remove and use it instead",
+      "range": {
+        "startLine": 56,
+        "startChar": 2,
+        "endLine": 56,
+        "endChar": 58
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a6a9dd7_0c9383a4",
         "filename": "datarouter-node/pom.xml",
         "patchSetId": 1
@@ -41,6 +64,98 @@
         "startChar": 0,
         "endLine": 57,
         "endChar": 83
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_6cb6bfde",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-07-31T16:50:47Z",
+      "side": 1,
+      "message": "Move to parent pom",
+      "range": {
+        "startLine": 57,
+        "startChar": 2,
+        "endLine": 57,
+        "endChar": 83
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_8cbb13c4",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-07-31T16:50:47Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 352,
+        "startChar": 3,
+        "endLine": 367,
+        "endChar": 12
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_2cb0c7dc",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 439,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-07-31T16:50:47Z",
+      "side": 1,
+      "message": "replace:\nonap.nexus.dockerregistry.daily",
+      "range": {
+        "startLine": 439,
+        "startChar": 20,
+        "endLine": 439,
+        "endChar": 40
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_4cb5fbcb",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-07-31T16:50:47Z",
+      "side": 1,
+      "message": "as above\nonap.nexus.dockerregistry.daily",
+      "range": {
+        "startLine": 450,
+        "startChar": 20,
+        "endLine": 450,
+        "endChar": 40
       },
       "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
@@ -94,6 +209,52 @@
     },
     {
       "key": {
+        "uuid": "9a6a9dd7_0ca0638f",
+        "filename": "datarouter-prov/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-07-31T16:50:47Z",
+      "side": 1,
+      "message": "Move to the parent and ref in both children poms",
+      "range": {
+        "startLine": 58,
+        "startChar": 8,
+        "endLine": 58,
+        "endChar": 89
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_eca2cf99",
+        "filename": "datarouter-prov/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-07-31T16:50:47Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 320,
+        "startChar": 12,
+        "endLine": 335,
+        "endChar": 21
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a6a9dd7_cc510bda",
         "filename": "datarouter-prov/pom.xml",
         "patchSetId": 1
@@ -133,6 +294,52 @@
         "startChar": 0,
         "endLine": 55,
         "endChar": 58
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_ec7baf27",
+        "filename": "pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-07-31T16:50:47Z",
+      "side": 1,
+      "message": "Already defined. remove",
+      "range": {
+        "startLine": 57,
+        "startChar": 8,
+        "endLine": 57,
+        "endChar": 55
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9a6a9dd7_ccc02b2d",
+        "filename": "pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-07-31T16:50:47Z",
+      "side": 1,
+      "message": "Use top parent level pom entry",
+      "range": {
+        "startLine": 58,
+        "startChar": 8,
+        "endLine": 58,
+        "endChar": 74
       },
       "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
