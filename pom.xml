@@ -31,7 +31,7 @@
     <parent>
         <groupId>org.onap.oparent</groupId>
         <artifactId>oparent</artifactId>
-        <version>0.1.1</version>
+        <version>1.1.0</version>
     </parent>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -45,11 +45,14 @@
         <sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
         <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
         <sonar.projectVersion>${project.version}</sonar.projectVersion>
-        <nexusproxy>https://nexus.onap.org</nexusproxy>
         <snapshotNexusPath>/content/repositories/snapshots/</snapshotNexusPath>
         <releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
         <stagingNexusPath>/content/repositories/staging/</stagingNexusPath>
         <sitePath>/content/sites/site/org/onap/dmaap/datarouter/${project.artifactId}/${project.version}</sitePath>
+        <docker.maven.plugin.version>1.0.0</docker.maven.plugin.version>
+        <skip.docker.build>true</skip.docker.build>
+        <skip.docker.tag>true</skip.docker.tag>
+        <skip.docker.push>true</skip.docker.push>
     </properties>
     <modules>
         <module>datarouter-prov</module>
@@ -58,14 +61,11 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
-                <extensions>true</extensions>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>${docker.maven.plugin.version}</version>
                 <configuration>
-                    <nexusUrl>${nexusproxy}</nexusUrl>
-                    <stagingProfileId>176c31dfe190a</stagingProfileId>
-                    <serverId>ecomp-staging</serverId>
+                    <skipDockerBuild>true</skipDockerBuild>
                 </configuration>
             </plugin>
             <plugin>
@@ -74,7 +74,7 @@
                 <version>1.6.7</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <nexusUrl>${nexusproxy}</nexusUrl>
+                    <nexusUrl>${onap.nexus.url}</nexusUrl>
                     <stagingProfileId>176c31dfe190a</stagingProfileId>
                     <serverId>ecomp-staging</serverId>
                 </configuration>
@@ -143,22 +143,22 @@
         <repository>
             <id>ecomp-releases</id>
             <name>DR Release Repository</name>
-            <url>${nexusproxy}${releaseNexusPath}</url>
+            <url>${onap.nexus.url}${releaseNexusPath}</url>
         </repository>
         <snapshotRepository>
             <id>ecomp-snapshots</id>
             <name>DR Snapshot Repository</name>
-            <url>${nexusproxy}${snapshotNexusPath}</url>
+            <url>${onap.nexus.url}${snapshotNexusPath}</url>
         </snapshotRepository>
         <site>
             <id>ecomp-site</id>
-            <url>dav:${nexusproxy}${sitePath}</url>
+            <url>dav:${onap.nexus.url}${sitePath}</url>
         </site>
     </distributionManagement>
     <pluginRepositories>
         <pluginRepository>
             <id>onap-plugin-snapshots</id>
-            <url>https://nexus.onap.org/content/repositories/snapshots/</url>
+            <url>${onap.nexus.url}${snapshotNexusPath}</url>
         </pluginRepository>
     </pluginRepositories>
 </project>
