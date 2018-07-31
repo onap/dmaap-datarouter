@@ -36,7 +36,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <docker.location>${basedir}/target/</docker.location>
+        <docker.location>${basedir}/target/${artifactId}</docker.location>
         <sonar.language>java</sonar.language>
         <sonar.skip>false</sonar.skip>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
@@ -51,6 +51,12 @@
         <releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
         <stagingNexusPath>/content/repositories/staging/</stagingNexusPath>
         <sitePath>/content/sites/site/${project.groupId}/${project.artifactId}/${project.version}</sitePath>
+
+        <skip.docker.build>false</skip.docker.build>
+        <skip.docker.push>false</skip.docker.push>
+        <docker.registry>nexus3.onap.org:10003</docker.registry>
+        <datarouter.prov.image.version>${project.version}</datarouter.prov.image.version>
+        <datarouter.prov.image.name>onap/dmaap/datarouter-prov</datarouter.prov.image.name>
     </properties>
     <dependencies>
         <dependency>
@@ -229,6 +235,18 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <properties>
+                <skip.docker.build>false</skip.docker.build>
+                <skip.docker.tag>false</skip.docker.tag>
+                <skip.docker.push>false</skip.docker.push>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <finalName>datarouter-prov</finalName>
         <resources>
@@ -315,6 +333,94 @@
                     <forceTags>true</forceTags>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>${docker.maven.plugin.version}</version>
+                <configuration>
+                    <skipDockerBuild>false</skipDockerBuild>
+                    <imageName>${onap.nexus.dockerregistry.daily}/${datarouter.prov.image.name}</imageName>
+                    <dockerDirectory>${docker.location}</dockerDirectory>
+                    <serverId>${onap.nexus.dockerregistry.daily}</serverId>
+                    <imageTags>
+                        <imageTag>${datarouter.prov.image.version}</imageTag>
+                        <imageTag>latest</imageTag>
+                    </imageTags>
+                    <forceTags>true</forceTags>
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${docker.location}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>**/**</include>
+                        </resource>
+                    </resources>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>build-image</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                        <configuration>
+                            <skipDockerBuild>${skip.docker.build}</skipDockerBuild>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>tag-image-project-version</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>tag</goal>
+                        </goals>
+                        <configuration>
+                            <image>${onap.nexus.dockerregistry.daily}/${datarouter.prov.image.name}</image>
+                            <newName>${docker.push.registry}/${datarouter.prov.image.name}:${project.version}</newName>
+                            <skipDockerTag>${skip.docker.push}</skipDockerTag>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>tag-image-latest</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>tag</goal>
+                        </goals>
+                        <configuration>
+                            <image>${onap.nexus.dockerregistry.daily}/${datarouter.prov.image.name}</image>
+                            <newName>${docker.push.registry}/${datarouter.prov.image.name}:latest</newName>
+                            <skipDockerTag>${skip.docker.push}</skipDockerTag>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>push-image-latest</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                        <configuration>
+                            <imageName>${docker.push.registry}/${datarouter.prov.image.name}:${project.version}</imageName>
+                            <skipDockerPush>${skip.docker.push}</skipDockerPush>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>push-image</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                        <configuration>
+                            <imageName>${docker.push.registry}/${datarouter.prov.image.name}:latest</imageName>
+                            <skipDockerPush>${skip.docker.push}</skipDockerPush>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.7</version>
