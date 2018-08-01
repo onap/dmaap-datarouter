@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_196e6bca",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-01T08:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a6a9dd7_6c823f54",
+      "range": {
+        "startLine": 54,
+        "startChar": 2,
+        "endLine": 55,
+        "endChar": 44
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a6a9dd7_cca90b7d",
         "filename": "datarouter-node/pom.xml",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2018-07-31T16:50:47Z",
       "side": 1,
       "message": "This is already defined in the top level parent. remove and use it instead",
+      "range": {
+        "startLine": 56,
+        "startChar": 2,
+        "endLine": 56,
+        "endChar": 58
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_397327b3",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-01T08:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a6a9dd7_cca90b7d",
       "range": {
         "startLine": 56,
         "startChar": 2,
@@ -94,6 +142,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_d96793e9",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-01T08:10:07Z",
+      "side": 1,
+      "message": "Keeping here as relative to the datarouter-node only.",
+      "parentUuid": "9a6a9dd7_6cb6bfde",
+      "range": {
+        "startLine": 57,
+        "startChar": 2,
+        "endLine": 57,
+        "endChar": 83
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a6a9dd7_8cbb13c4",
         "filename": "datarouter-node/pom.xml",
         "patchSetId": 1
@@ -140,6 +212,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_99611bd6",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 439,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-01T08:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a6a9dd7_2cb0c7dc",
+      "range": {
+        "startLine": 439,
+        "startChar": 20,
+        "endLine": 439,
+        "endChar": 40
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a6a9dd7_4cb5fbcb",
         "filename": "datarouter-node/pom.xml",
         "patchSetId": 1
@@ -151,6 +247,30 @@
       "writtenOn": "2018-07-31T16:50:47Z",
       "side": 1,
       "message": "as above\nonap.nexus.dockerregistry.daily",
+      "range": {
+        "startLine": 450,
+        "startChar": 20,
+        "endLine": 450,
+        "endChar": 40
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b95e5711",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-01T08:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a6a9dd7_4cb5fbcb",
       "range": {
         "startLine": 450,
         "startChar": 20,
@@ -186,6 +306,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_599b83c9",
+        "filename": "datarouter-prov/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-01T08:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a6a9dd7_2c41a70b",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 39,
+        "endChar": 74
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a6a9dd7_6c379fb1",
         "filename": "datarouter-prov/pom.xml",
         "patchSetId": 1
@@ -197,6 +341,30 @@
       "writtenOn": "2018-07-31T15:46:52Z",
       "side": 1,
       "message": "Remove from here if \u003cprofiles\u003e entry covers this.",
+      "range": {
+        "startLine": 55,
+        "startChar": 7,
+        "endLine": 56,
+        "endChar": 50
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_79a0bff4",
+        "filename": "datarouter-prov/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-01T08:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a6a9dd7_6c379fb1",
       "range": {
         "startLine": 55,
         "startChar": 7,
@@ -232,6 +400,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_19a50b04",
+        "filename": "datarouter-prov/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-01T08:10:07Z",
+      "side": 1,
+      "message": "Removed. Using ${project.version} directly instead.",
+      "parentUuid": "9a6a9dd7_0ca0638f",
+      "range": {
+        "startLine": 58,
+        "startChar": 8,
+        "endLine": 58,
+        "endChar": 89
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a6a9dd7_eca2cf99",
         "filename": "datarouter-prov/pom.xml",
         "patchSetId": 1
@@ -243,6 +435,30 @@
       "writtenOn": "2018-07-31T16:50:47Z",
       "side": 1,
       "message": "Remove",
+      "range": {
+        "startLine": 320,
+        "startChar": 12,
+        "endLine": 335,
+        "endChar": 21
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_39aa47d5",
+        "filename": "datarouter-prov/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-01T08:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a6a9dd7_eca2cf99",
       "range": {
         "startLine": 320,
         "startChar": 12,
@@ -278,6 +494,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_d9aeb3e7",
+        "filename": "datarouter-prov/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-01T08:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a6a9dd7_cc510bda",
+      "range": {
+        "startLine": 346,
+        "startChar": 0,
+        "endLine": 346,
+        "endChar": 73
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a6a9dd7_6c055fc1",
         "filename": "pom.xml",
         "patchSetId": 1
@@ -289,6 +529,30 @@
       "writtenOn": "2018-07-31T15:46:52Z",
       "side": 1,
       "message": "I think this is not used and can be removed.",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 58
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b9b5f732",
+        "filename": "pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-01T08:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a6a9dd7_6c055fc1",
       "range": {
         "startLine": 55,
         "startChar": 0,
@@ -324,6 +588,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_5982a353",
+        "filename": "pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-01T08:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a6a9dd7_ec7baf27",
+      "range": {
+        "startLine": 57,
+        "startChar": 8,
+        "endLine": 57,
+        "endChar": 55
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a6a9dd7_ccc02b2d",
         "filename": "pom.xml",
         "patchSetId": 1
@@ -335,6 +623,30 @@
       "writtenOn": "2018-07-31T16:50:47Z",
       "side": 1,
       "message": "Use top parent level pom entry",
+      "range": {
+        "startLine": 58,
+        "startChar": 8,
+        "endLine": 58,
+        "endChar": 74
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_79875f62",
+        "filename": "pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-01T08:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a6a9dd7_ccc02b2d",
       "range": {
         "startLine": 58,
         "startChar": 8,
@@ -370,6 +682,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_197c2b72",
+        "filename": "pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-01T08:10:07Z",
+      "side": 1,
+      "message": "Keeping as think they are needed as default.",
+      "parentUuid": "9a6a9dd7_0c6f0394",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 60,
+        "endChar": 49
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a6a9dd7_ecf88fc6",
         "filename": "pom.xml",
         "patchSetId": 1
@@ -381,6 +717,30 @@
       "writtenOn": "2018-07-31T15:46:52Z",
       "side": 1,
       "message": "Not your code but this is a duplicate of the previous plugin snippet - be good to remove.",
+      "range": {
+        "startLine": 87,
+        "startChar": 11,
+        "endLine": 97,
+        "endChar": 21
+      },
+      "revId": "f51e37267453f4de0f5f1d2c16e2dda77fa91ab3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_3981e74a",
+        "filename": "pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-01T08:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a6a9dd7_ecf88fc6",
       "range": {
         "startLine": 87,
         "startChar": 11,
