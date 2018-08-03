@@ -16,6 +16,29 @@
       "revId": "28ceb6a80cd2a7f4e76dd4eb7fc3feeb4f6bcf21",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_01f909c8",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-03T16:22:37Z",
+      "side": 1,
+      "message": "Following  discussion with @Fiachra Corcoran it may be better to prefix integration tests with \"IT\" or \"IT_\" and remove the skipTests. They will be excluded by the following lines in the oparent pom.xml:\n\n\u003cexcludes\u003e\n  \u003cexclude\u003e**/IT*.java\u003c/exclude\u003e\n\u003c/excludes\u003e",
+      "range": {
+        "startLine": 201,
+        "startChar": 15,
+        "endLine": 201,
+        "endChar": 19
+      },
+      "revId": "28ceb6a80cd2a7f4e76dd4eb7fc3feeb4f6bcf21",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
