@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_a1d5b544",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-03T15:55:46Z",
+      "side": 1,
+      "message": "Is there any case where we would run a docker build on its own that would require the tests to be executed?",
+      "revId": "28ceb6a80cd2a7f4e76dd4eb7fc3feeb4f6bcf21",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
