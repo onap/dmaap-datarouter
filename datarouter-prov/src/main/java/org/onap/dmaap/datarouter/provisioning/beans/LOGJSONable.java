@@ -27,7 +27,7 @@ package org.onap.dmaap.datarouter.provisioning.beans;
 import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
 
 /**
- * An object that can be represented as a {@link JSONObject}.
+ * An object that can be represented as a {@link LOGJSONObject}.
  * @author Robert Eby
  * @version $Id: JSONable.java,v 1.1 2013/04/26 21:00:26 eby Exp $
  */

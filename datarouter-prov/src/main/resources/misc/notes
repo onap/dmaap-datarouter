@@ -71,8 +71,8 @@ DRTR_PROV_TSTOREPASS (default changeit)
 	file is specified.
 
 DRTR_PROV_DBLOGIN (default datarouter)
-	The login used to access MySQL
+	The login used to access MariaDB
 DRTR_PROV_DBPASS (default datarouter)
-	The password used to access MySQL
+	The password used to access MariaDB
 DRTR_PROV_DBSCRIPTS (default /opt/app/datartr/etc)
 	The directory containing DB initialization scripts
