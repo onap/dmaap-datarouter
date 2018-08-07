@@ -501,7 +501,7 @@
                 <version>1.6.7</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <nexusUrl>${onap.nexus.dockerregistry.daily}</nexusUrl>
+                    <nexusUrl>${onap.nexus.url}</nexusUrl>
                     <stagingProfileId>176c31dfe190a</stagingProfileId>
                     <serverId>ecomp-staging</serverId>
                 </configuration>
