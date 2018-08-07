@@ -83,7 +83,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
  * <ol>
  * <li>Checking DNS once per minute to see which POD the DNS CNAME points to. The CNAME will point to
  * the active (master) POD.</li>
- * <li>On non-master (standby) PODs, fetches provisioning data and logs in order to keep MySQL in sync.</li>
+ * <li>On non-master (standby) PODs, fetches provisioning data and logs in order to keep MariaDB in sync.</li>
  * <li>Providing information to other parts of the system as to the current role (ACTIVE, STANDBY, UNKNOWN)
  * of this POD.</li>
  * </ol>

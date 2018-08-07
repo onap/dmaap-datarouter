@@ -52,14 +52,14 @@ public interface ProvDataProvider {
 
 	/** Get the identity of the owner of a feed by group id -  Rally : US708115
 	 * 
-	 * @param feedid, user the ID of the feed whose owner is being looked up.
+	 * @param feedId, user the ID of the feed whose owner is being looked up.
 	 * @return the feed owner's identity by group.
 	 */
 	public String getGroupByFeedGroupId(String owner, String feedId);
 	
 	/** Get the identity of the owner of a sub by group id Rally : US708115
 	 * 
-	 * @param subid, user the ID of the feed whose owner is being looked up.
+	 * @param subId, user the ID of the feed whose owner is being looked up.
 	 * @return the feed owner's identity by group.
 	 */
 	public String getGroupBySubGroupId(String owner, String subId);

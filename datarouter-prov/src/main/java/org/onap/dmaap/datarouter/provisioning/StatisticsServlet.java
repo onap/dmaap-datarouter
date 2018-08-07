@@ -356,8 +356,8 @@ public class StatisticsServlet extends BaseServlet {
 	
 	/**
 	 * queryGeneretor - Generating sql query
-	 * @exception SQL Query parse exception.
-	 * @param Map as key value pare of all user input fields
+	 * @exception ParseException
+	 * @param map as key value pare of all user input fields
 	 */
 	public String queryGeneretor(Map<String, String> map) throws ParseException{
 		 

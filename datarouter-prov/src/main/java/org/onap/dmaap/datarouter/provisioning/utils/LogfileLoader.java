@@ -59,7 +59,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.PublishRecord;
 
 /**
  * This class provides methods that run in a separate thread, in order to process logfiles uploaded into the spooldir.
- * These logfiles are loaded into the MySQL LOG_RECORDS table. In a running provisioning server, there should only be
+ * These logfiles are loaded into the MariaDB LOG_RECORDS table. In a running provisioning server, there should only be
  * two places where records can be loaded into this table; here, and in the method DB.retroFit4() which may be run at
  * startup to load the old (1.0) style log tables into LOG_RECORDS;
  * <p>This method maintains an {@link RLEBitSet} which can be used to easily see what records are presently in the
@@ -148,7 +148,7 @@ public class LogfileLoader extends Thread {
 	}
 	/**
 	 * Run continuously to look for new logfiles in the spool directory and import them into the DB.
-	 * The spool is checked once per second.  If free space on the MySQL filesystem falls below
+	 * The spool is checked once per second.  If free space on the MariaDB filesystem falls below
 	 * REQUIRED_FREE_PCT (normally 20%) then the oldest logfile entries are removed and the LOG_RECORDS
 	 * table is compacted until free space rises above the threshold.
 	 */
@@ -361,72 +361,7 @@ public class LogfileLoader extends Thread {
 			db.release(conn);
 		}
 	}
-// OLD CODE - commented here for historical purposes
-//
-//	private boolean pruneRecordsOldAlgorithm() {
-//		// Determine space available -- available space must be at least 20% under /opt/app/mysql
-//		int pct = getFreePercentage();
-//		boolean did1 = false;
-//		while (pct < REQUIRED_FREE_PCT) {
-//			logger.info("PROV8008: Free space is " + pct + "% - removing old log entries");
-//			boolean didit = removeOldestEntries();
-//			pct = didit ? getFreePercentage() : 100; // don't loop endlessly
-//			did1 |= didit;
-//		}
-//		return did1;
-//	}
-//	private int getFreePercentage() {
-//		FileSystem fs = (Paths.get("/opt/app/mysql")).getFileSystem();
-//		long total = 0;
-//		long avail = 0;
-//		try {
-//			for (FileStore store : fs.getFileStores()) {
-//				total += store.getTotalSpace();
-//				avail += store.getUsableSpace();
-//			}
-//		} catch (IOException e) {
-//		}
-//		try { fs.close(); } catch (Exception e) { }
-//		return (int)((avail * 100) / total);
-//	}
-//	private boolean removeOldestEntries() {
-//		// Remove the last days worth of entries
-//		Connection conn = null;
-//		try {
-//			conn = db.getConnection();
-//			Statement stmt = conn.createStatement();
-//			ResultSet rs = stmt.executeQuery("select min(event_time) as MIN from LOG_RECORDS");
-//			if (rs != null) {
-//				if (rs.next()) {
-//					// Compute the end of the first day of logs
-//					long first = rs.getLong("MIN");
-//					Calendar cal = new GregorianCalendar();
-//					cal.setTime(new Date(first));
-//					cal.add(Calendar.DAY_OF_YEAR, 1);
-//					cal.set(Calendar.HOUR_OF_DAY, 0);
-//					cal.set(Calendar.MINUTE, 0);
-//					cal.set(Calendar.SECOND, 0);
-//					cal.set(Calendar.MILLISECOND, 0);
-//					if (!stmt.execute("delete from LOG_RECORDS where event_time < " + cal.getTimeInMillis())) {
-//						int count = stmt.getUpdateCount();
-//						logger.info("PROV0009: Removed "+count+" old log entries.");
-//						stmt.execute("OPTIMIZE TABLE LOG_RECORDS");
-//					}
-//					rs.close();
-//					stmt.close();
-//					return true;
-//				}
-//				rs.close();
-//			}
-//			stmt.close();
-//		} catch (SQLException e) {
-//			System.err.println(e);
-//			e.printStackTrace();
-//		} finally {
-//			db.release(conn);
-//		}
-//		return false;
-//	}
+
 	@SuppressWarnings("resource")
 	private int[] process(File f) {
 		int ok = 0, total = 0;
