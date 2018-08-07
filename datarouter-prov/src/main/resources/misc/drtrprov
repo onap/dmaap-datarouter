@@ -56,7 +56,7 @@ start() {
 # 	fi
 	if [ "`pgrep -u mysql mysqld`" = "" ]
 	then
-		echo MySQL is not running.  It must be started before drtrprov
+		echo MariaDB is not running.  It must be started before drtrprov
 		exit 0
 	fi
 	PIDS=`pids`

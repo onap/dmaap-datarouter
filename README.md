@@ -8,7 +8,7 @@ The Data Routing System is different from many existing platforms for distributi
 
    Provisioning is implemented as a Java servlet running under Jetty in one JVM
    
-   Provisioning data is stored in a MySQL database
+   Provisioning data is stored in a MariaDB database
    
    The backup provisioning server and each node is informed any time provisioning data changes
    
@@ -103,11 +103,11 @@ Datarouter is a Unix based service
 
 Pre-requisites to run the service
 
-MySQL Version 5.6
+MariaDB Version 10.2.14
 
 Java JDK 1.8
 
-Install MySQL and load needed table into the database
+Install MariaDB and load needed table into the database
 
 Sample install_db.sql is provided in the datarouter-prov/data .
 
@@ -142,7 +142,7 @@ Java - 1.8
 
 Maven - 3.2.5 
 
-MySQL - 5.6
+MariaDB - 10.2.14
 
 Self Signed SSL certificates
  
