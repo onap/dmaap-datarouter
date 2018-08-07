@@ -47,7 +47,7 @@ then
 fi
 if [ "`pgrep -u mysql mysqld`" = "" ]
 then
-	echo MySQL is not running.  It must be started before runreports
+	echo MariaBD is not running.  It must be started before runreports
 	exit 1
 fi
 

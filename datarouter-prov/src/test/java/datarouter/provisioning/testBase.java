@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.Properties;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -49,7 +50,7 @@ import org.onap.dmaap.datarouter.provisioning.FeedServlet;
 
 public class testBase {
 	/** The properties file to read the DB properties from */
-	public static final String CONFIG_FILE = "tests.properties";
+	public static final String CONFIG_FILE = "integration_test.properties";
 
 	public Properties props;
 	protected AbstractHttpClient httpclient;
@@ -145,6 +146,7 @@ public class testBase {
 		// shut down the connection manager to ensure
 		// immediate deallocation of all system resources
 		httpclient.getConnectionManager().shutdown();
+		FileUtils.deleteDirectory(new File("./unit-test-logs"));
 	}
 
 	protected void ckResponse(HttpResponse response, int expect) {

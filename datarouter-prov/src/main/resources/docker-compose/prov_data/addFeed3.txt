@@ -31,7 +31,7 @@
      "authorization": {
           "classification": "unclassified",
           "endpoint_addrs": [
-               "172.18.0.3",
+               "172.100.0.3",
 			],
           "endpoint_ids": [
                {
