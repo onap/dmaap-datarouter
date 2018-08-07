@@ -200,11 +200,10 @@
             <version>1.6.4</version>
             <scope>test</scope>
         </dependency>
-        <!--        <dependency><groupId>org.junit</groupId><artifactId>com.springsource.org.junit</artifactId><version>4.4.0</version></dependency>-->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.21</version>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.2.5</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.cdi</groupId>
@@ -295,7 +294,13 @@
                     <include>**/log4j.properties</include>
                 </includes>
             </resource>
-            <!-- <resource><directory>src/main/config</directory><filtering>true</filtering><includes><include>**/log4j*.xml</include></includes></resource><resource><directory>src/main/resources</directory><filtering>false</filtering><excludes><exclude>**/cambriaApiVersion.properties</exclude></excludes></resource>-->
+            <resource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/log4j.properties</include>
+                </includes>
+            </resource>
         </resources>
         <plugins>
             <plugin>
