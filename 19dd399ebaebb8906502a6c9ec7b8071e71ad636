@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_73f3e10a",
+        "filename": "datarouter-prov/src/main/resources/misc/runreports",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-08T15:06:27Z",
+      "side": 1,
+      "message": "Typo",
+      "range": {
+        "startLine": 50,
+        "startChar": 11,
+        "endLine": 50,
+        "endChar": 13
+      },
+      "revId": "19dd399ebaebb8906502a6c9ec7b8071e71ad636",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
