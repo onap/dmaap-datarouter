@@ -7,9 +7,9 @@
  * * Licensed under the Apache License, Version 2.0 (the "License");
  * * you may not use this file except in compliance with the License.
  * * You may obtain a copy of the License at
- * * 
+ * *
  *  *      http://www.apache.org/licenses/LICENSE-2.0
- * * 
+ * *
  *  * Unless required by applicable law or agreed to in writing, software
  * * distributed under the License is distributed on an "AS IS" BASIS,
  * * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,22 +37,22 @@ import org.junit.Test;
 import org.onap.dmaap.datarouter.provisioning.FeedServlet;
 
 public class testDRFeedsDelete extends testBase {
-	@Test
-	public void testNotAllowed() {
-		String url = props.getProperty("test.host") + "/";
-		HttpDelete del = new HttpDelete(url);
-		try {
-			del.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
+    @Test
+    public void testNotAllowed() {
+        String url = props.getProperty("test.host") + "/";
+        HttpDelete del = new HttpDelete(url);
+        try {
+            del.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
 
-			HttpResponse response = httpclient.execute(del);
-		    ckResponse(response, HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            HttpResponse response = httpclient.execute(del);
+            ckResponse(response, HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 
-			HttpEntity entity = response.getEntity();
-			EntityUtils.consume(entity);
-		} catch (IOException e) {
-			fail(e.getMessage());
-		} finally {
-			del.releaseConnection();
-		}
-	}
+            HttpEntity entity = response.getEntity();
+            EntityUtils.consume(entity);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        } finally {
+            del.releaseConnection();
+        }
+    }
 }
