@@ -122,7 +122,7 @@ public class SubscriptionServlet extends ProxyServlet {
 
         // Delete Subscription
         if (doDelete(sub)) {
-            active_subs--;
+            activeSubs--;
             // send response
             elr.setResult(HttpServletResponse.SC_NO_CONTENT);
             eventlogger.info(elr);

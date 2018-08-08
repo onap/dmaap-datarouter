@@ -279,17 +279,17 @@ public class SynchronizerTask extends TimerTask {
             InetAddress myaddr = InetAddress.getLocalHost();
             if (logger.isTraceEnabled())
                 logger.trace("My address: "+myaddr);
-            String this_pod = myaddr.getHostName();
-            Set<String> pods = new TreeSet<String>(Arrays.asList(BaseServlet.getPods()));
-            if (pods.contains(this_pod)) {
-                InetAddress pserver = InetAddress.getByName(BaseServlet.active_prov_name);
+            String thisPod = myaddr.getHostName();
+            Set<String> pods = new TreeSet<>(Arrays.asList(BaseServlet.getPods()));
+            if (pods.contains(thisPod)) {
+                InetAddress pserver = InetAddress.getByName(BaseServlet.activeProvName);
                 newstate = myaddr.equals(pserver) ? ACTIVE : STANDBY;
-                if (logger.isDebugEnabled() && System.currentTimeMillis() >= next_msg) {
+                if (logger.isDebugEnabled() && System.currentTimeMillis() >= nextMsg) {
                     logger.debug("Active POD = "+pserver+", Current state is "+stnames[newstate]);
-                    next_msg = System.currentTimeMillis() + (5 * 60 * 1000L);
+                    nextMsg = System.currentTimeMillis() + (5 * 60 * 1000L);
                 }
             } else {
-                logger.warn("PROV5003: My name ("+this_pod+") is missing from the list of provisioning servers.");
+                logger.warn("PROV5003: My name ("+thisPod+") is missing from the list of provisioning servers.");
             }
         } catch (UnknownHostException e) {
             logger.warn("PROV5002: Cannot determine the name of this provisioning server.");
@@ -299,7 +299,7 @@ public class SynchronizerTask extends TimerTask {
             logger.info(String.format("PROV5001: Server state changed from %s to %s", stnames[state], stnames[newstate]));
         return newstate;
     }
-    private static long next_msg = 0;    // only display the "Current state" msg every 5 mins.
+    private static long nextMsg = 0;    // only display the "Current state" msg every 5 mins.
     /** Synchronize the Feeds in the JSONArray, with the Feeds in the DB. */
     private void syncFeeds(JSONArray ja) {
         Collection<Syncable> coll = new ArrayList<Syncable>();

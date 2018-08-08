@@ -23,7 +23,6 @@
 package org.onap.dmaap.datarouter.provisioning;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +32,7 @@ import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
+import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -41,8 +41,8 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.notNullValue;
@@ -229,7 +229,10 @@ public class FeedServletTest {
 
 
     private void initialiseBaseServletToBypassRetreiviingInitialisationParametersFromDatabase() throws IllegalAccessException {
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsg_flag", false, true);
+        Properties props = new Properties();
+        props.setProperty("org.onap.dmaap.datarouter.provserver.isaddressauthenabled", "false");
+        FieldUtils.writeDeclaredStaticField(DB.class, "props", props, true);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsgFlag", false, true);
         SynchronizerTask synchronizerTask = mock(SynchronizerTask.class);
         when(synchronizerTask.getState()).thenReturn(SynchronizerTask.UNKNOWN);
         FieldUtils.writeDeclaredStaticField(SynchronizerTask.class, "synctask", synchronizerTask, true);
@@ -240,7 +243,7 @@ public class FeedServletTest {
         Set<String> authAddressesAndNetworks = new HashSet<String>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks, true);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "require_cert", false, true);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", false, true);
     }
 
     private void setBehalfHeader(String headerValue) {
@@ -282,7 +285,7 @@ public class FeedServletTest {
 
     private void setPokerToNotCreateTimersWhenDeleteFeedIsCalled() throws Exception {
         Poker poker = mock(Poker.class);
-        FieldUtils.writeDeclaredStaticField(Poker.class, "p", poker, true);
+        FieldUtils.writeDeclaredStaticField(Poker.class, "poker", poker, true);
     }
 
     private void setupValidAuthorisedRequest() throws Exception {

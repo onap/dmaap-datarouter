@@ -29,11 +29,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.onap.dmaap.datarouter.provisioning.utils.DB;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.is;
@@ -51,20 +54,24 @@ public class BaseServletTest {
 
     @Before
     public void setUp() throws Exception {
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsg_flag", false, true);
+        Properties props = new Properties();
+        props.setProperty("org.onap.dmaap.datarouter.provserver.isaddressauthenabled", "false");
+        FieldUtils.writeDeclaredStaticField(DB.class, "props", props, true);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsgFlag", false, true);
         SynchronizerTask synchronizerTask = mock(SynchronizerTask.class);
+        when(synchronizerTask.getState()).thenReturn(SynchronizerTask.UNKNOWN);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "synctask", synchronizerTask, true);
         baseServlet = new BaseServlet();
     }
 
 
     @Test
-    public void Given_Request_Path_Info_Is_Valid_Then_Id_Is_Extracted_Correctly() throws Exception {
+    public void Given_Request_Path_Info_Is_Valid_Then_Id_Is_Extracted_Correctly() {
         when(request.getPathInfo()).thenReturn("/123");
         assertThat(baseServlet.getIdFromPath(request), is(123));
     }
     @Test
-    public void Given_Request_Path_Info_Is_Not_Valid_Then_Minus_One_Is_Returned() throws Exception {
+    public void Given_Request_Path_Info_Is_Not_Valid_Then_Minus_One_Is_Returned() {
         when(request.getPathInfo()).thenReturn("/abc");
         assertThat(baseServlet.getIdFromPath(request), is(-1));
         when(request.getPathInfo()).thenReturn("/");
@@ -77,7 +84,7 @@ public class BaseServletTest {
         Set<String> authAddressesAndNetworks = new HashSet<String>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks, true);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "require_cert", false, true);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", false, true);
         assertThat(baseServlet.isAuthorizedForProvisioning(request), is(nullValue()));
     }
 }

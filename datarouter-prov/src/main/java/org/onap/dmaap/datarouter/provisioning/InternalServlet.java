@@ -148,7 +148,7 @@ import com.att.eelf.configuration.EELFManager;
  */
 @SuppressWarnings("serial")
 public class InternalServlet extends ProxyServlet {
-    private static Integer logseq = new Integer(0); // another piece of info to make log spool file names unique
+    private static Integer logseq = 0; // another piece of info to make log spool file names unique
     //Adding EELF Logger Rally:US664892
     private static EELFLogger eelflogger = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.provisioning.InternalServlet");
 

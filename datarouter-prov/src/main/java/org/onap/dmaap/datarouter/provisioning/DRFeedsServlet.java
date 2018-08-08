@@ -247,8 +247,8 @@ public class DRFeedsServlet extends ProxyServlet {
         }
         if (intlogger.isDebugEnabled())
             intlogger.debug(jo.toString());
-        if (++active_feeds > max_feeds) {
-            active_feeds--;
+        if (++activeFeeds > maxFeeds) {
+            activeFeeds--;
             message = "Cannot create feed; the maximum number of feeds has been configured.";
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_CONFLICT);
