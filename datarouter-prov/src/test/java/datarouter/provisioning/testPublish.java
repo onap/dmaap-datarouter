@@ -7,9 +7,9 @@
  * * Licensed under the Apache License, Version 2.0 (the "License");
  * * you may not use this file except in compliance with the License.
  * * You may obtain a copy of the License at
- * * 
+ * *
  *  *      http://www.apache.org/licenses/LICENSE-2.0
- * * 
+ * *
  *  * Unless required by applicable law or agreed to in writing, software
  * * distributed under the License is distributed on an "AS IS" BASIS,
  * * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,72 +47,72 @@ import org.junit.Test;
 import org.onap.dmaap.datarouter.provisioning.FeedServlet;
 
 public class testPublish extends testBase {
-	private String publish_url;
+    private String publish_url;
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+    }
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception {
+    }
 
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
-		getDBstate();
-		// Get publish URL from first feed
-		JSONArray ja = db_state.getJSONArray("feeds");
-		for (int i = ja.length()-1; i >= 0; i--) {
-			JSONObject feed = ja.getJSONObject(i);
-			if (!feed.getBoolean("deleted")) {
-				publish_url = feed.getJSONObject("links").getString("publish");
-				publish_url += "/" + System.currentTimeMillis();
-				return;
-			}
-		}
-	}
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        getDBstate();
+        // Get publish URL from first feed
+        JSONArray ja = db_state.getJSONArray("feeds");
+        for (int i = ja.length()-1; i >= 0; i--) {
+            JSONObject feed = ja.getJSONObject(i);
+            if (!feed.getBoolean("deleted")) {
+                publish_url = feed.getJSONObject("links").getString("publish");
+                publish_url += "/" + System.currentTimeMillis();
+                return;
+            }
+        }
+    }
 
-	@Test
-	public void testDelete() {
-		HttpDelete x = new HttpDelete(publish_url);
-		testCommon(x);
-	}
-	@Test
-	public void testGet() {
-		HttpGet x = new HttpGet(publish_url);
-		testCommon(x);
-	}
-	@Test
-	public void testPut() {
-		HttpPut x = new HttpPut(publish_url);
-		testCommon(x);
-	}
-	@Test
-	public void testPost() {
-		HttpPost x = new HttpPost(publish_url);
-		testCommon(x);
-	}
-	private void testCommon(HttpRequestBase rb) {
-		try {
-			rb.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
-			RedirectStrategy strategy = new DefaultRedirectStrategy() {
-				protected boolean isRedirectable(String method) {
-					return false;
-				}
-			};
-			httpclient.setRedirectStrategy(strategy);
-			HttpResponse response = httpclient.execute(rb);
-		    ckResponse(response, HttpServletResponse.SC_MOVED_PERMANENTLY);
+    @Test
+    public void testDelete() {
+        HttpDelete x = new HttpDelete(publish_url);
+        testCommon(x);
+    }
+    @Test
+    public void testGet() {
+        HttpGet x = new HttpGet(publish_url);
+        testCommon(x);
+    }
+    @Test
+    public void testPut() {
+        HttpPut x = new HttpPut(publish_url);
+        testCommon(x);
+    }
+    @Test
+    public void testPost() {
+        HttpPost x = new HttpPost(publish_url);
+        testCommon(x);
+    }
+    private void testCommon(HttpRequestBase rb) {
+        try {
+            rb.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
+            RedirectStrategy strategy = new DefaultRedirectStrategy() {
+                protected boolean isRedirectable(String method) {
+                    return false;
+                }
+            };
+            httpclient.setRedirectStrategy(strategy);
+            HttpResponse response = httpclient.execute(rb);
+            ckResponse(response, HttpServletResponse.SC_MOVED_PERMANENTLY);
 
-		    // Make sure there is a Location hdr
-		    Header[] loc = response.getHeaders("Location");
-		    if (loc == null || loc.length == 0)
-		    	fail("No location header");
-		} catch (IOException e) {
-			fail(e.getMessage());
-		} finally {
-			rb.releaseConnection();
-		}
-	}
+            // Make sure there is a Location hdr
+            Header[] loc = response.getHeaders("Location");
+            if (loc == null || loc.length == 0)
+                fail("No location header");
+        } catch (IOException e) {
+            fail(e.getMessage());
+        } finally {
+            rb.releaseConnection();
+        }
+    }
 }
