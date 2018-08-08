@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_b8b636db",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-08T13:11:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_7d0c1095",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 4,
+        "endChar": 5
+      },
+      "revId": "dfa2914805227706541eaeeebf60536071c085ac",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_3d269817",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DB.java",
         "patchSetId": 1
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_18aaca70",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DB.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-08T13:11:57Z",
+      "side": 1,
+      "message": "Removed as many as may be necessary. Will check on remaining ones in scripts",
+      "parentUuid": "1a76adc5_3d269817",
+      "range": {
+        "startLine": 144,
+        "startChar": 9,
+        "endLine": 144,
+        "endChar": 14
+      },
+      "revId": "dfa2914805227706541eaeeebf60536071c085ac",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_7df3b00a",
         "filename": "datarouter-prov/src/main/resources/docker-compose/docker-compose.yml",
         "patchSetId": 1
@@ -59,6 +107,30 @@
       "writtenOn": "2018-08-08T08:23:20Z",
       "side": 1,
       "message": "Does this time need to be increased as the datarouter-prov sleep time was increased?",
+      "range": {
+        "startLine": 56,
+        "startChar": 38,
+        "endLine": 56,
+        "endChar": 40
+      },
+      "revId": "dfa2914805227706541eaeeebf60536071c085ac",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_f8acae8e",
+        "filename": "datarouter-prov/src/main/resources/docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-08T13:11:57Z",
+      "side": 1,
+      "message": "Changed impl to execute healthcheck for dependent containers so should be ok without",
+      "parentUuid": "1a76adc5_7df3b00a",
       "range": {
         "startLine": 56,
         "startChar": 38,
