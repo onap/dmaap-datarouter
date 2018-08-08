@@ -51,7 +51,7 @@ public class BaseServletTest {
 
     @Before
     public void setUp() throws Exception {
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsg_flag", false, true);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsgFlag", false, true);
         SynchronizerTask synchronizerTask = mock(SynchronizerTask.class);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "synctask", synchronizerTask, true);
         baseServlet = new BaseServlet();
@@ -77,7 +77,7 @@ public class BaseServletTest {
         Set<String> authAddressesAndNetworks = new HashSet<String>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks, true);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "require_cert", false, true);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", false, true);
         assertThat(baseServlet.isAuthorizedForProvisioning(request), is(nullValue()));
     }
 }

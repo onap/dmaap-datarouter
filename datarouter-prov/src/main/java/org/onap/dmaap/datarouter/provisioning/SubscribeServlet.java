@@ -237,8 +237,8 @@ public class SubscribeServlet extends ProxyServlet {
         }
         if (intlogger.isDebugEnabled())
             intlogger.debug(jo.toString());
-        if (++active_subs > max_subs) {
-            active_subs--;
+        if (++activeSubs > maxSubs) {
+            activeSubs--;
             message = "Cannot create subscription; the maximum number of subscriptions has been configured.";
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_CONFLICT);
@@ -250,7 +250,7 @@ public class SubscribeServlet extends ProxyServlet {
         try {
             sub = new Subscription(jo);
         } catch (InvalidObjectException e) {
-            active_subs--;
+            activeSubs--;
             message = e.getMessage();
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
@@ -279,7 +279,7 @@ public class SubscribeServlet extends ProxyServlet {
             provisioningDataChanged();
         } else {
             // Something went wrong with the INSERT
-            active_subs--;
+            activeSubs--;
             elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             eventlogger.info(elr);
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG);

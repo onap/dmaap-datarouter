@@ -29,6 +29,8 @@ import org.eclipse.jetty.util.ssl.*;
 import org.eclipse.jetty.server.*;
 import org.apache.log4j.Logger;
 
+import java.util.Arrays;
+
 /**
  * The main starting point for the Data Router node
  */
@@ -38,40 +40,40 @@ public class NodeMain {
 
     private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeMain");
 
-    private static class wfconfig implements Runnable {
-        private NodeConfigManager ncm;
+    private static class WaitForConfig implements Runnable {
+        private NodeConfigManager localNodeConfigManager;
 
-        wfconfig(NodeConfigManager ncm) {
-            this.ncm = ncm;
+        WaitForConfig(NodeConfigManager ncm) {
+            this.localNodeConfigManager = ncm;
         }
 
         public synchronized void run() {
             notify();
         }
 
-        synchronized void waitforconfig() {
-            ncm.registerConfigTask(this);
-            while (!ncm.isConfigured()) {
+        synchronized void waitForConfig() {
+            localNodeConfigManager.registerConfigTask(this);
+            while (!localNodeConfigManager.isConfigured()) {
                 logger.info("NODE0003 Waiting for Node Configuration");
                 try {
                     wait();
                 } catch (Exception e) {
-                    logger.debug("NodeMain: waitforconfig exception");
+                    logger.debug("NodeMain: waitForConfig exception");
                 }
             }
-            ncm.deregisterConfigTask(this);
+            localNodeConfigManager.deregisterConfigTask(this);
             logger.info("NODE0004 Node Configuration Data Received");
         }
     }
 
-    private static Delivery d;
-    private static NodeConfigManager ncm;
+    private static Delivery delivery;
+    private static NodeConfigManager nodeConfigManager;
 
     /**
      * Reset the retry timer for a subscription
      */
     static void resetQueue(String subid, String ip) {
-        d.resetQueue(ncm.getSpoolDir(subid, ip));
+        delivery.resetQueue(nodeConfigManager.getSpoolDir(subid, ip));
     }
 
     /**
@@ -84,45 +86,48 @@ public class NodeMain {
     public static void main(String[] args) throws Exception {
         logger.info("NODE0001 Data Router Node Starting");
         IsFrom.setDNSCache();
-        ncm = NodeConfigManager.getInstance();
-        logger.info("NODE0002 I am " + ncm.getMyName());
-        (new wfconfig(ncm)).waitforconfig();
-        d = new Delivery(ncm);
-        LogManager lm = new LogManager(ncm);
+        nodeConfigManager = NodeConfigManager.getInstance();
+        logger.info("NODE0002 I am " + nodeConfigManager.getMyName());
+        (new WaitForConfig(nodeConfigManager)).waitForConfig();
+        delivery = new Delivery(nodeConfigManager);
+        LogManager lm = new LogManager(nodeConfigManager);
         Server server = new Server();
 
         // HTTP configuration
-        HttpConfiguration http_config = new HttpConfiguration();
-        http_config.setIdleTimeout(2000);
-        http_config.setRequestHeaderSize(2048);
+        HttpConfiguration httpConfig = new HttpConfiguration();
+        httpConfig.setIdleTimeout(2000);
+        httpConfig.setRequestHeaderSize(2048);
 
-        ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config));
-        http.setPort(ncm.getHttpPort());
+        ServletContextHandler ctxt;
+        try (ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(httpConfig))) {
+            http.setPort(nodeConfigManager.getHttpPort());
 
-        // HTTPS configuration
-        SslContextFactory sslContextFactory = new SslContextFactory();
-        sslContextFactory.setKeyStoreType(ncm.getKSType());
-        sslContextFactory.setKeyStorePath(ncm.getKSFile());
-        sslContextFactory.setKeyStorePassword(ncm.getKSPass());
-        sslContextFactory.setKeyManagerPassword(ncm.getKPass());
+            // HTTPS configuration
+            SslContextFactory sslContextFactory = new SslContextFactory();
+            sslContextFactory.setKeyStoreType(nodeConfigManager.getKSType());
+            sslContextFactory.setKeyStorePath(nodeConfigManager.getKSFile());
+            sslContextFactory.setKeyStorePassword(nodeConfigManager.getKSPass());
+            sslContextFactory.setKeyManagerPassword(nodeConfigManager.getKPass());
 
-        HttpConfiguration https_config = new HttpConfiguration(http_config);
-        https_config.setRequestHeaderSize(8192);
+            HttpConfiguration httpsConfig = new HttpConfiguration(httpConfig);
+            httpsConfig.setRequestHeaderSize(8192);
 
-        ServerConnector https = new ServerConnector(server,
-                new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
-                new HttpConnectionFactory(https_config));
-        https.setPort(ncm.getHttpsPort());
-        https.setIdleTimeout(500000);
-        https.setAcceptQueueSize(2);
+            try (ServerConnector https = new ServerConnector(server,
+                    new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
+                    new HttpConnectionFactory(httpsConfig))) {
+                https.setPort(nodeConfigManager.getHttpsPort());
+                https.setIdleTimeout(500000);
+                https.setAcceptQueueSize(2);
 
-        /* Skip SSLv3 Fixes */
-        sslContextFactory.addExcludeProtocols("SSLv3");
-        logger.info("Excluded protocols node-" + sslContextFactory.getExcludeProtocols());
-        /* End of SSLv3 Fixes */
+                /* Skip SSLv3 Fixes */
+                sslContextFactory.addExcludeProtocols("SSLv3");
+                logger.info("Excluded protocols Data Router Node: " + Arrays.toString(sslContextFactory.getExcludeProtocols()));
+                /* End of SSLv3 Fixes */
 
-        server.setConnectors(new Connector[]{http, https});
-        ServletContextHandler ctxt = new ServletContextHandler(0);
+                server.setConnectors(new Connector[]{http, https});
+            }
+        }
+        ctxt = new ServletContextHandler(0);
         ctxt.setContextPath("/");
         server.setHandler(ctxt);
         ctxt.addServlet(new ServletHolder(new NodeServlet()), "/*");

@@ -229,7 +229,7 @@ public class FeedServletTest {
 
 
     private void initialiseBaseServletToBypassRetreiviingInitialisationParametersFromDatabase() throws IllegalAccessException {
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsg_flag", false, true);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsgFlag", false, true);
         SynchronizerTask synchronizerTask = mock(SynchronizerTask.class);
         when(synchronizerTask.getState()).thenReturn(SynchronizerTask.UNKNOWN);
         FieldUtils.writeDeclaredStaticField(SynchronizerTask.class, "synctask", synchronizerTask, true);
@@ -240,7 +240,7 @@ public class FeedServletTest {
         Set<String> authAddressesAndNetworks = new HashSet<String>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks, true);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "require_cert", false, true);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", false, true);
     }
 
     private void setBehalfHeader(String headerValue) {
