@@ -30,19 +30,19 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-	testDRFeedsPost.class,
-	testDRFeedsGet.class,
-	testDRFeedsPut.class,
-	testDRFeedsDelete.class,
-	testFeedPut.class,
-	testSubscribePost.class,
-	testInternalGet.class,
-	testInternalMisc.class,
-	testPublish.class,
-	testLogGet.class,
-	testFeedDelete.class,
-	testCleanup.class,
-	testRLEBitSet.class
+    testDRFeedsPost.class,
+    testDRFeedsGet.class,
+    testDRFeedsPut.class,
+    testDRFeedsDelete.class,
+    testFeedPut.class,
+    testSubscribePost.class,
+    testInternalGet.class,
+    testInternalMisc.class,
+    testPublish.class,
+    testLogGet.class,
+    testFeedDelete.class,
+    testCleanup.class,
+    testRLEBitSet.class
 })
 public class AllTests {
 }

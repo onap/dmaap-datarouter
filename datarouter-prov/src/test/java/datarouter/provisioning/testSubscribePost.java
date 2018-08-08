@@ -47,133 +47,133 @@ import org.onap.dmaap.datarouter.provisioning.FeedServlet;
 import org.onap.dmaap.datarouter.provisioning.SubscribeServlet;
 
 public class testSubscribePost extends testBase {
-	private int feednum = 0;
+    private int feednum = 0;
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+    }
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
+    @AfterClass
+    public static void tearDownAfterClass() throws Exception {
+    }
 
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
-		getDBstate();
-		// use the first feed to subscribe to
-		JSONArray ja = db_state.getJSONArray("feeds");
-		for (int i = 0; i < ja.length(); i++) {
-			JSONObject feed0 = ja.getJSONObject(i);
-			if (feed0 != null && !feed0.getBoolean("deleted")) {
-				feednum = feed0.getInt("feedid");
-				return;
-			}
-		}
-	}
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        getDBstate();
+        // use the first feed to subscribe to
+        JSONArray ja = db_state.getJSONArray("feeds");
+        for (int i = 0; i < ja.length(); i++) {
+            JSONObject feed0 = ja.getJSONObject(i);
+            if (feed0 != null && !feed0.getBoolean("deleted")) {
+                feednum = feed0.getInt("feedid");
+                return;
+            }
+        }
+    }
 
-	@Test
-	public void testNormal() {
-		JSONObject jo = buildSubRequest();
-		testCommon(jo, HttpServletResponse.SC_CREATED);
-	}
-	@Test
-	public void testMissingUrl() {
-		JSONObject jo = buildSubRequest();
-		jo.getJSONObject("delivery").remove("url");
-		testCommon(jo, HttpServletResponse.SC_BAD_REQUEST);
-	}
-	@Test
-	public void testTooLongUrl() {
-		JSONObject jo = buildSubRequest();
-		jo.getJSONObject("delivery").put("url", "https://"+s_257);
-		testCommon(jo, HttpServletResponse.SC_BAD_REQUEST);
-	}
-	@Test
-	public void testMissingUser() {
-		JSONObject jo = buildSubRequest();
-		jo.getJSONObject("delivery").remove("user");
-		testCommon(jo, HttpServletResponse.SC_BAD_REQUEST);
-	}
-	@Test
-	public void testTooLongUser() {
-		JSONObject jo = buildSubRequest();
-		jo.getJSONObject("delivery").put("user", s_33);
-		testCommon(jo, HttpServletResponse.SC_BAD_REQUEST);
-	}
-	@Test
-	public void testMissingPassword() {
-		JSONObject jo = buildSubRequest();
-		jo.getJSONObject("delivery").remove("password");
-		testCommon(jo, HttpServletResponse.SC_BAD_REQUEST);
-	}
-	@Test
-	public void testTooLongPassword() {
-		JSONObject jo = buildSubRequest();
-		jo.getJSONObject("delivery").put("password", s_33);
-		testCommon(jo, HttpServletResponse.SC_BAD_REQUEST);
-	}
-	@Test
-	public void testNonBooleanMetadata() {
-		JSONObject jo = buildSubRequest();
-		jo.put("metadataOnly", s_33);
-		testCommon(jo, HttpServletResponse.SC_BAD_REQUEST);
-	}
-	private void testCommon(JSONObject jo, int expect) {
-		String url   = props.getProperty("test.host") + "/subscribe/" + feednum;
-		HttpPost httpPost = new HttpPost(url);
-		try {
-			httpPost.addHeader(SubscribeServlet.BEHALF_HEADER, "JUnit");
-			String t = jo.toString();
-			HttpEntity body = new ByteArrayEntity(t.getBytes(), ContentType.create(SubscribeServlet.SUB_CONTENT_TYPE));
-			httpPost.setEntity(body);
+    @Test
+    public void testNormal() {
+        JSONObject jo = buildSubRequest();
+        testCommon(jo, HttpServletResponse.SC_CREATED);
+    }
+    @Test
+    public void testMissingUrl() {
+        JSONObject jo = buildSubRequest();
+        jo.getJSONObject("delivery").remove("url");
+        testCommon(jo, HttpServletResponse.SC_BAD_REQUEST);
+    }
+    @Test
+    public void testTooLongUrl() {
+        JSONObject jo = buildSubRequest();
+        jo.getJSONObject("delivery").put("url", "https://"+s_257);
+        testCommon(jo, HttpServletResponse.SC_BAD_REQUEST);
+    }
+    @Test
+    public void testMissingUser() {
+        JSONObject jo = buildSubRequest();
+        jo.getJSONObject("delivery").remove("user");
+        testCommon(jo, HttpServletResponse.SC_BAD_REQUEST);
+    }
+    @Test
+    public void testTooLongUser() {
+        JSONObject jo = buildSubRequest();
+        jo.getJSONObject("delivery").put("user", s_33);
+        testCommon(jo, HttpServletResponse.SC_BAD_REQUEST);
+    }
+    @Test
+    public void testMissingPassword() {
+        JSONObject jo = buildSubRequest();
+        jo.getJSONObject("delivery").remove("password");
+        testCommon(jo, HttpServletResponse.SC_BAD_REQUEST);
+    }
+    @Test
+    public void testTooLongPassword() {
+        JSONObject jo = buildSubRequest();
+        jo.getJSONObject("delivery").put("password", s_33);
+        testCommon(jo, HttpServletResponse.SC_BAD_REQUEST);
+    }
+    @Test
+    public void testNonBooleanMetadata() {
+        JSONObject jo = buildSubRequest();
+        jo.put("metadataOnly", s_33);
+        testCommon(jo, HttpServletResponse.SC_BAD_REQUEST);
+    }
+    private void testCommon(JSONObject jo, int expect) {
+        String url   = props.getProperty("test.host") + "/subscribe/" + feednum;
+        HttpPost httpPost = new HttpPost(url);
+        try {
+            httpPost.addHeader(SubscribeServlet.BEHALF_HEADER, "JUnit");
+            String t = jo.toString();
+            HttpEntity body = new ByteArrayEntity(t.getBytes(), ContentType.create(SubscribeServlet.SUB_CONTENT_TYPE));
+            httpPost.setEntity(body);
 
-			HttpResponse response = httpclient.execute(httpPost);
-		    ckResponse(response, expect);
+            HttpResponse response = httpclient.execute(httpPost);
+            ckResponse(response, expect);
 
-			HttpEntity entity = response.getEntity();
-			String ctype = entity.getContentType().getValue();
-			int code = response.getStatusLine().getStatusCode();
-			if (code == HttpServletResponse.SC_CREATED && !ctype.equals(SubscribeServlet.SUBFULL_CONTENT_TYPE))
-				fail("Got wrong content type: "+ctype);
+            HttpEntity entity = response.getEntity();
+            String ctype = entity.getContentType().getValue();
+            int code = response.getStatusLine().getStatusCode();
+            if (code == HttpServletResponse.SC_CREATED && !ctype.equals(SubscribeServlet.SUBFULL_CONTENT_TYPE))
+                fail("Got wrong content type: "+ctype);
 
-			// do something useful with the response body and ensure it is fully consumed
-			if (ctype.equals(FeedServlet.SUBFULL_CONTENT_TYPE)) {
-				JSONObject jo2 = null;
-				try {
-					jo2 = new JSONObject(new JSONTokener(entity.getContent()));
-				} catch (Exception e) {
-					fail("Bad JSON: "+e.getMessage());
-				}
-				try {
-					jo2.getString("subscriber");
-					JSONObject jo3 = jo2.getJSONObject("links");
-					jo3.getString("self");
-					jo3.getString("feed");
-					jo3.getString("log");
-				} catch (JSONException e) {
-					fail("required field missing from result: "+e.getMessage());
-				}
-			} else {
-				EntityUtils.consume(entity);
-			}
-		} catch (IOException e) {
-			fail(e.getMessage());
-		} finally {
-			httpPost.releaseConnection();
-		}
-	}
-	private JSONObject buildSubRequest() {
-		JSONObject jo = new JSONObject();
+            // do something useful with the response body and ensure it is fully consumed
+            if (ctype.equals(FeedServlet.SUBFULL_CONTENT_TYPE)) {
+                JSONObject jo2 = null;
+                try {
+                    jo2 = new JSONObject(new JSONTokener(entity.getContent()));
+                } catch (Exception e) {
+                    fail("Bad JSON: "+e.getMessage());
+                }
+                try {
+                    jo2.getString("subscriber");
+                    JSONObject jo3 = jo2.getJSONObject("links");
+                    jo3.getString("self");
+                    jo3.getString("feed");
+                    jo3.getString("log");
+                } catch (JSONException e) {
+                    fail("required field missing from result: "+e.getMessage());
+                }
+            } else {
+                EntityUtils.consume(entity);
+            }
+        } catch (IOException e) {
+            fail(e.getMessage());
+        } finally {
+            httpPost.releaseConnection();
+        }
+    }
+    private JSONObject buildSubRequest() {
+        JSONObject jo = new JSONObject();
 
-			JSONObject jo2 = new JSONObject();
-			jo2.put("url", "https://www.att.com/");
-			jo2.put("user", "dmr");
-			jo2.put("password", "passw0rd");
-			jo2.put("use100", true);
+            JSONObject jo2 = new JSONObject();
+            jo2.put("url", "https://www.att.com/");
+            jo2.put("user", "dmr");
+            jo2.put("password", "passw0rd");
+            jo2.put("use100", true);
 
-		jo.put("delivery", jo2);
-		jo.put("metadataOnly", Boolean.FALSE);
-		return jo;
-	}
+        jo.put("delivery", jo2);
+        jo.put("metadataOnly", Boolean.FALSE);
+        return jo;
+    }
 }
