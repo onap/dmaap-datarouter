@@ -39,112 +39,112 @@ import org.junit.Test;
 import org.onap.dmaap.datarouter.provisioning.FeedServlet;
 
 public class testInternalMisc extends testBase {
-	@Test
-	public void testInternalDrlogs() {
-		String url   = props.getProperty("test.host") + "/internal/drlogs";
-		HttpGet httpPost = new HttpGet(url);
-		try {
-			httpPost.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
+    @Test
+    public void testInternalDrlogs() {
+        String url   = props.getProperty("test.host") + "/internal/drlogs";
+        HttpGet httpPost = new HttpGet(url);
+        try {
+            httpPost.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
 
-			HttpResponse response = httpclient.execute(httpPost);
-			int code = response.getStatusLine().getStatusCode();
-			if (code != 200)
-				fail("Unexpected response, expect "+HttpServletResponse.SC_NOT_FOUND+" got "+code);
+            HttpResponse response = httpclient.execute(httpPost);
+            int code = response.getStatusLine().getStatusCode();
+            if (code != 200)
+                fail("Unexpected response, expect "+HttpServletResponse.SC_NOT_FOUND+" got "+code);
 
-			HttpEntity entity = response.getEntity();
-			String ctype = entity.getContentType().getValue().trim();
-			boolean ok  = ctype.equals("text/plain");
-			if (!ok)
-				fail("Got wrong content type: "+ctype);
+            HttpEntity entity = response.getEntity();
+            String ctype = entity.getContentType().getValue().trim();
+            boolean ok  = ctype.equals("text/plain");
+            if (!ok)
+                fail("Got wrong content type: "+ctype);
 
-			EntityUtils.consume(entity);
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		} finally {
-			httpPost.releaseConnection();
-		}
-	}
+            EntityUtils.consume(entity);
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        } finally {
+            httpPost.releaseConnection();
+        }
+    }
 
-	@Test
-	public void testInternalHalt() {
-		String url   = props.getProperty("test.host") + "/internal/halt";
-		HttpGet httpPost = new HttpGet(url);
-		try {
-			httpPost.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
+    @Test
+    public void testInternalHalt() {
+        String url   = props.getProperty("test.host") + "/internal/halt";
+        HttpGet httpPost = new HttpGet(url);
+        try {
+            httpPost.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
 
-			HttpResponse response = httpclient.execute(httpPost);
-			int code = response.getStatusLine().getStatusCode();
-			if (code != HttpServletResponse.SC_NOT_FOUND)
-				fail("Unexpected response, expect "+HttpServletResponse.SC_NOT_FOUND+" got "+code);
+            HttpResponse response = httpclient.execute(httpPost);
+            int code = response.getStatusLine().getStatusCode();
+            if (code != HttpServletResponse.SC_NOT_FOUND)
+                fail("Unexpected response, expect "+HttpServletResponse.SC_NOT_FOUND+" got "+code);
 
-			HttpEntity entity = response.getEntity();
-			EntityUtils.consume(entity);
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		} finally {
-			httpPost.releaseConnection();
-		}
-	}
+            HttpEntity entity = response.getEntity();
+            EntityUtils.consume(entity);
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        } finally {
+            httpPost.releaseConnection();
+        }
+    }
 
-	@SuppressWarnings("unused")
-	@Test
-	public void testInternalLogs() {
-		String url   = props.getProperty("test.host") + "/internal/logs";
-		HttpGet httpPost = new HttpGet(url);
-		try {
-			httpPost.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
+    @SuppressWarnings("unused")
+    @Test
+    public void testInternalLogs() {
+        String url   = props.getProperty("test.host") + "/internal/logs";
+        HttpGet httpPost = new HttpGet(url);
+        try {
+            httpPost.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
 
-			HttpResponse response = httpclient.execute(httpPost);
-			int code = response.getStatusLine().getStatusCode();
-			if (code != 200)
-				fail("Unexpected response, expect "+200+" got "+code);
+            HttpResponse response = httpclient.execute(httpPost);
+            int code = response.getStatusLine().getStatusCode();
+            if (code != 200)
+                fail("Unexpected response, expect "+200+" got "+code);
 
-			HttpEntity entity = response.getEntity();
-			String ctype = entity.getContentType().getValue().trim();
-			boolean ok  = ctype.equals("application/json");
-			if (!ok)
-				fail("Got wrong content type: "+ctype);
+            HttpEntity entity = response.getEntity();
+            String ctype = entity.getContentType().getValue().trim();
+            boolean ok  = ctype.equals("application/json");
+            if (!ok)
+                fail("Got wrong content type: "+ctype);
 
-			// do something useful with the response body and ensure it is fully consumed
-			if (ok) {
-				try {
-					new JSONArray(new JSONTokener(entity.getContent()));
-				} catch (Exception e) {
-					fail("Bad JSON: "+e.getMessage());
-				}
-			} else {
-				EntityUtils.consume(entity);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		} finally {
-			httpPost.releaseConnection();
-		}
-	}
+            // do something useful with the response body and ensure it is fully consumed
+            if (ok) {
+                try {
+                    new JSONArray(new JSONTokener(entity.getContent()));
+                } catch (Exception e) {
+                    fail("Bad JSON: "+e.getMessage());
+                }
+            } else {
+                EntityUtils.consume(entity);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        } finally {
+            httpPost.releaseConnection();
+        }
+    }
 
-	@Test
-	public void testInternalBadURL() {
-		String url   = props.getProperty("test.host") + "/internal/badurl";
-		HttpGet httpPost = new HttpGet(url);
-		try {
-			httpPost.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
+    @Test
+    public void testInternalBadURL() {
+        String url   = props.getProperty("test.host") + "/internal/badurl";
+        HttpGet httpPost = new HttpGet(url);
+        try {
+            httpPost.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
 
-			HttpResponse response = httpclient.execute(httpPost);
-			int code = response.getStatusLine().getStatusCode();
-			if (code != HttpServletResponse.SC_NOT_FOUND)
-				fail("Unexpected response, expect "+HttpServletResponse.SC_NOT_FOUND+" got "+code);
+            HttpResponse response = httpclient.execute(httpPost);
+            int code = response.getStatusLine().getStatusCode();
+            if (code != HttpServletResponse.SC_NOT_FOUND)
+                fail("Unexpected response, expect "+HttpServletResponse.SC_NOT_FOUND+" got "+code);
 
-			HttpEntity entity = response.getEntity();
-			EntityUtils.consume(entity);
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		} finally {
-			httpPost.releaseConnection();
-		}
-	}
+            HttpEntity entity = response.getEntity();
+            EntityUtils.consume(entity);
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        } finally {
+            httpPost.releaseConnection();
+        }
+    }
 
 }

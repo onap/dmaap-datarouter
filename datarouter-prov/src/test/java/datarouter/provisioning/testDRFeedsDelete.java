@@ -37,22 +37,22 @@ import org.junit.Test;
 import org.onap.dmaap.datarouter.provisioning.FeedServlet;
 
 public class testDRFeedsDelete extends testBase {
-	@Test
-	public void testNotAllowed() {
-		String url = props.getProperty("test.host") + "/";
-		HttpDelete del = new HttpDelete(url);
-		try {
-			del.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
+    @Test
+    public void testNotAllowed() {
+        String url = props.getProperty("test.host") + "/";
+        HttpDelete del = new HttpDelete(url);
+        try {
+            del.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
 
-			HttpResponse response = httpclient.execute(del);
-		    ckResponse(response, HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            HttpResponse response = httpclient.execute(del);
+            ckResponse(response, HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 
-			HttpEntity entity = response.getEntity();
-			EntityUtils.consume(entity);
-		} catch (IOException e) {
-			fail(e.getMessage());
-		} finally {
-			del.releaseConnection();
-		}
-	}
+            HttpEntity entity = response.getEntity();
+            EntityUtils.consume(entity);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        } finally {
+            del.releaseConnection();
+        }
+    }
 }

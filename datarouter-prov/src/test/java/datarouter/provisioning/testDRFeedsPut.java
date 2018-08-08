@@ -37,22 +37,22 @@ import org.junit.Test;
 import org.onap.dmaap.datarouter.provisioning.FeedServlet;
 
 public class testDRFeedsPut extends testBase {
-	@Test
-	public void testNotAllowed() {
-		String url = props.getProperty("test.host") + "/";
-		HttpPut put = new HttpPut(url);
-		try {
-			put.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
+    @Test
+    public void testNotAllowed() {
+        String url = props.getProperty("test.host") + "/";
+        HttpPut put = new HttpPut(url);
+        try {
+            put.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
 
-			HttpResponse response = httpclient.execute(put);
-		    ckResponse(response, HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            HttpResponse response = httpclient.execute(put);
+            ckResponse(response, HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 
-			HttpEntity entity = response.getEntity();
-			EntityUtils.consume(entity);
-		} catch (IOException e) {
-			fail(e.getMessage());
-		} finally {
-			put.releaseConnection();
-		}
-	}
+            HttpEntity entity = response.getEntity();
+            EntityUtils.consume(entity);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        } finally {
+            put.releaseConnection();
+        }
+    }
 }
