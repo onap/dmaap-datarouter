@@ -16,4 +16,4 @@ java -classpath $CLASSPATH  org.onap.dmaap.datarouter.node.NodeMain
 
 runner_file="$LIB/datarouter-node-jar-with-dependencies.jar"
 echo "Starting using" $runner_file
-java -Dcom.att.eelf.logging.file==/opt/app/datartr/etc/logback.xml -Dcom.att.eelf.logging.path=/ -Dorg.onap.dmaap.datarouter.node.ConfigFile==/opt/app/datartr/etc/node.properties -jar $runner_file
+java -Dcom.att.eelf.logging.file=/opt/app/datartr/etc/logback.xml -Dcom.att.eelf.logging.path=/root -Dorg.onap.dmaap.datarouter.node.properties=/opt/app/datartr/etc/node.properties -jar $runner_file

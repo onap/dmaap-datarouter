@@ -44,7 +44,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generateFeedURL(int feedid) {
-        return "https://" + BaseServlet.prov_name + "/feed/" + feedid;
+        return "https://" + BaseServlet.provName + "/feed/" + feedid;
     }
 
     /**
@@ -54,7 +54,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generatePublishURL(int feedid) {
-        return "https://" + BaseServlet.prov_name + "/publish/" + feedid;
+        return "https://" + BaseServlet.provName + "/publish/" + feedid;
     }
 
     /**
@@ -64,7 +64,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generateSubscribeURL(int feedid) {
-        return "https://" + BaseServlet.prov_name + "/subscribe/" + feedid;
+        return "https://" + BaseServlet.provName + "/subscribe/" + feedid;
     }
 
     /**
@@ -74,7 +74,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generateFeedLogURL(int feedid) {
-        return "https://" + BaseServlet.prov_name + "/feedlog/" + feedid;
+        return "https://" + BaseServlet.provName + "/feedlog/" + feedid;
     }
 
     /**
@@ -84,7 +84,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generateSubscriptionURL(int subid) {
-        return "https://" + BaseServlet.prov_name + "/subs/" + subid;
+        return "https://" + BaseServlet.provName + "/subs/" + subid;
     }
 
     /**
@@ -94,7 +94,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generateSubLogURL(int subid) {
-        return "https://" + BaseServlet.prov_name + "/sublog/" + subid;
+        return "https://" + BaseServlet.provName + "/sublog/" + subid;
     }
 
     /**

@@ -40,8 +40,6 @@ public class DB {
     /**
      * The name of the properties file (in CLASSPATH)
      */
-    private static final String CONFIG_FILE = "provserver.properties";
-
     private static String DB_URL;
     private static String DB_LOGIN;
     private static String DB_PASSWORD;
@@ -60,8 +58,10 @@ public class DB {
     public DB() {
         if (props == null) {
             props = new Properties();
-            try (InputStream inStream = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE)) {
-                props.load(inStream);
+            try {
+                props.load(new FileInputStream(System.getProperty(
+                        "org.onap.dmaap.datarouter.provserver.properties",
+                        "/opt/app/datartr/etc/provserver.properties")));
                 String DB_DRIVER = (String) props.get("org.onap.dmaap.datarouter.db.driver");
                 DB_URL = (String) props.get("org.onap.dmaap.datarouter.db.url");
                 DB_LOGIN = (String) props.get("org.onap.dmaap.datarouter.db.login");
@@ -151,7 +151,6 @@ public class DB {
     /**
      * Retrofit 1 - Make sure the expected tables are in DB and are initialized.
      * Uses sql_init_01.sql to setup the DB.
-     *
      * @return true if the retrofit worked, false otherwise
      */
     private boolean retroFit1() {
@@ -166,14 +165,14 @@ public class DB {
             Set<String> actualTables = getTableSet(connection);
             boolean initialize = false;
             for (String table : expectedTables) {
-                initialize |= !actualTables.contains(table);
+                initialize |= !actualTables.contains(table.toLowerCase());
             }
             if (initialize) {
                 intlogger.info("PROV9001: First time startup; The database is being initialized.");
                 runInitScript(connection, 1);
             }
         } catch (SQLException e) {
-            intlogger.fatal("PROV9000: The database credentials are not working: " + e.getMessage());
+            intlogger.fatal("PROV9000: The database credentials are not working: "+e.getMessage());
             return false;
         } finally {
             if (connection != null)
@@ -184,7 +183,6 @@ public class DB {
 
     /**
      * Get a set of all table names in the DB.
-     *
      * @param connection a DB connection
      * @return the set of table names
      */
@@ -192,7 +190,7 @@ public class DB {
         Set<String> tables = new HashSet<String>();
         try {
             DatabaseMetaData md = connection.getMetaData();
-            ResultSet rs = md.getTables("datarouter", "", "", null);
+            ResultSet rs = md.getTables(null, null, "%", null);
             if (rs != null) {
                 while (rs.next()) {
                     tables.add(rs.getString("TABLE_NAME"));
@@ -200,46 +198,46 @@ public class DB {
                 rs.close();
             }
         } catch (SQLException e) {
+            intlogger.fatal("PROV9010: Failed to get TABLE data from DB: "+e.getMessage());
         }
         return tables;
     }
-
     /**
      * Initialize the tables by running the initialization scripts located in the directory specified
      * by the property <i>org.onap.dmaap.datarouter.provserver.dbscripts</i>.  Scripts have names of
      * the form sql_init_NN.sql
-     *
      * @param connection a DB connection
-     * @param scriptId   the number of the sql_init_NN.sql script to run
+     * @param scriptId the number of the sql_init_NN.sql script to run
      */
     private void runInitScript(Connection connection, int scriptId) {
         String scriptDir = (String) props.get("org.onap.dmaap.datarouter.provserver.dbscripts");
-        StringBuilder sb = new StringBuilder();
+        StringBuilder strBuilder = new StringBuilder();
         try {
             String scriptFile = String.format("%s/sql_init_%02d.sql", scriptDir, scriptId);
-            if (!(new File(scriptFile)).exists())
-                return;
-
-            LineNumberReader in = new LineNumberReader(new FileReader(scriptFile));
+            if (!(new File(scriptFile)).exists()) {
+                intlogger.fatal("PROV9005 Failed to load sql script from : " + scriptFile);
+                System.exit(1);
+            }
+            LineNumberReader lineReader = new LineNumberReader(new FileReader(scriptFile));
             String line;
-            while ((line = in.readLine()) != null) {
+            while ((line = lineReader.readLine()) != null) {
                 if (!line.startsWith("--")) {
                     line = line.trim();
-                    sb.append(line);
+                    strBuilder.append(line);
                     if (line.endsWith(";")) {
                         // Execute one DDL statement
-                        String sql = sb.toString();
-                        sb.setLength(0);
-                        Statement s = connection.createStatement();
-                        s.execute(sql);
-                        s.close();
+                        String sql = strBuilder.toString();
+                        strBuilder.setLength(0);
+                        Statement statement = connection.createStatement();
+                        statement.execute(sql);
+                        statement.close();
                     }
                 }
             }
-            in.close();
-            sb.setLength(0);
+            lineReader.close();
+            strBuilder.setLength(0);
         } catch (Exception e) {
-            intlogger.fatal("PROV9002 Error when initializing table: " + e.getMessage());
+            intlogger.fatal("PROV9002 Error when initializing table: "+e.getMessage());
             System.exit(1);
         }
     }

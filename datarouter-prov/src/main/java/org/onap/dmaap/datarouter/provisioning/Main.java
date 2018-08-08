@@ -129,110 +129,114 @@ public class Main {
         http_config.setSendServerVersion(true);
         http_config.setSendDateHeader(false);
 
-        ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config));
-        http.setPort(http_port);
-        http.setAcceptQueueSize(2);
-
-        // HTTPS config
-        HttpConfiguration https_config = new HttpConfiguration(http_config);
-        https_config.setRequestHeaderSize(8192);
-
-        // HTTPS connector
-        SslContextFactory sslContextFactory = new SslContextFactory();
-        sslContextFactory.setKeyStorePath(p.getProperty(KEYSTORE_PATH_PROPERTY));
-        sslContextFactory.setKeyStorePassword(p.getProperty(KEYSTORE_PASSWORD_PROPERTY));
-        sslContextFactory.setKeyManagerPassword(p.getProperty("org.onap.dmaap.datarouter.provserver.keymanager.password"));
-
-        ServerConnector https = new ServerConnector(server,
-                new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
-                new HttpConnectionFactory(https_config));
-        https.setPort(https_port);
-        https.setIdleTimeout(30000);
-        https.setAcceptQueueSize(2);
-
-        // SSL stuff
-        /* Skip SSLv3 Fixes */
-        sslContextFactory.addExcludeProtocols("SSLv3");
-        logger.info("Excluded protocols prov-" + sslContextFactory.getExcludeProtocols());
-        /* End of SSLv3 Fixes */
-
-        sslContextFactory.setKeyStoreType(p.getProperty(KEYSTORE_TYPE_PROPERTY, "jks"));
-        sslContextFactory.setKeyStorePath(p.getProperty(KEYSTORE_PATH_PROPERTY));
-        sslContextFactory.setKeyStorePassword(p.getProperty(KEYSTORE_PASSWORD_PROPERTY));
-        sslContextFactory.setKeyManagerPassword(p.getProperty("org.onap.dmaap.datarouter.provserver.keymanager.password"));
-        String ts = p.getProperty(TRUSTSTORE_PATH_PROPERTY);
-        if (ts != null && ts.length() > 0) {
-            System.out.println("@@ TS -> " + ts);
-            sslContextFactory.setTrustStorePath(ts);
-            sslContextFactory.setTrustStorePassword(p.getProperty(TRUSTSTORE_PASSWORD_PROPERTY));
-        } else {
-            sslContextFactory.setTrustStorePath(DEFAULT_TRUSTSTORE);
-            sslContextFactory.setTrustStorePassword("changeit");
-        }
-        sslContextFactory.setTrustStorePath("/opt/app/datartr/self_signed/cacerts.jks");
-        sslContextFactory.setTrustStorePassword("changeit");
-        sslContextFactory.setWantClientAuth(true);
-
-        // Servlet and Filter configuration
-        ServletContextHandler ctxt = new ServletContextHandler(0);
-        ctxt.setContextPath("/");
-        ctxt.addServlet(new ServletHolder(new FeedServlet()), "/feed/*");
-        ctxt.addServlet(new ServletHolder(new FeedLogServlet()), "/feedlog/*");
-        ctxt.addServlet(new ServletHolder(new PublishServlet()), "/publish/*");
-        ctxt.addServlet(new ServletHolder(new SubscribeServlet()), "/subscribe/*");
-        ctxt.addServlet(new ServletHolder(new StatisticsServlet()), "/statistics/*");
-        ctxt.addServlet(new ServletHolder(new SubLogServlet()), "/sublog/*");
-        ctxt.addServlet(new ServletHolder(new GroupServlet()), "/group/*"); //Provision groups - Rally US708115 -1610
-        ctxt.addServlet(new ServletHolder(new SubscriptionServlet()), "/subs/*");
-        ctxt.addServlet(new ServletHolder(new InternalServlet()), "/internal/*");
-        ctxt.addServlet(new ServletHolder(new RouteServlet()), "/internal/route/*");
-        ctxt.addServlet(new ServletHolder(new DRFeedsServlet()), "/");
-        ctxt.addFilter(new FilterHolder(new ThrottleFilter()), "/publish/*", EnumSet.of(DispatcherType.REQUEST));
-
-        ContextHandlerCollection contexts = new ContextHandlerCollection();
-        contexts.addHandler(ctxt);
-
-        // Request log configuration
-        NCSARequestLog nrl = new NCSARequestLog();
-        nrl.setFilename(p.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir") + "/request.log.yyyy_mm_dd");
-        nrl.setFilenameDateFormat("yyyyMMdd");
-        nrl.setRetainDays(90);
-        nrl.setAppend(true);
-        nrl.setExtended(false);
-        nrl.setLogCookies(false);
-        nrl.setLogTimeZone("GMT");
-
-        RequestLogHandler reqlog = new RequestLogHandler();
-        reqlog.setRequestLog(nrl);
-
-        // Server's Handler collection
-        HandlerCollection hc = new HandlerCollection();
-        hc.setHandlers(new Handler[]{contexts, new DefaultHandler()});
-        hc.addHandler(reqlog);
-
         // Server's thread pool
         QueuedThreadPool queuedThreadPool = new QueuedThreadPool();
         queuedThreadPool.setMinThreads(10);
         queuedThreadPool.setMaxThreads(200);
         queuedThreadPool.setDetailedDump(false);
 
-        // Daemon to clean up the log directory on a daily basis
-        Timer rolex = new Timer();
-        rolex.scheduleAtFixedRate(new PurgeLogDirTask(), 0, 86400000L);    // run once per day
-
-        // Start LogfileLoader
-        LogfileLoader.getLoader();
-
         // The server itself
         server = new Server(queuedThreadPool);
 
-        ServerConnector serverConnector = new ServerConnector(server,
-                new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
-                new HttpConnectionFactory(https_config));
-        serverConnector.setPort(https_port);
-        serverConnector.setIdleTimeout(500000);
+        HandlerCollection hc;
+        try (ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config))) {
+            http.setPort(http_port);
+            http.setAcceptQueueSize(2);
 
-        server.setConnectors(new Connector[]{http, https});
+            // HTTPS config
+            HttpConfiguration https_config = new HttpConfiguration(http_config);
+            https_config.setRequestHeaderSize(8192);
+
+            // HTTPS connector
+            SslContextFactory sslContextFactory = new SslContextFactory();
+            sslContextFactory.setKeyStorePath(p.getProperty(KEYSTORE_PATH_PROPERTY));
+            sslContextFactory.setKeyStorePassword(p.getProperty(KEYSTORE_PASSWORD_PROPERTY));
+            sslContextFactory.setKeyManagerPassword(p.getProperty("org.onap.dmaap.datarouter.provserver.keymanager.password"));
+
+            try (ServerConnector https = new ServerConnector(server,
+                    new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
+                    new HttpConnectionFactory(https_config))) {
+                https.setPort(https_port);
+                https.setIdleTimeout(30000);
+                https.setAcceptQueueSize(2);
+
+                // SSL stuff
+                /* Skip SSLv3 Fixes */
+                sslContextFactory.addExcludeProtocols("SSLv3");
+                logger.info("Excluded protocols prov-" + sslContextFactory.getExcludeProtocols());
+                /* End of SSLv3 Fixes */
+
+                sslContextFactory.setKeyStoreType(p.getProperty(KEYSTORE_TYPE_PROPERTY, "jks"));
+                sslContextFactory.setKeyStorePath(p.getProperty(KEYSTORE_PATH_PROPERTY));
+                sslContextFactory.setKeyStorePassword(p.getProperty(KEYSTORE_PASSWORD_PROPERTY));
+                sslContextFactory.setKeyManagerPassword(p.getProperty("org.onap.dmaap.datarouter.provserver.keymanager.password"));
+                String ts = p.getProperty(TRUSTSTORE_PATH_PROPERTY);
+                if (ts != null && ts.length() > 0) {
+                    System.out.println("@@ TS -> " + ts);
+                    sslContextFactory.setTrustStorePath(ts);
+                    sslContextFactory.setTrustStorePassword(p.getProperty(TRUSTSTORE_PASSWORD_PROPERTY));
+                } else {
+                    sslContextFactory.setTrustStorePath(DEFAULT_TRUSTSTORE);
+                    sslContextFactory.setTrustStorePassword("changeit");
+                }
+                sslContextFactory.setTrustStorePath("/opt/app/datartr/self_signed/cacerts.jks");
+                sslContextFactory.setTrustStorePassword("changeit");
+                sslContextFactory.setWantClientAuth(true);
+
+                // Servlet and Filter configuration
+                ServletContextHandler ctxt = new ServletContextHandler(0);
+                ctxt.setContextPath("/");
+                ctxt.addServlet(new ServletHolder(new FeedServlet()), "/feed/*");
+                ctxt.addServlet(new ServletHolder(new FeedLogServlet()), "/feedlog/*");
+                ctxt.addServlet(new ServletHolder(new PublishServlet()), "/publish/*");
+                ctxt.addServlet(new ServletHolder(new SubscribeServlet()), "/subscribe/*");
+                ctxt.addServlet(new ServletHolder(new StatisticsServlet()), "/statistics/*");
+                ctxt.addServlet(new ServletHolder(new SubLogServlet()), "/sublog/*");
+                ctxt.addServlet(new ServletHolder(new GroupServlet()), "/group/*"); //Provision groups - Rally US708115 -1610
+                ctxt.addServlet(new ServletHolder(new SubscriptionServlet()), "/subs/*");
+                ctxt.addServlet(new ServletHolder(new InternalServlet()), "/internal/*");
+                ctxt.addServlet(new ServletHolder(new RouteServlet()), "/internal/route/*");
+                ctxt.addServlet(new ServletHolder(new DRFeedsServlet()), "/");
+                ctxt.addFilter(new FilterHolder(new ThrottleFilter()), "/publish/*", EnumSet.of(DispatcherType.REQUEST));
+
+                ContextHandlerCollection contexts = new ContextHandlerCollection();
+                contexts.addHandler(ctxt);
+
+                // Request log configuration
+                NCSARequestLog nrl = new NCSARequestLog();
+                nrl.setFilename(p.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir") + "/request.log.yyyy_mm_dd");
+                nrl.setFilenameDateFormat("yyyyMMdd");
+                nrl.setRetainDays(90);
+                nrl.setAppend(true);
+                nrl.setExtended(false);
+                nrl.setLogCookies(false);
+                nrl.setLogTimeZone("GMT");
+
+                RequestLogHandler reqlog = new RequestLogHandler();
+                reqlog.setRequestLog(nrl);
+
+                // Server's Handler collection
+                hc = new HandlerCollection();
+                hc.setHandlers(new Handler[]{contexts, new DefaultHandler()});
+                hc.addHandler(reqlog);
+
+                // Daemon to clean up the log directory on a daily basis
+                Timer rolex = new Timer();
+                rolex.scheduleAtFixedRate(new PurgeLogDirTask(), 0, 86400000L);    // run once per day
+
+                // Start LogfileLoader
+                LogfileLoader.getLoader();
+
+                try (ServerConnector serverConnector = new ServerConnector(server,
+                        new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
+                        new HttpConnectionFactory(https_config))) {
+                    serverConnector.setPort(https_port);
+                    serverConnector.setIdleTimeout(500000);
+                }
+
+                server.setConnectors(new Connector[]{http, https});
+            }
+        }
         server.setHandler(hc);
         server.setStopAtShutdown(true);
         server.setStopTimeout(5000);

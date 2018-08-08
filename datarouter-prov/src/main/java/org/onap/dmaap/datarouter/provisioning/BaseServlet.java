@@ -89,20 +89,20 @@ import javax.mail.internet.MimeMultipart;
 @SuppressWarnings("serial")
 public class BaseServlet extends HttpServlet implements ProvDataProvider {
     public static final String BEHALF_HEADER         = "X-ATT-DR-ON-BEHALF-OF";
-    public static final String FEED_BASECONTENT_TYPE = "application/vnd.att-dr.feed";
+    static final String FEED_BASECONTENT_TYPE = "application/vnd.att-dr.feed";
     public static final String FEED_CONTENT_TYPE     = "application/vnd.att-dr.feed; version=2.0";
     public static final String FEEDFULL_CONTENT_TYPE = "application/vnd.att-dr.feed-full; version=2.0";
     public static final String FEEDLIST_CONTENT_TYPE = "application/vnd.att-dr.feed-list; version=1.0";
-    public static final String SUB_BASECONTENT_TYPE  = "application/vnd.att-dr.subscription";
+    static final String SUB_BASECONTENT_TYPE  = "application/vnd.att-dr.subscription";
     public static final String SUB_CONTENT_TYPE      = "application/vnd.att-dr.subscription; version=2.0";
     public static final String SUBFULL_CONTENT_TYPE  = "application/vnd.att-dr.subscription-full; version=2.0";
-    public static final String SUBLIST_CONTENT_TYPE  = "application/vnd.att-dr.subscription-list; version=1.0";
+    static final String SUBLIST_CONTENT_TYPE  = "application/vnd.att-dr.subscription-list; version=1.0";
 
 
     //Adding groups functionality, ...1610
-    public static final String GROUP_BASECONTENT_TYPE = "application/vnd.att-dr.group";
+    static final String GROUP_BASECONTENT_TYPE = "application/vnd.att-dr.group";
     public static final String GROUP_CONTENT_TYPE     = "application/vnd.att-dr.group; version=2.0";
-    public static final String GROUPFULL_CONTENT_TYPE = "application/vnd.att-dr.group-full; version=2.0";
+    static final String GROUPFULL_CONTENT_TYPE = "application/vnd.att-dr.group-full; version=2.0";
     public static final String GROUPLIST_CONTENT_TYPE = "application/vnd.att-dr.fegrouped-list; version=1.0";
 
 
@@ -111,37 +111,37 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     public static final String PROVFULL_CONTENT_TYPE2 = "application/vnd.att-dr.provfeed-full; version=2.0";
     public static final String CERT_ATTRIBUTE        = "javax.servlet.request.X509Certificate";
 
-    public static final String DB_PROBLEM_MSG = "There has been a problem with the DB.  It is suggested you try the operation again.";
+    static final String DB_PROBLEM_MSG = "There has been a problem with the DB.  It is suggested you try the operation again.";
 
-    public static final int    DEFAULT_MAX_FEEDS     = 10000;
-    public static final int    DEFAULT_MAX_SUBS      = 100000;
-    public static final int    DEFAULT_POKETIMER1    = 5;
-    public static final int    DEFAULT_POKETIMER2    = 30;
-    public static final String DEFAULT_DOMAIN        = "web.att.com";
-    public static final String DEFAULT_PROVSRVR_NAME = "feeds-drtr.web.att.com";
-    public static final String RESEARCH_SUBNET       = "135.207.136.128/25";
-    public static final String STATIC_ROUTING_NODES       = ""; //Adding new param for static Routing - Rally:US664862-1610
+    private static final int    DEFAULT_MAX_FEEDS     = 10000;
+    private static final int    DEFAULT_MAX_SUBS      = 100000;
+    private static final int    DEFAULT_POKETIMER1    = 5;
+    private static final int    DEFAULT_POKETIMER2    = 30;
+    private static final String DEFAULT_DOMAIN        = "onap";
+    private static final String DEFAULT_PROVSRVR_NAME = "dmaap-dr-prov";
+    private static final String RESEARCH_SUBNET       = "10.42.0.0/16";
+    private static final String STATIC_ROUTING_NODES  = ""; //Adding new param for static Routing - Rally:US664862-1610
 
     /** A boolean to trigger one time "provisioning changed" event on startup */
-    private static boolean startmsg_flag  = true;
+    private static boolean startmsgFlag = true;
     /** This POD should require SSL connections from clients; pulled from the DB (PROV_REQUIRE_SECURE) */
-    private static boolean require_secure = true;
+    private static boolean requireSecure = true;
     /** This POD should require signed, recognized certificates from clients; pulled from the DB (PROV_REQUIRE_CERT) */
-    private static boolean require_cert   = true;
+    private static boolean requireCert = true;
     /** The set of authorized addresses and networks; pulled from the DB (PROV_AUTH_ADDRESSES) */
     private static Set<String> authorizedAddressesAndNetworks = new HashSet<String>();
     /** The set of authorized names; pulled from the DB (PROV_AUTH_SUBJECTS) */
     private static Set<String> authorizedNames = new HashSet<String>();
     /** The FQDN of the initially "active" provisioning server in this Data Router ecosystem */
-    private static String initial_active_pod;
+    private static String initialActivePod;
     /** The FQDN of the initially "standby" provisioning server in this Data Router ecosystem */
-    private static String initial_standby_pod;
+    private static String initialStandbyPod;
     /** The FQDN of this provisioning server in this Data Router ecosystem */
-    private static String this_pod;
+    private static String thisPod;
     /** "Timer 1" - used to determine when to notify nodes of provisioning changes */
-    private static long poke_timer1;
+    private static long pokeTimer1;
     /** "Timer 2" - used to determine when to notify nodes of provisioning changes */
-    private static long poke_timer2;
+    private static long pokeTimer2;
     /** Array of nodes names and/or FQDNs */
     private static String[] nodes = new String[0];
     /** Array of node IP addresses */
@@ -149,25 +149,24 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     /** Array of POD IP addresses */
     private static InetAddress[] podAddresses = new InetAddress[0];
     /** The maximum number of feeds allowed; pulled from the DB (PROV_MAXFEED_COUNT) */
-    protected static int max_feeds    = 0;
+    static int maxFeeds = 0;
     /** The maximum number of subscriptions allowed; pulled from the DB (PROV_MAXSUB_COUNT) */
-    protected static int max_subs     = 0;
+    static int maxSubs = 0;
     /** The current number of feeds in the system */
-    protected static int active_feeds = 0;
+    static int activeFeeds = 0;
     /** The current number of subscriptions in the system */
-    protected static int active_subs  = 0;
+    static int activeSubs = 0;
     /** The domain used to generate a FQDN from the "bare" node names */
-    public static String prov_domain = "web.att.com";
+    private static String provDomain = "web.att.com";
     /** The standard FQDN of the provisioning server in this Data Router ecosystem */
-    public static String prov_name   = "feeds-drtr.web.att.com";
+    public static String provName = "feeds-drtr.web.att.com";
     /** The standard FQDN of the ACTIVE provisioning server in this Data Router ecosystem */
-    public static String active_prov_name   = "feeds-drtr.web.att.com";
+    public static String activeProvName = "feeds-drtr.web.att.com";
     /** Special subnet that is allowed access to /internal */
-    protected static String special_subnet = RESEARCH_SUBNET;
-
+    private static String researchSubnet = RESEARCH_SUBNET;
     /** Special subnet that is allowed access to /internal to Lab Machine */
-    protected static String special_subnet_secondary = RESEARCH_SUBNET;
-    protected static String static_routing_nodes = STATIC_ROUTING_NODES; //Adding new param for static Routing - Rally:US664862-1610
+    private static String researchSubnet1 = RESEARCH_SUBNET;
+    private static String staticRoutingNodes = STATIC_ROUTING_NODES; //Adding new param for static Routing - Rally:US664862-1610
 
     /** This logger is used to log provisioning events */
     protected static Logger eventlogger;
@@ -176,15 +175,19 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     /** Authorizer - interface to the Policy Engine */
     protected static Authorizer authz;
     /** The Synchronizer used to sync active DB to standby one */
-    protected static SynchronizerTask synctask = null;
+    private static SynchronizerTask synctask = null;
 
     //Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
     private InetAddress thishost;
     private InetAddress loopback;
     private static Boolean mailSendFlag = false;
 
-    public static final String MAILCONFIG_FILE = "mail.properties";
+    private static final String MAILCONFIG_FILE = "mail.properties";
     private static Properties mailprops;
+
+    //DMAAP-597 (Tech Dept) REST request source IP auth relaxation to accommodate OOM kubernetes deploy
+    private static String isAddressAuthEnabled = (new DB()).getProperties().getProperty("org.onap.dmaap.datarouter.provserver.isaddressauthenabled", "false");
+
     /**
      * Initialize data common to all the provisioning server servlets.
      */
@@ -192,11 +195,11 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         if (eventlogger == null)
             eventlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.events");
         if (intlogger == null)
-            intlogger   = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+            intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
         if (authz == null)
             authz = new ProvAuthorizer(this);
-        if (startmsg_flag) {
-            startmsg_flag = false;
+        if (startmsgFlag) {
+            startmsgFlag = false;
             provisioningParametersChanged();
         }
         if (synctask == null) {
@@ -216,7 +219,8 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             // ignore
         }
     }
-    protected int getIdFromPath(HttpServletRequest req) {
+
+    int getIdFromPath(HttpServletRequest req) {
         String path = req.getPathInfo();
         if (path == null || path.length() < 2)
             return -1;
@@ -231,7 +235,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * @param req the HTTP request
      * @return the JSONObject, or null if the stream cannot be parsed
      */
-    protected JSONObject getJSONfromInput(HttpServletRequest req) {
+    JSONObject getJSONfromInput(HttpServletRequest req) {
         JSONObject jo = null;
         try {
             jo = new JSONObject(new JSONTokener(req.getInputStream()));
@@ -250,9 +254,12 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * @param request the request
      * @return an error string, or null if all is OK
      */
-    protected String isAuthorizedForProvisioning(HttpServletRequest request) {
+    String isAuthorizedForProvisioning(HttpServletRequest request) {
+        if (Boolean.parseBoolean(isAddressAuthEnabled)){
+            return null;
+        }
         // Is the request https?
-        if (require_secure && !request.isSecure()) {
+        if (requireSecure && !request.isSecure()) {
             return "Request must be made over an HTTPS connection.";
         }
 
@@ -272,7 +279,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         }
 
         // Does remote have a valid certificate?
-        if (require_cert) {
+        if (requireCert) {
             X509Certificate certs[] = (X509Certificate[]) request.getAttribute(CERT_ATTRIBUTE);
             if (certs == null || certs.length == 0) {
                 return "Client certificate is missing.";
@@ -293,8 +300,12 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * @param request the HTTP request
      * @return true iff authorized
      */
-    protected boolean isAuthorizedForInternal(HttpServletRequest request) {
+    boolean isAuthorizedForInternal(HttpServletRequest request) {
+
         try {
+            if (Boolean.parseBoolean(isAddressAuthEnabled)) {
+                return true;
+            }
             InetAddress ip = InetAddress.getByName(request.getRemoteAddr());
             for (InetAddress node : getNodeAddresses()) {
                 if (node != null && ip.equals(node))
@@ -309,9 +320,9 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             if (loopback != null && ip.equals(loopback))
                 return true;
             // Also allow the "special subnet" access
-            if (addressMatchesNetwork(ip, special_subnet_secondary))
+            if (addressMatchesNetwork(ip, researchSubnet1))
                 return true;
-            if (addressMatchesNetwork(ip, special_subnet))
+            if (addressMatchesNetwork(ip, researchSubnet))
                 return true;
         } catch (UnknownHostException e) {
             // ignore
@@ -324,7 +335,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * @param s the network address; a bare IP address may be matched also
      * @return true if they intersect
      */
-    protected static boolean addressMatchesNetwork(InetAddress ip, String s) {
+    private static boolean addressMatchesNetwork(InetAddress ip, String s) {
         int mlen = -1;
         int n = s.indexOf("/");
         if (n >= 0) {
@@ -365,36 +376,36 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     public static void provisioningDataChanged() {
         long now = System.currentTimeMillis();
         Poker p = Poker.getPoker();
-        p.setTimers(now + (poke_timer1 * 1000L), now + (poke_timer2 * 1000L));
+        p.setTimers(now + (pokeTimer1 * 1000L), now + (pokeTimer2 * 1000L));
     }
     /**
      * Something in the parameters has changed, reload all parameters from the DB.
      */
     public static void provisioningParametersChanged() {
         Map<String,String> map         = Parameters.getParameters();
-        require_secure   = getBoolean(map, Parameters.PROV_REQUIRE_SECURE);
-        require_cert     = getBoolean(map, Parameters.PROV_REQUIRE_CERT);
+        requireSecure = getBoolean(map, Parameters.PROV_REQUIRE_SECURE);
+        requireCert = getBoolean(map, Parameters.PROV_REQUIRE_CERT);
         authorizedAddressesAndNetworks = getSet(map, Parameters.PROV_AUTH_ADDRESSES);
         authorizedNames  = getSet    (map, Parameters.PROV_AUTH_SUBJECTS);
         nodes            = getSet    (map, Parameters.NODES).toArray(new String[0]);
-        max_feeds        = getInt    (map, Parameters.PROV_MAXFEED_COUNT, DEFAULT_MAX_FEEDS);
-        max_subs         = getInt    (map, Parameters.PROV_MAXSUB_COUNT, DEFAULT_MAX_SUBS);
-        poke_timer1      = getInt    (map, Parameters.PROV_POKETIMER1, DEFAULT_POKETIMER1);
-        poke_timer2      = getInt    (map, Parameters.PROV_POKETIMER2, DEFAULT_POKETIMER2);
-        prov_domain      = getString (map, Parameters.PROV_DOMAIN, DEFAULT_DOMAIN);
-        prov_name        = getString (map, Parameters.PROV_NAME, DEFAULT_PROVSRVR_NAME);
-        active_prov_name = getString (map, Parameters.PROV_ACTIVE_NAME, prov_name);
-        special_subnet   = getString (map, Parameters.PROV_SPECIAL_SUBNET, RESEARCH_SUBNET);
-        static_routing_nodes = getString (map, Parameters.STATIC_ROUTING_NODES, ""); //Adding new param for static Routing - Rally:US664862-1610
-        initial_active_pod  = getString (map, Parameters.ACTIVE_POD, "");
-        initial_standby_pod = getString (map, Parameters.STANDBY_POD, "");
-        static_routing_nodes = getString (map, Parameters.STATIC_ROUTING_NODES, ""); //Adding new param for static Routing - Rally:US664862-1610
-        active_feeds     = Feed.countActiveFeeds();
-        active_subs      = Subscription.countActiveSubscriptions();
+        maxFeeds = getInt    (map, Parameters.PROV_MAXFEED_COUNT, DEFAULT_MAX_FEEDS);
+        maxSubs = getInt    (map, Parameters.PROV_MAXSUB_COUNT, DEFAULT_MAX_SUBS);
+        pokeTimer1 = getInt    (map, Parameters.PROV_POKETIMER1, DEFAULT_POKETIMER1);
+        pokeTimer2 = getInt    (map, Parameters.PROV_POKETIMER2, DEFAULT_POKETIMER2);
+        provDomain = getString (map, Parameters.PROV_DOMAIN, DEFAULT_DOMAIN);
+        provName = getString (map, Parameters.PROV_NAME, DEFAULT_PROVSRVR_NAME);
+        activeProvName = getString (map, Parameters.PROV_ACTIVE_NAME, provName);
+        researchSubnet = getString (map, Parameters.PROV_SPECIAL_SUBNET, RESEARCH_SUBNET);
+        staticRoutingNodes = getString (map, Parameters.STATIC_ROUTING_NODES, ""); //Adding new param for static Routing - Rally:US664862-1610
+        initialActivePod = getString (map, Parameters.ACTIVE_POD, "");
+        initialStandbyPod = getString (map, Parameters.STANDBY_POD, "");
+        staticRoutingNodes = getString (map, Parameters.STATIC_ROUTING_NODES, ""); //Adding new param for static Routing - Rally:US664862-1610
+        activeFeeds = Feed.countActiveFeeds();
+        activeSubs = Subscription.countActiveSubscriptions();
         try {
-            this_pod = InetAddress.getLocalHost().getHostName();
+            thisPod = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            this_pod = "";
+            thisPod = "";
             intlogger.warn("PROV0014 Cannot determine the name of this provisioning server.");
         }
 
@@ -402,7 +413,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         InetAddress[] na = new InetAddress[nodes.length];
         for (int i = 0; i < nodes.length; i++) {
             if (nodes[i].indexOf('.') < 0)
-                nodes[i] += "." + prov_domain;
+                nodes[i] += "." + provDomain;
             try {
                 na[i] = InetAddress.getByName(nodes[i]);
                 intlogger.debug("PROV0003 DNS lookup: "+nodes[i]+" => "+na[i].toString());
@@ -414,13 +425,12 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
 
         //Reset Nodes arr after - removing static routing Nodes, Rally Userstory - US664862 .
         List<String> filterNodes = new ArrayList<>();
-        for (int i = 0; i < nodes.length; i++) {
-            if(!static_routing_nodes.contains(nodes[i])){
-                filterNodes.add(nodes[i]);
+        for (String node : nodes) {
+            if (!staticRoutingNodes.contains(node)) {
+                filterNodes.add(node);
             }
         }
-        String [] filteredNodes = filterNodes.toArray(new String[filterNodes.size()]);
-        nodes = filteredNodes;
+        nodes = filterNodes.toArray(new String[filterNodes.size()]);
 
         nodeAddresses = na;
         NodeClass.setNodes(nodes);        // update NODES table
@@ -430,7 +440,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         na = new InetAddress[pods.length];
         for (int i = 0; i < pods.length; i++) {
             if (pods[i].indexOf('.') < 0)
-                pods[i] += "." + prov_domain;
+                pods[i] += "." + provDomain;
             try {
                 na[i] = InetAddress.getByName(pods[i]);
                 intlogger.debug("PROV0003 DNS lookup: "+pods[i]+" => "+na[i].toString());
@@ -482,7 +492,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      *
     **/
     private void checkHttpsRelaxation() {
-        if(mailSendFlag == false) {
+        if(!mailSendFlag) {
             Properties p = (new DB()).getProperties();
             intlogger.info("HTTPS relaxatio: "+p.get("org.onap.dmaap.datarouter.provserver.https.relaxation"));
 
@@ -562,13 +572,13 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * @return an array of Strings
      */
     public static String[] getPods() {
-        return new String[] { initial_active_pod, initial_standby_pod };
+        return new String[] {initialActivePod, initialStandbyPod};
     }
     /**
      * Get an array of all POD InetAddresses in the DR network.
      * @return an array of InetAddresses
      */
-    public static InetAddress[] getPodAddresses() {
+    private static InetAddress[] getPodAddresses() {
         return podAddresses;
     }
     /**
@@ -579,7 +589,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * @return the FQDN
      */
     public static boolean isInitialActivePOD() {
-        return this_pod.equals(initial_active_pod);
+        return thisPod.equals(initialActivePod);
     }
     /**
      * Gets the FQDN of the initially STANDBY provisioning server (POD).
@@ -589,7 +599,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * @return the FQDN
      */
     public static boolean isInitialStandbyPOD() {
-        return this_pod.equals(initial_standby_pod);
+        return thisPod.equals(initialStandbyPod);
     }
     /**
      * INSERT an {@link Insertable} bean into the database.
@@ -597,7 +607,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * @return true if the INSERT was successful
      */
     protected boolean doInsert(Insertable bean) {
-        boolean rv = false;
+        boolean rv;
         DB db = new DB();
         Connection conn = null;
         try {
@@ -619,7 +629,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * @return true if the UPDATE was successful
      */
     protected boolean doUpdate(Updateable bean) {
-        boolean rv = false;
+        boolean rv;
         DB db = new DB();
         Connection conn = null;
         try {
@@ -641,7 +651,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * @return true if the DELETE was successful
      */
     protected boolean doDelete(Deleteable bean) {
-        boolean rv = false;
+        boolean rv;
         DB db = new DB();
         Connection conn = null;
         try {
@@ -696,10 +706,10 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     public class ContentHeader {
         private String type = "";
         private Map<String, String> map = new HashMap<String, String>();
-        public ContentHeader() {
+        ContentHeader() {
             this("", "1.0");
         }
-        public ContentHeader(String t, String v) {
+        ContentHeader(String t, String v) {
             type = t.trim();
             map.put("version", v);
         }
@@ -719,7 +729,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * @param req the request
      * @return the header, encapsulated in a ContentHeader object
      */
-    public ContentHeader getContentHeader(HttpServletRequest req) {
+    ContentHeader getContentHeader(HttpServletRequest req) {
         ContentHeader ch = new ContentHeader();
         String s = req.getHeader("Content-Type");
         if (s != null) {
@@ -783,18 +793,18 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     private boolean isUserMemberOfGroup(Group group, String user) {
 
-        String groupdetails = group.getMembers().replace("]", "").replace("[", "");
-        String s[] =    groupdetails.split("},");
+        String groupDetails = group.getMembers().replace("]", "").replace("[", "");
+        String [] s = groupDetails.split("},");
 
-        for(int i=0; i < s.length; i++) {
-                JSONObject jsonObj = null;
-                try {
-                    jsonObj = new JSONObject(s[i]+"}");
-                    if(jsonObj.get("id").equals(user))
-                        return true;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+        for (String value : s) {
+            JSONObject jsonObj;
+            try {
+                jsonObj = new JSONObject(value + "}");
+                if (jsonObj.get("id").equals(user))
+                    return true;
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
         return false;
 
@@ -814,6 +824,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 int groupid = f.getGroupid();
                 if(groupid > 0) {
                     Group group = Group.getGroupById(groupid);
+                    assert group != null;
                     if(isUserMemberOfGroup(group, owner)) {
                         return group.getAuthid();
                     }
@@ -839,6 +850,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 int groupid = s.getGroupid();
                 if(groupid > 0) {
                     Group group = Group.getGroupById(groupid);
+                    assert group != null;
                     if(isUserMemberOfGroup(group, owner)) {
                         return group.getAuthid();
                     }
@@ -854,7 +866,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * @Method - setIpAndFqdnForEelf - Rally:US664892
      * @Params - method, prints method name in EELF log.
      */
-    protected void setIpAndFqdnForEelf(String method) {
+    void setIpAndFqdnForEelf(String method) {
         MDC.clear();
         MDC.put(MDC_SERVICE_NAME, method);
         try {

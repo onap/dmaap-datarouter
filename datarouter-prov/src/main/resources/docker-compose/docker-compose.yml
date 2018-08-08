@@ -30,11 +30,9 @@ services:
      - "8443:8443"
      - "8080:8080"  
     volumes:
-     - ./prov_data/proserver.properties:/opt/app/datartr/etc/proserver.properties
-#     - ./prov_data/datarouter-prov-jar-with-dependencies.jar:/opt/app/datartr/lib/datarouter-prov-jar-with-dependencies.jar
+     - ./prov_data/provserver.properties:/opt/app/datartr/etc/provserver.properties
      - ./prov_data/addSubscriber.txt:/opt/app/datartr/addSubscriber.txt
      - ./prov_data/addFeed3.txt:/opt/app/datartr/addFeed3.txt
-    entrypoint: ["bash", "-c", "./startup.sh"]
     depends_on:
       mariadb_container:
         condition: service_healthy
@@ -58,7 +56,6 @@ services:
      - "9090:8080"
     volumes:
      - ./node_data/node.properties:/opt/app/datartr/etc/node.properties
-    entrypoint: ["bash", "-c", "./startup.sh"]
     depends_on:
       datarouter-prov:
         condition: service_healthy
@@ -73,15 +70,17 @@ services:
     container_name: mariadb
     ports:
       - "3306:3306"
+#    volumes:
+#     - ./database/sql_init_01.sql:/docker-entrypoint-initdb.d/sql_init_01.sql
     environment:
       MYSQL_ROOT_PASSWORD: datarouter
       MYSQL_DATABASE: datarouter
       MYSQL_USER: datarouter
       MYSQL_PASSWORD: datarouter
     healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "--silent"]
       interval: 10s
-      timeout: 10s
+      timeout: 30s
       retries: 5
 
     networks:
