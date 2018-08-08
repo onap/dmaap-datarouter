@@ -49,14 +49,17 @@ import org.junit.Before;
 import org.onap.dmaap.datarouter.provisioning.FeedServlet;
 
 public class IntegrationTestBase {
-    /** The properties file to read the DB properties from. */
-    public static final String CONFIG_FILE = "integration_test.properties";
+
+    /**
+     * The properties file to read the DB properties from.
+     */
+    private static final String CONFIG_FILE = "integration_test.properties";
 
     public Properties props;
     protected AbstractHttpClient httpclient;
-    protected String s33;
-    protected String s257;
-    protected static JSONObject db_state;
+    String s33;
+    String s257;
+    static JSONObject db_state;
 
     /**
      * This is the setUp method.
@@ -65,13 +68,10 @@ public class IntegrationTestBase {
     public void setUp() throws Exception {
         if (props == null) {
             props = new Properties();
-            InputStream inStream = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE);
-            try {
+            try (InputStream inStream = getClass().getClassLoader().getResourceAsStream(CONFIG_FILE)) {
                 props.load(inStream);
             } catch (Exception e) {
                 e.printStackTrace();
-            } finally {
-                inStream.close();
             }
         }
 
@@ -83,8 +83,8 @@ public class IntegrationTestBase {
 
         // keystore
         String store = props.getProperty("test.keystore");
-        String pass  = props.getProperty("test.kspassword");
-        KeyStore keyStore  = KeyStore.getInstance(KeyStore.getDefaultType());
+        String pass = props.getProperty("test.kspassword");
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         FileInputStream instream = new FileInputStream(new File(store));
         try {
             keyStore.load(instream, pass.toCharArray());
@@ -99,8 +99,8 @@ public class IntegrationTestBase {
         }
 
         store = props.getProperty("test.truststore");
-        pass  = props.getProperty("test.tspassword");
-        KeyStore trustStore  = KeyStore.getInstance(KeyStore.getDefaultType());
+        pass = props.getProperty("test.tspassword");
+        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
         instream = new FileInputStream(new File(store));
         try {
             trustStore.load(instream, pass.toCharArray());
@@ -117,15 +117,17 @@ public class IntegrationTestBase {
         SSLSocketFactory socketFactory = new SSLSocketFactory(keyStore, "changeit", trustStore);
         Scheme sch = new Scheme("https", 443, socketFactory);
         httpclient.getConnectionManager().getSchemeRegistry().register(sch);
+
+        //DbTestData.populateDb(httpclient, props);
     }
 
     /**
      * This is the getDBstate method.
      */
-    public JSONObject getDBstate() {
+    void getDBstate() {
         // set db_state!
         if (db_state == null) {
-            String url   = props.getProperty("test.host") + "/internal/prov";
+            String url = props.getProperty("test.host") + "/internal/prov";
             HttpGet httpGet = new HttpGet(url);
             try {
                 httpGet.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");
@@ -133,7 +135,7 @@ public class IntegrationTestBase {
                 HttpEntity entity = response.getEntity();
                 String ctype = entity.getContentType().getValue().trim();
                 // save the response body as db_state
-                boolean ok  = ctype.equals(FeedServlet.PROVFULL_CONTENT_TYPE1);
+                boolean ok = ctype.equals(FeedServlet.PROVFULL_CONTENT_TYPE1);
                 ok |= ctype.equals(FeedServlet.PROVFULL_CONTENT_TYPE2);
                 if (ok) {
                     db_state = null;
@@ -151,7 +153,6 @@ public class IntegrationTestBase {
                 httpGet.releaseConnection();
             }
         }
-        return db_state;
     }
 
     /**

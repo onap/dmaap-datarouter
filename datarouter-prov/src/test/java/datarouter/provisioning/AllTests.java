@@ -30,20 +30,21 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-        IntegrationTestDrFeedsPost.class,
-        IntegrationTestDrFeedsGet.class,
-        IntegrationTestDrFeedsPut.class,
-        IntegrationTestDrFeedsDelete.class,
-        IntegrationTestFeedPut.class,
-        IntegrationTestSubscribePost.class,
-        IntegrationTestInternalGet.class,
-        IntegrationTestInternalMisc.class,
-        IntegrationTestPublish.class,
-        IntegrationTestLogGet.class,
-        IntegrationTestFeedDelete.class,
-        IntegrationTestCleanup.class,
-        IntegrationTestRleBitSet.class
-    })
+    IntegrationTestDrFeedsPost.class,
+    IntegrationTestDrFeedsPut.class,
+    IntegrationTestDrFeedsDelete.class,
+    IntegrationTestFeedPut.class,
+    IntegrationTestDrFeedsGet.class,
+    IntegrationTestInternalGet.class,
+    IntegrationTestInternalMisc.class,
+    IntegrationTestPublish.class,
+    IntegrationTestSubscribePost.class,
+    IntegrationTestLogGet.class,
+    IntegrationTestFeedDelete.class,
+    IntegrationTestCleanup.class,
+    IntegrationTestRleBitSet.class
+})
 
 public class AllTests {
+
 }

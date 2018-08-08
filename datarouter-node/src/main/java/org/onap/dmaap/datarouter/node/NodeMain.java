@@ -29,66 +29,69 @@ import org.eclipse.jetty.util.ssl.*;
 import org.eclipse.jetty.server.*;
 import org.apache.log4j.Logger;
 
+import java.util.Arrays;
+
 /**
  * The main starting point for the Data Router node
  */
 public class NodeMain {
+
     private NodeMain() {
     }
 
     private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeMain");
 
-    private static class wfconfig implements Runnable {
-        private NodeConfigManager ncm;
+    private static class WaitForConfig implements Runnable {
 
-        wfconfig(NodeConfigManager ncm) {
-            this.ncm = ncm;
+        private NodeConfigManager localNodeConfigManager;
+
+        WaitForConfig(NodeConfigManager ncm) {
+            this.localNodeConfigManager = ncm;
         }
 
         public synchronized void run() {
             notify();
         }
 
-        synchronized void waitforconfig() {
-            ncm.registerConfigTask(this);
-            while (!ncm.isConfigured()) {
+        synchronized void waitForConfig() {
+            localNodeConfigManager.registerConfigTask(this);
+            while (!localNodeConfigManager.isConfigured()) {
                 logger.info("NODE0003 Waiting for Node Configuration");
                 try {
                     wait();
                 } catch (Exception e) {
-                    logger.debug("NodeMain: waitforconfig exception");
+                    logger.debug("NodeMain: waitForConfig exception");
                 }
             }
-            ncm.deregisterConfigTask(this);
+            localNodeConfigManager.deregisterConfigTask(this);
             logger.info("NODE0004 Node Configuration Data Received");
         }
     }
 
-    private static Delivery d;
-    private static NodeConfigManager ncm;
+    private static Delivery delivery;
+    private static NodeConfigManager nodeConfigManager;
 
     /**
      * Reset the retry timer for a subscription
      */
     static void resetQueue(String subid, String ip) {
-        d.resetQueue(ncm.getSpoolDir(subid, ip));
+        delivery.resetQueue(nodeConfigManager.getSpoolDir(subid, ip));
     }
 
     /**
      * Start the data router.
      * <p>
-     * The location of the node configuration file can be set using the
-     * org.onap.dmaap.datarouter.node.ConfigFile system property.  By
-     * default, it is "etc/node.properties".
+     * The location of the node configuration file can be set using the org.onap.dmaap.datarouter.node.ConfigFile system
+     * property.  By default, it is "etc/node.properties".
      */
     public static void main(String[] args) throws Exception {
         logger.info("NODE0001 Data Router Node Starting");
         IsFrom.setDNSCache();
-        ncm = NodeConfigManager.getInstance();
-        logger.info("NODE0002 I am " + ncm.getMyName());
-        (new wfconfig(ncm)).waitforconfig();
-        d = new Delivery(ncm);
-        LogManager lm = new LogManager(ncm);
+        nodeConfigManager = NodeConfigManager.getInstance();
+        logger.info("NODE0002 I am " + nodeConfigManager.getMyName());
+        (new WaitForConfig(nodeConfigManager)).waitForConfig();
+        delivery = new Delivery(nodeConfigManager);
+        LogManager lm = new LogManager(nodeConfigManager);
         Server server = new Server();
 
         // HTTP configuration
@@ -97,38 +100,41 @@ public class NodeMain {
         httpConfiguration.setRequestHeaderSize(2048);
 
         // HTTP connector
-        ServerConnector httpServerConnector = new ServerConnector(server, new HttpConnectionFactory(httpConfiguration));
-        httpServerConnector.setPort(ncm.getHttpPort());
+        ServletContextHandler ctxt;
+        try (ServerConnector httpServerConnector = new ServerConnector(server,
+            new HttpConnectionFactory(httpConfiguration))) {
+            httpServerConnector.setPort(nodeConfigManager.getHttpPort());
 
-        // HTTPS configuration
-        SslContextFactory sslContextFactory = new SslContextFactory();
-        sslContextFactory.setKeyStoreType(ncm.getKSType());
-        sslContextFactory.setKeyStorePath(ncm.getKSFile());
-        sslContextFactory.setKeyStorePassword(ncm.getKSPass());
-        sslContextFactory.setKeyManagerPassword(ncm.getKPass());
-        /* Skip SSLv3 Fixes */
-        sslContextFactory.addExcludeProtocols("SSLv3");
-        logger.info("Excluded protocols node-" + sslContextFactory.getExcludeProtocols());
-        /* End of SSLv3 Fixes */
+            // HTTPS configuration
+            SslContextFactory sslContextFactory = new SslContextFactory();
+            sslContextFactory.setKeyStoreType(nodeConfigManager.getKSType());
+            sslContextFactory.setKeyStorePath(nodeConfigManager.getKSFile());
+            sslContextFactory.setKeyStorePassword(nodeConfigManager.getKSPass());
+            sslContextFactory.setKeyManagerPassword(nodeConfigManager.getKPass());
+            /* Skip SSLv3 Fixes */
+            sslContextFactory.addExcludeProtocols("SSLv3");
+            logger.info("Excluded protocols node-" + Arrays.toString(sslContextFactory.getExcludeProtocols()));
+            /* End of SSLv3 Fixes */
 
-        HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
-        httpsConfiguration.setRequestHeaderSize(8192);
+            HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
+            httpsConfiguration.setRequestHeaderSize(8192);
 
-        SecureRequestCustomizer secureRequestCustomizer = new SecureRequestCustomizer();
-        secureRequestCustomizer.setStsMaxAge(2000);
-        secureRequestCustomizer.setStsIncludeSubDomains(true);
-        httpsConfiguration.addCustomizer(secureRequestCustomizer);
+            SecureRequestCustomizer secureRequestCustomizer = new SecureRequestCustomizer();
+            secureRequestCustomizer.setStsMaxAge(2000);
+            secureRequestCustomizer.setStsIncludeSubDomains(true);
+            httpsConfiguration.addCustomizer(secureRequestCustomizer);
 
-        // HTTPS connector
-        ServerConnector httpsServerConnector = new ServerConnector(server,
-                new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
+            // HTTPS connector
+            ServerConnector httpsServerConnector = new ServerConnector(server,
+                new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
                 new HttpConnectionFactory(httpsConfiguration));
-        httpsServerConnector.setPort(ncm.getHttpsPort());
-        httpsServerConnector.setIdleTimeout(500000);
-        httpsServerConnector.setAcceptQueueSize(2);
+            httpsServerConnector.setPort(nodeConfigManager.getHttpsPort());
+            httpsServerConnector.setIdleTimeout(500000);
+            httpsServerConnector.setAcceptQueueSize(2);
 
-        server.setConnectors(new Connector[]{httpServerConnector, httpsServerConnector});
-        ServletContextHandler ctxt = new ServletContextHandler(0);
+            server.setConnectors(new Connector[]{httpServerConnector, httpsServerConnector});
+        }
+        ctxt = new ServletContextHandler(0);
         ctxt.setContextPath("/");
         server.setHandler(ctxt);
         ctxt.addServlet(new ServletHolder(new NodeServlet()), "/*");
