@@ -7,9 +7,9 @@
  * * Licensed under the Apache License, Version 2.0 (the "License");
  * * you may not use this file except in compliance with the License.
  * * You may obtain a copy of the License at
- * * 
+ * *
  *  *      http://www.apache.org/licenses/LICENSE-2.0
- * * 
+ * *
  *  * Unless required by applicable law or agreed to in writing, software
  * * distributed under the License is distributed on an "AS IS" BASIS,
  * * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -59,134 +59,134 @@ import com.att.eelf.configuration.EELFManager;
  */
 @SuppressWarnings("serial")
 public class PublishServlet extends BaseServlet {
-	private int next_node;
-	private String provstring;
-	private List<IngressRoute> irt;
-	//Adding EELF Logger Rally:US664892  
+    private int next_node;
+    private String provstring;
+    private List<IngressRoute> irt;
+    //Adding EELF Logger Rally:US664892
     private static EELFLogger eelflogger = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.provisioning.PublishServlet");
-    
 
-	@Override
-	public void init(ServletConfig config) throws ServletException {
-		super.init(config);
-		next_node = 0;
-		provstring = "";
-		irt = new ArrayList<IngressRoute>();
-	
-	}
-	@Override
-	public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		setIpAndFqdnForEelf("doDelete");
-		eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
-		redirect(req, resp);
-	}
-	@Override
-	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		setIpAndFqdnForEelf("doGet");
-		eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
-		redirect(req, resp);
-	}
-	@Override
-	public void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		setIpAndFqdnForEelf("doPut");
-		eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
-		redirect(req, resp);
-	}
-	@Override
-	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		setIpAndFqdnForEelf("doPost");
-		eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
-		redirect(req, resp);
-	}
-	private void redirect(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		String[] nodes = getNodes();
-		if (nodes == null || nodes.length == 0) {
-			resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "There are no nodes defined in the DR network.");
-		} else {
-			EventLogRecord elr = new EventLogRecord(req);
-			int feedid = checkPath(req);
-			if (feedid < 0) {
-				String message = (feedid == -1)
-					? "Invalid request - Missing or bad feed number."
-					: "Invalid request - Missing file ID.";
-				elr.setMessage(message);
-				elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-				eventlogger.info(elr);
 
-				resp.sendError(HttpServletResponse.SC_NOT_FOUND, message);
-			} else {
-				// Generate new URL
-				String nextnode = getRedirectNode(feedid, req);
-				nextnode = nextnode+":"+DB.HTTPS_PORT;
-				String newurl = "https://" + nextnode + "/publish" + req.getPathInfo();
-				String qs = req.getQueryString();
-				if (qs != null)
-					newurl += "?" + qs;
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        next_node = 0;
+        provstring = "";
+        irt = new ArrayList<IngressRoute>();
 
-				// Log redirect in event log
-				String message = "Redirected to: "+newurl;
-				elr.setMessage(message);
-				elr.setResult(HttpServletResponse.SC_MOVED_PERMANENTLY);
-				eventlogger.info(elr);
+    }
+    @Override
+    public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        setIpAndFqdnForEelf("doDelete");
+        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
+        redirect(req, resp);
+    }
+    @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        setIpAndFqdnForEelf("doGet");
+        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
+        redirect(req, resp);
+    }
+    @Override
+    public void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        setIpAndFqdnForEelf("doPut");
+        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
+        redirect(req, resp);
+    }
+    @Override
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        setIpAndFqdnForEelf("doPost");
+        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
+        redirect(req, resp);
+    }
+    private void redirect(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String[] nodes = getNodes();
+        if (nodes == null || nodes.length == 0) {
+            resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "There are no nodes defined in the DR network.");
+        } else {
+            EventLogRecord elr = new EventLogRecord(req);
+            int feedid = checkPath(req);
+            if (feedid < 0) {
+                String message = (feedid == -1)
+                    ? "Invalid request - Missing or bad feed number."
+                    : "Invalid request - Missing file ID.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_NOT_FOUND);
+                eventlogger.info(elr);
 
-				resp.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-				resp.setHeader("Location", newurl);
-			}
-		}
-	}
-	private String getRedirectNode(int feedid, HttpServletRequest req) {
-		// Check to see if the IRT needs to be updated
-		Poker p = Poker.getPoker();
-		String s = p.getProvisioningString();
-		synchronized (provstring) {
-			if (irt == null || (s.length() != provstring.length()) || !s.equals(provstring)) {
-				// Provisioning string has changed -- update the IRT
-				provstring = s;
-				JSONObject jo = new JSONObject(new JSONTokener(provstring));
-				JSONArray ja = jo.getJSONArray("ingress");
-				List<IngressRoute> newlist = new ArrayList<IngressRoute>();
-				for (int i = 0; i < ja.length(); i++) {
-					IngressRoute iroute = new IngressRoute(ja.getJSONObject(i));
-					newlist.add(iroute);
-				}
-				irt = newlist;
-			}
-		}
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, message);
+            } else {
+                // Generate new URL
+                String nextnode = getRedirectNode(feedid, req);
+                nextnode = nextnode+":"+DB.HTTPS_PORT;
+                String newurl = "https://" + nextnode + "/publish" + req.getPathInfo();
+                String qs = req.getQueryString();
+                if (qs != null)
+                    newurl += "?" + qs;
 
-		// Look in IRT for next node
-		for (IngressRoute route : irt) {
-			if (route.matches(feedid, req)) {
-				// pick a node at random from the list
-				Collection<String> nodes = route.getNodes();
-				String[] arr = nodes.toArray(new String[0]);
-				long id = System.currentTimeMillis() % arr.length;
-				String node = arr[(int) id];
-				intlogger.info("Redirecting to "+node+" because of route "+route);
-				return node;
-			}
-		}
+                // Log redirect in event log
+                String message = "Redirected to: "+newurl;
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_MOVED_PERMANENTLY);
+                eventlogger.info(elr);
 
-		// No IRT rule matches, do round robin of all active nodes
-		String[] nodes = getNodes();
-		if (next_node >= nodes.length)	// The list of nodes may have grown/shrunk
-			next_node = 0;
-		return nodes[next_node++];
-	}
-	private int checkPath(HttpServletRequest req) {
-		String path = req.getPathInfo();
-		if (path == null || path.length() < 2)
-			return -1;
-		path = path.substring(1);
-		int ix = path.indexOf('/');
-		if (ix < 0 || ix == path.length()-1)
-			return -2;
-		try {
-			int feedid = Integer.parseInt(path.substring(0, ix));
-			if (!Feed.isFeedValid(feedid))
-				return -1;
-			return feedid;
-		} catch (NumberFormatException e) {
-			return -1;
-		}
-	}
+                resp.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+                resp.setHeader("Location", newurl);
+            }
+        }
+    }
+    private String getRedirectNode(int feedid, HttpServletRequest req) {
+        // Check to see if the IRT needs to be updated
+        Poker p = Poker.getPoker();
+        String s = p.getProvisioningString();
+        synchronized (provstring) {
+            if (irt == null || (s.length() != provstring.length()) || !s.equals(provstring)) {
+                // Provisioning string has changed -- update the IRT
+                provstring = s;
+                JSONObject jo = new JSONObject(new JSONTokener(provstring));
+                JSONArray ja = jo.getJSONArray("ingress");
+                List<IngressRoute> newlist = new ArrayList<IngressRoute>();
+                for (int i = 0; i < ja.length(); i++) {
+                    IngressRoute iroute = new IngressRoute(ja.getJSONObject(i));
+                    newlist.add(iroute);
+                }
+                irt = newlist;
+            }
+        }
+
+        // Look in IRT for next node
+        for (IngressRoute route : irt) {
+            if (route.matches(feedid, req)) {
+                // pick a node at random from the list
+                Collection<String> nodes = route.getNodes();
+                String[] arr = nodes.toArray(new String[0]);
+                long id = System.currentTimeMillis() % arr.length;
+                String node = arr[(int) id];
+                intlogger.info("Redirecting to "+node+" because of route "+route);
+                return node;
+            }
+        }
+
+        // No IRT rule matches, do round robin of all active nodes
+        String[] nodes = getNodes();
+        if (next_node >= nodes.length)    // The list of nodes may have grown/shrunk
+            next_node = 0;
+        return nodes[next_node++];
+    }
+    private int checkPath(HttpServletRequest req) {
+        String path = req.getPathInfo();
+        if (path == null || path.length() < 2)
+            return -1;
+        path = path.substring(1);
+        int ix = path.indexOf('/');
+        if (ix < 0 || ix == path.length()-1)
+            return -2;
+        try {
+            int feedid = Integer.parseInt(path.substring(0, ix));
+            if (!Feed.isFeedValid(feedid))
+                return -1;
+            return feedid;
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
 }

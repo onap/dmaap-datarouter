@@ -7,9 +7,9 @@
  * * Licensed under the Apache License, Version 2.0 (the "License");
  * * you may not use this file except in compliance with the License.
  * * You may obtain a copy of the License at
- * * 
+ * *
  *  *      http://www.apache.org/licenses/LICENSE-2.0
- * * 
+ * *
  *  * Unless required by applicable law or agreed to in writing, software
  * * distributed under the License is distributed on an "AS IS" BASIS,
  * * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,44 +41,47 @@ import org.onap.dmaap.datarouter.provisioning.BaseServlet;
  * @version $Id: EventLogRecord.java,v 1.1 2013/04/26 21:00:25 eby Exp $
  */
 public class EventLogRecord {
-	private final String ipaddr;		// Who
-	private final String behalfof;
-	private final String clientSubject;
-	private final String method;		// What
-	private final String servlet;
-	private int result;					// How
-	private String message;
+    private final String ipaddr;        // Who
+    private final String behalfof;
+    private final String clientSubject;
+    private final String method;        // What
+    private final String servlet;
+    private int result;                    // How
+    private String message;
 
-	public EventLogRecord(HttpServletRequest request) {
-		// Who is making the request
-		this.ipaddr = request.getRemoteAddr();
-		String s = request.getHeader(BaseServlet.BEHALF_HEADER);
-		this.behalfof = (s != null) ? s : "";
-		X509Certificate certs[] = (X509Certificate[]) request.getAttribute(BaseServlet.CERT_ATTRIBUTE);
-		this.clientSubject = (certs != null && certs.length > 0)
-			? certs[0].getSubjectX500Principal().getName() : "";
+    public EventLogRecord(HttpServletRequest request) {
+        // Who is making the request
+        this.ipaddr = request.getRemoteAddr();
+        String s = request.getHeader(BaseServlet.BEHALF_HEADER);
+        this.behalfof = (s != null) ? s : "";
+        X509Certificate certs[] = (X509Certificate[]) request.getAttribute(BaseServlet.CERT_ATTRIBUTE);
+        this.clientSubject = (certs != null && certs.length > 0)
+                ? certs[0].getSubjectX500Principal().getName() : "";
 
-		// What is the request
-		this.method  = request.getMethod();
-		this.servlet = request.getServletPath();
+        // What is the request
+        this.method = request.getMethod();
+        this.servlet = request.getServletPath();
 
-		// How was it dealt with
-		this.result = -1;
-		this.message = "";
-	}
-	public void setResult(int result) {
-		this.result = result;
-	}
-	public void setMessage(String message) {
-		this.message = message;
-	}
-	@Override
-	public String toString() {
-		return String.format(
-			"%s %s \"%s\" %s %s %d \"%s\"",
-			ipaddr, behalfof, clientSubject,
-			method, servlet,
-			result, message
-		);
-	}
+        // How was it dealt with
+        this.result = -1;
+        this.message = "";
+    }
+
+    public void setResult(int result) {
+        this.result = result;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "%s %s \"%s\" %s %s %d \"%s\"",
+                ipaddr, behalfof, clientSubject,
+                method, servlet,
+                result, message
+        );
+    }
 }

@@ -26,105 +26,105 @@ export PATH PROVSRVR PROVCMD NOPROXY
 
 if [ ! -x /usr/bin/curl ]
 then
-	echo provcmd: curl is required for this tool.
-	exit 1
+    echo provcmd: curl is required for this tool.
+    exit 1
 fi
 optloop=
 while [ -z "$optloop" ]
 do
-	if [ "$1" == '-s' ]
-	then
-		shift
-		PROVSRVR="$1"
-		shift
-	elif [ "$1" == '-v' ]
-	then
-		shift
-		VERBOSE=x
-	elif [ "$1" == '-N' ]
-	then
-		shift
-		NOPROXY='?noproxy=1'
-	else
-		optloop=1
-	fi
+    if [ "$1" == '-s' ]
+    then
+        shift
+        PROVSRVR="$1"
+        shift
+    elif [ "$1" == '-v' ]
+    then
+        shift
+        VERBOSE=x
+    elif [ "$1" == '-N' ]
+    then
+        shift
+        NOPROXY='?noproxy=1'
+    else
+        optloop=1
+    fi
 done
 if [ -z "$PROVSRVR" ]
 then
-	echo "provcmd: you need to specify the server, either via the -s option"
-	echo "         or by setting and exporting PROVSRVR"
-	exit 1
+    echo "provcmd: you need to specify the server, either via the -s option"
+    echo "         or by setting and exporting PROVSRVR"
+    exit 1
 fi
 
 CMD="$1"
 shift
 if [ "$CMD" == 'delete' ]
 then
-	if [ $# -gt 0 ]
-	then
-		for i
-		do
-			[ -n "$VERBOSE" ] && echo curl -4 -k -X DELETE "https://$PROVSRVR/internal/api/$1$NOPROXY"
-			curl -4 -k -X DELETE "https://$PROVSRVR/internal/api/$1$NOPROXY"
-		done
-		exit 0
-	fi
+    if [ $# -gt 0 ]
+    then
+        for i
+        do
+            [ -n "$VERBOSE" ] && echo curl -4 -k -X DELETE "https://$PROVSRVR/internal/api/$1$NOPROXY"
+            curl -4 -k -X DELETE "https://$PROVSRVR/internal/api/$1$NOPROXY"
+        done
+        exit 0
+    fi
 elif [ "$CMD" == 'create' ]
 then
-	if [ $# -eq 2 ]
-	then
-		# create (with POST), then set the value
-		[ -n "$VERBOSE" ] && echo curl -4 -k -X POST --data '' "https://$PROVSRVR/internal/api/$1$NOPROXY"
-		curl -4 -k -X POST --data '' "https://$PROVSRVR/internal/api/$1$NOPROXY"
-		$PROVCMD set "$1" "$2"
-		exit 0
-	fi
+    if [ $# -eq 2 ]
+    then
+        # create (with POST), then set the value
+        [ -n "$VERBOSE" ] && echo curl -4 -k -X POST --data '' "https://$PROVSRVR/internal/api/$1$NOPROXY"
+        curl -4 -k -X POST --data '' "https://$PROVSRVR/internal/api/$1$NOPROXY"
+        $PROVCMD set "$1" "$2"
+        exit 0
+    fi
 elif [ "$CMD" == 'get' ]
 then
-	if [ $# -eq 1 ]
-	then
-		# get
-		[ -n "$VERBOSE" ] && echo curl -4 -k "https://$PROVSRVR/internal/api/$1$NOPROXY"
-		curl -4 -k "https://$PROVSRVR/internal/api/$1$NOPROXY" 2>/dev/null | tr '|' '\012' | sort
-		exit 0
-	fi
+    if [ $# -eq 1 ]
+    then
+        # get
+        [ -n "$VERBOSE" ] && echo curl -4 -k "https://$PROVSRVR/internal/api/$1$NOPROXY"
+        curl -4 -k "https://$PROVSRVR/internal/api/$1$NOPROXY" 2>/dev/null | tr '|' '\012' | sort
+        exit 0
+    fi
 elif [ "$CMD" == 'set' ]
 then
-	if [ $# -ge 2 ]
-	then
-		p="$1"
-		shift
-		v=""
-		for i; do [ -n "$v" ] && v="$v|"; v="$v$i"; done
-		# set (with PUT)
-		ue=`urlencode "$v"`
-		NOPROXY=`echo $NOPROXY | tr '?' '&'`
-		[ -n "$VERBOSE" ] && echo curl -4 -k -X PUT "https://$PROVSRVR/internal/api/$p?val=$ue$NOPROXY"
-		curl -4 -k -X PUT "https://$PROVSRVR/internal/api/$p?val=$ue$NOPROXY"
-		exit 0
-	fi
+    if [ $# -ge 2 ]
+    then
+        p="$1"
+        shift
+        v=""
+        for i; do [ -n "$v" ] && v="$v|"; v="$v$i"; done
+        # set (with PUT)
+        ue=`urlencode "$v"`
+        NOPROXY=`echo $NOPROXY | tr '?' '&'`
+        [ -n "$VERBOSE" ] && echo curl -4 -k -X PUT "https://$PROVSRVR/internal/api/$p?val=$ue$NOPROXY"
+        curl -4 -k -X PUT "https://$PROVSRVR/internal/api/$p?val=$ue$NOPROXY"
+        exit 0
+    fi
 elif [ "$CMD" == 'append' ]
 then
-	if [ $# -ge 2 ]
-	then
-		p="$1"
-		shift
-		tmp=`curl -4 -k "https://$PROVSRVR/internal/api/$p$NOPROXY" 2>/dev/null`
-		$PROVCMD set "$p" "$tmp" "$@"
-		exit 0
-	fi
+    if [ $# -ge 2 ]
+    then
+        p="$1"
+        shift
+        tmp=`curl -4 -k "https://$PROVSRVR/internal/api/$p$NOPROXY" 2>/dev/null`
+        $PROVCMD set "$p" "$tmp" "$@"
+        exit 0
+    fi
 elif [ "$CMD" == 'remove' ]
 then
-	if [ $# -eq 2 ]
-	then
-		p="$1"
-		rm="$2"
-		$PROVCMD get "$p" | grep -v "^$rm\$" > /tmp/pc$$
-		IFS=$'\r\n'
-		$PROVCMD set "$p" `cat /tmp/pc$$`
-		rm /tmp/pc$$
-		exit 0
-	fi
+    if [ $# -eq 2 ]
+    then
+        p="$1"
+        rm="$2"
+        $PROVCMD get "$p" | grep -v "^$rm\$" > /tmp/pc$$
+        IFS=$'\r\n'
+        $PROVCMD set "$p" `cat /tmp/pc$$`
+        rm /tmp/pc$$
+        exit 0
+    fi
 fi
 
 # Some error somewhere - display usage

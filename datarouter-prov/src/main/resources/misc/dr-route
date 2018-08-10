@@ -28,5 +28,5 @@ CLASSPATH=`echo /opt/app/datartr/etc /opt/app/datartr/lib/*.jar | tr ' ' ':'`
 export CLASSPATH JAVA_HOME JAVA_OPTS TZ PATH
 
 $JAVA_HOME/bin/java \
-	-Dlog4j.configuration=file:///opt/app/datartr/etc/log4j.drroute.properties \
-	org.onap.dmaap.datarouter.provisioning.utils.DRRouteCLI $*
+    -Dlog4j.configuration=file:///opt/app/datartr/etc/log4j.drroute.properties \
+    org.onap.dmaap.datarouter.provisioning.utils.DRRouteCLI $*

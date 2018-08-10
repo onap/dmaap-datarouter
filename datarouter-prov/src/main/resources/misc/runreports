@@ -37,18 +37,18 @@ ID=`id -n -u`
 GRP=`id -n -g`
 if [ "$ID" != "datartr" ]
 then
-	echo runreports must be started as user datartr not $ID
-	exit 1
+    echo runreports must be started as user datartr not $ID
+    exit 1
 fi
 if [ "$GRP" != "datartr" ]
 then
-	echo runreports must be started as group datartr not $GRP
-	exit 1
+    echo runreports must be started as group datartr not $GRP
+    exit 1
 fi
 if [ "`pgrep -u mysql mysqld`" = "" ]
 then
-	echo MariaDB is not running.  It must be started before runreports
-	exit 1
+    echo MariaDB is not running.  It must be started before runreports
+    exit 1
 fi
 
 # Volume report

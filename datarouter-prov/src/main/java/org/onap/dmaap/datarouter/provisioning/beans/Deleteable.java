@@ -7,9 +7,9 @@
  * * Licensed under the Apache License, Version 2.0 (the "License");
  * * you may not use this file except in compliance with the License.
  * * You may obtain a copy of the License at
- * * 
+ * *
  *  *      http://www.apache.org/licenses/LICENSE-2.0
- * * 
+ * *
  *  * Unless required by applicable law or agreed to in writing, software
  * * distributed under the License is distributed on an "AS IS" BASIS,
  * * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,10 +32,10 @@ import java.sql.Connection;
  * @version $Id: Deleteable.java,v 1.2 2013/05/29 14:44:36 eby Exp $
  */
 public interface Deleteable {
-	/**
-	 * Delete this object in the DB.
-	 * @param c the JDBC Connection to use
-	 * @return true if the DELETE succeeded, false otherwise
-	 */
-	public boolean doDelete(Connection c);
+    /**
+     * Delete this object in the DB.
+     * @param c the JDBC Connection to use
+     * @return true if the DELETE succeeded, false otherwise
+     */
+    public boolean doDelete(Connection c);
 }

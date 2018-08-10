@@ -30,108 +30,108 @@ CLASSPATH=`echo /opt/app/datartr/etc /opt/app/datartr/lib/*.jar | tr ' ' ':'`
 export CLASSPATH JAVA_HOME JAVA_OPTS TZ PATH
 
 pids() {
-	pgrep -u datartr -f provisioning.Main
+    pgrep -u datartr -f provisioning.Main
 }
 
 start() {
-	ID=`id -n -u`
-	GRP=`id -n -g`
-	if [ "$ID" != "root" ]
-	then
-		echo drtrprov must be started as user datartr not $ID
-		exit 1
-	fi
+    ID=`id -n -u`
+    GRP=`id -n -g`
+    if [ "$ID" != "root" ]
+    then
+        echo drtrprov must be started as user datartr not $ID
+        exit 1
+    fi
 #  if [ "$GRP" != "datartr" ]
-# 	then
-# 		echo drtrprov must be started as group datartr not $GRP
-# 		exit 1
-# 	fi  
-# 	cd /opt/app/datartr
-# 	if etc/havecert
-# 	then
-# 		echo >/dev/null
-# 	else
-# 		echo No certificate file available.  Cannot start
-# 		exit 0
-# 	fi
-	if [ "`pgrep -u mysql mysqld`" = "" ]
-	then
-		echo MariaDB is not running.  It must be started before drtrprov
-		exit 0
-	fi
-	PIDS=`pids`
-	if [ "$PIDS" != "" ]
-	then
-		echo drtrprov already running
-		exit 0
-	fi
-	echo '0 1 * * * /opt/app/datartr/bin/runreports' | crontab
-	nohup java $JAVA_OPTS org.onap.dmaap.datarouter.provisioning.Main </dev/null &
-	sleep 5
-	PIDS=`pids`
-	if [ "$PIDS" = "" ]
-	then
-		echo drtrprov startup failed
-	else
-		echo drtrprov started
-	fi
+#     then
+#         echo drtrprov must be started as group datartr not $GRP
+#         exit 1
+#     fi
+#     cd /opt/app/datartr
+#     if etc/havecert
+#     then
+#         echo >/dev/null
+#     else
+#         echo No certificate file available.  Cannot start
+#         exit 0
+#     fi
+    if [ "`pgrep -u mysql mysqld`" = "" ]
+    then
+        echo MariaDB is not running.  It must be started before drtrprov
+        exit 0
+    fi
+    PIDS=`pids`
+    if [ "$PIDS" != "" ]
+    then
+        echo drtrprov already running
+        exit 0
+    fi
+    echo '0 1 * * * /opt/app/datartr/bin/runreports' | crontab
+    nohup java $JAVA_OPTS org.onap.dmaap.datarouter.provisioning.Main </dev/null &
+    sleep 5
+    PIDS=`pids`
+    if [ "$PIDS" = "" ]
+    then
+        echo drtrprov startup failed
+    else
+        echo drtrprov started
+    fi
 }
 
 stop() {
-	ID=`id -n -u`
-	GRP=`id -n -g`
-	if [ "$ID" != "datartr" ]
-	then
-		echo drtrprov must be stopped as user datartr not $ID
-		exit 1
-	fi
-	if [ "$GRP" != "datartr" ]
-	then
-		echo drtrprov must be stopped as group datartr not $GRP
-		exit 1
-	fi
-	/usr/bin/curl http://127.0.0.1:8080/internal/halt
-	sleep 5
-	PIDS=`pids`
-	if [ "$PIDS" != "" ]
-	then
-		sleep 5
-		kill -9 $PIDS
-		sleep 5
-		echo drtrprov stopped
-	else
-		echo drtrprov not running
-	fi
+    ID=`id -n -u`
+    GRP=`id -n -g`
+    if [ "$ID" != "datartr" ]
+    then
+        echo drtrprov must be stopped as user datartr not $ID
+        exit 1
+    fi
+    if [ "$GRP" != "datartr" ]
+    then
+        echo drtrprov must be stopped as group datartr not $GRP
+        exit 1
+    fi
+    /usr/bin/curl http://127.0.0.1:8080/internal/halt
+    sleep 5
+    PIDS=`pids`
+    if [ "$PIDS" != "" ]
+    then
+        sleep 5
+        kill -9 $PIDS
+        sleep 5
+        echo drtrprov stopped
+    else
+        echo drtrprov not running
+    fi
 }
 
 status() {
-	PIDS=`pids`
-	if [ "$PIDS" != "" ]
-	then
-		echo drtrprov running
-	else
-		echo drtrprov not running
-	fi
+    PIDS=`pids`
+    if [ "$PIDS" != "" ]
+    then
+        echo drtrprov running
+    else
+        echo drtrprov not running
+    fi
 }
 
 case "$1" in
 'start')
-	start
-	;;
+    start
+    ;;
 'stop')
-	stop
-	;;
+    stop
+    ;;
 'restart')
-	stop
-	sleep 20
-	start
-	;;
+    stop
+    sleep 20
+    start
+    ;;
 'status')
-	status
-	;;
+    status
+    ;;
 *)
-	echo "Usage: $0 { start | stop | restart | status }"
-	exit 1
-	;;
+    echo "Usage: $0 { start | stop | restart | status }"
+    exit 1
+    ;;
 esac
 exit 0

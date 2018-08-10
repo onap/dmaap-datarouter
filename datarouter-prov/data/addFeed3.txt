@@ -11,7 +11,7 @@
           "classification": "unclassified",
           "endpoint_addrs": [
                "172.18.0.3",
-			],
+            ],
           "endpoint_ids": [
                {
                     "password": "rs873m",

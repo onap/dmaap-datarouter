@@ -7,9 +7,9 @@
  * * Licensed under the Apache License, Version 2.0 (the "License");
  * * you may not use this file except in compliance with the License.
  * * You may obtain a copy of the License at
- * * 
+ * *
  *  *      http://www.apache.org/licenses/LICENSE-2.0
- * * 
+ * *
  *  * Unless required by applicable law or agreed to in writing, software
  * * distributed under the License is distributed on an "AS IS" BASIS,
  * * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,21 +37,22 @@ import org.json.JSONObject;
  * @version $Id: Syncable.java,v 1.1 2013/07/05 13:48:05 eby Exp $
  */
 public abstract class Syncable implements Deleteable, Insertable, Updateable, JSONable {
-	@Override
-	abstract public JSONObject asJSONObject();
+    @Override
+    abstract public JSONObject asJSONObject();
 
-	@Override
-	abstract public boolean doUpdate(Connection c);
+    @Override
+    abstract public boolean doUpdate(Connection c);
 
-	@Override
-	abstract public boolean doInsert(Connection c);
+    @Override
+    abstract public boolean doInsert(Connection c);
 
-	@Override
-	abstract public boolean doDelete(Connection c);
+    @Override
+    abstract public boolean doDelete(Connection c);
 
-	/**
-	 * Get the "natural key" for this object type, as a String.
-	 * @return the key
-	 */
-	abstract public String getKey();
+    /**
+     * Get the "natural key" for this object type, as a String.
+     *
+     * @return the key
+     */
+    abstract public String getKey();
 }
