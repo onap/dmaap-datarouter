@@ -1,0 +1,211 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_e0c70f11",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-10T15:10:14Z",
+      "side": 1,
+      "message": "Missed a bit here, not sure if it matters for the codestyle check",
+      "range": {
+        "startLine": 151,
+        "startChar": 2,
+        "endLine": 151,
+        "endChar": 6
+      },
+      "revId": "ac8f6e28fa42037258b6ff19488081677230926b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_a0d117cf",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/SubscriptionServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-10T15:10:14Z",
+      "side": 1,
+      "message": "Same here",
+      "range": {
+        "startLine": 346,
+        "startChar": 2,
+        "endLine": 346,
+        "endChar": 4
+      },
+      "revId": "ac8f6e28fa42037258b6ff19488081677230926b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_c0d693c5",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/beans/DeliveryExtraRecord.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-10T15:10:14Z",
+      "side": 1,
+      "message": "Same here",
+      "range": {
+        "startLine": 55,
+        "startChar": 31,
+        "endLine": 56,
+        "endChar": 27
+      },
+      "revId": "ac8f6e28fa42037258b6ff19488081677230926b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_60dbffed",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/beans/EgressRoute.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-10T15:10:14Z",
+      "side": 1,
+      "message": "Same here",
+      "range": {
+        "startLine": 119,
+        "startChar": 2,
+        "endLine": 120,
+        "endChar": 5
+      },
+      "revId": "ac8f6e28fa42037258b6ff19488081677230926b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_20e507a8",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/beans/Feed.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 563,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-10T15:10:14Z",
+      "side": 1,
+      "message": "Same here",
+      "range": {
+        "startLine": 563,
+        "startChar": 2,
+        "endLine": 563,
+        "endChar": 6
+      },
+      "revId": "ac8f6e28fa42037258b6ff19488081677230926b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_40e283a0",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/beans/Feed.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-10T15:10:14Z",
+      "side": 1,
+      "message": "Same here",
+      "range": {
+        "startLine": 622,
+        "startChar": 2,
+        "endLine": 622,
+        "endChar": 4
+      },
+      "revId": "ac8f6e28fa42037258b6ff19488081677230926b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_a0e8377d",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/beans/Subscription.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-10T15:10:14Z",
+      "side": 1,
+      "message": "Same here",
+      "range": {
+        "startLine": 394,
+        "startChar": 2,
+        "endLine": 394,
+        "endChar": 5
+      },
+      "revId": "ac8f6e28fa42037258b6ff19488081677230926b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_009b2b19",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/reports/FeedReport.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-10T15:10:14Z",
+      "side": 1,
+      "message": "Same here",
+      "range": {
+        "startLine": 73,
+        "startChar": 2,
+        "endLine": 73,
+        "endChar": 5
+      },
+      "revId": "ac8f6e28fa42037258b6ff19488081677230926b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_e0bcef6e",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/reports/LatencyReport.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-10T15:10:14Z",
+      "side": 1,
+      "message": "Same here",
+      "range": {
+        "startLine": 174,
+        "startChar": 2,
+        "endLine": 174,
+        "endChar": 6
+      },
+      "revId": "ac8f6e28fa42037258b6ff19488081677230926b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
