@@ -7,9 +7,9 @@
  * * Licensed under the Apache License, Version 2.0 (the "License");
  * * you may not use this file except in compliance with the License.
  * * You may obtain a copy of the License at
- * * 
+ * *
  *  *      http://www.apache.org/licenses/LICENSE-2.0
- * * 
+ * *
  *  * Unless required by applicable law or agreed to in writing, software
  * * distributed under the License is distributed on an "AS IS" BASIS,
  * * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -126,303 +126,303 @@ import org.onap.dmaap.datarouter.provisioning.beans.NodeClass;
  */
 @SuppressWarnings("serial")
 public class RouteServlet extends ProxyServlet {
-	/**
-	 * DELETE route table entries by deleting part of the route table tree.
-	 */
-	@Override
-	public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		EventLogRecord elr = new EventLogRecord(req);
-		if (!isAuthorizedForInternal(req)) {
-			elr.setMessage("Unauthorized.");
-			elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-			eventlogger.info(elr);
-			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized.");
-			return;
-		}
-		if (isProxyOK(req) && isProxyServer()) {
-			super.doDelete(req, resp);
-			return;
-		}
+    /**
+     * DELETE route table entries by deleting part of the route table tree.
+     */
+    @Override
+    public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        EventLogRecord elr = new EventLogRecord(req);
+        if (!isAuthorizedForInternal(req)) {
+            elr.setMessage("Unauthorized.");
+            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+            eventlogger.info(elr);
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized.");
+            return;
+        }
+        if (isProxyOK(req) && isProxyServer()) {
+            super.doDelete(req, resp);
+            return;
+        }
 
-		String path = req.getPathInfo();
-		String[] parts = path.substring(1).split("/");
-		Deleteable[] d = null;
-		if (parts[0].equals("ingress")) {
-			if (parts.length == 4) {
-				// /internal/route/ingress/<feed>/<user>/<subnet>
-				try {
-					int feedid = Integer.parseInt(parts[1]);
-					IngressRoute er = IngressRoute.getIngressRoute(feedid, parts[2], parts[3].replaceAll("!", "/"));
-					if (er == null) {
-						resp.sendError(HttpServletResponse.SC_NOT_FOUND, "The specified ingress route does not exist.");
-						return;
-					}
-					d = new Deleteable[] { er };
-				} catch (NumberFormatException e) {
-					resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid feed ID in 'delete ingress' command.");
-					return;
-				}
-			} else if (parts.length == 2) {
-				// /internal/route/ingress/<seq>
-				try {
-					int seq = Integer.parseInt(parts[1]);
-					Set<IngressRoute> set = IngressRoute.getIngressRoutesForSeq(seq);
-					d = set.toArray(new Deleteable[0]);
-				} catch (NumberFormatException e) {
-					resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid sequence number in 'delete ingress' command.");
-					return;
-				}
-			} else {
-				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid number of arguments in 'delete ingress' command.");
-				return;
-			}
-		} else if (parts[0].equals("egress")) {
-			if (parts.length == 2) {
-				// /internal/route/egress/<sub>
-				try {
-					int subid = Integer.parseInt(parts[1]);
-					EgressRoute er = EgressRoute.getEgressRoute(subid);
-					if (er == null) {
-						resp.sendError(HttpServletResponse.SC_NOT_FOUND, "The specified egress route does not exist.");
-						return;
-					}
-					d = new Deleteable[] { er };
-				} catch (NumberFormatException e) {
-					resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid sub ID in 'delete egress' command.");
-					return;
-				}
-			} else {
-				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid number of arguments in 'delete egress' command.");
-				return;
-			}
-		} else if (parts[0].equals("network")) {
-			if (parts.length == 3) {
-				// /internal/route/network/<from>/<to>
-				try {//
-					NetworkRoute nr = new NetworkRoute(
-						NodeClass.normalizeNodename(parts[1]),
-						NodeClass.normalizeNodename(parts[2])
-					);
-					d = new Deleteable[] { nr };
-				} catch (IllegalArgumentException e) {
-					resp.sendError(HttpServletResponse.SC_NOT_FOUND, "The specified network route does not exist.");
-					return;
-				}
-			} else {
-				resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid number of arguments in 'delete network' command.");
-				return;
-			}
-		}
-		if (d == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bad URL.");
-			return;
-		}
-		boolean rv = true;
-		for (Deleteable dd : d) {
-			rv &= doDelete(dd);
-		}
-		if (rv) {
-			elr.setResult(HttpServletResponse.SC_OK);
-			eventlogger.info(elr);
-			resp.setStatus(HttpServletResponse.SC_OK);
-			provisioningDataChanged();
-			provisioningParametersChanged();
-		} else {
-			// Something went wrong with the DELETE
-			elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			eventlogger.info(elr);
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG);
-		}
-	}
-	/**
-	 * GET route table entries from the route table tree specified by the URL path.
-	 */
-	@Override
-	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		EventLogRecord elr = new EventLogRecord(req);
-		if (!isAuthorizedForInternal(req)) {
-			elr.setMessage("Unauthorized.");
-			elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-			eventlogger.info(elr);
-			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized.");
-			return;
-		}
-		if (isProxyOK(req) && isProxyServer()) {
-			super.doGet(req, resp);
-			return;
-		}
+        String path = req.getPathInfo();
+        String[] parts = path.substring(1).split("/");
+        Deleteable[] d = null;
+        if (parts[0].equals("ingress")) {
+            if (parts.length == 4) {
+                // /internal/route/ingress/<feed>/<user>/<subnet>
+                try {
+                    int feedid = Integer.parseInt(parts[1]);
+                    IngressRoute er = IngressRoute.getIngressRoute(feedid, parts[2], parts[3].replaceAll("!", "/"));
+                    if (er == null) {
+                        resp.sendError(HttpServletResponse.SC_NOT_FOUND, "The specified ingress route does not exist.");
+                        return;
+                    }
+                    d = new Deleteable[] { er };
+                } catch (NumberFormatException e) {
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid feed ID in 'delete ingress' command.");
+                    return;
+                }
+            } else if (parts.length == 2) {
+                // /internal/route/ingress/<seq>
+                try {
+                    int seq = Integer.parseInt(parts[1]);
+                    Set<IngressRoute> set = IngressRoute.getIngressRoutesForSeq(seq);
+                    d = set.toArray(new Deleteable[0]);
+                } catch (NumberFormatException e) {
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid sequence number in 'delete ingress' command.");
+                    return;
+                }
+            } else {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid number of arguments in 'delete ingress' command.");
+                return;
+            }
+        } else if (parts[0].equals("egress")) {
+            if (parts.length == 2) {
+                // /internal/route/egress/<sub>
+                try {
+                    int subid = Integer.parseInt(parts[1]);
+                    EgressRoute er = EgressRoute.getEgressRoute(subid);
+                    if (er == null) {
+                        resp.sendError(HttpServletResponse.SC_NOT_FOUND, "The specified egress route does not exist.");
+                        return;
+                    }
+                    d = new Deleteable[] { er };
+                } catch (NumberFormatException e) {
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid sub ID in 'delete egress' command.");
+                    return;
+                }
+            } else {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid number of arguments in 'delete egress' command.");
+                return;
+            }
+        } else if (parts[0].equals("network")) {
+            if (parts.length == 3) {
+                // /internal/route/network/<from>/<to>
+                try {//
+                    NetworkRoute nr = new NetworkRoute(
+                        NodeClass.normalizeNodename(parts[1]),
+                        NodeClass.normalizeNodename(parts[2])
+                    );
+                    d = new Deleteable[] { nr };
+                } catch (IllegalArgumentException e) {
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, "The specified network route does not exist.");
+                    return;
+                }
+            } else {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid number of arguments in 'delete network' command.");
+                return;
+            }
+        }
+        if (d == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bad URL.");
+            return;
+        }
+        boolean rv = true;
+        for (Deleteable dd : d) {
+            rv &= doDelete(dd);
+        }
+        if (rv) {
+            elr.setResult(HttpServletResponse.SC_OK);
+            eventlogger.info(elr);
+            resp.setStatus(HttpServletResponse.SC_OK);
+            provisioningDataChanged();
+            provisioningParametersChanged();
+        } else {
+            // Something went wrong with the DELETE
+            elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            eventlogger.info(elr);
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG);
+        }
+    }
+    /**
+     * GET route table entries from the route table tree specified by the URL path.
+     */
+    @Override
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        EventLogRecord elr = new EventLogRecord(req);
+        if (!isAuthorizedForInternal(req)) {
+            elr.setMessage("Unauthorized.");
+            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+            eventlogger.info(elr);
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized.");
+            return;
+        }
+        if (isProxyOK(req) && isProxyServer()) {
+            super.doGet(req, resp);
+            return;
+        }
 
-		String path = req.getPathInfo();
-		if (!path.endsWith("/"))
-			path += "/";
-		if (!path.equals("/") && !path.equals("/ingress/") && !path.equals("/egress/") && !path.equals("/network/")) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bad URL.");
-			return;
-		}
+        String path = req.getPathInfo();
+        if (!path.endsWith("/"))
+            path += "/";
+        if (!path.equals("/") && !path.equals("/ingress/") && !path.equals("/egress/") && !path.equals("/network/")) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bad URL.");
+            return;
+        }
 
-		StringBuilder sb = new StringBuilder("{\n");
-		String px2 = "";
-		if (path.equals("/") || path.equals("/ingress/")) {
-			String pfx = "\n";
-			sb.append("\"ingress\": [");
-			for (IngressRoute in : IngressRoute.getAllIngressRoutes()) {
-				sb.append(pfx);
-				sb.append(in.asJSONObject().toString());
-				pfx = ",\n";
-			}
-			sb.append("\n]");
-			px2 = ",\n";
-		}
+        StringBuilder sb = new StringBuilder("{\n");
+        String px2 = "";
+        if (path.equals("/") || path.equals("/ingress/")) {
+            String pfx = "\n";
+            sb.append("\"ingress\": [");
+            for (IngressRoute in : IngressRoute.getAllIngressRoutes()) {
+                sb.append(pfx);
+                sb.append(in.asJSONObject().toString());
+                pfx = ",\n";
+            }
+            sb.append("\n]");
+            px2 = ",\n";
+        }
 
-		if (path.equals("/") || path.equals("/egress/")) {
-			String pfx = "\n";
-			sb.append(px2);
-			sb.append("\"egress\": {");
-			for (EgressRoute eg : EgressRoute.getAllEgressRoutes()) {
-				JSONObject jx = eg.asJSONObject();
-				for (String key : jx.keySet()) {
-					sb.append(pfx);
-					sb.append("  \"").append(key).append("\": ");
-					sb.append("\"").append(jx.getString(key)).append("\"");
-					pfx = ",\n";
-				}
-			}
-			sb.append("\n}");
-			px2 = ",\n";
-		}
+        if (path.equals("/") || path.equals("/egress/")) {
+            String pfx = "\n";
+            sb.append(px2);
+            sb.append("\"egress\": {");
+            for (EgressRoute eg : EgressRoute.getAllEgressRoutes()) {
+                JSONObject jx = eg.asJSONObject();
+                for (String key : jx.keySet()) {
+                    sb.append(pfx);
+                    sb.append("  \"").append(key).append("\": ");
+                    sb.append("\"").append(jx.getString(key)).append("\"");
+                    pfx = ",\n";
+                }
+            }
+            sb.append("\n}");
+            px2 = ",\n";
+        }
 
-		if (path.equals("/") || path.equals("/network/")) {
-			String pfx = "\n";
-			sb.append(px2);
-			sb.append("\"routing\": [");
-			for (NetworkRoute ne : NetworkRoute.getAllNetworkRoutes()) {
-				sb.append(pfx);
-				sb.append(ne.asJSONObject().toString());
-				pfx = ",\n";
-			}
-			sb.append("\n]");
-		}
-		sb.append("}\n");
-		resp.setStatus(HttpServletResponse.SC_OK);
-		resp.setContentType("application/json");
-		resp.getOutputStream().print(sb.toString());
-	}
-	/**
-	 * PUT on &lt;/internal/route/*&gt; -- not supported.
-	 */
-	@Override
-	public void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		EventLogRecord elr = new EventLogRecord(req);
-		if (!isAuthorizedForInternal(req)) {
-			elr.setMessage("Unauthorized.");
-			elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-			eventlogger.info(elr);
-			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized.");
-			return;
-		}
-		resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bad URL.");
-	}
-	/**
-	 * POST - modify existing route table entries in the route table tree specified by the URL path.
-	 */
-	@Override
-	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		EventLogRecord elr = new EventLogRecord(req);
-		if (!isAuthorizedForInternal(req)) {
-			elr.setMessage("Unauthorized.");
-			elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-			eventlogger.info(elr);
-			resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized.");
-			return;
-		}
-		if (isProxyOK(req) && isProxyServer()) {
-			super.doPost(req, resp);
-			return;
-		}
-		String path = req.getPathInfo();
-		Insertable[] ins = null;
-		if (path.startsWith("/ingress/")) {
-			// /internal/route/ingress/?feed=%s&amp;user=%s&amp;subnet=%s&amp;nodepatt=%s
-			try {
-				// Although it probably doesn't make sense, you can install two identical routes in the IRT
-				int feedid = Integer.parseInt(req.getParameter("feed"));
-				String user = req.getParameter("user");
-				if (user == null)
-					user = "-";
-				String subnet = req.getParameter("subnet");
-				if (subnet == null)
-					subnet = "-";
-				String nodepatt = req.getParameter("nodepatt");
-				String t = req.getParameter("seq");
-				int seq = (t != null) ? Integer.parseInt(t) : (IngressRoute.getMaxSequence() + 100);
-				ins = new Insertable[] { new IngressRoute(seq, feedid, user, subnet, NodeClass.lookupNodeNames(nodepatt)) };
-			} catch (Exception e) {
-				intlogger.info(e);
-				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments in 'add ingress' command.");
-				return;
-			}
-		} else if (path.startsWith("/egress/")) {
-			// /internal/route/egress/?sub=%s&amp;node=%s
-			try {
-				int subid = Integer.parseInt(req.getParameter("sub"));
-				EgressRoute er = EgressRoute.getEgressRoute(subid);
-				if (er != null) {
-					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "An egress route already exists for that subscriber.");
-					return;
-				}
-				String node = NodeClass.normalizeNodename(req.getParameter("node"));
-				ins = new Insertable[] { new EgressRoute(subid, node) };
-			} catch (Exception e) {
-				intlogger.info(e);
-				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments in 'add egress' command.");
-				return;
-			}
-		} else if (path.startsWith("/network/")) {
-			// /internal/route/network/?from=%s&amp;to=%s&amp;via=%s
-			try {
-				String nfrom = req.getParameter("from");
-				String nto   = req.getParameter("to");
-				String nvia  = req.getParameter("via");
-				if (nfrom == null || nto == null || nvia == null) {
-					resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing arguments in 'add network' command.");
-					return;
-				}
-				nfrom = NodeClass.normalizeNodename(nfrom);
-				nto   = NodeClass.normalizeNodename(nto);
-				nvia  = NodeClass.normalizeNodename(nvia);
-				NetworkRoute nr = new NetworkRoute(nfrom, nto, nvia);
-				for (NetworkRoute route : NetworkRoute.getAllNetworkRoutes()) {
-					if (route.getFromnode() == nr.getFromnode() && route.getTonode() == nr.getTonode()) {
-						resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Network route table already contains a route for "+nfrom+" and "+nto);
-						return;
-					}
-				}
-				ins = new Insertable[] { nr };
-			} catch (IllegalArgumentException e) {
-				intlogger.info(e);
-				resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments in 'add network' command.");
-				return;
-			}
-		}
-		if (ins == null) {
-			resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bad URL.");
-			return;
-		}
-		boolean rv = true;
-		for (Insertable dd : ins) {
-			rv &= doInsert(dd);
-		}
-		if (rv) {
-			elr.setResult(HttpServletResponse.SC_OK);
-			eventlogger.info(elr);
-			resp.setStatus(HttpServletResponse.SC_OK);
-			provisioningDataChanged();
-			provisioningParametersChanged();
-		} else {
-			// Something went wrong with the INSERT
-			elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			eventlogger.info(elr);
-			resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG);
-		}
-	}
+        if (path.equals("/") || path.equals("/network/")) {
+            String pfx = "\n";
+            sb.append(px2);
+            sb.append("\"routing\": [");
+            for (NetworkRoute ne : NetworkRoute.getAllNetworkRoutes()) {
+                sb.append(pfx);
+                sb.append(ne.asJSONObject().toString());
+                pfx = ",\n";
+            }
+            sb.append("\n]");
+        }
+        sb.append("}\n");
+        resp.setStatus(HttpServletResponse.SC_OK);
+        resp.setContentType("application/json");
+        resp.getOutputStream().print(sb.toString());
+    }
+    /**
+     * PUT on &lt;/internal/route/*&gt; -- not supported.
+     */
+    @Override
+    public void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        EventLogRecord elr = new EventLogRecord(req);
+        if (!isAuthorizedForInternal(req)) {
+            elr.setMessage("Unauthorized.");
+            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+            eventlogger.info(elr);
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized.");
+            return;
+        }
+        resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bad URL.");
+    }
+    /**
+     * POST - modify existing route table entries in the route table tree specified by the URL path.
+     */
+    @Override
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        EventLogRecord elr = new EventLogRecord(req);
+        if (!isAuthorizedForInternal(req)) {
+            elr.setMessage("Unauthorized.");
+            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+            eventlogger.info(elr);
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized.");
+            return;
+        }
+        if (isProxyOK(req) && isProxyServer()) {
+            super.doPost(req, resp);
+            return;
+        }
+        String path = req.getPathInfo();
+        Insertable[] ins = null;
+        if (path.startsWith("/ingress/")) {
+            // /internal/route/ingress/?feed=%s&amp;user=%s&amp;subnet=%s&amp;nodepatt=%s
+            try {
+                // Although it probably doesn't make sense, you can install two identical routes in the IRT
+                int feedid = Integer.parseInt(req.getParameter("feed"));
+                String user = req.getParameter("user");
+                if (user == null)
+                    user = "-";
+                String subnet = req.getParameter("subnet");
+                if (subnet == null)
+                    subnet = "-";
+                String nodepatt = req.getParameter("nodepatt");
+                String t = req.getParameter("seq");
+                int seq = (t != null) ? Integer.parseInt(t) : (IngressRoute.getMaxSequence() + 100);
+                ins = new Insertable[] { new IngressRoute(seq, feedid, user, subnet, NodeClass.lookupNodeNames(nodepatt)) };
+            } catch (Exception e) {
+                intlogger.info(e);
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments in 'add ingress' command.");
+                return;
+            }
+        } else if (path.startsWith("/egress/")) {
+            // /internal/route/egress/?sub=%s&amp;node=%s
+            try {
+                int subid = Integer.parseInt(req.getParameter("sub"));
+                EgressRoute er = EgressRoute.getEgressRoute(subid);
+                if (er != null) {
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "An egress route already exists for that subscriber.");
+                    return;
+                }
+                String node = NodeClass.normalizeNodename(req.getParameter("node"));
+                ins = new Insertable[] { new EgressRoute(subid, node) };
+            } catch (Exception e) {
+                intlogger.info(e);
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments in 'add egress' command.");
+                return;
+            }
+        } else if (path.startsWith("/network/")) {
+            // /internal/route/network/?from=%s&amp;to=%s&amp;via=%s
+            try {
+                String nfrom = req.getParameter("from");
+                String nto   = req.getParameter("to");
+                String nvia  = req.getParameter("via");
+                if (nfrom == null || nto == null || nvia == null) {
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing arguments in 'add network' command.");
+                    return;
+                }
+                nfrom = NodeClass.normalizeNodename(nfrom);
+                nto   = NodeClass.normalizeNodename(nto);
+                nvia  = NodeClass.normalizeNodename(nvia);
+                NetworkRoute nr = new NetworkRoute(nfrom, nto, nvia);
+                for (NetworkRoute route : NetworkRoute.getAllNetworkRoutes()) {
+                    if (route.getFromnode() == nr.getFromnode() && route.getTonode() == nr.getTonode()) {
+                        resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Network route table already contains a route for "+nfrom+" and "+nto);
+                        return;
+                    }
+                }
+                ins = new Insertable[] { nr };
+            } catch (IllegalArgumentException e) {
+                intlogger.info(e);
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments in 'add network' command.");
+                return;
+            }
+        }
+        if (ins == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bad URL.");
+            return;
+        }
+        boolean rv = true;
+        for (Insertable dd : ins) {
+            rv &= doInsert(dd);
+        }
+        if (rv) {
+            elr.setResult(HttpServletResponse.SC_OK);
+            eventlogger.info(elr);
+            resp.setStatus(HttpServletResponse.SC_OK);
+            provisioningDataChanged();
+            provisioningParametersChanged();
+        } else {
+            // Something went wrong with the INSERT
+            elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            eventlogger.info(elr);
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG);
+        }
+    }
 }

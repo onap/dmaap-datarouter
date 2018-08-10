@@ -7,9 +7,9 @@
  * * Licensed under the Apache License, Version 2.0 (the "License");
  * * you may not use this file except in compliance with the License.
  * * You may obtain a copy of the License at
- * * 
+ * *
  *  *      http://www.apache.org/licenses/LICENSE-2.0
- * * 
+ * *
  *  * Unless required by applicable law or agreed to in writing, software
  * * distributed under the License is distributed on an "AS IS" BASIS,
  * * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,37 +35,37 @@ import org.onap.dmaap.datarouter.authz.AuthorizationResponseSupplement;
  *
  */
 public class AuthRespSupplementImpl implements AuthorizationResponseSupplement {
-	
-	private String id = null;
-	private Map<String, String> attributes = null;
 
-	/** Constructor, available within the package.
-	 * 
-	 * @param id  The identifier for the advice or obligation element
-	 * @param attributes The attributes (name-value pairs) for the advice or obligation element.
-	 */
-	AuthRespSupplementImpl (String id, Map<String, String> attributes) {
-		this.id = id;
-		this.attributes = new HashMap<String,String>(attributes);
-	}
+    private String id = null;
+    private Map<String, String> attributes = null;
 
-	/** Return the identifier for the supplementary information element.
-	 * 
-	 * @return a <code>String</code> containing the identifier.
-	 */
-	@Override
-	public String getId() {
-		return id;
-	}
+    /** Constructor, available within the package.
+     *
+     * @param id  The identifier for the advice or obligation element
+     * @param attributes The attributes (name-value pairs) for the advice or obligation element.
+     */
+    AuthRespSupplementImpl (String id, Map<String, String> attributes) {
+        this.id = id;
+        this.attributes = new HashMap<String,String>(attributes);
+    }
 
-	/** Return the attributes for the supplementary information element, as a <code>Map</code> in which
-	 * keys represent attribute identifiers and values represent attribute values.
-	 * 
-	 * @return attributes for the supplementary information element.
-	 */
-	@Override
-	public Map<String, String> getAttributes() {
-		return attributes;
-	}
+    /** Return the identifier for the supplementary information element.
+     *
+     * @return a <code>String</code> containing the identifier.
+     */
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    /** Return the attributes for the supplementary information element, as a <code>Map</code> in which
+     * keys represent attribute identifiers and values represent attribute values.
+     *
+     * @return attributes for the supplementary information element.
+     */
+    @Override
+    public Map<String, String> getAttributes() {
+        return attributes;
+    }
 
 }

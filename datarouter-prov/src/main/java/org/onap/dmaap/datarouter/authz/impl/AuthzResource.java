@@ -7,9 +7,9 @@
  * * Licensed under the Apache License, Version 2.0 (the "License");
  * * you may not use this file except in compliance with the License.
  * * You may obtain a copy of the License at
- * * 
+ * *
  *  *      http://www.apache.org/licenses/LICENSE-2.0
- * * 
+ * *
  *  * Unless required by applicable law or agreed to in writing, software
  * * distributed under the License is distributed on an "AS IS" BASIS,
  * * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,57 +44,57 @@ import java.util.regex.Pattern;
  * <li>a subscription resource, the target of GET, PUT, and DELETE requests used to manage an existing subscription.
  * Each subscription has a unique subscription ID.
  * </li>
- * 
+ *
  * @author J. F. Lucas
  *
  */
 public class AuthzResource {
-	private ResourceType type = null;
-	private String id = "";
+    private ResourceType type = null;
+    private String id = "";
 
-	/* Construct an AuthzResource by matching a request URI against the various patterns */
-	public AuthzResource(String rURI) {
-		if (rURI != null) {
-			for (ResourceType t : ResourceType.values()) {
-				Matcher m = t.getPattern().matcher(rURI);
-				if (m.find(0)) {
-					this.type = t;
-					if (m.group("id") != null) {
-						this.id = m.group("id");
-					}
-					break;
-				}
-			}
-		}
-	}
-	
-	public ResourceType getType() {
-		return this.type;
-	}
-	
-	public String getId() {
-		return this.id;
-	}
-	
-	/* Enumeration that helps turn a request URI into something more useful for
-	 * authorization purposes by given a type name and a pattern for determining if the URI
-	 * represents that resource type.
-	 * Highly dependent on the URL scheme, could be parameterized.
-	 */
-	public enum ResourceType { 
-		FEEDS_COLLECTION("((://[^/]+/)|(^/))(?<id>)$"), 
-		SUBS_COLLECTION ("((://[^/]+/)|(^/{0,1}))subscribe/(?<id>[^/]+)$"),
-		FEED("((://[^/]+/)|(^/{0,1}))feed/(?<id>[^/]+)$"),
-		SUB("((://[^/]+/)|(^/{0,1}))subs/(?<id>[^/]+)$");
-		
-		private Pattern uriPattern;
-		
-		private ResourceType(String patternString) {
-			this.uriPattern = Pattern.compile(patternString);
-		}
-		
-		Pattern getPattern() {
-			return this.uriPattern;
-		}
-	}
+    /* Construct an AuthzResource by matching a request URI against the various patterns */
+    public AuthzResource(String rURI) {
+        if (rURI != null) {
+            for (ResourceType t : ResourceType.values()) {
+                Matcher m = t.getPattern().matcher(rURI);
+                if (m.find(0)) {
+                    this.type = t;
+                    if (m.group("id") != null) {
+                        this.id = m.group("id");
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    public ResourceType getType() {
+        return this.type;
+    }
+
+    public String getId() {
+        return this.id;
+    }
+
+    /* Enumeration that helps turn a request URI into something more useful for
+     * authorization purposes by given a type name and a pattern for determining if the URI
+     * represents that resource type.
+     * Highly dependent on the URL scheme, could be parameterized.
+     */
+    public enum ResourceType {
+        FEEDS_COLLECTION("((://[^/]+/)|(^/))(?<id>)$"),
+        SUBS_COLLECTION ("((://[^/]+/)|(^/{0,1}))subscribe/(?<id>[^/]+)$"),
+        FEED("((://[^/]+/)|(^/{0,1}))feed/(?<id>[^/]+)$"),
+        SUB("((://[^/]+/)|(^/{0,1}))subs/(?<id>[^/]+)$");
+
+        private Pattern uriPattern;
+
+        private ResourceType(String patternString) {
+            this.uriPattern = Pattern.compile(patternString);
+        }
+
+        Pattern getPattern() {
+            return this.uriPattern;
+        }
+    }
 }
