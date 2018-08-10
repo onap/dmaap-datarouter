@@ -7,9 +7,9 @@
  * * Licensed under the Apache License, Version 2.0 (the "License");
  * * you may not use this file except in compliance with the License.
  * * You may obtain a copy of the License at
- * * 
+ * *
  *  *      http://www.apache.org/licenses/LICENSE-2.0
- * * 
+ * *
  *  * Unless required by applicable law or agreed to in writing, software
  * * distributed under the License is distributed on an "AS IS" BASIS,
  * * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,13 +28,15 @@ import org.json.JSONObject;
 
 /**
  * An object that can be represented as a {@link JSONObject}.
+ *
  * @author Robert Eby
  * @version $Id: JSONable.java,v 1.1 2013/04/26 21:00:26 eby Exp $
  */
 public interface JSONable {
-	/**
-	 * Get a JSONObject representing this object.
-	 * @return the JSONObject
-	 */
-	public JSONObject asJSONObject();
+    /**
+     * Get a JSONObject representing this object.
+     *
+     * @return the JSONObject
+     */
+    public JSONObject asJSONObject();
 }
