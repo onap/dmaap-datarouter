@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_f4a10daa",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/BaseServletTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-13T09:45:52Z",
+      "side": 1,
+      "message": "LOGGER does not seem to be used anywhere - is this needed?",
+      "range": {
+        "startLine": 47,
+        "startChar": 32,
+        "endLine": 47,
+        "endChar": 38
+      },
+      "revId": "97049a37daed0fc68b53f2b5c697a8e11cb21748",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b4ab9588",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/BaseServletTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-13T09:45:52Z",
+      "side": 1,
+      "message": "Response does not seem to be used anywhere.",
+      "range": {
+        "startLine": 53,
+        "startChar": 32,
+        "endLine": 53,
+        "endChar": 40
+      },
+      "revId": "97049a37daed0fc68b53f2b5c697a8e11cb21748",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_d4edf18c",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/FeedServletTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-13T09:45:52Z",
+      "side": 1,
+      "message": "LOGGER does not seem to be used...is it needed?",
+      "range": {
+        "startLine": 52,
+        "startChar": 32,
+        "endLine": 52,
+        "endChar": 38
+      },
+      "revId": "97049a37daed0fc68b53f2b5c697a8e11cb21748",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
