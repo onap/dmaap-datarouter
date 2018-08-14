@@ -24,31 +24,34 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
-import java.security.Security;
-import java.util.Properties;
-import java.util.Timer;
+import java.security.*;
+import java.util.*;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.NCSARequestLog;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
-import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.servlet.FilterHolder;
-import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
 import org.onap.dmaap.datarouter.provisioning.utils.PurgeLogDirTask;
 import org.onap.dmaap.datarouter.provisioning.utils.ThrottleFilter;
+
+import javax.servlet.DispatcherType;
 
 /**
  * <p>
@@ -117,45 +120,58 @@ public class Main {
         int https_port = Integer.parseInt(p.getProperty("org.onap.dmaap.datarouter.provserver.https.port", "8443"));
 
         // HTTP connector
-        SelectChannelConnector http = new SelectChannelConnector();
+        HttpConfiguration http_config = new HttpConfiguration();
+        http_config.setSecureScheme("https");
+        http_config.setSecurePort(https_port);
+        http_config.setOutputBufferSize(32768);
+        http_config.setRequestHeaderSize(2048);
+        http_config.setIdleTimeout(300000);
+        http_config.setSendServerVersion(true);
+        http_config.setSendDateHeader(false);
+
+        ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config));
         http.setPort(http_port);
-        http.setMaxIdleTime(300000);
-        http.setRequestHeaderSize(2048);
-        http.setAcceptors(2);
-        http.setConfidentialPort(https_port);
-        http.setLowResourcesConnections(20000);
+        http.setAcceptQueueSize(2);
+
+        // HTTPS config
+        HttpConfiguration https_config = new HttpConfiguration(http_config);
+        https_config.setRequestHeaderSize(8192);
 
         // HTTPS connector
-        SslSelectChannelConnector https = new SslSelectChannelConnector();
+        SslContextFactory sslContextFactory = new SslContextFactory();
+        sslContextFactory.setKeyStorePath(p.getProperty(KEYSTORE_PATH_PROPERTY));
+        sslContextFactory.setKeyStorePassword(p.getProperty(KEYSTORE_PASSWORD_PROPERTY));
+        sslContextFactory.setKeyManagerPassword(p.getProperty("org.onap.dmaap.datarouter.provserver.keymanager.password"));
+
+        ServerConnector https = new ServerConnector(server,
+                new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
+                new HttpConnectionFactory(https_config));
         https.setPort(https_port);
-        https.setMaxIdleTime(30000);
-        https.setRequestHeaderSize(8192);
-        https.setAcceptors(2);
+        https.setIdleTimeout(30000);
+        https.setAcceptQueueSize(2);
 
         // SSL stuff
-        SslContextFactory cf = https.getSslContextFactory();
+        /* Skip SSLv3 Fixes */
+        sslContextFactory.addExcludeProtocols("SSLv3");
+        logger.info("Excluded protocols prov-" + sslContextFactory.getExcludeProtocols());
+        /* End of SSLv3 Fixes */
 
-        /**Skip SSLv3 Fixes*/
-        cf.addExcludeProtocols("SSLv3");
-        logger.info("Excluded protocols prov-" + cf.getExcludeProtocols());
-        /**End of SSLv3 Fixes*/
-
-        cf.setKeyStoreType(p.getProperty(KEYSTORE_TYPE_PROPERTY, "jks"));
-        cf.setKeyStorePath(p.getProperty(KEYSTORE_PATH_PROPERTY));
-        cf.setKeyStorePassword(p.getProperty(KEYSTORE_PASSWORD_PROPERTY));
-        cf.setKeyManagerPassword(p.getProperty("org.onap.dmaap.datarouter.provserver.keymanager.password"));
+        sslContextFactory.setKeyStoreType(p.getProperty(KEYSTORE_TYPE_PROPERTY, "jks"));
+        sslContextFactory.setKeyStorePath(p.getProperty(KEYSTORE_PATH_PROPERTY));
+        sslContextFactory.setKeyStorePassword(p.getProperty(KEYSTORE_PASSWORD_PROPERTY));
+        sslContextFactory.setKeyManagerPassword(p.getProperty("org.onap.dmaap.datarouter.provserver.keymanager.password"));
         String ts = p.getProperty(TRUSTSTORE_PATH_PROPERTY);
         if (ts != null && ts.length() > 0) {
             System.out.println("@@ TS -> " + ts);
-            cf.setTrustStore(ts);
-            cf.setTrustStorePassword(p.getProperty(TRUSTSTORE_PASSWORD_PROPERTY));
+            sslContextFactory.setTrustStorePath(ts);
+            sslContextFactory.setTrustStorePassword(p.getProperty(TRUSTSTORE_PASSWORD_PROPERTY));
         } else {
-            cf.setTrustStore(DEFAULT_TRUSTSTORE);
-            cf.setTrustStorePassword("changeit");
+            sslContextFactory.setTrustStorePath(DEFAULT_TRUSTSTORE);
+            sslContextFactory.setTrustStorePassword("changeit");
         }
-        cf.setTrustStore("/opt/app/datartr/self_signed/cacerts.jks");
-        cf.setTrustStorePassword("changeit");
-        cf.setWantClientAuth(true);
+        sslContextFactory.setTrustStorePath("/opt/app/datartr/self_signed/cacerts.jks");
+        sslContextFactory.setTrustStorePassword("changeit");
+        sslContextFactory.setWantClientAuth(true);
 
         // Servlet and Filter configuration
         ServletContextHandler ctxt = new ServletContextHandler(0);
@@ -171,7 +187,7 @@ public class Main {
         ctxt.addServlet(new ServletHolder(new InternalServlet()), "/internal/*");
         ctxt.addServlet(new ServletHolder(new RouteServlet()), "/internal/route/*");
         ctxt.addServlet(new ServletHolder(new DRFeedsServlet()), "/");
-        ctxt.addFilter(new FilterHolder(new ThrottleFilter()), "/publish/*", FilterMapping.REQUEST);
+        ctxt.addFilter(new FilterHolder(new ThrottleFilter()), "/publish/*", EnumSet.of(DispatcherType.REQUEST));
 
         ContextHandlerCollection contexts = new ContextHandlerCollection();
         contexts.addHandler(ctxt);
@@ -195,10 +211,10 @@ public class Main {
         hc.addHandler(reqlog);
 
         // Server's thread pool
-        QueuedThreadPool pool = new QueuedThreadPool();
-        pool.setMinThreads(10);
-        pool.setMaxThreads(200);
-        pool.setDetailedDump(false);
+        QueuedThreadPool queuedThreadPool = new QueuedThreadPool();
+        queuedThreadPool.setMinThreads(10);
+        queuedThreadPool.setMaxThreads(200);
+        queuedThreadPool.setDetailedDump(false);
 
         // Daemon to clean up the log directory on a daily basis
         Timer rolex = new Timer();
@@ -208,14 +224,19 @@ public class Main {
         LogfileLoader.getLoader();
 
         // The server itself
-        server = new Server();
-        server.setThreadPool(pool);
+        server = new Server(queuedThreadPool);
+
+        ServerConnector serverConnector = new ServerConnector(server,
+                new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
+                new HttpConnectionFactory(https_config));
+        serverConnector.setPort(https_port);
+        serverConnector.setIdleTimeout(500000);
+
         server.setConnectors(new Connector[]{http, https});
         server.setHandler(hc);
         server.setStopAtShutdown(true);
-        server.setSendServerVersion(true);
-        server.setSendDateHeader(true);
-        server.setGracefulShutdown(5000);    // allow 5 seconds for servlets to wrap up
+        server.setStopTimeout(5000);
+
         server.setDumpAfterStart(false);
         server.setDumpBeforeStop(false);
 
@@ -232,18 +253,15 @@ public class Main {
     /**
      * Stop the Jetty server.
      */
-    public static void shutdown() {
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    server.stop();
-                    Thread.sleep(5000L);
-                    System.exit(0);
-                } catch (Exception e) {
-                    // ignore
-                }
+    static void shutdown() {
+        new Thread(() -> {
+            try {
+                server.stop();
+                Thread.sleep(5000L);
+                System.exit(0);
+            } catch (Exception e) {
+                // ignore
             }
-        }.start();
+        });
     }
 }

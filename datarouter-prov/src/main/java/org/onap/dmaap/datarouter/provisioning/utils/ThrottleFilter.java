@@ -46,8 +46,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationSupport;
-import org.eclipse.jetty.server.AbstractHttpConnection;
-import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.*;
 import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 
 /**
@@ -174,15 +173,15 @@ public class ThrottleFilter extends TimerTask implements Filter {
 
     public void dropFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        int rate = getRequestRate((HttpServletRequest) request);
+        int rate = getRequestRate(request);
         if (rate >= n_requests) {
             // drop request - only works under Jetty
-            String m = String.format("Dropping connection: %s %d bad connections in %d minutes", getConnectionId((HttpServletRequest) request), rate, m_minutes);
+            String m = String.format("Dropping connection: %s %d bad connections in %d minutes", getConnectionId(request), rate, m_minutes);
             logger.info(m);
             Request base_request = (request instanceof Request)
                     ? (Request) request
-                    : AbstractHttpConnection.getCurrentConnection().getRequest();
-            base_request.getConnection().getEndPoint().close();
+                    : HttpConnection.getCurrentConnection().getHttpChannel().getRequest();
+            base_request.getHttpChannel().getEndPoint().close();
         } else {
             chain.doFilter(request, response);
         }
@@ -191,11 +190,11 @@ public class ThrottleFilter extends TimerTask implements Filter {
     public void throttleFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         // throttle request
-        String id = getConnectionId((HttpServletRequest) request);
-        int rate = getRequestRate((HttpServletRequest) request);
+        String id = getConnectionId(request);
+        int rate = getRequestRate(request);
         Object results = request.getAttribute(THROTTLE_MARKER);
         if (rate >= n_requests && results == null) {
-            String m = String.format("Throttling connection: %s %d bad connections in %d minutes", getConnectionId((HttpServletRequest) request), rate, m_minutes);
+            String m = String.format("Throttling connection: %s %d bad connections in %d minutes", getConnectionId(request), rate, m_minutes);
             logger.info(m);
             Continuation continuation = ContinuationSupport.getContinuation(request);
             continuation.suspend();
