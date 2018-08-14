@@ -21,14 +21,12 @@
  * *
  ******************************************************************************/
 
-
 package org.onap.dmaap.datarouter.node;
 
+import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.servlet.*;
 import org.eclipse.jetty.util.ssl.*;
 import org.eclipse.jetty.server.*;
-import org.eclipse.jetty.server.nio.*;
-import org.eclipse.jetty.server.ssl.*;
 import org.apache.log4j.Logger;
 
 /**
@@ -43,7 +41,7 @@ public class NodeMain {
     private static class wfconfig implements Runnable {
         private NodeConfigManager ncm;
 
-        public wfconfig(NodeConfigManager ncm) {
+        wfconfig(NodeConfigManager ncm) {
             this.ncm = ncm;
         }
 
@@ -51,13 +49,14 @@ public class NodeMain {
             notify();
         }
 
-        public synchronized void waitforconfig() {
+        synchronized void waitforconfig() {
             ncm.registerConfigTask(this);
             while (!ncm.isConfigured()) {
                 logger.info("NODE0003 Waiting for Node Configuration");
                 try {
                     wait();
                 } catch (Exception e) {
+                    logger.debug("NodeMain: waitforconfig exception");
                 }
             }
             ncm.deregisterConfigTask(this);
@@ -71,7 +70,7 @@ public class NodeMain {
     /**
      * Reset the retry timer for a subscription
      */
-    public static void resetQueue(String subid, String ip) {
+    static void resetQueue(String subid, String ip) {
         d.resetQueue(ncm.getSpoolDir(subid, ip));
     }
 
@@ -91,25 +90,39 @@ public class NodeMain {
         d = new Delivery(ncm);
         LogManager lm = new LogManager(ncm);
         Server server = new Server();
-        SelectChannelConnector http = new SelectChannelConnector();
+
+        // HTTP configuration
+        HttpConfiguration http_config = new HttpConfiguration();
+        http_config.setIdleTimeout(2000);
+        http_config.setRequestHeaderSize(2048);
+
+        ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config));
         http.setPort(ncm.getHttpPort());
-        http.setMaxIdleTime(2000);
-        http.setRequestHeaderSize(2048);
-        SslSelectChannelConnector https = new SslSelectChannelConnector();
+
+
+        // HTTPS configuration
+        SslContextFactory sslContextFactory = new SslContextFactory();
+        sslContextFactory.setKeyStoreType(ncm.getKSType());
+        sslContextFactory.setKeyStorePath(ncm.getKSFile());
+        sslContextFactory.setKeyStorePassword(ncm.getKSPass());
+        sslContextFactory.setKeyManagerPassword(ncm.getKPass());
+
+        HttpConfiguration https_config = new HttpConfiguration(http_config);
+        https_config.setRequestHeaderSize(8192);
+
+        ServerConnector https = new ServerConnector(server,
+                new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
+                new HttpConnectionFactory(https_config));
         https.setPort(ncm.getHttpsPort());
-        https.setMaxIdleTime(30000);
-        https.setRequestHeaderSize(8192);
-        SslContextFactory cf = https.getSslContextFactory();
+        https.setIdleTimeout(500000);
+        https.setAcceptQueueSize(2);
 
-        /**Skip SSLv3 Fixes*/
-        cf.addExcludeProtocols("SSLv3");
-        logger.info("Excluded protocols node-" + cf.getExcludeProtocols());
-        /**End of SSLv3 Fixes*/
 
-        cf.setKeyStoreType(ncm.getKSType());
-        cf.setKeyStorePath(ncm.getKSFile());
-        cf.setKeyStorePassword(ncm.getKSPass());
-        cf.setKeyManagerPassword(ncm.getKPass());
+        /* Skip SSLv3 Fixes */
+        sslContextFactory.addExcludeProtocols("SSLv3");
+        logger.info("Excluded protocols node-" + sslContextFactory.getExcludeProtocols());
+        /* End of SSLv3 Fixes */
+
         server.setConnectors(new Connector[]{http, https});
         ServletContextHandler ctxt = new ServletContextHandler(0);
         ctxt.setContextPath("/");
