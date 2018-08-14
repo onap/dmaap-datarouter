@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_fe26bf67",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/Main.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1111
+      },
+      "writtenOn": "2018-08-14T18:23:32Z",
+      "side": 1,
+      "message": "shouldn\u0027t this dereference https_port variable instead of hardcoding?",
+      "range": {
+        "startLine": 231,
+        "startChar": 26,
+        "endLine": 232,
+        "endChar": 37
+      },
+      "revId": "3ec4b750aa98bafcf10ad3dc7675744d44321ced",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
