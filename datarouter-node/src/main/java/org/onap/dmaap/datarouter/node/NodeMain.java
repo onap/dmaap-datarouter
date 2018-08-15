@@ -92,12 +92,13 @@ public class NodeMain {
         Server server = new Server();
 
         // HTTP configuration
-        HttpConfiguration http_config = new HttpConfiguration();
-        http_config.setIdleTimeout(2000);
-        http_config.setRequestHeaderSize(2048);
+        HttpConfiguration httpConfiguration = new HttpConfiguration();
+        httpConfiguration.setIdleTimeout(2000);
+        httpConfiguration.setRequestHeaderSize(2048);
 
-        ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config));
-        http.setPort(ncm.getHttpPort());
+        // HTTP connector
+        ServerConnector httpServerConnector = new ServerConnector(server, new HttpConnectionFactory(httpConfiguration));
+        httpServerConnector.setPort(ncm.getHttpPort());
 
         // HTTPS configuration
         SslContextFactory sslContextFactory = new SslContextFactory();
@@ -105,23 +106,28 @@ public class NodeMain {
         sslContextFactory.setKeyStorePath(ncm.getKSFile());
         sslContextFactory.setKeyStorePassword(ncm.getKSPass());
         sslContextFactory.setKeyManagerPassword(ncm.getKPass());
-
-        HttpConfiguration https_config = new HttpConfiguration(http_config);
-        https_config.setRequestHeaderSize(8192);
-
-        ServerConnector https = new ServerConnector(server,
-                new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
-                new HttpConnectionFactory(https_config));
-        https.setPort(ncm.getHttpsPort());
-        https.setIdleTimeout(500000);
-        https.setAcceptQueueSize(2);
-
         /* Skip SSLv3 Fixes */
         sslContextFactory.addExcludeProtocols("SSLv3");
         logger.info("Excluded protocols node-" + sslContextFactory.getExcludeProtocols());
         /* End of SSLv3 Fixes */
 
-        server.setConnectors(new Connector[]{http, https});
+        HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
+        httpsConfiguration.setRequestHeaderSize(8192);
+
+        SecureRequestCustomizer secureRequestCustomizer = new SecureRequestCustomizer();
+        secureRequestCustomizer.setStsMaxAge(2000);
+        secureRequestCustomizer.setStsIncludeSubDomains(true);
+        httpsConfiguration.addCustomizer(secureRequestCustomizer);
+
+        // HTTPS connector
+        ServerConnector httpsServerConnector = new ServerConnector(server,
+                new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
+                new HttpConnectionFactory(httpsConfiguration));
+        httpsServerConnector.setPort(ncm.getHttpsPort());
+        httpsServerConnector.setIdleTimeout(500000);
+        httpsServerConnector.setAcceptQueueSize(2);
+
+        server.setConnectors(new Connector[]{httpServerConnector, httpsServerConnector});
         ServletContextHandler ctxt = new ServletContextHandler(0);
         ctxt.setContextPath("/");
         server.setHandler(ctxt);

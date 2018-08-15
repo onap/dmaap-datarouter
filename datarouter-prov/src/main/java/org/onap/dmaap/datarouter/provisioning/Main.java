@@ -116,50 +116,60 @@ public class Main {
 
         // Get properties
         Properties p = (new DB()).getProperties();
-        int http_port = Integer.parseInt(p.getProperty("org.onap.dmaap.datarouter.provserver.http.port", "8080"));
-        int https_port = Integer.parseInt(p.getProperty("org.onap.dmaap.datarouter.provserver.https.port", "8443"));
+        int httpPort = Integer.parseInt(p.getProperty("org.onap.dmaap.datarouter.provserver.http.port", "8080"));
+        int httpsPort = Integer.parseInt(p.getProperty("org.onap.dmaap.datarouter.provserver.https.port", "8443"));
+
+        // HTTP configuration
+        HttpConfiguration httpConfiguration = new HttpConfiguration();
+        httpConfiguration.setSecureScheme("https");
+        httpConfiguration.setSecurePort(httpsPort);
+        httpConfiguration.setOutputBufferSize(32768);
+        httpConfiguration.setRequestHeaderSize(2048);
+        httpConfiguration.setIdleTimeout(300000);
+        httpConfiguration.setSendServerVersion(true);
+        httpConfiguration.setSendDateHeader(false);
+
+        // Server's thread pool
+        QueuedThreadPool queuedThreadPool = new QueuedThreadPool();
+        queuedThreadPool.setMinThreads(10);
+        queuedThreadPool.setMaxThreads(200);
+        queuedThreadPool.setDetailedDump(false);
+
+        // The server itself
+        server = new Server(queuedThreadPool);
 
         // HTTP connector
-        HttpConfiguration http_config = new HttpConfiguration();
-        http_config.setSecureScheme("https");
-        http_config.setSecurePort(https_port);
-        http_config.setOutputBufferSize(32768);
-        http_config.setRequestHeaderSize(2048);
-        http_config.setIdleTimeout(300000);
-        http_config.setSendServerVersion(true);
-        http_config.setSendDateHeader(false);
+        ServerConnector httpServerConnector = new ServerConnector(server, new HttpConnectionFactory(httpConfiguration));
+        httpServerConnector.setPort(httpPort);
+        httpServerConnector.setAcceptQueueSize(2);
 
-        ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config));
-        http.setPort(http_port);
-        http.setAcceptQueueSize(2);
-
-        // HTTPS config
-        HttpConfiguration https_config = new HttpConfiguration(http_config);
-        https_config.setRequestHeaderSize(8192);
+        // HTTPS configuration
+        HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
+        httpsConfiguration.setRequestHeaderSize(8192);
 
         // HTTPS connector
         SslContextFactory sslContextFactory = new SslContextFactory();
         sslContextFactory.setKeyStorePath(p.getProperty(KEYSTORE_PATH_PROPERTY));
         sslContextFactory.setKeyStorePassword(p.getProperty(KEYSTORE_PASSWORD_PROPERTY));
         sslContextFactory.setKeyManagerPassword(p.getProperty("org.onap.dmaap.datarouter.provserver.keymanager.password"));
-
-        ServerConnector https = new ServerConnector(server,
-                new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
-                new HttpConnectionFactory(https_config));
-        https.setPort(https_port);
-        https.setIdleTimeout(30000);
-        https.setAcceptQueueSize(2);
-
         // SSL stuff
         /* Skip SSLv3 Fixes */
         sslContextFactory.addExcludeProtocols("SSLv3");
         logger.info("Excluded protocols prov-" + sslContextFactory.getExcludeProtocols());
         /* End of SSLv3 Fixes */
 
+        ServerConnector httpsServerConnector = new ServerConnector(server,
+                new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
+                new HttpConnectionFactory(httpsConfiguration));
+        httpsServerConnector.setPort(httpsPort);
+        httpsServerConnector.setIdleTimeout(30000);
+        httpsServerConnector.setAcceptQueueSize(2);
+
         sslContextFactory.setKeyStoreType(p.getProperty(KEYSTORE_TYPE_PROPERTY, "jks"));
         sslContextFactory.setKeyStorePath(p.getProperty(KEYSTORE_PATH_PROPERTY));
         sslContextFactory.setKeyStorePassword(p.getProperty(KEYSTORE_PASSWORD_PROPERTY));
         sslContextFactory.setKeyManagerPassword(p.getProperty("org.onap.dmaap.datarouter.provserver.keymanager.password"));
+
         String ts = p.getProperty(TRUSTSTORE_PATH_PROPERTY);
         if (ts != null && ts.length() > 0) {
             System.out.println("@@ TS -> " + ts);
@@ -210,12 +220,6 @@ public class Main {
         hc.setHandlers(new Handler[]{contexts, new DefaultHandler()});
         hc.addHandler(reqlog);
 
-        // Server's thread pool
-        QueuedThreadPool queuedThreadPool = new QueuedThreadPool();
-        queuedThreadPool.setMinThreads(10);
-        queuedThreadPool.setMaxThreads(200);
-        queuedThreadPool.setDetailedDump(false);
-
         // Daemon to clean up the log directory on a daily basis
         Timer rolex = new Timer();
         rolex.scheduleAtFixedRate(new PurgeLogDirTask(), 0, 86400000L);    // run once per day
@@ -223,16 +227,13 @@ public class Main {
         // Start LogfileLoader
         LogfileLoader.getLoader();
 
-        // The server itself
-        server = new Server(queuedThreadPool);
-
         ServerConnector serverConnector = new ServerConnector(server,
                 new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
-                new HttpConnectionFactory(https_config));
-        serverConnector.setPort(https_port);
+                new HttpConnectionFactory(httpsConfiguration));
+        serverConnector.setPort(httpsPort);
         serverConnector.setIdleTimeout(500000);
 
-        server.setConnectors(new Connector[]{http, https});
+        server.setConnectors(new Connector[]{httpServerConnector, httpsServerConnector});
         server.setHandler(hc);
         server.setStopAtShutdown(true);
         server.setStopTimeout(5000);
