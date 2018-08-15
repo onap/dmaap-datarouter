@@ -129,6 +129,15 @@ public class Main {
         http_config.setSendServerVersion(true);
         http_config.setSendDateHeader(false);
 
+        // Server's thread pool
+        QueuedThreadPool queuedThreadPool = new QueuedThreadPool();
+        queuedThreadPool.setMinThreads(10);
+        queuedThreadPool.setMaxThreads(200);
+        queuedThreadPool.setDetailedDump(false);
+
+        // The server itself
+        server = new Server(queuedThreadPool);
+
         ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config));
         http.setPort(http_port);
         http.setAcceptQueueSize(2);
@@ -210,21 +219,12 @@ public class Main {
         hc.setHandlers(new Handler[]{contexts, new DefaultHandler()});
         hc.addHandler(reqlog);
 
-        // Server's thread pool
-        QueuedThreadPool queuedThreadPool = new QueuedThreadPool();
-        queuedThreadPool.setMinThreads(10);
-        queuedThreadPool.setMaxThreads(200);
-        queuedThreadPool.setDetailedDump(false);
-
         // Daemon to clean up the log directory on a daily basis
         Timer rolex = new Timer();
         rolex.scheduleAtFixedRate(new PurgeLogDirTask(), 0, 86400000L);    // run once per day
 
         // Start LogfileLoader
         LogfileLoader.getLoader();
-
-        // The server itself
-        server = new Server(queuedThreadPool);
 
         ServerConnector serverConnector = new ServerConnector(server,
                 new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
