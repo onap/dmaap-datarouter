@@ -47,6 +47,7 @@
         <sonar.projectVersion>${project.version}</sonar.projectVersion>
         <jetty.version>9.4.11.v20180605</jetty.version>
         <jetty.websocket.version>8.2.0.v20160908</jetty.websocket.version>
+        <thoughtworks.version>1.4.10</thoughtworks.version>
         <snapshotNexusPath>/content/repositories/snapshots/</snapshotNexusPath>
         <releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
         <stagingNexusPath>/content/repositories/staging/</stagingNexusPath>
