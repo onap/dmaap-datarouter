@@ -72,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_55ac6435",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-17T11:00:35Z",
+      "side": 1,
+      "message": "tried to fix it.... I\u0027ll try expand it out for the next push.",
+      "parentUuid": "1a76adc5_ef904197",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 39
+      },
+      "revId": "4dadfe552603380b8daee09dd92c4539021bbbb3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_2fde396e",
         "filename": "docs/data-router/data-router.rst",
         "patchSetId": 1
@@ -83,6 +107,30 @@
       "writtenOn": "2018-08-17T10:15:09Z",
       "side": 1,
       "message": "Would prefer to omit this.\nAlternatively, \"Creates a unique set of URLs to service the publisher/subscriber model\"",
+      "range": {
+        "startLine": 50,
+        "startChar": 31,
+        "endLine": 50,
+        "endChar": 76
+      },
+      "revId": "4dadfe552603380b8daee09dd92c4539021bbbb3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_f5aa5018",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-17T11:00:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_2fde396e",
       "range": {
         "startLine": 50,
         "startChar": 31,
@@ -118,6 +166,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_15458cb2",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-17T11:00:35Z",
+      "side": 1,
+      "message": "yeah, I was intending on adding the api for create and subscribe in a seperate review, dominic identified the publish and logging as the primary focus for documentation so thats what I was focusing on for this review.",
+      "parentUuid": "1a76adc5_6fcbd1a5",
+      "range": {
+        "startLine": 52,
+        "startChar": 2,
+        "endLine": 52,
+        "endChar": 14
+      },
+      "revId": "4dadfe552603380b8daee09dd92c4539021bbbb3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_cfd46549",
         "filename": "docs/data-router/data-router.rst",
         "patchSetId": 1
@@ -129,6 +201,30 @@
       "writtenOn": "2018-08-17T10:15:09Z",
       "side": 1,
       "message": "Template all hardcoded params. \"{user}\".\nSame for URL in each curl example.",
+      "range": {
+        "startLine": 55,
+        "startChar": 91,
+        "endLine": 55,
+        "endChar": 97
+      },
+      "revId": "4dadfe552603380b8daee09dd92c4539021bbbb3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b564d822",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-17T11:00:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_cfd46549",
       "range": {
         "startLine": 55,
         "startChar": 91,
@@ -305,6 +401,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_d5671424",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-17T11:00:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_2fc5d98d",
+      "range": {
+        "startLine": 76,
+        "startChar": 16,
+        "endLine": 76,
+        "endChar": 42
+      },
+      "revId": "4dadfe552603380b8daee09dd92c4539021bbbb3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_247d001d",
         "filename": "docs/data-router/data-router.rst",
         "patchSetId": 1
@@ -410,6 +530,30 @@
       "writtenOn": "2018-08-17T10:15:09Z",
       "side": 1,
       "message": "Not sure we need the error code here. Could go on a separate page/heading. Like an appendix.",
+      "range": {
+        "startLine": 103,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 20
+      },
+      "revId": "4dadfe552603380b8daee09dd92c4539021bbbb3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_75d2c0d3",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-17T11:00:35Z",
+      "side": 1,
+      "message": "I\u0027m basing it upon what message routers api docs look like here: http://onap.readthedocs.io/en/amsterdam/submodules/dmaap/messagerouter/messageservice.git/docs/message-router/message-router.html\n\nthey include the response parameters and codes.",
+      "parentUuid": "1a76adc5_8fce6db3",
       "range": {
         "startLine": 103,
         "startChar": 0,
@@ -574,6 +718,30 @@
       "writtenOn": "2018-08-17T10:15:09Z",
       "side": 1,
       "message": "Can this be removed?",
+      "range": {
+        "startLine": 432,
+        "startChar": 0,
+        "endLine": 435,
+        "endChar": 59
+      },
+      "revId": "4dadfe552603380b8daee09dd92c4539021bbbb3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_95719ce2",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 435,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-17T11:00:35Z",
+      "side": 1,
+      "message": "I think its worth keeping to provide an example request for the sublogging,if you\u0027re really adamant I can remove it.",
+      "parentUuid": "1a76adc5_afd1e958",
       "range": {
         "startLine": 432,
         "startChar": 0,
