@@ -49,6 +49,98 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_ef904197",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-17T10:15:09Z",
+      "side": 1,
+      "message": "I think most of this is specific to Message Router. No topic involved.",
+      "range": {
+        "startLine": 42,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 39
+      },
+      "revId": "4dadfe552603380b8daee09dd92c4539021bbbb3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_2fde396e",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-17T10:15:09Z",
+      "side": 1,
+      "message": "Would prefer to omit this.\nAlternatively, \"Creates a unique set of URLs to service the publisher/subscriber model\"",
+      "range": {
+        "startLine": 50,
+        "startChar": 31,
+        "endLine": 50,
+        "endChar": 76
+      },
+      "revId": "4dadfe552603380b8daee09dd92c4539021bbbb3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_6fcbd1a5",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-17T10:15:09Z",
+      "side": 1,
+      "message": "Are we missing a table with feed json payload params?\n\nSame for \"Subscribe to a feed\" below.",
+      "range": {
+        "startLine": 52,
+        "startChar": 2,
+        "endLine": 52,
+        "endChar": 14
+      },
+      "revId": "4dadfe552603380b8daee09dd92c4539021bbbb3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_cfd46549",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-17T10:15:09Z",
+      "side": 1,
+      "message": "Template all hardcoded params. \"{user}\".\nSame for URL in each curl example.",
+      "range": {
+        "startLine": 55,
+        "startChar": 91,
+        "endLine": 55,
+        "endChar": 97
+      },
+      "revId": "4dadfe552603380b8daee09dd92c4539021bbbb3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_84af3494",
         "filename": "docs/data-router/data-router.rst",
         "patchSetId": 1
@@ -190,6 +282,29 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_2fc5d98d",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-17T10:15:09Z",
+      "side": 1,
+      "message": "I would try to expand on these descriptions a bit. Doesn\u0027t really say more than what\u0027s in the heading.",
+      "range": {
+        "startLine": 76,
+        "startChar": 16,
+        "endLine": 76,
+        "endChar": 42
+      },
+      "revId": "4dadfe552603380b8daee09dd92c4539021bbbb3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_247d001d",
         "filename": "docs/data-router/data-router.rst",
         "patchSetId": 1
@@ -276,6 +391,29 @@
         "startLine": 81,
         "startChar": 9,
         "endLine": 81,
+        "endChar": 20
+      },
+      "revId": "4dadfe552603380b8daee09dd92c4539021bbbb3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_8fce6db3",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-17T10:15:09Z",
+      "side": 1,
+      "message": "Not sure we need the error code here. Could go on a separate page/heading. Like an appendix.",
+      "range": {
+        "startLine": 103,
+        "startChar": 0,
+        "endLine": 103,
         "endChar": 20
       },
       "revId": "4dadfe552603380b8daee09dd92c4539021bbbb3",
@@ -418,6 +556,29 @@
         "startChar": 53,
         "endLine": 428,
         "endChar": 54
+      },
+      "revId": "4dadfe552603380b8daee09dd92c4539021bbbb3",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_afd1e958",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 435,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-17T10:15:09Z",
+      "side": 1,
+      "message": "Can this be removed?",
+      "range": {
+        "startLine": 432,
+        "startChar": 0,
+        "endLine": 435,
+        "endChar": 59
       },
       "revId": "4dadfe552603380b8daee09dd92c4539021bbbb3",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
