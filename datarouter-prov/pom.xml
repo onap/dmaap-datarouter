@@ -57,7 +57,7 @@
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
-            <version>1.4.7</version>
+            <version>${thoughtworks.version}</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
@@ -208,7 +208,7 @@
         <dependency>
             <groupId>org.eclipse.jetty.cdi</groupId>
             <artifactId>cdi-websocket</artifactId>
-            <version>9.3.11.v20160721</version>
+            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
