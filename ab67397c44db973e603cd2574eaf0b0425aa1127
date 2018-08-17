@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_90ce8ab3",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-17T12:47:10Z",
+      "side": 1,
+      "message": "Space",
+      "range": {
+        "startLine": 112,
+        "startChar": 35,
+        "endLine": 112,
+        "endChar": 36
+      },
+      "revId": "ab67397c44db973e603cd2574eaf0b0425aa1127",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_d0d40249",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-17T12:47:10Z",
+      "side": 1,
+      "message": "Typo",
+      "range": {
+        "startLine": 134,
+        "startChar": 192,
+        "endLine": 134,
+        "endChar": 198
+      },
+      "revId": "ab67397c44db973e603cd2574eaf0b0425aa1127",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_70cbaea5",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-17T12:47:10Z",
+      "side": 1,
+      "message": "can remove the .",
+      "range": {
+        "startLine": 203,
+        "startChar": 43,
+        "endLine": 203,
+        "endChar": 45
+      },
+      "revId": "ab67397c44db973e603cd2574eaf0b0425aa1127",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
