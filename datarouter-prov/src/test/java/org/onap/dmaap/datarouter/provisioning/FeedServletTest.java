@@ -53,7 +53,7 @@ import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.onap.dmaap.datarouter.provisioning.beans.Feed")
 public class FeedServletTest {
-    private static FeedServlet feedServlet;
+    private FeedServlet feedServlet;
 
     @Mock
     private HttpServletRequest request;

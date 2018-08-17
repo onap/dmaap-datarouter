@@ -4,3 +4,4 @@
 *.log
 *.classpath
 *.project
+datarouter-prov/unit-test-logs/
