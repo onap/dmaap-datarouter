@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_2a038743",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-17T17:01:01Z",
+      "side": 1,
+      "message": "Replace tabs with spaces. Please check for other occurrences within this code change.",
+      "range": {
+        "startLine": 96,
+        "startChar": 6,
+        "endLine": 96,
+        "endChar": 7
+      },
+      "revId": "e12fcb9685d5308b0cb86e5093779752ede4b8eb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_a4102ba9",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-17T17:01:01Z",
+      "side": 1,
+      "message": "This change in format is undoing the changes pushed to address coce-style errors in the Jenkins jobs. Please see https://wiki.onap.org/display/DW/Java+code+style\nPlease can you revert the format before committing.",
+      "range": {
+        "startLine": 189,
+        "startChar": 8,
+        "endLine": 197,
+        "endChar": 117
+      },
+      "revId": "e12fcb9685d5308b0cb86e5093779752ede4b8eb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
