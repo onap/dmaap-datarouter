@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_9eef8187",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-17T17:01:01Z",
+      "side": 1,
+      "message": "Some tabs creeping back in. Can we get rid of those here and elsewhere?",
+      "range": {
+        "startLine": 96,
+        "startChar": 6,
+        "endLine": 96,
+        "endChar": 7
+      },
+      "revId": "555372f1a717bd14452ba62429c79594c6c9d753",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
