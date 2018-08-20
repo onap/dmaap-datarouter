@@ -25,6 +25,29 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_6e50aa5e",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-20T16:15:49Z",
+      "side": 1,
+      "message": "Line 52 uses \"hostname\" and here we use \"host\".\nPlease use one of above throughout the documentation for consistency.",
+      "range": {
+        "startLine": 170,
+        "startChar": 11,
+        "endLine": 170,
+        "endChar": 15
+      },
+      "revId": "e96f556d23af48825167cf7437afc79432cc442f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_ce13feb6",
         "filename": "docs/data-router/data-router.rst",
         "patchSetId": 9
@@ -133,6 +156,52 @@
         "startChar": 11,
         "endLine": 401,
         "endChar": 12
+      },
+      "revId": "e96f556d23af48825167cf7437afc79432cc442f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_eecb5a1c",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-20T16:15:49Z",
+      "side": 1,
+      "message": "Sometimes we use \"user\" other times \"username\" - can you check throughout doc and stick with 1 of these.",
+      "range": {
+        "startLine": 463,
+        "startChar": 23,
+        "endLine": 463,
+        "endChar": 31
+      },
+      "revId": "e96f556d23af48825167cf7437afc79432cc442f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_8ed2e6d0",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 581,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-20T16:15:49Z",
+      "side": 1,
+      "message": "Uppercase",
+      "range": {
+        "startLine": 581,
+        "startChar": 27,
+        "endLine": 581,
+        "endChar": 28
       },
       "revId": "e96f556d23af48825167cf7437afc79432cc442f",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
