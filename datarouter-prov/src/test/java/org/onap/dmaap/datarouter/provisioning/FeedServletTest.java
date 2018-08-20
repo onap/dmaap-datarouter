@@ -67,7 +67,7 @@ public class FeedServletTest {
         feedServlet = new FeedServlet();
         setAuthoriserToReturnRequestIsAuthorized();
         setPokerToNotCreateTimersWhenDeleteFeedIsCalled();
-        setupValidAuthorisedRequest();
+        setUpValidAuthorisedRequest();
         setUpValidSecurityOnHttpRequest();
     }
 
@@ -312,7 +312,7 @@ public class FeedServletTest {
         FieldUtils.writeDeclaredStaticField(Poker.class, "poker", poker, true);
     }
 
-    private void setupValidAuthorisedRequest() throws Exception {
+    private void setUpValidAuthorisedRequest() throws Exception {
         setUpValidSecurityOnHttpRequest();
         setBehalfHeader("Stub_Value");
         setValidPathInfoInHttpHeader();
