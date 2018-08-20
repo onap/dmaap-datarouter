@@ -32,7 +32,6 @@ import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -42,7 +41,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.notNullValue;
@@ -52,7 +50,7 @@ import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.onap.dmaap.datarouter.provisioning.beans.Feed")
-public class FeedServletTest {
+public class FeedServletTest extends DrServletTestBase {
 
     private static FeedServlet feedServlet;
 
@@ -63,7 +61,7 @@ public class FeedServletTest {
 
     @Before
     public void setUp() throws Exception {
-        initialiseBaseServletToBypassRetreiviingInitialisationParametersFromDatabase();
+        super.setUp();
         feedServlet = new FeedServlet();
         setAuthoriserToReturnRequestIsAuthorized();
         setPokerToNotCreateTimersWhenDeleteFeedIsCalled();
@@ -246,18 +244,6 @@ public class FeedServletTest {
         when(request.getInputStream()).thenReturn(inStream);
         feedServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
-    }
-
-
-    private void initialiseBaseServletToBypassRetreiviingInitialisationParametersFromDatabase()
-        throws IllegalAccessException {
-        Properties props = new Properties();
-        props.setProperty("org.onap.dmaap.datarouter.provserver.isaddressauthenabled", "false");
-        FieldUtils.writeDeclaredStaticField(DB.class, "props", props, true);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsgFlag", false, true);
-        SynchronizerTask synchronizerTask = mock(SynchronizerTask.class);
-        when(synchronizerTask.getState()).thenReturn(SynchronizerTask.UNKNOWN);
-        FieldUtils.writeDeclaredStaticField(SynchronizerTask.class, "synctask", synchronizerTask, true);
     }
 
     private void setUpValidSecurityOnHttpRequest() throws Exception {

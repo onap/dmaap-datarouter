@@ -42,7 +42,6 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -50,14 +49,12 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.onap.dmaap.datarouter.provisioning.beans.Group")
-public class GroupServletTest {
+public class GroupServletTest extends DrServletTestBase {
     private GroupServlet groupServlet;
 
     @Mock
@@ -68,7 +65,7 @@ public class GroupServletTest {
 
     @Before
     public void setUp() throws Exception {
-        initialiseBaseServletToBypassRetreiviingInitialisationParametersFromDatabase();
+        super.setUp();
         groupServlet = new GroupServlet();
         setAuthoriserToReturnRequestIsAuthorized();
         setPokerToNotCreateTimersWhenDeleteFeedIsCalled();
@@ -245,13 +242,6 @@ public class GroupServletTest {
         verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), argThat(notNullValue(String.class)));
     }
 
-    private void initialiseBaseServletToBypassRetreiviingInitialisationParametersFromDatabase() throws IllegalAccessException {
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsg_flag", false, true);
-        SynchronizerTask synchronizerTask = mock(SynchronizerTask.class);
-        when(synchronizerTask.getState()).thenReturn(SynchronizerTask.UNKNOWN);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "synctask", synchronizerTask, true);
-    }
-
     private void setAuthoriserToReturnRequestIsAuthorized() throws IllegalAccessException {
         AuthorizationResponse authResponse = mock(AuthorizationResponse.class);
         Authorizer authorizer = mock(Authorizer.class);
@@ -262,7 +252,7 @@ public class GroupServletTest {
 
     private void setPokerToNotCreateTimersWhenDeleteFeedIsCalled() throws Exception {
         Poker poker = mock(Poker.class);
-        FieldUtils.writeDeclaredStaticField(Poker.class, "p", poker, true);
+        FieldUtils.writeDeclaredStaticField(Poker.class, "poker", poker, true);
     }
 
     private void setUpValidAuthorisedRequest() throws Exception {
@@ -277,7 +267,7 @@ public class GroupServletTest {
         Set<String> authAddressesAndNetworks = new HashSet<String>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks, true);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "require_cert", false, true);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", false, true);
     }
 
     private void setBehalfHeader(String headerValue) {

@@ -24,29 +24,23 @@
 package org.onap.dmaap.datarouter.provisioning;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class BaseServletTest {
+public class BaseServletTest extends DrServletTestBase {
 
     private BaseServlet baseServlet;
 
@@ -55,13 +49,7 @@ public class BaseServletTest {
 
     @Before
     public void setUp() throws Exception {
-        Properties props = new Properties();
-        props.setProperty("org.onap.dmaap.datarouter.provserver.isaddressauthenabled", "false");
-        FieldUtils.writeDeclaredStaticField(DB.class, "props", props, true);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsgFlag", false, true);
-        SynchronizerTask synchronizerTask = mock(SynchronizerTask.class);
-        when(synchronizerTask.getState()).thenReturn(SynchronizerTask.UNKNOWN);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "synctask", synchronizerTask, true);
+        super.setUp();
         baseServlet = new BaseServlet();
     }
 
