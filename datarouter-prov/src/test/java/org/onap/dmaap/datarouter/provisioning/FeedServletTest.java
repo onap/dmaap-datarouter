@@ -23,7 +23,6 @@
 package org.onap.dmaap.datarouter.provisioning;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +40,6 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -66,7 +64,7 @@ public class FeedServletTest {
         feedServlet = new FeedServlet();
         setAuthoriserToReturnRequestIsAuthorized();
         setPokerToNotCreateTimersWhenDeleteFeedIsCalled();
-        setupValidAuthorisedRequest();
+        setUpValidAuthorisedRequest();
         setUpValidSecurityOnHttpRequest();
     }
 
@@ -285,7 +283,7 @@ public class FeedServletTest {
         FieldUtils.writeDeclaredStaticField(Poker.class, "p", poker, true);
     }
 
-    private void setupValidAuthorisedRequest() throws Exception {
+    private void setUpValidAuthorisedRequest() throws Exception {
         setUpValidSecurityOnHttpRequest();
         setBehalfHeader("Stub_Value");
         setValidPathInfoInHttpHeader();
