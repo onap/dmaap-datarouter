@@ -53,81 +53,86 @@ import com.att.eelf.configuration.EELFManager;
 
 /**
  * <p>
- * This servlet handles requests to URLs under /internal on the provisioning server.
- * These include:
+ * This servlet handles requests to URLs under /internal on the provisioning server. These include:
  * </p>
  * <div class="contentContainer">
  * <table class="packageSummary" border="0" cellpadding="3" cellspacing="0">
  * <caption><span>URL Path Summary</span><span class="tabEnd">&nbsp;</span></caption>
  * <tr>
- *   <th class="colFirst" width="15%">URL Path</th>
- *   <th class="colOne">Method</th>
- *   <th class="colLast">Purpose</th>
+ * <th class="colFirst" width="15%">URL Path</th>
+ * <th class="colOne">Method</th>
+ * <th class="colLast">Purpose</th>
  * </tr>
  * <tr class="altColor">
- *   <td class="colFirst">/internal/prov</td>
- *   <td class="colOne">GET</td>
- *   <td class="colLast">used to GET a full JSON copy of the provisioning data.</td>
+ * <td class="colFirst">/internal/prov</td>
+ * <td class="colOne">GET</td>
+ * <td class="colLast">used to GET a full JSON copy of the provisioning data.</td>
  * </tr>
  * <tr class="rowColor">
- *   <td class="colFirst">/internal/fetchProv</td>
- *   <td class="colOne">GET</td>
- *   <td class="colLast">used to signal to a standby POD that the provisioning data should be fetched from the active POD.</td>
+ * <td class="colFirst">/internal/fetchProv</td>
+ * <td class="colOne">GET</td>
+ * <td class="colLast">used to signal to a standby POD that the provisioning data should be fetched from the active
+ * POD.</td>
  * </tr>
  * <tr class="altColor">
- *   <td class="colFirst" rowspan="2">/internal/logs</td>
- *   <td class="colOne">GET</td>
- *   <td class="colLast">used to GET an index of log files and individual logs for this provisioning server.</td>
+ * <td class="colFirst" rowspan="2">/internal/logs</td>
+ * <td class="colOne">GET</td>
+ * <td class="colLast">used to GET an index of log files and individual logs for this provisioning server.</td>
  * </tr>
  * <tr class="altColor">
- *   <td class="colOne">POST</td>
- *   <td class="colLast">used to POST log files from the individual nodes to this provisioning server.</td>
+ * <td class="colOne">POST</td>
+ * <td class="colLast">used to POST log files from the individual nodes to this provisioning server.</td>
  * </tr>
  * <tr class="rowColor">
- *   <td class="colFirst" rowspan="4">/internal/api</td>
- *   <td class="colOne">GET</td>
- *   <td class="colLast">used to GET an individual parameter value. The parameter name is specified by the path after /api/.</td>
+ * <td class="colFirst" rowspan="4">/internal/api</td>
+ * <td class="colOne">GET</td>
+ * <td class="colLast">used to GET an individual parameter value. The parameter name is specified by the path after
+ * /api/.</td>
  * </tr>
  * <tr class="rowColor">
- *   <td class="colOne">PUT</td>
- *   <td class="colLast">used to set an individual parameter value. The parameter name is specified by the path after /api/.</td>
+ * <td class="colOne">PUT</td>
+ * <td class="colLast">used to set an individual parameter value. The parameter name is specified by the path after
+ * /api/.</td>
  * </tr>
  * <tr class="rowColor">
- *   <td class="colOne">DELETE</td>
- *   <td class="colLast">used to remove an individual parameter value. The parameter name is specified by the path after /api/.</td>
+ * <td class="colOne">DELETE</td>
+ * <td class="colLast">used to remove an individual parameter value. The parameter name is specified by the path after
+ * /api/.</td>
  * </tr>
  * <tr class="rowColor">
- *   <td class="colOne">POST</td>
- *   <td class="colLast">used to create a new individual parameter value. The parameter name is specified by the path after /api/.</td>
+ * <td class="colOne">POST</td>
+ * <td class="colLast">used to create a new individual parameter value. The parameter name is specified by the path
+ * after /api/.</td>
  * </tr>
  * <tr class="altColor">
- *   <td class="colFirst">/internal/halt</td>
- *   <td class="colOne">GET</td>
- *   <td class="colLast">used to halt the server (must be accessed from 127.0.0.1).</td>
+ * <td class="colFirst">/internal/halt</td>
+ * <td class="colOne">GET</td>
+ * <td class="colLast">used to halt the server (must be accessed from 127.0.0.1).</td>
  * </tr>
  * <tr class="rowColor">
- *   <td class="colFirst" rowspan="2">/internal/drlogs</td>
- *   <td class="colOne">GET</td>
- *   <td class="colLast">used to get a list of DR log entries available for retrieval.
- *   Note: these are the actual data router log entries sent to the provisioning server
- *   by the nodes, not the provisioning server's internal logs (access via /internal/logs above).
- *   The range is returned as a list of record sequence numbers.</td>
+ * <td class="colFirst" rowspan="2">/internal/drlogs</td>
+ * <td class="colOne">GET</td>
+ * <td class="colLast">used to get a list of DR log entries available for retrieval.
+ * Note: these are the actual data router log entries sent to the provisioning server by the nodes, not the provisioning
+ * server's internal logs (access via /internal/logs above). The range is returned as a list of record sequence
+ * numbers.</td>
  * </tr>
  * <tr class="rowColor">
- *   <td class="colOne">POST</td>
- *   <td class="colLast">used to retrieve specific log entries.
- *   The sequence numbers of the records to fetch are POST-ed; the records matching the sequence numbers are returned.</td>
+ * <td class="colOne">POST</td>
+ * <td class="colLast">used to retrieve specific log entries.
+ * The sequence numbers of the records to fetch are POST-ed; the records matching the sequence numbers are
+ * returned.</td>
  * </tr>
  * <tr class="altColor">
- *   <td class="colFirst">/internal/route/*</td>
- *   <td class="colOne">*</td>
- *   <td class="colLast">URLs under this path are handled via the {@link org.onap.dmaap.datarouter.provisioning.RouteServlet}</td>
+ * <td class="colFirst">/internal/route/*</td>
+ * <td class="colOne">*</td>
+ * <td class="colLast">URLs under this path are handled via the {@link org.onap.dmaap.datarouter.provisioning.RouteServlet}</td>
  * </tr>
  * </table>
  * </div>
  * <p>
- * Authorization to use these URLs is a little different than for other URLs on the provisioning server.
- * For the most part, the IP address that the request comes from should be either:
+ * Authorization to use these URLs is a little different than for other URLs on the provisioning server. For the most
+ * part, the IP address that the request comes from should be either:
  * </p>
  * <ol>
  * <li>an IP address of a provisioning server, or</li>
@@ -139,8 +144,8 @@ import com.att.eelf.configuration.EELFManager;
  * In addition, requests to /internal/halt can ONLY come from localhost (127.0.0.1) on the HTTP port.
  * </p>
  * <p>
- * All DELETE/GET/PUT/POST requests made to /internal/api on this servlet on the standby server are
- * proxied to the active server (using the {@link ProxyServlet}) if it is up and reachable.
+ * All DELETE/GET/PUT/POST requests made to /internal/api on this servlet on the standby server are proxied to the
+ * active server (using the {@link ProxyServlet}) if it is up and reachable.
  * </p>
  *
  * @author Robert Eby
@@ -148,18 +153,20 @@ import com.att.eelf.configuration.EELFManager;
  */
 @SuppressWarnings("serial")
 public class InternalServlet extends ProxyServlet {
-    private static Integer logseq = new Integer(0); // another piece of info to make log spool file names unique
+
+    private static Integer logseq = 0; // another piece of info to make log spool file names unique
     //Adding EELF Logger Rally:US664892
-    private static EELFLogger eelflogger = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.provisioning.InternalServlet");
+    private static EELFLogger eelflogger = EELFManager.getInstance()
+        .getLogger("org.onap.dmaap.datarouter.provisioning.InternalServlet");
 
     /**
-     * Delete a parameter at the address /internal/api/&lt;parameter&gt;.
-     * See the <b>Internal API</b> document for details on how this method should be invoked.
+     * Delete a parameter at the address /internal/api/&lt;parameter&gt;. See the <b>Internal API</b> document for
+     * details on how this method should be invoked.
      */
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         setIpAndFqdnForEelf("doDelete");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
+        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         EventLogRecord elr = new EventLogRecord(req);
         if (!isAuthorizedForInternal(req)) {
             elr.setMessage("Unauthorized.");
@@ -197,14 +204,15 @@ public class InternalServlet extends ProxyServlet {
         }
         resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bad URL.");
     }
+
     /**
-     * Get some information (such as a parameter) underneath the /internal/ namespace.
-     * See the <b>Internal API</b> document for details on how this method should be invoked.
+     * Get some information (such as a parameter) underneath the /internal/ namespace. See the <b>Internal API</b>
+     * document for details on how this method should be invoked.
      */
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         setIpAndFqdnForEelf("doGet");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
+        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         String path = req.getPathInfo();
         if (path.equals("/halt") && !req.isSecure()) {
             // request to halt the server - can ONLY come from localhost
@@ -214,7 +222,7 @@ public class InternalServlet extends ProxyServlet {
                 resp.setStatus(HttpServletResponse.SC_OK);
                 Main.shutdown();
             } else {
-                intlogger.info("PROV0010 Disallowed request to HALT received from "+remote);
+                intlogger.info("PROV0010 Disallowed request to HALT received from " + remote);
                 resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
             }
             return;
@@ -237,8 +245,9 @@ public class InternalServlet extends ProxyServlet {
         }
         if (path.equals("/prov")) {
             if (isProxyOK(req) && isProxyServer()) {
-                if (super.doGetWithFallback(req, resp))
+                if (super.doGetWithFallback(req, resp)) {
                     return;
+                }
                 // fall back to returning the local data if the remote is unreachable
                 intlogger.info("Active server unavailable; falling back to local copy.");
             }
@@ -297,14 +306,15 @@ public class InternalServlet extends ProxyServlet {
         }
         resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bad URL.");
     }
+
     /**
-     * Modify a parameter at the address /internal/api/&lt;parameter&gt;.
-     * See the <b>Internal API</b> document for details on how this method should be invoked.
+     * Modify a parameter at the address /internal/api/&lt;parameter&gt;. See the <b>Internal API</b> document for
+     * details on how this method should be invoked.
      */
     @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         setIpAndFqdnForEelf("doPut");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
+        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         EventLogRecord elr = new EventLogRecord(req);
         if (!isAuthorizedForInternal(req)) {
             elr.setMessage("Unauthorized.");
@@ -343,9 +353,10 @@ public class InternalServlet extends ProxyServlet {
         }
         resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bad URL.");
     }
+
     /**
-     * Create some new information (such as a parameter or log entries) underneath the /internal/ namespace.
-     * See the <b>Internal API</b> document for details on how this method should be invoked.
+     * Create some new information (such as a parameter or log entries) underneath the /internal/ namespace. See the
+     * <b>Internal API</b> document for details on how this method should be invoked.
      */
     @SuppressWarnings("resource")
     @Override
@@ -394,7 +405,7 @@ public class InternalServlet extends ProxyServlet {
             String ctype = req.getHeader("Content-Type");
             if (ctype == null || !ctype.equals("text/plain")) {
                 elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-                elr.setMessage("Bad media type: "+ctype);
+                elr.setMessage("Bad media type: " + ctype);
                 resp.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
                 eventlogger.info(elr);
                 return;
@@ -421,11 +432,14 @@ public class InternalServlet extends ProxyServlet {
             FileSystem fs = (Paths.get(spooldir)).getFileSystem();
             long total = 0;
             long avail = 0;
-            for (FileStore store: fs.getFileStores()) {
+            for (FileStore store : fs.getFileStores()) {
                 total += store.getTotalSpace();
                 avail += store.getUsableSpace();
             }
-            try { fs.close(); } catch (Exception e) { }
+            try {
+                fs.close();
+            } catch (Exception e) {
+            }
             if (((avail * 100) / total) < 5) {
                 elr.setResult(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
                 resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
@@ -433,7 +447,7 @@ public class InternalServlet extends ProxyServlet {
                 return;
             }
             Path tmppath = Paths.get(spooldir, spoolname);
-            Path donepath = Paths.get(spooldir, "IN."+spoolname);
+            Path donepath = Paths.get(spooldir, "IN." + spoolname);
             Files.copy(req.getInputStream(), Paths.get(spooldir, spoolname), StandardCopyOption.REPLACE_EXISTING);
             Files.move(tmppath, donepath, StandardCopyOption.REPLACE_EXISTING);
             elr.setResult(HttpServletResponse.SC_CREATED);
@@ -448,7 +462,7 @@ public class InternalServlet extends ProxyServlet {
             String ctype = req.getHeader("Content-Type");
             if (ctype == null || !ctype.equals("text/plain")) {
                 elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-                elr.setMessage("Bad media type: "+ctype);
+                elr.setMessage("Bad media type: " + ctype);
                 resp.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
                 eventlogger.info(elr);
                 return;
@@ -456,8 +470,9 @@ public class InternalServlet extends ProxyServlet {
             InputStream is = req.getInputStream();
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             int ch = 0;
-            while ((ch = is.read()) >= 0)
+            while ((ch = is.read()) >= 0) {
                 bos.write(ch);
+            }
             RLEBitSet bs = new RLEBitSet(bos.toString());    // The set of records to retrieve
             elr.setResult(HttpServletResponse.SC_OK);
             resp.setStatus(HttpServletResponse.SC_OK);
@@ -484,6 +499,7 @@ public class InternalServlet extends ProxyServlet {
         }
         return sb.toString();
     }
+
     private JSONArray generateLogfileList() {
         JSONArray ja = new JSONArray();
         Properties p = (new DB()).getProperties();
@@ -495,8 +511,9 @@ public class InternalServlet extends ProxyServlet {
                 String[] list = f.list();
                 if (list != null) {
                     for (String s2 : list) {
-                        if (!s2.startsWith("."))
+                        if (!s2.startsWith(".")) {
                             ja.put(s2);
+                        }
                     }
                 }
             }

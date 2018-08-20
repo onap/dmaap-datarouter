@@ -42,17 +42,18 @@ import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 
 /**
- * This servlet handles provisioning for the &lt;drFeedsURL&gt; which is the URL on the
- * provisioning server used to create new feeds.  It supports POST to create new feeds,
- * and GET to support the Feeds Collection Query function.
+ * This servlet handles provisioning for the &lt;drFeedsURL&gt; which is the URL on the provisioning server used to
+ * create new feeds.  It supports POST to create new feeds, and GET to support the Feeds Collection Query function.
  *
  * @author Robert Eby
  * @version $Id$
  */
 @SuppressWarnings("serial")
 public class DRFeedsServlet extends ProxyServlet {
+
     //Adding EELF Logger Rally:US664892
-    private static EELFLogger eelflogger = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.provisioning.DRFeedsServlet");
+    private static EELFLogger eelflogger = EELFManager.getInstance()
+        .getLogger("org.onap.dmaap.datarouter.provisioning.DRFeedsServlet");
 
     /**
      * DELETE on the &lt;drFeedsURL&gt; -- not supported.
@@ -60,7 +61,7 @@ public class DRFeedsServlet extends ProxyServlet {
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         setIpAndFqdnForEelf("doDelete");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
+        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         String message = "DELETE not allowed for the drFeedsURL.";
         EventLogRecord elr = new EventLogRecord(req);
         elr.setMessage(message);
@@ -68,15 +69,15 @@ public class DRFeedsServlet extends ProxyServlet {
         eventlogger.info(elr);
         resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, message);
     }
+
     /**
-     * GET on the &lt;drFeedsURL&gt; -- query the list of feeds already existing in the DB.
-     * See the <i>Feeds Collection Queries</i> section in the <b>Provisioning API</b>
-     * document for details on how this method should be invoked.
+     * GET on the &lt;drFeedsURL&gt; -- query the list of feeds already existing in the DB. See the <i>Feeds Collection
+     * Queries</i> section in the <b>Provisioning API</b> document for details on how this method should be invoked.
      */
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         setIpAndFqdnForEelf("doGet");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
+        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         EventLogRecord elr = new EventLogRecord(req);
         String message = isAuthorizedForProvisioning(req);
         if (message != null) {
@@ -92,14 +93,15 @@ public class DRFeedsServlet extends ProxyServlet {
         }
         String bhdr = req.getHeader(BEHALF_HEADER);
         if (bhdr == null) {
-            message = "Missing "+BEHALF_HEADER+" header.";
+            message = "Missing " + BEHALF_HEADER + " header.";
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
-        String path = req.getRequestURI(); // Note: I think this should be getPathInfo(), but that doesn't work (Jetty bug?)
+        String path = req
+            .getRequestURI(); // Note: I think this should be getPathInfo(), but that doesn't work (Jetty bug?)
         if (path != null && !path.equals("/")) {
             message = "Bad URL.";
             elr.setMessage(message);
@@ -110,7 +112,7 @@ public class DRFeedsServlet extends ProxyServlet {
         }
         // Check with the Authorizer
         AuthorizationResponse aresp = authz.decide(req);
-        if (! aresp.isAuthorized()) {
+        if (!aresp.isAuthorized()) {
             message = "Policy Engine disallows access.";
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
@@ -161,13 +163,14 @@ public class DRFeedsServlet extends ProxyServlet {
             resp.getOutputStream().print(t);
         }
     }
+
     /**
      * PUT on the &lt;drFeedsURL&gt; -- not supported.
      */
     @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         setIpAndFqdnForEelf("doPut");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
+        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         String message = "PUT not allowed for the drFeedsURL.";
         EventLogRecord elr = new EventLogRecord(req);
         elr.setMessage(message);
@@ -175,10 +178,10 @@ public class DRFeedsServlet extends ProxyServlet {
         eventlogger.info(elr);
         resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, message);
     }
+
     /**
-     * POST on the &lt;drFeedsURL&gt; -- create a new feed.
-     * See the <i>Creating a Feed</i> section in the <b>Provisioning API</b>
-     * document for details on how this method should be invoked.
+     * POST on the &lt;drFeedsURL&gt; -- create a new feed. See the <i>Creating a Feed</i> section in the
+     * <b>Provisioning API</b> document for details on how this method should be invoked.
      */
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -199,14 +202,15 @@ public class DRFeedsServlet extends ProxyServlet {
         }
         String bhdr = req.getHeader(BEHALF_HEADER);
         if (bhdr == null) {
-            message = "Missing "+BEHALF_HEADER+" header.";
+            message = "Missing " + BEHALF_HEADER + " header.";
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
-        String path = req.getRequestURI(); // Note: I think this should be getPathInfo(), but that doesn't work (Jetty bug?)
+        String path = req
+            .getRequestURI(); // Note: I think this should be getPathInfo(), but that doesn't work (Jetty bug?)
         if (path != null && !path.equals("/")) {
             message = "Bad URL.";
             elr.setMessage(message);
@@ -228,7 +232,7 @@ public class DRFeedsServlet extends ProxyServlet {
         }
         // Check with the Authorizer
         AuthorizationResponse aresp = authz.decide(req);
-        if (! aresp.isAuthorized()) {
+        if (!aresp.isAuthorized()) {
             message = "Policy Engine disallows access.";
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
@@ -245,10 +249,11 @@ public class DRFeedsServlet extends ProxyServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
-        if (intlogger.isDebugEnabled())
+        if (intlogger.isDebugEnabled()) {
             intlogger.debug(jo.toString());
-        if (++active_feeds > max_feeds) {
-            active_feeds--;
+        }
+        if (++activeFeeds > maxFeeds) {
+            activeFeeds--;
             message = "Cannot create feed; the maximum number of feeds has been configured.";
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_CONFLICT);

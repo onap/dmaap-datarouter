@@ -38,15 +38,17 @@ import com.att.eelf.configuration.EELFManager;
 /**
  * Maintain the configuration of a Data Router node
  * <p>
- * The NodeConfigManager is the single point of contact for servlet, delivery, event logging, and log retention subsystems to access configuration information.  (Log4J has its own configuration mechanism).
+ * The NodeConfigManager is the single point of contact for servlet, delivery, event logging, and log retention
+ * subsystems to access configuration information.  (Log4J has its own configuration mechanism).
  * <p>
- * There are two basic sets of configuration data.  The
- * static local configuration data, stored in a local configuration file (created
- * as part of installation by SWM), and the dynamic global
- * configuration data fetched from the data router provisioning server.
+ * There are two basic sets of configuration data.  The static local configuration data, stored in a local configuration
+ * file (created as part of installation by SWM), and the dynamic global configuration data fetched from the data router
+ * provisioning server.
  */
 public class NodeConfigManager implements DeliveryQueueHelper {
-    private static EELFLogger eelflogger = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.node.NodeConfigManager");
+
+    private static EELFLogger eelflogger = EELFManager.getInstance()
+        .getLogger("org.onap.dmaap.datarouter.node.NodeConfigManager");
     private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeConfigManager");
     private static NodeConfigManager base = new NodeConfigManager();
 
@@ -105,12 +107,14 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private NodeConfigManager() {
         Properties p = new Properties();
         try {
-            p.load(new FileInputStream(System.getProperty("org.onap.dmaap.datarouter.node.ConfigFile", "/opt/app/datartr/etc/node.properties")));
+            p.load(new FileInputStream(System
+                .getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties")));
         } catch (Exception e) {
 
             NodeUtils.setIpAndFqdnForEelf("NodeConfigManager");
             eelflogger.error(EelfMsgs.MESSAGE_PROPERTIES_LOAD_ERROR);
-            logger.error("NODE0301 Unable to load local configuration file " + System.getProperty("org.onap.dmaap.datarouter.node.ConfigFile", "/opt/app/datartr/etc/node.properties"), e);
+            logger.error("NODE0301 Unable to load local configuration file " + System
+                .getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties"), e);
         }
         provurl = p.getProperty("ProvisioningURL", "https://feeds-drtr.web.att.com/internal/prov");
         try {
@@ -262,10 +266,9 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Process a gofetch request from a particular IP address.  If the
-     * IP address is not an IP address we would go to to fetch the
-     * provisioning data, ignore the request.  If the data has been
-     * fetched very recently (default 10 seconds), wait a while before fetching again.
+     * Process a gofetch request from a particular IP address.  If the IP address is not an IP address we would go to to
+     * fetch the provisioning data, ignore the request.  If the data has been fetched very recently (default 10
+     * seconds), wait a while before fetching again.
      */
     public synchronized void gofetch(String remoteaddr) {
         if (provcheck.isFrom(remoteaddr)) {
@@ -304,7 +307,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * Given a set of credentials and an IP address, is this request from another node?
      *
      * @param credentials Credentials offered by the supposed node
-     * @param ip          IP address the request came from
+     * @param ip IP address the request came from
      * @return If the credentials and IP address are recognized, true, otherwise false.
      */
     public boolean isAnotherNode(String credentials, String ip) {
@@ -314,9 +317,9 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     /**
      * Check whether publication is allowed.
      *
-     * @param feedid      The ID of the feed being requested
+     * @param feedid The ID of the feed being requested
      * @param credentials The offered credentials
-     * @param ip          The requesting IP address
+     * @param ip The requesting IP address
      * @return True if the IP and credentials are valid for the specified feed.
      */
     public String isPublishPermitted(String feedid, String credentials, String ip) {
@@ -326,7 +329,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     /**
      * Check who the user is given the feed ID and the offered credentials.
      *
-     * @param feedid      The ID of the feed specified
+     * @param feedid The ID of the feed specified
      * @param credentials The offered credentials
      * @return Null if the credentials are invalid or the user if they are valid.
      */
@@ -338,8 +341,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * Check if the publish request should be sent to another node based on the feedid, user, and source IP address.
      *
      * @param feedid The ID of the feed specified
-     * @param user   The publishing user
-     * @param ip     The IP address of the publish endpoint
+     * @param user The publishing user
+     * @param ip The IP address of the publish endpoint
      * @return Null if the request should be accepted or the correct hostname if it should be sent to another node.
      */
     public String getIngressNode(String feedid, String user, String ip) {
@@ -359,7 +362,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     /**
      * Get a provisioned configuration parameter (from the provisioning server configuration)
      *
-     * @param name  The name of the parameter
+     * @param name The name of the parameter
      * @param deflt The value to use if the parameter is not defined
      * @return The value of the parameter or deflt if it is not defined.
      */
@@ -379,8 +382,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Get all the outbound spooling destinations.
-     * This will include both subscriptions and nodes.
+     * Get all the outbound spooling destinations. This will include both subscriptions and nodes.
      */
     public DestInfo[] getAllDests() {
         return (config.getAllDests());
@@ -404,7 +406,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * Get the URL to deliver a message to.
      *
      * @param destinfo The destination information
-     * @param fileid   The file ID
+     * @param fileid The file ID
      * @return The URL to deliver to
      */
     public String getDestURL(DestInfo destinfo, String fileid) {
@@ -479,16 +481,14 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Get the maximum number of file delivery attempts before checking
-     * if another queue has work to be performed.
+     * Get the maximum number of file delivery attempts before checking if another queue has work to be performed.
      */
     public int getFairFileLimit() {
         return (fairfilelimit);
     }
 
     /**
-     * Get the maximum amount of time spent delivering files before
-     * checking if another queue has work to be performed.
+     * Get the maximum amount of time spent delivering files before checking if another queue has work to be performed.
      */
     public long getFairTimeLimit() {
         return (fairtimelimit);
@@ -657,14 +657,16 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Get the fraction of free spool disk space where we start throwing away undelivered files.  This is FREE_DISK_RED_PERCENT / 100.0.  Default is 0.05.  Limited by 0.01 <= FreeDiskStart <= 0.5.
+     * Get the fraction of free spool disk space where we start throwing away undelivered files.  This is
+     * FREE_DISK_RED_PERCENT / 100.0.  Default is 0.05.  Limited by 0.01 <= FreeDiskStart <= 0.5.
      */
     public double getFreeDiskStart() {
         return (fdpstart);
     }
 
     /**
-     * Get the fraction of free spool disk space where we stop throwing away undelivered files.  This is FREE_DISK_YELLOW_PERCENT / 100.0.  Default is 0.2.  Limited by FreeDiskStart <= FreeDiskStop <= 0.5.
+     * Get the fraction of free spool disk space where we stop throwing away undelivered files.  This is
+     * FREE_DISK_YELLOW_PERCENT / 100.0.  Default is 0.2.  Limited by FreeDiskStart <= FreeDiskStop <= 0.5.
      */
     public double getFreeDiskStop() {
         return (fdpstop);
@@ -677,9 +679,11 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         if (provcheck.isFrom(remoteaddr)) {
             String sdir = config.getSpoolDir(subid);
             if (sdir != null) {
-                logger.info("NODE0310 Received subscription reset request for subscription " + subid + " from provisioning server " + remoteaddr);
+                logger.info("NODE0310 Received subscription reset request for subscription " + subid
+                    + " from provisioning server " + remoteaddr);
             } else {
-                logger.info("NODE0311 Received subscription reset request for unknown subscription " + subid + " from provisioning server " + remoteaddr);
+                logger.info("NODE0311 Received subscription reset request for unknown subscription " + subid
+                    + " from provisioning server " + remoteaddr);
             }
             return (sdir);
         } else {

@@ -116,7 +116,7 @@ public class FeedServlet extends ProxyServlet {
         // Delete FEED table entry (set DELETED flag)
         feed.setDeleted(true);
         if (doUpdate(feed)) {
-            active_feeds--;
+            activeFeeds--;
             // send response
             elr.setResult(HttpServletResponse.SC_NO_CONTENT);
             eventlogger.info(elr);
