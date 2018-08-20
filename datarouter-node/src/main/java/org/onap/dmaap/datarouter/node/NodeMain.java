@@ -23,11 +23,14 @@
 
 package org.onap.dmaap.datarouter.node;
 
+import org.apache.http.HttpException;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.servlet.*;
 import org.eclipse.jetty.util.ssl.*;
 import org.eclipse.jetty.server.*;
 import org.apache.log4j.Logger;
+
+import javax.xml.ws.http.HTTPException;
 
 /**
  * The main starting point for the Data Router node
@@ -37,7 +40,8 @@ public class NodeMain {
     }
 
     private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeMain");
-
+    private static ServerConnector httpServerConnector;
+    private static ServerConnector httpsServerConnector;
     private static class wfconfig implements Runnable {
         private NodeConfigManager ncm;
 
@@ -56,7 +60,7 @@ public class NodeMain {
                 try {
                     wait();
                 } catch (Exception e) {
-                    logger.debug("NodeMain: waitforconfig exception");
+                    logger.debug("NodeMain: waitforconfig exception. " + e.getMessage());
                 }
             }
             ncm.deregisterConfigTask(this);
@@ -88,8 +92,8 @@ public class NodeMain {
         logger.info("NODE0002 I am " + ncm.getMyName());
         (new wfconfig(ncm)).waitforconfig();
         d = new Delivery(ncm);
-        LogManager lm = new LogManager(ncm);
         Server server = new Server();
+        SslContextFactory sslContextFactory = new SslContextFactory();
 
         // HTTP configuration
         HttpConfiguration httpConfiguration = new HttpConfiguration();
@@ -97,36 +101,32 @@ public class NodeMain {
         httpConfiguration.setRequestHeaderSize(2048);
 
         // HTTP connector
-        ServerConnector httpServerConnector = new ServerConnector(server, new HttpConnectionFactory(httpConfiguration));
-        httpServerConnector.setPort(ncm.getHttpPort());
-
-        // HTTPS configuration
-        SslContextFactory sslContextFactory = new SslContextFactory();
-        sslContextFactory.setKeyStoreType(ncm.getKSType());
-        sslContextFactory.setKeyStorePath(ncm.getKSFile());
-        sslContextFactory.setKeyStorePassword(ncm.getKSPass());
-        sslContextFactory.setKeyManagerPassword(ncm.getKPass());
-        /* Skip SSLv3 Fixes */
-        sslContextFactory.addExcludeProtocols("SSLv3");
-        logger.info("Excluded protocols node-" + sslContextFactory.getExcludeProtocols());
+        try(ServerConnector httpServerConnector = new ServerConnector(server, new HttpConnectionFactory(httpConfiguration))) {
+            httpServerConnector.setPort(ncm.getHttpPort());
+            // HTTPS configuration
+            sslContextFactory.setKeyStoreType(ncm.getKSType());
+            sslContextFactory.setKeyStorePath(ncm.getKSFile());
+            sslContextFactory.setKeyStorePassword(ncm.getKSPass());
+            sslContextFactory.setKeyManagerPassword(ncm.getKPass());
+            /* Skip SSLv3 Fixes */
+            sslContextFactory.addExcludeProtocols("SSLv3");
+        }
         /* End of SSLv3 Fixes */
-
         HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
         httpsConfiguration.setRequestHeaderSize(8192);
-
         SecureRequestCustomizer secureRequestCustomizer = new SecureRequestCustomizer();
         secureRequestCustomizer.setStsMaxAge(2000);
         secureRequestCustomizer.setStsIncludeSubDomains(true);
         httpsConfiguration.addCustomizer(secureRequestCustomizer);
 
         // HTTPS connector
-        ServerConnector httpsServerConnector = new ServerConnector(server,
+       try(ServerConnector httpsServerConnector = new ServerConnector(server,
                 new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
-                new HttpConnectionFactory(httpsConfiguration));
-        httpsServerConnector.setPort(ncm.getHttpsPort());
-        httpsServerConnector.setIdleTimeout(500000);
-        httpsServerConnector.setAcceptQueueSize(2);
-
+                new HttpConnectionFactory(httpsConfiguration))) {
+           httpsServerConnector.setPort(ncm.getHttpsPort());
+           httpsServerConnector.setIdleTimeout(500000);
+           httpsServerConnector.setAcceptQueueSize(2);
+       }
         server.setConnectors(new Connector[]{httpServerConnector, httpsServerConnector});
         ServletContextHandler ctxt = new ServletContextHandler(0);
         ctxt.setContextPath("/");
