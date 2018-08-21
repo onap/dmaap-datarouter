@@ -68,7 +68,7 @@ public class GroupServletTest extends DrServletTestBase {
         super.setUp();
         groupServlet = new GroupServlet();
         setAuthoriserToReturnRequestIsAuthorized();
-        setPokerToNotCreateTimersWhenDeleteFeedIsCalled();
+        setPokerToNotCreateTimers();
         setUpValidAuthorisedRequest();
     }
 
@@ -250,7 +250,7 @@ public class GroupServletTest extends DrServletTestBase {
         when(authResponse.isAuthorized()).thenReturn(true);
     }
 
-    private void setPokerToNotCreateTimersWhenDeleteFeedIsCalled() throws Exception {
+    private void setPokerToNotCreateTimers() throws Exception {
         Poker poker = mock(Poker.class);
         FieldUtils.writeDeclaredStaticField(Poker.class, "poker", poker, true);
     }
