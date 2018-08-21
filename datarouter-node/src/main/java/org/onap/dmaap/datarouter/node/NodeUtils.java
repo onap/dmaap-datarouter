@@ -47,13 +47,13 @@ import com.att.eelf.configuration.EELFManager;
  * Utility functions for the data router node
  */
 public class NodeUtils {
-    private static EELFLogger eelflogger = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
-    private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
-    private static SimpleDateFormat logdate;
+    private static EELFLogger EELFLOGGER = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
+    private static Logger LOGGER = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
+    private static SimpleDateFormat LOGDATE;
 
     static {
-        logdate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        logdate.setTimeZone(TimeZone.getTimeZone("GMT"));
+        LOGDATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        LOGDATE.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
     private NodeUtils() {
@@ -96,6 +96,7 @@ public class NodeUtils {
             md.update(key.getBytes());
             return (getAuthHdr(node, base64Encode(md.digest())));
         } catch (Exception e) {
+            LOGGER.error("Exception in generating Credentials for given node name:= " + e.getMessage());
             return (null);
         }
     }
@@ -109,16 +110,22 @@ public class NodeUtils {
      * @return CN of the certificate subject or null
      */
     public static String getCanonicalName(String kstype, String ksfile, String kspass) {
+        KeyStore ks=null;
         try {
-            KeyStore ks = KeyStore.getInstance(kstype);
-            ks.load(new FileInputStream(ksfile), kspass.toCharArray());
-            return (getCanonicalName(ks));
+            ks = KeyStore.getInstance(kstype);
+            try(FileInputStream fileInputStream=new FileInputStream(ksfile)) {
+                ks.load(fileInputStream, kspass.toCharArray());
+            }
+        } catch(IOException ioException) {
+            LOGGER.error("Exception occurred while opening FileInputStream",ioException);
+            return (null);
         } catch (Exception e) {
             setIpAndFqdnForEelf("getCanonicalName");
-            eelflogger.error(EelfMsgs.MESSAGE_KEYSTORE_LOAD_ERROR, ksfile, e.toString());
-            logger.error("NODE0401 Error loading my keystore file + " + ksfile + " " + e.toString(), e);
+            EELFLOGGER.error(EelfMsgs.MESSAGE_KEYSTORE_LOAD_ERROR, ksfile, e.toString());
+            LOGGER.error("NODE0401 Error loading my keystore file + " + ksfile + " " + e.toString(), e);
             return (null);
         }
+        return (getCanonicalName(ks));
     }
 
     /**
@@ -150,7 +157,7 @@ public class NodeUtils {
                 }
             }
         } catch (Exception e) {
-            logger.error("NODE0402 Error extracting my name from my keystore file " + e.toString(), e);
+            LOGGER.error("NODE0402 Error extracting my name from my keystore file " + e.toString(), e);
         }
         return (null);
     }
@@ -165,6 +172,7 @@ public class NodeUtils {
         try {
             return (InetAddress.getByName(ip).getAddress());
         } catch (Exception e) {
+            LOGGER.error("Exception in generating byte array for given IP address := " + e.getMessage());
         }
         return (null);
     }
@@ -224,7 +232,7 @@ public class NodeUtils {
      * Format a logging timestamp as yyyy-mm-ddThh:mm:ss.mmmZ
      */
     public static synchronized String logts(Date when) {
-        return (logdate.format(when));
+        return (LOGDATE.format(when));
     }
 
     /* Method prints method name, server FQDN and IP Address of the machine in EELF logs
@@ -238,7 +246,7 @@ public class NodeUtils {
             MDC.put(MDC_SERVER_FQDN, InetAddress.getLocalHost().getHostName());
             MDC.put(MDC_SERVER_IP_ADDRESS, InetAddress.getLocalHost().getHostAddress());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Exception in generating byte array for given IP address := " + e.getMessage());
         }
 
     }
