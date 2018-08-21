@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_f6ca4c4e",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-21T08:31:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_2e45d2b2",
+      "range": {
+        "startLine": 165,
+        "startChar": 17,
+        "endLine": 165,
+        "endChar": 18
+      },
+      "revId": "e96f556d23af48825167cf7437afc79432cc442f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_6e50aa5e",
         "filename": "docs/data-router/data-router.rst",
         "patchSetId": 9
@@ -36,6 +60,30 @@
       "writtenOn": "2018-08-20T16:15:49Z",
       "side": 1,
       "message": "Line 52 uses \"hostname\" and here we use \"host\".\nPlease use one of above throughout the documentation for consistency.",
+      "range": {
+        "startLine": 170,
+        "startChar": 11,
+        "endLine": 170,
+        "endChar": 15
+      },
+      "revId": "e96f556d23af48825167cf7437afc79432cc442f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_16c6e849",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-21T08:31:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_6e50aa5e",
       "range": {
         "startLine": 170,
         "startChar": 11,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_b6c4d440",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-21T08:31:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_ce13feb6",
+      "range": {
+        "startLine": 172,
+        "startChar": 42,
+        "endLine": 172,
+        "endChar": 43
+      },
+      "revId": "e96f556d23af48825167cf7437afc79432cc442f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_8e0d0693",
         "filename": "docs/data-router/data-router.rst",
         "patchSetId": 9
@@ -82,6 +154,30 @@
       "writtenOn": "2018-08-20T15:55:55Z",
       "side": 1,
       "message": "In the feed example its \"delivery\" : {\nNo gap in lines",
+      "range": {
+        "startLine": 324,
+        "startChar": 4,
+        "endLine": 326,
+        "endChar": 5
+      },
+      "revId": "e96f556d23af48825167cf7437afc79432cc442f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_76de3c13",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-21T08:31:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_8e0d0693",
       "range": {
         "startLine": 324,
         "startChar": 4,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_96e198d2",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-21T08:31:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_ae1002a9",
+      "range": {
+        "startLine": 343,
+        "startChar": 17,
+        "endLine": 343,
+        "endChar": 18
+      },
+      "revId": "e96f556d23af48825167cf7437afc79432cc442f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_4e27ee12",
         "filename": "docs/data-router/data-router.rst",
         "patchSetId": 9
@@ -128,6 +248,30 @@
       "writtenOn": "2018-08-20T15:55:55Z",
       "side": 1,
       "message": "see a",
+      "range": {
+        "startLine": 350,
+        "startChar": 48,
+        "endLine": 350,
+        "endChar": 50
+      },
+      "revId": "e96f556d23af48825167cf7437afc79432cc442f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_36e8c4b3",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-21T08:31:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_4e27ee12",
       "range": {
         "startLine": 350,
         "startChar": 48,
@@ -163,6 +307,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_56eb00b0",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-21T08:31:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_ee16faa6",
+      "range": {
+        "startLine": 401,
+        "startChar": 11,
+        "endLine": 401,
+        "endChar": 12
+      },
+      "revId": "e96f556d23af48825167cf7437afc79432cc442f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_eecb5a1c",
         "filename": "docs/data-router/data-router.rst",
         "patchSetId": 9
@@ -186,6 +354,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_f6d1ecfb",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-21T08:31:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_eecb5a1c",
+      "range": {
+        "startLine": 463,
+        "startChar": 23,
+        "endLine": 463,
+        "endChar": 31
+      },
+      "revId": "e96f556d23af48825167cf7437afc79432cc442f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_8ed2e6d0",
         "filename": "docs/data-router/data-router.rst",
         "patchSetId": 9
@@ -197,6 +389,30 @@
       "writtenOn": "2018-08-20T16:15:49Z",
       "side": 1,
       "message": "Uppercase",
+      "range": {
+        "startLine": 581,
+        "startChar": 27,
+        "endLine": 581,
+        "endChar": 28
+      },
+      "revId": "e96f556d23af48825167cf7437afc79432cc442f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_16cd885d",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 581,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-21T08:31:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_8ed2e6d0",
       "range": {
         "startLine": 581,
         "startChar": 27,
