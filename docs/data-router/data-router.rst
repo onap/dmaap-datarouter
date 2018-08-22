@@ -74,10 +74,123 @@ Request Parameters:
 | group-id               |                                 |     Body         |   Integer  |              |     Y       |                     |                                      |
 |                        |                                 |                  |            |              |             |                     |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
-| content-type           | To specify type of message      |     Header       |   String   |     20       |     N       |                     | application/vnd.att-dr.subscription  |
+| content-type           | To specify type of message      |     Header       |   String   |     20       |     N       |                     | application/vnd.att-dr.feed          |
 |                        | (feed,subscriber,publisher)     |                  |            |              |             |                     |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
-| X-ATT-DR-ON-BEHALF-OF  | User id of subscriber           |     Header       |   String   |     1        |     N       |                     |  username                            |
+| X-ATT-DR-ON-BEHALF-OF  | User id of owner of feed        |     Header       |   String   |     1        |     N       |                     |  username                            |
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+
+Response/Error Codes
+====================
+
++------------------------+-------------------------------------------+
+| Response statusCode    | Response Description                      |
++========================+===========================================+
+| 200                    | Successful query                          |
++------------------------+-------------------------------------------+
+| 400                    | Bad request - The request is defective in |
+|                        | some way. Possible causes:                |
+|                        |                                           |
+|                        | * JSON object in request body does not    |
+|                        |   conform to the spec.                    |
+|                        | * Invalid parameter value in query string |
++------------------------+-------------------------------------------+
+| 401                    | Indicates that the request was missing the|
+|                        | Authorization header or, if the header    |
+|                        | was presented, the credentials were not   |
+|                        | acceptable                                |
++------------------------+-------------------------------------------+
+| 403                    | The request failed authorization.         |
+|                        | Possible causes:                          |
+|                        |                                           |
+|                        | * Request originated from an unauthorized |
+|                        |   IP address                              |
+|                        | * Client certificate subject is not on    |
+|                        |   the API’s authorized list.              |
+|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        |   authorized to perform                   |
++------------------------+-------------------------------------------+
+| 404                    | Not Found - The Request-URI does not point|
+|                        | to a resource that is known to the API.   |
++------------------------+-------------------------------------------+
+| 405                    | Method Not Allowed - The HTTP method in   |
+|                        | the request is not supported for the      |
+|                        | resource addressed by the Request-URI.    |
++------------------------+-------------------------------------------+
+| 415                    | Unsupported Media Type - The media type in|
+|                        | the requests Content-Type header is not  |
+|                        | appropriate for the request.              |
++------------------------+-------------------------------------------+
+| 500                    | Internal Server Error - The DR API server |
+|                        | encountered an internal error and could   |
+|                        | not complete the request.                 |
++------------------------+-------------------------------------------+
+| 503                    | Service Unavailable - The DR API service  |
+|                        | is currently unavailable                  |
++------------------------+-------------------------------------------+
+| -1                     | Failed Delivery                           |
++------------------------+-------------------------------------------+
+
+Sample Body
+===========
+.. code-block:: json
+
+ {
+     "name": "Jettydemo",
+     "version": "m1.0",
+     "description": "Jettydemo",
+     "business_description": "Jettydemo",
+     "suspend": false,
+     "deleted": false,
+     "changeowner": true,
+     "authorization": {
+          "classification": "unclassified",
+          "endpoint_addrs": [
+               "172.18.0.3",
+            ],
+          "endpoint_ids": [
+               {
+                    "password": "password",
+                    "id": "user"
+               }
+          ]
+     },
+
+}
+
+Updating a Feed
+---------------
+
+**Description**: Update a feed with new parameters.
+
+Sample Request
+==============
+
+curl -v -X PUT -H "Content-Type: application/vnd.att-dr.feed" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @/opt/app/datartr/addFeed3.txt --location-trusted -k https:/{host}:{port}
+
+Request Parameters:
+===================
+
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+| Name                   | Description                     |  Param Type      |  Data Type |   MaxLen     |  Required   |  Format             |  Valid/Example Values                |
++========================+=================================+==================+============+==============+=============+=====================+======================================+
+| description            | Feed description                |     Body         |   String   |              |     Y       |                     |                                      |
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+| business description   | Business description            |     Body         |   String   |              |     Y       |                     |                                      |
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+| Authorization          | Information for authorizing     |     Body         |   Object   |              |     Y       |                     |                                      |
+|                        | publishing requests             |                  |            |              |             |                     |                                      |
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+| suspend                | Set to true if the feed is in   |     Body         |   Boolean  |              |     N       |                     | true                                 |
+|                        | the suspended state             |                  |            |              |             |                     | false                                |
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+| group-id               |                                 |     Body         |   Integer  |              |     Y       |                     |                                      |
+|                        |                                 |                  |            |              |             |                     |                                      |
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+| content-type           | To specify type of message      |     Header       |   String   |     20       |     N       |                     | application/vnd.att-dr.feed          |
+|                        | (feed,subscriber,publisher)     |                  |            |              |             |                     |                                      |
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+| X-ATT-DR-ON-BEHALF-OF  | User id of owner of feed        |     Header       |   String   |     1        |     N       |                     |  username                            |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
 
 Response/Error Codes
@@ -136,8 +249,6 @@ Sample Body
 .. code-block:: json
 
  {
-     "name": "Jettydemo",
-     "version": "m1.0",
      "description": "Jettydemo",
      "business_description": "Jettydemo",
      "suspend": false,
@@ -158,7 +269,6 @@ Sample Body
 
 }
 
-
 Get a Feed
 ----------
 
@@ -169,7 +279,7 @@ Request URL
 
 http[s]://{host}:{port}/feed/{feedId}
 
-* {feedId}: Id of the feed you wish to see a representation of
+* {feedId}: Id of the feed you want to see a representation of
 
 Sample Request
 ==============
@@ -220,6 +330,66 @@ Response/Error Codes
 | -1                     | Failed Delivery                           |
 +------------------------+-------------------------------------------+
 
+Delete a Feed
+-------------
+
+**Description**: Deletes a specified feed
+
+Request URL
+===========
+
+http[s]://{host}:{port}/feed/{feedId}
+
+* {feedId}: Id of the feed you want to delete
+
+Sample Request
+==============
+
+curl -v -X DELETE -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/feed/{feedId}
+
+Response/Error Codes
+====================
+
++------------------------+-------------------------------------------+
+| Response statusCode    | Response Description                      |
++========================+===========================================+
+| 200                    | Successful query                          |
++------------------------+-------------------------------------------+
+| 401                    | Indicates that the request was missing the|
+|                        | Authorization header or, if the header    |
+|                        | was presented, the credentials were not   |
+|                        | acceptable                                |
++------------------------+-------------------------------------------+
+| 403                    | The request failed authorization.         |
+|                        | Possible causes:                          |
+|                        |                                           |
+|                        | * Request originated from an unauthorized |
+|                        |   IP address                              |
+|                        | * Client certificate subject is not on    |
+|                        |   the API’s authorized list.              |
+|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        |   authorized to perform                   |
++------------------------+-------------------------------------------+
+| 404                    | Not Found - The Request-URI does not point|
+|                        | to a resource that is known to the API.   |
++------------------------+-------------------------------------------+
+| 405                    | Method Not Allowed - The HTTP method in   |
+|                        | the request is not supported for the      |
+|                        | resource addressed by the Request-URI.    |
++------------------------+-------------------------------------------+
+| 415                    | Unsupported Media Type - The media type in|
+|                        | the request’s Content-Type header is not  |
+|                        | appropriate for the request.              |
++------------------------+-------------------------------------------+
+| 500                    | Internal Server Error - The DR API server |
+|                        | encountered an internal error and could   |
+|                        | not complete the request.                 |
++------------------------+-------------------------------------------+
+| 503                    | Service Unavailable - The DR API service  |
+|                        | is currently unavailable                  |
++------------------------+-------------------------------------------+
+| -1                     | Failed Delivery                           |
++------------------------+-------------------------------------------+
 
 
 Subscribe to Feed
@@ -245,6 +415,120 @@ Request Parameters:
 +========================+=================================+==================+============+==============+=============+=====================+======================================+
 | feedId                 | ID for the feed you are         |     Path         |   String   |              |     Y       |                     |                                      |
 |                        | subscribing to                  |                  |            |              |             |                     |                                      |
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+| delivery               | Address and credentials for     |     Body         |   Object   |              |     Y       |                     |                                      |
+|                        | delivery                        |                  |            |              |             |                     |                                      |
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+| follow_redirect        | Set to true if feed redirection |     Body         |   Boolean  |              |     Y       |                     | true                                 |
+|                        | is expected                     |                  |            |              |             |                     | false                                |
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+| metadata_only          | Set to true if subscription is  |     Body         |   Boolean  |              |     Y       |                     | true                                 |
+|                        | to receive per-file metadata    |                  |            |              |             |                     | false                                |
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+| suspend                | Set to true if the subscription |     Body         |   Boolean  |              |     N       |                     | true                                 |
+|                        | is in the suspended state       |                  |            |              |             |                     | false                                |
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+| group-id               |                                 |     Body         |   Integer  |              |     Y       |                     |                                      |
+|                        |                                 |                  |            |              |             |                     |                                      |
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+| content-type           | To specify type of message      |     Header       |   String   |     20       |     N       |                     | application/vnd.att-dr.subscription  |
+|                        | (feed,subscriber,publisher)     |                  |            |              |             |                     |                                      |
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+| X-ATT-DR-ON-BEHALF-OF  | User id of subscriber           |     Header       |   String   |     1        |     N       |                     |  username                            |
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+
+Response/Error Codes
+====================
+
++------------------------+-------------------------------------------+
+| Response statusCode    | Response Description                      |
++========================+===========================================+
+| 200                    | Successful query                          |
++------------------------+-------------------------------------------+
+| 400                    | Bad request - The request is defective in |
+|                        | some way. Possible causes:                |
+|                        |                                           |
+|                        | * JSON object in request body does not    |
+|                        |   conform to the spec.                    |
+|                        | * Invalid parameter value in query string |
++------------------------+-------------------------------------------+
+| 401                    | Indicates that the request was missing the|
+|                        | Authorization header or, if the header    |
+|                        | was presented, the credentials were not   |
+|                        | acceptable                                |
++------------------------+-------------------------------------------+
+| 403                    | The request failed authorization.         |
+|                        | Possible causes:                          |
+|                        |                                           |
+|                        | * Request originated from an unauthorized |
+|                        |   IP address                              |
+|                        | * Client certificate subject is not on    |
+|                        |   the API’s authorized list.              |
+|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        |   authorized to perform                   |
++------------------------+-------------------------------------------+
+| 404                    | Not Found - The Request-URI does not point|
+|                        | to a resource that is known to the API.   |
++------------------------+-------------------------------------------+
+| 405                    | Method Not Allowed - The HTTP method in   |
+|                        | the request is not supported for the      |
+|                        | resource addressed by the Request-URI.    |
++------------------------+-------------------------------------------+
+| 415                    | Unsupported Media Type - The media type in|
+|                        | the requests Content-Type header is not  |
+|                        | appropriate for the request.              |
++------------------------+-------------------------------------------+
+| 500                    | Internal Server Error - The DR API server |
+|                        | encountered an internal error and could   |
+|                        | not complete the request.                 |
++------------------------+-------------------------------------------+
+| 503                    | Service Unavailable - The DR API service  |
+|                        | is currently unavailable                  |
++------------------------+-------------------------------------------+
+| -1                     | Failed Delivery                           |
++------------------------+-------------------------------------------+
+
+Sample Body
+===========
+.. code-block:: json
+
+ {
+    "delivery" :{
+        "url" : "http://172.18.0.3:7070/",
+        "user" : "LOGIN",
+        "password" : "PASSWORD",
+        "use100" : true
+    },
+    "metadataOnly" : false,
+    "suspend" : false,
+    "groupid" : 29,
+    "subscriber" : "sg481n"
+
+}
+
+Update subscription
+-------------------
+
+**Description**: Update a subscription to a feed.
+
+Request URL
+===========
+
+http[s]://{host}:{port}/subscribe/{feedId}
+
+Sample Request
+==============
+
+curl -v -X PUT -H "Content-Type: application/vnd.att-dr.subscription" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @/opt/app/datartr/addSubscriber.txt --location-trusted -k https://{host}:{port}/subscribe/{feedId}
+
+Request Parameters:
+===================
+
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+| Name                   | Description                     |  Param Type      |  Data Type |   MaxLen     |  Required   |  Format             |  Valid/Example Values                |
++========================+=================================+==================+============+==============+=============+=====================+======================================+
+| feedId                 | ID for the subscription you are |     Path         |   String   |              |     Y       |                     |                                      |
+|                        | updating                        |                  |            |              |             |                     |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
 | delivery               | Address and credentials for     |     Body         |   Object   |              |     Y       |                     |                                      |
 |                        | delivery                        |                  |            |              |             |                     |                                      |
@@ -347,12 +631,73 @@ Request URL
 
 http[s]://{host}:{port}/subscribe/{subId}
 
-* {subId}: Id of the subscription you wish to see a representation of
+* {subId}: Id of the subscription you want to see a representation of
 
 Sample Request
 ==============
 
 curl -v -X GET -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/subscribe/{subId}
+
+Response/Error Codes
+====================
+
++------------------------+-------------------------------------------+
+| Response statusCode    | Response Description                      |
++========================+===========================================+
+| 200                    | Successful query                          |
++------------------------+-------------------------------------------+
+| 401                    | Indicates that the request was missing the|
+|                        | Authorization header or, if the header    |
+|                        | was presented, the credentials were not   |
+|                        | acceptable                                |
++------------------------+-------------------------------------------+
+| 403                    | The request failed authorization.         |
+|                        | Possible causes:                          |
+|                        |                                           |
+|                        | * Request originated from an unauthorized |
+|                        |   IP address                              |
+|                        | * Client certificate subject is not on    |
+|                        |   the API’s authorized list.              |
+|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        |   authorized to perform                   |
++------------------------+-------------------------------------------+
+| 404                    | Not Found - The Request-URI does not point|
+|                        | to a resource that is known to the API.   |
++------------------------+-------------------------------------------+
+| 405                    | Method Not Allowed - The HTTP method in   |
+|                        | the request is not supported for the      |
+|                        | resource addressed by the Request-URI.    |
++------------------------+-------------------------------------------+
+| 415                    | Unsupported Media Type - The media type in|
+|                        | the request’s Content-Type header is not  |
+|                        | appropriate for the request.              |
++------------------------+-------------------------------------------+
+| 500                    | Internal Server Error - The DR API server |
+|                        | encountered an internal error and could   |
+|                        | not complete the request.                 |
++------------------------+-------------------------------------------+
+| 503                    | Service Unavailable - The DR API service  |
+|                        | is currently unavailable                  |
++------------------------+-------------------------------------------+
+| -1                     | Failed Delivery                           |
++------------------------+-------------------------------------------+
+
+Delete a subscription
+---------------------
+
+**Description**: Deletes a specified subscription
+
+Request URL
+===========
+
+http[s]://{host}:{port}/feed/{feedId}
+
+* {feedId}: Id of the subscription you want to delete
+
+Sample Request
+==============
+
+curl -v -X DELETE -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/subscribe/{feedId}
 
 Response/Error Codes
 ====================
@@ -460,7 +805,54 @@ Response/Error Codes
 Sample Request
 ==============
 
-curl -v -X PUT --user {user}:{password} -H "Content-Type: application/octet-stream" --data-binary @/opt/app/datartr/sampleFile.txt --post301 --location-trusted -k https://{host}:{port}/publish/{feedId}/sampleFile.txt
+curl -v -X PUT --user {user}:{password} -H "Content-Type: application/octet-stream" --data-binary @/opt/app/datartr/sampleFile.txt --location-trusted -k https://{host}:{port}/publish/{feedId}/sampleFile.txt
+
+Delete a Published file
+-----------------------
+
+**Description**: Deletes a specified published file
+
+Request URL
+===========
+
+http[s]://{host}:{port}/publish/{feedId}/{fileId}
+
+* {feedId}: Id of the feed you want to delete a published file from
+* {fileId}: Id of the published file you want to delete
+
+Sample Request
+==============
+
+curl -v -X DELETE -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/publish/{feedId}/{fileId}
+
+Response/Error Codes
+====================
+
++------------------------+---------------------------------+
+| Response statusCode    | Response Description            |
++========================+=================================+
+| 204                    | Successful PUT or DELETE        |
++------------------------+---------------------------------+
+| 400                    | Failure - Malformed request     |
++------------------------+---------------------------------+
+| 401                    | Failure - Request was missing   |
+|                        | authorization header, or        |
+|                        | credentials were not accepted   |
++------------------------+---------------------------------+
+| 403                    | Failure - User could not be     |
+|                        | authenticated, or was not       |
+|                        | authorized to make the request  |
++------------------------+---------------------------------+
+| 404                    | Failure - Path in the request   |
+|                        | URL did not point to a valid    |
+|                        | feed publishing URL             |
++------------------------+---------------------------------+
+| 500                    | Failure - DR experienced an     |
+|                        | internal problem                |
++------------------------+---------------------------------+
+| 503                    | Failure - DR is not currently   |
+|                        | available                       |
++------------------------+---------------------------------+
 
 Feed logging
 ------------
@@ -473,8 +865,8 @@ Request URL
 
 http[s]://{host}:{port}/feedlog/{feedId}?{queryParameter}
 
-* {feedId} is the id of the feed you wish to get logs from
-* {queryParameter} a parameter passed through to narrow the returned logs. multiple parameters can be passed
+* {feedId} : The id of the feed you want to get logs from
+* {queryParameter}: A parameter passed through to narrow the returned logs. multiple parameters can be passed
 
 Request parameters
 ==================
@@ -623,8 +1015,8 @@ Request URL
 
 http[s]://{host}:{port}/sublog/{subId}?{queryParameter}
 
-* {subId} is the id of the feed you wish to get logs from
-* {queryParameter} a parameter passed through to narrow the returned logs. multiple parameters can be passed
+* {subId}: The id of the feed you want to get logs from
+* {queryParameter}: A parameter passed through to narrow the returned logs. multiple parameters can be passed
 
 Request parameters
 ==================
