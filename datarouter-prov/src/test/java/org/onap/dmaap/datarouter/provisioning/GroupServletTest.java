@@ -55,6 +55,7 @@ import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.onap.dmaap.datarouter.provisioning.beans.Group")
 public class GroupServletTest extends DrServletTestBase {
+
     private GroupServlet groupServlet;
 
     @Mock
