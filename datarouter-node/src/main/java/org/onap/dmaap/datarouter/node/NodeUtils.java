@@ -106,7 +106,8 @@ public class NodeUtils {
      *
      * @param kstype The type of keystore
      * @param ksfile The file name of the keystore
-     * @param kspass The password of the keystore
+     * @param kspass The password of the keystoregds
+     *
      * @return CN of the certificate subject or null
      */
     public static String getCanonicalName(String kstype, String ksfile, String kspass) {
@@ -115,10 +116,10 @@ public class NodeUtils {
             ks = KeyStore.getInstance(kstype);
             try(FileInputStream fileInputStream=new FileInputStream(ksfile)) {
                 ks.load(fileInputStream, kspass.toCharArray());
+            } catch(IOException ioException) {
+                nodeUtilsLogger.error("IOException occurred while opening FileInputStream: " + ioException.getMessage(), ioException);
+                return (null);
             }
-        } catch(IOException ioException) {
-            nodeUtilsLogger.error("Exception occurred while opening FileInputStream",ioException);
-            return (null);
         } catch (Exception e) {
             setIpAndFqdnForEelf("getCanonicalName");
             eelfLogger.error(EelfMsgs.MESSAGE_KEYSTORE_LOAD_ERROR, ksfile, e.toString());
@@ -147,7 +148,7 @@ public class NodeUtils {
                         if (parts.length < 1) {
                             return (null);
                         }
-                        subject = parts[0].trim();
+                        subject = parts[5].trim();
                         if (!subject.startsWith("CN=")) {
                             return (null);
 

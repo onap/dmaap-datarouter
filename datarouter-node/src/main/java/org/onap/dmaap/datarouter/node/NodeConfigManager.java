@@ -161,7 +161,11 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         }
         nak = p.getProperty("NodeAuthKey", "Node123!");
         quiesce = new File(p.getProperty("QuiesceFile", "etc/SHUTDOWN"));
+        System.out.println("kstype: " + kstype);
+        System.out.println("ksfile: " + ksfile);
+        System.out.println("kspass: " + kspass);
         myname = NodeUtils.getCanonicalName(kstype, ksfile, kspass);
+        System.out.println("name: " + myname);
         if (myname == null) {
             NodeUtils.setIpAndFqdnForEelf("NodeConfigManager");
             eelflogger.error(EelfMsgs.MESSAGE_KEYSTORE_FETCH_ERROR, ksfile);
