@@ -23,6 +23,8 @@
 package org.onap.dmaap.datarouter.provisioning;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,6 +69,7 @@ public class FeedServletTest extends DrServletTestBase {
         setPokerToNotCreateTimersWhenDeleteFeedIsCalled();
         setUpValidAuthorisedRequest();
         setUpValidSecurityOnHttpRequest();
+        setUpValidContentHeadersAndJSONOnHttpRequest();
     }
 
     @Test
@@ -230,6 +233,7 @@ public class FeedServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Content_Header_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated()
         throws Exception {
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.feed-fail; version=2.0");
         when(request.getContentType()).thenReturn("stub_contentType");
         feedServlet.doPut(request, response);
         verify(response)
@@ -239,11 +243,159 @@ public class FeedServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Request_Contains_Badly_Formed_JSON_Then_Bad_Request_Response_Is_Generated()
         throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.feed; version=1.0");
         ServletInputStream inStream = mock(ServletInputStream.class);
         when(request.getInputStream()).thenReturn(inStream);
         feedServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_PUT_And_Request_Contains_Invalid_JSON_Then_Bad_Request_Response_Is_Generated() throws Exception {
+        FeedServlet feedServlet = new FeedServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                return new JSONObject();
+            }
+        };
+        feedServlet.doPut(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_PUT_And_Feed_Change_Is_Not_Publisher_Who_Requested_Feed_Bad_Request_Response_Is_Generated() throws Exception {
+        when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn(null);
+        JSONObject JSObject = buildRequestJsonObject();
+        FeedServlet feedServlet = new FeedServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                JSONObject jo = new JSONObject();
+                jo.put("name", "stub_name");
+                jo.put("version", "1.0");
+                jo.put("authorization", JSObject);
+                return jo;
+            }
+        };
+
+        feedServlet.doPut(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_PUT_And_Feed_Name_Change_is_Requested_Bad_Request_Response_Is_Generated() throws Exception {
+        JSONObject JSObject = buildRequestJsonObject();
+        FeedServlet feedServlet = new FeedServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                JSONObject jo = new JSONObject();
+                jo.put("name", "not_stub_name");
+                jo.put("version", "1.0");
+                jo.put("authorization", JSObject);
+                return jo;
+            }
+        };
+        feedServlet.doPut(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_PUT_And_Feed_Version_Change_is_Requested_Bad_Request_Response_Is_Generated() throws Exception {
+        JSONObject JSObject = buildRequestJsonObject();
+        FeedServlet feedServlet = new FeedServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                JSONObject jo = new JSONObject();
+                jo.put("name", "stub_name");
+                jo.put("version", "2.0");
+                jo.put("authorization", JSObject);
+                return jo;
+            }
+        };
+        feedServlet.doPut(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_PUT_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated() throws Exception {
+        JSONObject JSObject = buildRequestJsonObject();
+        FeedServlet feedServlet = new FeedServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                JSONObject jo = new JSONObject();
+                jo.put("name", "stub_name");
+                jo.put("version", "1.0");
+                jo.put("authorization", JSObject);
+                return jo;
+            }
+        };
+        setAuthoriserToReturnRequestNotAuthorized();
+        feedServlet.doPut(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_PUT_And_Change_On_Feeds_Fails_A_STATUS_OK_Response_Is_Generated() throws Exception {
+        ServletOutputStream outStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outStream);
+
+        JSONObject JSObject = buildRequestJsonObject();
+        FeedServlet feedServlet = new FeedServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                JSONObject jo = new JSONObject();
+                jo.put("name", "stub_name");
+                jo.put("version", "1.0");
+                jo.put("authorization", JSObject);
+                return jo;
+            }
+
+            @Override
+            protected boolean doUpdate(Updateable bean) {
+                return false;
+            }
+        };
+        feedServlet.doPut(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_PUT_And_Change_On_Feeds_Suceeds_A_STATUS_OK_Response_Is_Generated() throws Exception {
+        ServletOutputStream outStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outStream);
+        JSONObject JSObject = buildRequestJsonObject();
+        FeedServlet feedServlet = new FeedServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                JSONObject jo = new JSONObject();
+                jo.put("name", "stub_name");
+                jo.put("version", "1.0");
+                jo.put("authorization", JSObject);
+                return jo;
+            }
+
+            @Override
+            protected boolean doUpdate(Updateable bean) {
+                return true;
+            }
+        };
+        feedServlet.doPut(request, response);
+        verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_POST_SC_METHOD_NOT_ALLOWED_Response_Is_Generated() throws Exception {
+        feedServlet.doPost(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), argThat(notNullValue(String.class)));
+    }
+
+    @NotNull
+    private JSONObject buildRequestJsonObject() {
+        JSONObject JSObject = new JSONObject();
+        JSONArray endpointIDs = new JSONArray();
+        JSONObject JOEndpointIDs = new JSONObject();
+        JOEndpointIDs.put("id", "stub_endpoint_id");
+        JOEndpointIDs.put("password", "stub_endpoint_password");
+        endpointIDs.put(JOEndpointIDs);
+
+        JSONArray endpointAddresses = new JSONArray();
+        endpointAddresses.put("127.0.0.1");
+
+        JSObject.put("classification", "stub_classification");
+        JSObject.put("endpoint_ids", endpointIDs);
+        JSObject.put("endpoint_addrs", endpointAddresses);
+        return JSObject;
     }
 
     private void setUpValidSecurityOnHttpRequest() throws Exception {
@@ -275,6 +427,10 @@ public class FeedServletTest extends DrServletTestBase {
         PowerMockito.when(Feed.getFeedById(anyInt())).thenReturn(feed);
         when(feed.isDeleted()).thenReturn(false);
         when(feed.asJSONObject(true)).thenReturn(mock(JSONObject.class));
+        when(feed.getPublisher()).thenReturn("Stub_Value");
+        when(feed.getName()).thenReturn("stub_name");
+        when(feed.getVersion()).thenReturn("1.0");
+        when(feed.asLimitedJSONObject()).thenReturn(mock(JSONObject.class));
     }
 
     private void setAuthoriserToReturnRequestNotAuthorized() throws IllegalAccessException {
@@ -303,5 +459,10 @@ public class FeedServletTest extends DrServletTestBase {
         setBehalfHeader("Stub_Value");
         setValidPathInfoInHttpHeader();
         setFeedToReturnValidFeedForSuppliedId();
+    }
+
+    private void setUpValidContentHeadersAndJSONOnHttpRequest() {
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.feed; version=1.0");
+        when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
     }
 }
