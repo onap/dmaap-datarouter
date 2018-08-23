@@ -22,6 +22,30 @@
       "revId": "26a5df9da570afb21a1c9aa761a1b4ba358abea8",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_3f62cb3e",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/PublishServletTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-23T06:14:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_c5c8af76",
+      "range": {
+        "startLine": 138,
+        "startChar": 17,
+        "endLine": 138,
+        "endChar": 52
+      },
+      "revId": "26a5df9da570afb21a1c9aa761a1b4ba358abea8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
