@@ -1,0 +1,9 @@
+################################################################
+# Configuration File generated on Fri Aug 17 16:17:55 UTC 2018
+################################################################
+aaf_id=dmaap-dr-prov@dmaap-dr.onap.org
+aaf_password=enc:N1T8OlUFU4vwIEiWVhK73bgVCnSxCa13BIpWTDQ2kuy
+cadi_keyfile=/opt/app/osaaf/local/org.onap.dmaap-dr.keyfile
+cadi_truststore=/opt/app/osaaf/local/truststoreONAPall.jks
+cadi_truststore_password=enc:y862_ajGF5tblo0dXPllOwmUkwoREwyoDE59Awju3LA
+cadi_x509_issuers=CN=intermediateCA_1, OU=OSAAF, O=ONAP, C=US:CN=intermediateCA_7, OU=OSAAF, O=ONAP, C=US
