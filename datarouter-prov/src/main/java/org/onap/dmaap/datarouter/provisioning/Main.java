@@ -185,8 +185,6 @@ public class Main {
                 sslContextFactory.setTrustStorePath(DEFAULT_TRUSTSTORE);
                 sslContextFactory.setTrustStorePassword("changeit");
             }
-            sslContextFactory.setTrustStorePath("/opt/app/datartr/self_signed/cacerts.jks");
-            sslContextFactory.setTrustStorePassword("changeit");
             sslContextFactory.setWantClientAuth(true);
 
             // Servlet and Filter configuration

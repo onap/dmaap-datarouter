@@ -124,18 +124,18 @@ CREATE TABLE GROUPS (
 );
 
 INSERT INTO PARAMETERS VALUES
-    ('ACTIVE_POD',  'prov.datarouternew.com'),
-    ('PROV_ACTIVE_NAME',  'prov.datarouternew.com'),
+    ('ACTIVE_POD',  'dmaap-dr-prov'),
+    ('PROV_ACTIVE_NAME',  'dmaap-dr-prov'),
     ('STANDBY_POD', ''),
-    ('PROV_NAME',   'prov.datarouternew.com'),
-    ('NODES',       '172.100.0.1|node.datarouternew.com'),
+    ('PROV_NAME',   'dmaap-dr-prov'),
+    ('NODES',       '172.100.0.1|dmaap-dr-node'),
     ('PROV_DOMAIN', 'datarouternew.com'),
     ('DELIVERY_INIT_RETRY_INTERVAL', '10'),
     ('DELIVERY_MAX_AGE', '86400'),
     ('DELIVERY_MAX_RETRY_INTERVAL', '3600'),
     ('DELIVERY_RETRY_RATIO', '2'),
     ('LOGROLL_INTERVAL', '300'),
-    ('PROV_AUTH_ADDRESSES', '172.100.0.1|prov.datarouternew.com|node.datarouternew.com'),
+    ('PROV_AUTH_ADDRESSES', '172.100.0.1|dmaap-dr-prov|dmaap-dr-node'),
     ('PROV_AUTH_SUBJECTS', ''),
     ('PROV_MAXFEED_COUNT',  '10000'),
     ('PROV_MAXSUB_COUNT',   '100000'),

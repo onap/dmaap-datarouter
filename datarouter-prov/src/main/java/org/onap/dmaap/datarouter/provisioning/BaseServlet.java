@@ -25,7 +25,6 @@
 package org.onap.dmaap.datarouter.provisioning;
 
 import static com.att.eelf.configuration.Configuration.MDC_SERVER_FQDN;
-
 import static com.att.eelf.configuration.Configuration.MDC_SERVER_IP_ADDRESS;
 import static com.att.eelf.configuration.Configuration.MDC_SERVICE_NAME;
 
@@ -36,19 +35,30 @@ import java.net.UnknownHostException;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import java.util.List;
-import java.util.ArrayList;
-
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.regex.Pattern;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.onap.dmaap.datarouter.authz.Authorizer;
@@ -64,21 +74,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.ThrottleFilter;
-import org.json.JSONException;
 import org.slf4j.MDC;
-
-import java.util.Properties;
-import java.util.regex.Pattern;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
 
 /**
  * This is the base class for all Servlets in the provisioning code. It provides standard constants and some common
