@@ -81,6 +81,7 @@ public class SubscribeServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_GET_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated() throws Exception {
         when(request.isSecure()).thenReturn(false);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         subscribeServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
@@ -137,6 +138,7 @@ public class SubscribeServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_POST_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated() throws Exception {
         when(request.isSecure()).thenReturn(false);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         subscribeServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }

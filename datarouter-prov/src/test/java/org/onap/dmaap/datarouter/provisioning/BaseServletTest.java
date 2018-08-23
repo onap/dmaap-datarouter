@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.Set;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -84,7 +85,7 @@ public class BaseServletTest extends DrServletTestBase {
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks, true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", true, true);
-        assertThat(baseServlet.isAuthorizedForProvisioning(request), is("Client certificate is missing."));
+        assertNull(baseServlet.isAuthorizedForProvisioning(request));
     }
 
     @Test
