@@ -426,10 +426,10 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/opt/app/datartr/self_signed</outputDirectory>
+                            <outputDirectory>${basedir}/target/opt/app/datartr/aaf_certs</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${basedir}/self_signed</directory>
+                                    <directory>${basedir}/aaf_certs</directory>
                                     <includes>
                                         <include>misc/**</include>
                                         <include>**/**</include>
