@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_8594f2e2",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DB.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-23T12:47:58Z",
+      "side": 1,
+      "message": "Maybe just change the file permissions here back to 644",
+      "revId": "abd85f1b22abe26ee3052276039b3a53a5ac33c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
