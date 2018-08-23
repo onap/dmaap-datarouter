@@ -28,26 +28,30 @@ import static com.att.eelf.configuration.Configuration.MDC_SERVER_FQDN;
 import static com.att.eelf.configuration.Configuration.MDC_SERVER_IP_ADDRESS;
 import static com.att.eelf.configuration.Configuration.MDC_SERVICE_NAME;
 
-import java.security.*;
-import java.io.*;
-import java.util.*;
-import java.security.cert.*;
-import java.net.*;
-import java.text.*;
-
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.security.KeyStore;
+import java.security.MessageDigest;
+import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.TimeZone;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 import org.slf4j.MDC;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
-
 /**
  * Utility functions for the data router node
  */
 public class NodeUtils {
-    private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
+
+    private static EELFLogger eelfLogger = EELFManager.getInstance()
+        .getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
     private static Logger nodeUtilsLogger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
     private static SimpleDateFormat logDate;
 
@@ -72,7 +76,7 @@ public class NodeUtils {
     /**
      * Given a user and password, generate the credentials
      *
-     * @param user     User name
+     * @param user User name
      * @param password User password
      * @return Authorization header value
      */
@@ -96,13 +100,15 @@ public class NodeUtils {
             md.update(key.getBytes());
             return (getAuthHdr(node, base64Encode(md.digest())));
         } catch (Exception exception) {
-            nodeUtilsLogger.error("Exception in generating Credentials for given node name:= " + exception.toString(), exception);
+            nodeUtilsLogger
+                .error("Exception in generating Credentials for given node name:= " + exception.toString(), exception);
             return (null);
         }
     }
 
     /**
-     * Given a keystore file and its password, return the value of the CN of the first private key entry with a certificate.
+     * Given a keystore file and its password, return the value of the CN of the first private key entry with a
+     * certificate.
      *
      * @param kstype The type of keystore
      * @param ksfile The file name of the keystore
@@ -110,15 +116,16 @@ public class NodeUtils {
      * @return CN of the certificate subject or null
      */
     public static String getCanonicalName(String kstype, String ksfile, String kspass) {
-        KeyStore ks=null;
+        KeyStore ks;
         try {
             ks = KeyStore.getInstance(kstype);
-            try(FileInputStream fileInputStream=new FileInputStream(ksfile)) {
+            try (FileInputStream fileInputStream = new FileInputStream(ksfile)) {
                 ks.load(fileInputStream, kspass.toCharArray());
+            } catch (IOException ioException) {
+                nodeUtilsLogger.error("IOException occurred while opening FileInputStream: " + ioException.getMessage(),
+                    ioException);
+                return (null);
             }
-        } catch(IOException ioException) {
-            nodeUtilsLogger.error("Exception occurred while opening FileInputStream",ioException);
-            return (null);
         } catch (Exception e) {
             setIpAndFqdnForEelf("getCanonicalName");
             eelfLogger.error(EelfMsgs.MESSAGE_KEYSTORE_LOAD_ERROR, ksfile, e.toString());
@@ -147,7 +154,7 @@ public class NodeUtils {
                         if (parts.length < 1) {
                             return (null);
                         }
-                        subject = parts[0].trim();
+                        subject = parts[5].trim();
                         if (!subject.startsWith("CN=")) {
                             return (null);
 
@@ -172,7 +179,8 @@ public class NodeUtils {
         try {
             return (InetAddress.getByName(ip).getAddress());
         } catch (Exception exception) {
-            nodeUtilsLogger.error("Exception in generating byte array for given IP address := " + exception.toString(), exception);
+            nodeUtilsLogger
+                .error("Exception in generating byte array for given IP address := " + exception.toString(), exception);
         }
         return (null);
     }
@@ -202,7 +210,8 @@ public class NodeUtils {
     }
 
     /**
-     * Escape fields that might contain vertical bar, backslash, or newline by replacing them with backslash p, backslash e and backslash n.
+     * Escape fields that might contain vertical bar, backslash, or newline by replacing them with backslash p,
+     * backslash e and backslash n.
      */
     public static String loge(String s) {
         if (s == null) {
@@ -246,7 +255,8 @@ public class NodeUtils {
             MDC.put(MDC_SERVER_FQDN, InetAddress.getLocalHost().getHostName());
             MDC.put(MDC_SERVER_IP_ADDRESS, InetAddress.getLocalHost().getHostAddress());
         } catch (Exception exception) {
-            nodeUtilsLogger.error("Exception in generating byte array for given IP address := " + exception.toString(), exception);
+            nodeUtilsLogger
+                .error("Exception in generating byte array for given IP address := " + exception.toString(), exception);
         }
 
     }

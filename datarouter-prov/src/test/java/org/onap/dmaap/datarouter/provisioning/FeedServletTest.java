@@ -76,6 +76,7 @@ public class FeedServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_DELETE_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated()
         throws Exception {
         when(request.isSecure()).thenReturn(false);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         feedServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
@@ -147,6 +148,7 @@ public class FeedServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_GET_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated()
         throws Exception {
         when(request.isSecure()).thenReturn(false);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         feedServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
@@ -200,6 +202,7 @@ public class FeedServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_PUT_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated()
         throws Exception {
         when(request.isSecure()).thenReturn(false);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         feedServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
