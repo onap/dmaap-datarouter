@@ -39,6 +39,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.onap.dmaap.datarouter.provisioning.beans.DeliveryRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.ExpiryRecord;
@@ -63,17 +64,16 @@ import com.att.eelf.configuration.EELFManager;
 public class LogServlet extends BaseServlet {
     //Adding EELF Logger Rally:US664892
     private static EELFLogger eelflogger = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.provisioning.LogServlet");
-
     private static final long TWENTYFOUR_HOURS = (24 * 60 * 60 * 1000L);
     private static final String fmt1 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     private static final String fmt2 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
-    private boolean isfeedlog;
+    private static  boolean isfeedlog;
 
     public abstract class RowHandler {
         private final ServletOutputStream out;
         private final String[] fields;
-        public boolean firstrow;
+        private boolean firstrow;
 
         public RowHandler(ServletOutputStream out, String fieldparam, boolean b) {
             this.out = out;
@@ -98,8 +98,8 @@ public class LogServlet extends BaseServlet {
                 t += jo.toString();
                 out.print(t);
                 firstrow = false;
-            } catch (Exception e) {
-                // ignore
+            } catch (Exception exception) {
+                intlogger.info("Failed to handle row. Exception = " + exception.getMessage(),exception);
             }
         }
         public abstract LOGJSONable buildJSONable(ResultSet rs) throws SQLException;
@@ -345,13 +345,15 @@ public class LogServlet extends BaseServlet {
             SimpleDateFormat sdf = new SimpleDateFormat(fmt);
             Date d = sdf.parse(s);
             return d.getTime();
-        } catch (ParseException e) {
+        } catch (ParseException parseException) {
+            intlogger.error("Exception in getting Time :- "+parseException.getMessage(),parseException);
         }
         try {
             // Also allow a long (in ms); useful for testing
             long n = Long.parseLong(s);
             return n;
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException numberFormatException) {
+            intlogger.error("Exception in getting Time :- "+numberFormatException.getMessage(),numberFormatException);
         }
         intlogger.info("Error parsing time="+s);
         return -1;
@@ -422,8 +424,8 @@ public class LogServlet extends BaseServlet {
             }
             rs.close();
             stmt.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException sqlException) {
+            intlogger.info("Failed to get Records. Exception = " +sqlException.getMessage(),sqlException);
         } finally {
             if (conn != null)
                 db.release(conn);

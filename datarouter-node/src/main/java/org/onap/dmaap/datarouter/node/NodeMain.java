@@ -39,7 +39,7 @@ public class NodeMain {
     private NodeMain() {
     }
 
-    private static Logger LOGGER = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeMain");
+    private static Logger nodeMainLogger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeMain");
 
     private static class WaitForConfig implements Runnable {
 
@@ -56,15 +56,15 @@ public class NodeMain {
         synchronized void waitForConfig() {
             localNodeConfigManager.registerConfigTask(this);
             while (!localNodeConfigManager.isConfigured()) {
-                LOGGER.info("NODE0003 Waiting for Node Configuration");
+                nodeMainLogger.info("NODE0003 Waiting for Node Configuration");
                 try {
                     wait();
-                } catch (Exception e) {
-                    LOGGER.debug("NodeMain: waitForConfig exception. Exception Message:- " +e.getMessage());
+                } catch (Exception exception) {
+                    nodeMainLogger.debug("NodeMain: waitForConfig exception. Exception Message:- " + exception.toString(), exception);
                 }
             }
             localNodeConfigManager.deregisterConfigTask(this);
-            LOGGER.info("NODE0004 Node Configuration Data Received");
+            nodeMainLogger.info("NODE0004 Node Configuration Data Received");
         }
     }
 
@@ -85,10 +85,10 @@ public class NodeMain {
      * property.  By default, it is "etc/node.properties".
      */
     public static void main(String[] args) throws Exception {
-        LOGGER.info("NODE0001 Data Router Node Starting");
+        nodeMainLogger.info("NODE0001 Data Router Node Starting");
         IsFrom.setDNSCache();
         nodeConfigManager = NodeConfigManager.getInstance();
-        LOGGER.info("NODE0002 I am " + nodeConfigManager.getMyName());
+        nodeMainLogger.info("NODE0002 I am " + nodeConfigManager.getMyName());
         (new WaitForConfig(nodeConfigManager)).waitForConfig();
         delivery = new Delivery(nodeConfigManager);
         Server server = new Server();
@@ -111,7 +111,7 @@ public class NodeMain {
             sslContextFactory.setKeyManagerPassword(nodeConfigManager.getKPass());
             /* Skip SSLv3 Fixes */
             sslContextFactory.addExcludeProtocols("SSLv3");
-            LOGGER.info("Excluded protocols node-" + Arrays.toString(sslContextFactory.getExcludeProtocols()));
+            nodeMainLogger.info("Excluded protocols node-" + Arrays.toString(sslContextFactory.getExcludeProtocols()));
             /* End of SSLv3 Fixes */
 
             HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
@@ -136,7 +136,7 @@ public class NodeMain {
         ctxt.setContextPath("/");
         server.setHandler(ctxt);
         ctxt.addServlet(new ServletHolder(new NodeServlet()), "/*");
-        LOGGER.info("NODE0005 Data Router Node Activating Service");
+        nodeMainLogger.info("NODE0005 Data Router Node Activating Service");
         server.start();
         server.join();
     }

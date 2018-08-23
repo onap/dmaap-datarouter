@@ -47,13 +47,13 @@ import com.att.eelf.configuration.EELFManager;
  * Utility functions for the data router node
  */
 public class NodeUtils {
-    private static EELFLogger EELFLOGGER = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
-    private static Logger LOGGER = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
-    private static SimpleDateFormat LOGDATE;
+    private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
+    private static Logger nodeUtilsLogger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
+    private static SimpleDateFormat logDate;
 
     static {
-        LOGDATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        LOGDATE.setTimeZone(TimeZone.getTimeZone("GMT"));
+        logDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        logDate.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
     private NodeUtils() {
@@ -95,8 +95,8 @@ public class NodeUtils {
             md.update(node.getBytes());
             md.update(key.getBytes());
             return (getAuthHdr(node, base64Encode(md.digest())));
-        } catch (Exception e) {
-            LOGGER.error("Exception in generating Credentials for given node name:= " + e.getMessage());
+        } catch (Exception exception) {
+            nodeUtilsLogger.error("Exception in generating Credentials for given node name:= " + exception.toString(), exception);
             return (null);
         }
     }
@@ -117,12 +117,12 @@ public class NodeUtils {
                 ks.load(fileInputStream, kspass.toCharArray());
             }
         } catch(IOException ioException) {
-            LOGGER.error("Exception occurred while opening FileInputStream",ioException);
+            nodeUtilsLogger.error("Exception occurred while opening FileInputStream",ioException);
             return (null);
         } catch (Exception e) {
             setIpAndFqdnForEelf("getCanonicalName");
-            EELFLOGGER.error(EelfMsgs.MESSAGE_KEYSTORE_LOAD_ERROR, ksfile, e.toString());
-            LOGGER.error("NODE0401 Error loading my keystore file + " + ksfile + " " + e.toString(), e);
+            eelfLogger.error(EelfMsgs.MESSAGE_KEYSTORE_LOAD_ERROR, ksfile, e.toString());
+            nodeUtilsLogger.error("NODE0401 Error loading my keystore file + " + ksfile + " " + e.toString(), e);
             return (null);
         }
         return (getCanonicalName(ks));
@@ -157,7 +157,7 @@ public class NodeUtils {
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("NODE0402 Error extracting my name from my keystore file " + e.toString(), e);
+            nodeUtilsLogger.error("NODE0402 Error extracting my name from my keystore file " + e.toString(), e);
         }
         return (null);
     }
@@ -171,8 +171,8 @@ public class NodeUtils {
     public static byte[] getInetAddress(String ip) {
         try {
             return (InetAddress.getByName(ip).getAddress());
-        } catch (Exception e) {
-            LOGGER.error("Exception in generating byte array for given IP address := " + e.getMessage());
+        } catch (Exception exception) {
+            nodeUtilsLogger.error("Exception in generating byte array for given IP address := " + exception.toString(), exception);
         }
         return (null);
     }
@@ -232,7 +232,7 @@ public class NodeUtils {
      * Format a logging timestamp as yyyy-mm-ddThh:mm:ss.mmmZ
      */
     public static synchronized String logts(Date when) {
-        return (LOGDATE.format(when));
+        return (logDate.format(when));
     }
 
     /* Method prints method name, server FQDN and IP Address of the machine in EELF logs
@@ -245,8 +245,8 @@ public class NodeUtils {
         try {
             MDC.put(MDC_SERVER_FQDN, InetAddress.getLocalHost().getHostName());
             MDC.put(MDC_SERVER_IP_ADDRESS, InetAddress.getLocalHost().getHostAddress());
-        } catch (Exception e) {
-            LOGGER.error("Exception in generating byte array for given IP address := " + e.getMessage());
+        } catch (Exception exception) {
+            nodeUtilsLogger.error("Exception in generating byte array for given IP address := " + exception.toString(), exception);
         }
 
     }
