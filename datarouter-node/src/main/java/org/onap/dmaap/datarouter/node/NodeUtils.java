@@ -113,12 +113,13 @@ public class NodeUtils {
         KeyStore ks=null;
         try {
             ks = KeyStore.getInstance(kstype);
+            System.out.println("ks: " + ks.toString());
             try(FileInputStream fileInputStream=new FileInputStream(ksfile)) {
                 ks.load(fileInputStream, kspass.toCharArray());
+            } catch(IOException ioException) {
+                LOGGER.error("Exception occurred while opening FileInputStream", ioException);
+                return (null);
             }
-        } catch(IOException ioException) {
-            LOGGER.error("Exception occurred while opening FileInputStream",ioException);
-            return (null);
         } catch (Exception e) {
             setIpAndFqdnForEelf("getCanonicalName");
             EELFLOGGER.error(EelfMsgs.MESSAGE_KEYSTORE_LOAD_ERROR, ksfile, e.toString());
