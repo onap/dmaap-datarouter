@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 
@@ -43,6 +42,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  * @version $Id: NodeClass.java,v 1.2 2014/01/15 16:08:43 eby Exp $
  */
 public abstract class NodeClass extends Syncable {
+
     private static Map<String, Integer> map;
     private static Logger intLogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
     public NodeClass() {
@@ -53,19 +53,20 @@ public abstract class NodeClass extends Syncable {
     }
 
     /**
-     * Add nodes to the NODES table, when the NODES parameter value is changed.
-     * Nodes are only added to the table, they are never deleted.  The node name is normalized
-     * to contain the domain (if missing).
+     * Add nodes to the NODES table, when the NODES parameter value is changed. Nodes are only added to the table, they
+     * are never deleted.  The node name is normalized to contain the domain (if missing).
      *
      * @param nodes a pipe separated list of the current nodes
      */
     public static void setNodes(String[] nodes) {
-        if (map == null)
+        if (map == null) {
             reload();
+        }
         int nextid = 0;
         for (Integer n : map.values()) {
-            if (n >= nextid)
+            if (n >= nextid) {
                 nextid = n + 1;
+            }
         }
         // take | separated list, add domain if needed.
 
@@ -136,8 +137,9 @@ public abstract class NodeClass extends Syncable {
 
     public static Integer lookupNodeName(final String name) {
         Integer n = map.get(name);
-        if (n == null)
+        if (n == null) {
             throw new IllegalArgumentException("Invalid node name: " + name);
+        }
         return n;
     }
 
@@ -148,8 +150,9 @@ public abstract class NodeClass extends Syncable {
             if (s.endsWith("*")) {
                 s = s.substring(0, s.length() - 1);
                 for (String s2 : keyset) {
-                    if (s2.startsWith(s))
+                    if (s2.startsWith(s)) {
                         coll.add(s2);
+                    }
                 }
             } else if (keyset.contains(s)) {
                 coll.add(s);
@@ -160,14 +163,6 @@ public abstract class NodeClass extends Syncable {
             }
         }
         return coll;
-    }
-
-    protected String lookupNodeID(int n) {
-        for (String s : map.keySet()) {
-            if (map.get(s) == n)
-                return s;
-        }
-        return null;
     }
 
     public static String normalizeNodename(String s) {
@@ -183,5 +178,14 @@ public abstract class NodeClass extends Syncable {
             return s;
         }
 
+    }
+
+    protected String lookupNodeID(int n) {
+        for (String s : map.keySet()) {
+            if (map.get(s) == n) {
+                return s;
+            }
+        }
+        return null;
     }
 }

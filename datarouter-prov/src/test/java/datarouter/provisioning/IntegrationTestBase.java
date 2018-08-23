@@ -114,7 +114,7 @@ public class IntegrationTestBase {
             }
         }
 
-        SSLSocketFactory socketFactory = new SSLSocketFactory(keyStore, "changeit", trustStore);
+        SSLSocketFactory socketFactory = new SSLSocketFactory(keyStore, props.getProperty("test.kspassword"), trustStore);
         Scheme sch = new Scheme("https", 443, socketFactory);
         httpclient.getConnectionManager().getSchemeRegistry().register(sch);
 
@@ -164,7 +164,7 @@ public class IntegrationTestBase {
         // shut down the connection manager to ensure
         // immediate deallocation of all system resources
         httpclient.getConnectionManager().shutdown();
-        FileUtils.deleteDirectory(new File("./unit-test-logs"));
+        FileUtils.deleteDirectory(new File("." + File.pathSeparator+  "unit-test-logs"));
     }
 
     protected void ckResponse(HttpResponse response, int expect) {
