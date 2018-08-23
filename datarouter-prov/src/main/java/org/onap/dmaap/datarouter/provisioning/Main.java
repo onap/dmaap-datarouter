@@ -185,8 +185,8 @@ public class Main {
                 sslContextFactory.setTrustStorePath(DEFAULT_TRUSTSTORE);
                 sslContextFactory.setTrustStorePassword("changeit");
             }
-            sslContextFactory.setTrustStorePath("/opt/app/datartr/self_signed/cacerts.jks");
-            sslContextFactory.setTrustStorePassword("changeit");
+            sslContextFactory.setTrustStorePath("/opt/app/datartr/self_signed/org.onap.dmaap-dr.trust.jks");
+            sslContextFactory.setTrustStorePassword("9M?)?:KAj1z6gpLhNrVUG@0T");
             sslContextFactory.setWantClientAuth(true);
 
             // Servlet and Filter configuration
