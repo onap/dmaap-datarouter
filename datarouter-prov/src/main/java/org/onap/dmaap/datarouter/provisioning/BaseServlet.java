@@ -319,7 +319,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * @return an error string, or null if all is OK
      */
     String isAuthorizedForProvisioning(HttpServletRequest request) {
-        if (Boolean.parseBoolean(isAddressAuthEnabled)) {
+        if (!Boolean.parseBoolean(isAddressAuthEnabled)) {
             return null;
         }
         // Is the request https?
@@ -369,7 +369,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     boolean isAuthorizedForInternal(HttpServletRequest request) {
 
         try {
-            if (Boolean.parseBoolean(isAddressAuthEnabled)) {
+            if (!Boolean.parseBoolean(isAddressAuthEnabled)) {
                 return true;
             }
             InetAddress ip = InetAddress.getByName(request.getRemoteAddr());
@@ -492,9 +492,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         // Normalize the nodes, and fill in nodeAddresses
         InetAddress[] na = new InetAddress[nodes.length];
         for (int i = 0; i < nodes.length; i++) {
-            if (nodes[i].indexOf('.') < 0) {
-                nodes[i] += "." + provDomain;
-            }
             try {
                 na[i] = InetAddress.getByName(nodes[i]);
                 intlogger.debug("PROV0003 DNS lookup: " + nodes[i] + " => " + na[i].toString());
@@ -520,9 +517,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         String[] pods = getPods();
         na = new InetAddress[pods.length];
         for (int i = 0; i < pods.length; i++) {
-            if (pods[i].indexOf('.') < 0) {
-                pods[i] += "." + provDomain;
-            }
             try {
                 na[i] = InetAddress.getByName(pods[i]);
                 intlogger.debug("PROV0003 DNS lookup: " + pods[i] + " => " + na[i].toString());

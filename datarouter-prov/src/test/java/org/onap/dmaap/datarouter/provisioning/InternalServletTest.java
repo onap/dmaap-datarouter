@@ -232,6 +232,7 @@ public class InternalServletTest extends DrServletTestBase {
   public void Given_Request_Is_HTTP_DELETE_And_Address_Not_Authorized_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated()
       throws Exception {
     when(request.getRemoteAddr()).thenReturn("127.100.0.3");
+    FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
     internalServlet.doDelete(request, response);
     verify(response)
         .sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
@@ -278,6 +279,7 @@ public class InternalServletTest extends DrServletTestBase {
       throws Exception {
     when(request.getRemoteAddr()).thenReturn("127.100.0.3");
     internalServlet.doPost(request, response);
+    FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
     verify(response)
         .sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
   }
