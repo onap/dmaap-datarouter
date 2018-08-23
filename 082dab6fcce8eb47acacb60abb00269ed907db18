@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_c22660ce",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/RouteServletTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 4419
+      },
+      "writtenOn": "2018-08-23T09:45:52Z",
+      "side": 1,
+      "message": "delete if not needed",
+      "range": {
+        "startLine": 209,
+        "startChar": 0,
+        "endLine": 228,
+        "endChar": 7
+      },
+      "revId": "082dab6fcce8eb47acacb60abb00269ed907db18",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_023d38de",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/RouteServletTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 4419
+      },
+      "writtenOn": "2018-08-23T09:45:52Z",
+      "side": 1,
+      "message": "can delete this i think",
+      "range": {
+        "startLine": 442,
+        "startChar": 0,
+        "endLine": 463,
+        "endChar": 7
+      },
+      "revId": "082dab6fcce8eb47acacb60abb00269ed907db18",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
