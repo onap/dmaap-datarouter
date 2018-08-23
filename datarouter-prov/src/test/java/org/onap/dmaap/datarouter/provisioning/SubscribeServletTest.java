@@ -24,7 +24,6 @@ package org.onap.dmaap.datarouter.provisioning;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +53,7 @@ import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.provisioning.beans.Feed", "org.onap.dmaap.datarouter.provisioning.beans.Subscription"})
-public class SubscribeServletTest extends DrServletTestBase{
+public class SubscribeServletTest extends DrServletTestBase {
     private static SubscribeServlet subscribeServlet;
 
     @Mock
@@ -211,6 +210,7 @@ public class SubscribeServletTest extends DrServletTestBase{
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
                 jo.put("delivery", JSObject);
+                jo.put("sync", false);
                 return jo;
             }
 
@@ -219,7 +219,6 @@ public class SubscribeServletTest extends DrServletTestBase{
                 return false;
             }
         };
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "maxSubs", 10, true);
         subscribeServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
     }
@@ -240,6 +239,7 @@ public class SubscribeServletTest extends DrServletTestBase{
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
                 jo.put("delivery", JSObject);
+                jo.put("sync", true);
                 return jo;
             }
 
@@ -248,7 +248,6 @@ public class SubscribeServletTest extends DrServletTestBase{
                 return true;
             }
         };
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "maxSubs", 10, true);
         subscribeServlet.doPost(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_CREATED));
     }
@@ -257,33 +256,11 @@ public class SubscribeServletTest extends DrServletTestBase{
     @NotNull
     private JSONObject buildRequestJsonObject() {
         JSONObject JSObject = new JSONObject();
-        JSONArray endpointIDs = new JSONArray();
-        JSONObject JOEndpointIDs = new JSONObject();
-        JOEndpointIDs.put("id", "stub_endpoint_id");
-        JOEndpointIDs.put("password", "stub_endpoint_password");
-        endpointIDs.put(JOEndpointIDs);
-
-        JSONArray endpointAddresses = new JSONArray();
-        endpointAddresses.put("127.0.0.1");
-
-        JSObject.put("classification", "stub_classification");
-        JSObject.put("endpoint_ids", endpointIDs);
-        JSObject.put("endpoint_addrs", endpointAddresses);
         JSObject.put("url", "https://stub_address");
         JSObject.put("use100", "true");
         JSObject.put("password", "stub_password");
         JSObject.put("user", "stub_user");
         return JSObject;
-    }
-
-
-
-    private void initialiseBaseServletToBypassRetreiviingInitialisationParametersFromDatabase() throws IllegalAccessException {
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsgFlag", false, true);
-        SynchronizerTask synchronizerTask = mock(SynchronizerTask.class);
-        when(synchronizerTask.getState()).thenReturn(SynchronizerTask.UNKNOWN);
-        FieldUtils.writeDeclaredStaticField(SynchronizerTask.class, "synctask", synchronizerTask, true);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "max_subs", 10, true);
     }
 
     private void setUpValidSecurityOnHttpRequest() throws Exception {
@@ -292,6 +269,7 @@ public class SubscribeServletTest extends DrServletTestBase{
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks, true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", false, true);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "maxSubs", 1, true);
     }
 
     private void setBehalfHeader(String headerValue) {
@@ -352,5 +330,4 @@ public class SubscribeServletTest extends DrServletTestBase{
         when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
 
     }
-
 }
