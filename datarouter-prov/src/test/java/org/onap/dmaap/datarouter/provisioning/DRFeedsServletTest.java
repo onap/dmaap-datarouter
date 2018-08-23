@@ -1,4 +1,3 @@
-
 /*******************************************************************************
  * ============LICENSE_START==================================================
  * * org.onap.dmaap
@@ -213,7 +212,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
                 return jo;
             }
         };
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "maxFeeds", 10, true);
+
         drfeedsServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
     }
@@ -231,7 +230,6 @@ public class DRFeedsServletTest extends DrServletTestBase {
                 return jo;
             }
         };
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "maxFeeds", 10, true);
         drfeedsServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
     }
@@ -253,7 +251,6 @@ public class DRFeedsServletTest extends DrServletTestBase {
                 return false;
             }
         };
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "maxFeeds", 10, true);
         drfeedsServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
     }
@@ -263,7 +260,6 @@ public class DRFeedsServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_POST_And_Change_On_Feeds_Succeeds_A_STATUS_OK_Response_Is_Generated() throws Exception {
         ServletOutputStream outStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outStream);
-
         JSONObject JSObject = buildRequestJsonObject();
         DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -279,7 +275,6 @@ public class DRFeedsServletTest extends DrServletTestBase {
                 return true;
             }
         };
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "maxFeeds", 10, true);
         drfeedsServlet.doPost(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_CREATED));
     }
@@ -302,22 +297,13 @@ public class DRFeedsServletTest extends DrServletTestBase {
         return JSObject;
     }
 
-
-
-    private void initialiseBaseServletToBypassRetreiviingInitialisationParametersFromDatabase() throws IllegalAccessException {
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsgFlag", false, true);
-        SynchronizerTask synchronizerTask = mock(SynchronizerTask.class);
-        when(synchronizerTask.getState()).thenReturn(SynchronizerTask.UNKNOWN);
-        FieldUtils.writeDeclaredStaticField(SynchronizerTask.class, "synctask", synchronizerTask, true);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "max_feeds", 10, true);
-    }
-
     private void setUpValidSecurityOnHttpRequest() throws Exception {
         when(request.isSecure()).thenReturn(true);
         Set<String> authAddressesAndNetworks = new HashSet<String>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks, true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", false, true);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "maxFeeds", 100, true);
     }
 
     private void setBehalfHeader(String headerValue) {
@@ -380,5 +366,4 @@ public class DRFeedsServletTest extends DrServletTestBase {
         when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
 
     }
-
 }

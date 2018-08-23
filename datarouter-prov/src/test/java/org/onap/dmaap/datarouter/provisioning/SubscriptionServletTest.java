@@ -24,7 +24,6 @@ package org.onap.dmaap.datarouter.provisioning;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +32,6 @@ import org.mockito.Mock;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.Deleteable;
-import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
 import org.powermock.api.mockito.PowerMockito;
@@ -54,7 +52,7 @@ import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.onap.dmaap.datarouter.provisioning.beans.Subscription")
-public class SubscriptionServletTest extends DrServletTestBase{
+public class SubscriptionServletTest extends DrServletTestBase {
     private SubscriptionServlet subscriptionServlet;
 
     @Mock
@@ -173,6 +171,7 @@ public class SubscriptionServletTest extends DrServletTestBase{
         jo.put("metadataOnly", true);
         jo.put("suspend", true);
         jo.put("delivery", JSObject);
+        jo.put("sync", true);
         Subscription sub = new Subscription(jo);
         PowerMockito.mockStatic(Subscription.class);
         PowerMockito.when(Subscription.getSubscriptionById(anyInt())).thenReturn(sub);
@@ -259,6 +258,7 @@ public class SubscriptionServletTest extends DrServletTestBase{
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
                 jo.put("delivery", JSObject);
+                jo.put("sync", true);
                 return jo;
             }
         };
@@ -279,6 +279,7 @@ public class SubscriptionServletTest extends DrServletTestBase{
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
                 jo.put("delivery", JSObject);
+                jo.put("sync", true);
                 return jo;
             }
 
@@ -306,6 +307,7 @@ public class SubscriptionServletTest extends DrServletTestBase{
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
                 jo.put("delivery", JSObject);
+                jo.put("sync", true);
                 return jo;
             }
 
@@ -421,13 +423,6 @@ public class SubscriptionServletTest extends DrServletTestBase{
         JSObject.put("password", "stub_password");
         JSObject.put("user", "stub_user");
         return JSObject;
-    }
-
-    private void initialiseBaseServletToBypassRetreiviingInitialisationParametersFromDatabase() throws IllegalAccessException {
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsgFlag", false, true);
-        SynchronizerTask synchronizerTask = mock(SynchronizerTask.class);
-        when(synchronizerTask.getState()).thenReturn(SynchronizerTask.UNKNOWN);
-        FieldUtils.writeDeclaredStaticField(SynchronizerTask.class, "synctask", synchronizerTask, true);
     }
 
     private void setUpValidSecurityOnHttpRequest() throws Exception {
