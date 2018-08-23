@@ -7,9 +7,9 @@
 # * Licensed under the Apache License, Version 2.0 (the "License");
 # * you may not use this file except in compliance with the License.
 # * You may obtain a copy of the License at
-# * 
+# *
 #  *      http://www.apache.org/licenses/LICENSE-2.0
-# * 
+# *
 #  * Unless required by applicable law or agreed to in writing, software
 # * distributed under the License is distributed on an "AS IS" BASIS,
 # * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,10 +25,11 @@ services:
   datarouter-prov:
     image: nexus3.onap.org:10003/onap/dmaap/datarouter-prov
     container_name: datarouter-prov
-    hostname: prov.datarouternew.com
+    hostname: dmaap-dr-prov
     ports:
+     - "443:8443"
      - "8443:8443"
-     - "8080:8080"  
+     - "8080:8080"
     volumes:
      - ./prov_data/provserver.properties:/opt/app/datartr/etc/provserver.properties
      - ./prov_data/addSubscriber.txt:/opt/app/datartr/addSubscriber.txt
@@ -37,12 +38,12 @@ services:
       mariadb_container:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://prov.datarouternew.com:8080/internal/prov"]
+      test: ["CMD", "curl", "-f", "http://dmaap-dr-prov:8080/internal/prov"]
       interval: 10s
       timeout: 10s
       retries: 5
     extra_hosts:
-      - "node.datarouternew.com:172.100.0.4"
+      - "dmaap-dr-node:172.100.0.4"
     networks:
       testing_net:
         ipv4_address: 172.100.0.3
@@ -50,7 +51,7 @@ services:
   datarouter-node:
     image: nexus3.onap.org:10003/onap/dmaap/datarouter-node
     container_name: datarouter-node
-    hostname: node.datarouternew.com
+    hostname: dmaap-dr-node
     ports:
      - "9443:8443"
      - "9090:8080"
@@ -60,7 +61,7 @@ services:
       datarouter-prov:
         condition: service_healthy
     extra_hosts:
-      - "prov.datarouternew.com:172.100.0.3"
+      - "dmaap-dr-prov:172.100.0.3"
     networks:
       testing_net:
         ipv4_address: 172.100.0.4
@@ -76,7 +77,7 @@ services:
       networks:
         testing_net:
           ipv4_address: 172.100.0.5
-      
+
   mariadb_container:
     image: mariadb:10.2.14
     container_name: mariadb
