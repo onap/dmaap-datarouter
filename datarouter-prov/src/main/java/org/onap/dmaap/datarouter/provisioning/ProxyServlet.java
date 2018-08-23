@@ -95,7 +95,7 @@ public class ProxyServlet extends BaseServlet {
 
             // We are connecting with the node name, but the certificate will have the CNAME
             // So we need to accept a non-matching certificate name
-            SSLSocketFactory socketFactory = new SSLSocketFactory(keyStore, "changeit", trustStore);
+            SSLSocketFactory socketFactory = new SSLSocketFactory(keyStore, props.getProperty(Main.KEYSTORE_PASSWORD_PROPERTY), trustStore);
             socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
             sch = new Scheme("https", 443, socketFactory);
             inited = true;
