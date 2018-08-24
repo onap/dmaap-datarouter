@@ -41,7 +41,7 @@
         <sonar.skip>false</sonar.skip>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.surefire.reportsPath>${project.build.directory}/surefire-reports</sonar.surefire.reportsPath>
-        <sonar.jacoco.reportPath>${project.build.directory}/coverage-reports/jacoco.exec</sonar.jacoco.reportPath>
+        <sonar.jacoco.reportPaths>${project.build.directory}/coverage-reports/jacoco.exec</sonar.jacoco.reportPaths>
         <sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
         <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
         <sonar.projectVersion>${project.version}</sonar.projectVersion>
