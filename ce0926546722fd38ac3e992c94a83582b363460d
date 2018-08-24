@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_ded2b0d1",
+        "filename": "datarouter-node/src/main/resources/misc/node.properties",
+        "patchSetId": 8
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-24T16:48:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_3ed5e442",
+      "range": {
+        "startLine": 81,
+        "startChar": 30,
+        "endLine": 81,
+        "endChar": 41
+      },
+      "revId": "ce0926546722fd38ac3e992c94a83582b363460d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_5ebf80fb",
         "filename": "datarouter-prov/src/main/resources/docker-compose/database/sql_init_01.sql",
         "patchSetId": 8
@@ -36,6 +60,30 @@
       "writtenOn": "2018-08-24T15:22:04Z",
       "side": 1,
       "message": "can remove this now.\nsame below",
+      "range": {
+        "startLine": 131,
+        "startChar": 21,
+        "endLine": 131,
+        "endChar": 32
+      },
+      "revId": "ce0926546722fd38ac3e992c94a83582b363460d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_5ee6a0b5",
+        "filename": "datarouter-prov/src/main/resources/docker-compose/database/sql_init_01.sql",
+        "patchSetId": 8
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-08-24T16:48:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_5ebf80fb",
       "range": {
         "startLine": 131,
         "startChar": 21,
