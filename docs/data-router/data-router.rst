@@ -807,7 +807,7 @@ Response/Error Codes
 Sample Request
 ==============
 
-curl -v -X PUT --user {user}:{password} -H "Content-Type: application/octet-stream" --data-binary @/opt/app/datartr/sampleFile.txt --location-trusted -k https://{host}:{port}/publish/{feedId}/sampleFile.txt
+curl -v -X PUT --user {user}:{password} -H "Content-Type: application/octet-stream" --data-binary @/opt/app/datartr/sampleFile.txt --post301 --location-trusted -k https://{host}:{port}/publish/{feedId}/sampleFile.txt
 
 Delete a Published file
 -----------------------
