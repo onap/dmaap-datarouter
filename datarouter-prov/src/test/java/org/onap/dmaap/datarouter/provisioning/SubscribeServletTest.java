@@ -220,7 +220,7 @@ public class SubscribeServletTest extends DrServletTestBase {
             }
         };
         subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_CONFLICT), argThat(notNullValue(String.class)));
     }
 
 
