@@ -33,6 +33,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.*;
 import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
 import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -47,12 +48,11 @@ import java.util.Map;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 @RunWith(PowerMockRunner.class)
+@PrepareForTest(LogRecord.class)
 @SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.provisioning.beans.Feed", "org.onap.dmaap.datarouter.provisioning.beans.Parameters", "org.onap.dmaap.datarouter.provisioning.beans.NodeClass",
                                   "org.onap.dmaap.datarouter.provisioning.beans.Subscription", "org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader"})
 public class InternalServletTest extends DrServletTestBase {
@@ -299,6 +299,7 @@ public class InternalServletTest extends DrServletTestBase {
         ServletInputStream inStream = mock(ServletInputStream.class);
         when(inStream.read()).thenReturn(1, -1);
         when(request.getInputStream()).thenReturn(inStream);
+        PowerMockito.mockStatic(LogRecord.class);
         internalServlet.doPost(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
     }

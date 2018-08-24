@@ -269,7 +269,7 @@ public class SubscribeServletTest extends DrServletTestBase {
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks, true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", false, true);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "maxSubs", 1, true);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "maxSubs", 100, true);
     }
 
     private void setBehalfHeader(String headerValue) {

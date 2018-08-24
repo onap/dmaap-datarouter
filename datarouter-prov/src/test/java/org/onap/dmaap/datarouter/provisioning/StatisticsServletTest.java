@@ -26,8 +26,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,7 +37,9 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
+
 @RunWith(PowerMockRunner.class)
+@PrepareForTest(StatisticsServlet.class)
 public class StatisticsServletTest extends DrServletTestBase{
     private StatisticsServlet statisticsServlet;
 
@@ -82,9 +85,10 @@ public class StatisticsServletTest extends DrServletTestBase{
     public void Given_Request_Is_HTTP_GET_With_GroupId_But_No_FeedId_Parameters_Then_Request_Succeeds() throws Exception {
         ServletOutputStream outStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outStream);
-        statisticsServlet = mock(StatisticsServlet.class);
-        doCallRealMethod().when(statisticsServlet).doGet(request, response);
+        statisticsServlet = PowerMockito.mock(StatisticsServlet.class);
+        PowerMockito.doReturn(null).when(statisticsServlet, "getRecordsForSQL", anyString());
         doNothing().when(statisticsServlet).rsToCSV(anyObject(), anyObject());
+        doCallRealMethod().when(statisticsServlet).doGet(request, response);
         when(statisticsServlet.getFeedIdsByGroupId(anyInt())).thenReturn(new StringBuffer("1"));
         statisticsServlet.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
@@ -95,10 +99,11 @@ public class StatisticsServletTest extends DrServletTestBase{
         when(request.getParameter("feedid")).thenReturn("1");
         ServletOutputStream outStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outStream);
-        statisticsServlet = mock(StatisticsServlet.class);
+        statisticsServlet = PowerMockito.mock(StatisticsServlet.class);
+        PowerMockito.doReturn(null).when(statisticsServlet, "getRecordsForSQL", anyString());
+        doNothing().when(statisticsServlet).rsToCSV(anyObject(), anyObject());
         doCallRealMethod().when(statisticsServlet).doGet(request, response);
         doCallRealMethod().when(statisticsServlet).queryGeneretor(anyObject());
-        doNothing().when(statisticsServlet).rsToCSV(anyObject(), anyObject());
         when(statisticsServlet.getFeedIdsByGroupId(anyInt())).thenReturn(new StringBuffer("1"));
         statisticsServlet.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
