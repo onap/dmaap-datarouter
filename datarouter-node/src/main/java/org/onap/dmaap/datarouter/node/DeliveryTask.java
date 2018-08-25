@@ -109,8 +109,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
         boolean monly = di.isMetaDataOnly();
         date = Long.parseLong(pubid.substring(0, pubid.indexOf('.')));
         Vector<String[]> hdrv = new Vector<String[]>();
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(metafile));
+        try (BufferedReader br = new BufferedReader(new FileReader(metafile))) {
             String s = br.readLine();
             int i = s.indexOf('\t');
             method = s.substring(0, i);
@@ -134,7 +133,6 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 }
                 hdrv.add(new String[]{h, v});
             }
-            br.close();
         } catch (Exception e) {
         }
         hdrs = hdrv.toArray(new String[hdrv.size()][]);
@@ -189,9 +187,8 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 }
                 if (os != null) {
                     long sofar = 0;
-                    try {
+                    try (InputStream is = new FileInputStream(datafile)) {
                         byte[] buf = new byte[1024 * 1024];
-                        InputStream is = new FileInputStream(datafile);
                         while (sofar < length) {
                             int i = buf.length;
                             if (sofar + i > length) {
@@ -204,7 +201,6 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                             sofar += i;
                             os.write(buf, 0, i);
                         }
-                        is.close();
                         os.close();
                     } catch (IOException ioe) {
                         dth.reportDeliveryExtra(this, sofar);
