@@ -23,13 +23,19 @@
 
 package org.onap.dmaap.datarouter.node;
 
-import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.servlet.*;
-import org.eclipse.jetty.util.ssl.*;
-import org.eclipse.jetty.server.*;
-import org.apache.log4j.Logger;
-
 import java.util.Arrays;
+import org.apache.log4j.Logger;
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 /**
  * The main starting point for the Data Router node
@@ -60,7 +66,9 @@ public class NodeMain {
                 try {
                     wait();
                 } catch (Exception exception) {
-                    nodeMainLogger.debug("NodeMain: waitForConfig exception. Exception Message:- " + exception.toString(), exception);
+                    nodeMainLogger
+                        .debug("NodeMain: waitForConfig exception. Exception Message:- " + exception.toString(),
+                            exception);
                 }
             }
             localNodeConfigManager.deregisterConfigTask(this);
@@ -123,14 +131,15 @@ public class NodeMain {
             httpsConfiguration.addCustomizer(secureRequestCustomizer);
 
             // HTTPS connector
-            ServerConnector httpsServerConnector = new ServerConnector(server,
+            try (ServerConnector httpsServerConnector = new ServerConnector(server,
                 new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
-                new HttpConnectionFactory(httpsConfiguration));
-            httpsServerConnector.setPort(nodeConfigManager.getHttpsPort());
-            httpsServerConnector.setIdleTimeout(500000);
-            httpsServerConnector.setAcceptQueueSize(2);
+                new HttpConnectionFactory(httpsConfiguration))) {
+                httpsServerConnector.setPort(nodeConfigManager.getHttpsPort());
+                httpsServerConnector.setIdleTimeout(500000);
+                httpsServerConnector.setAcceptQueueSize(2);
 
-            server.setConnectors(new Connector[]{httpServerConnector, httpsServerConnector});
+                server.setConnectors(new Connector[]{httpServerConnector, httpsServerConnector});
+            }
         }
         ctxt = new ServletContextHandler(0);
         ctxt.setContextPath("/");
