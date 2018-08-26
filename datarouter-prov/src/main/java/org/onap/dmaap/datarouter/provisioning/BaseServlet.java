@@ -273,7 +273,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         try {
             thishost = InetAddress.getLocalHost();
             loopback = InetAddress.getLoopbackAddress();
-            checkHttpsRelaxation(); //Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
+            //checkHttpsRelaxation(); //Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
         } catch (UnknownHostException e) {
             // ignore
         }
@@ -575,7 +575,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     private void checkHttpsRelaxation() {
         if (!mailSendFlag) {
             Properties p = (new DB()).getProperties();
-            intlogger.info("HTTPS relaxatio: " + p.get("org.onap.dmaap.datarouter.provserver.https.relaxation"));
+            intlogger.info("HTTPS relaxation: " + p.get("org.onap.dmaap.datarouter.provserver.https.relaxation"));
 
             if (p.get("org.onap.dmaap.datarouter.provserver.https.relaxation").equals("true")) {
                 try {
