@@ -24,6 +24,8 @@
 
 package org.onap.dmaap.datarouter.node;
 
+import org.apache.log4j.Logger;
+
 import java.util.*;
 import java.net.*;
 
@@ -34,6 +36,7 @@ public class IsFrom {
     private long nextcheck;
     private String[] ips;
     private String fqdn;
+    private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.IsFrom");
 
     /**
      * Configure the JVM DNS cache to have a 10 second TTL.  This needs to be called very very early or it won't have any effect.
@@ -59,18 +62,20 @@ public class IsFrom {
         long now = System.currentTimeMillis();
         if (now > nextcheck) {
             nextcheck = now + 10000;
-            Vector<String> v = new Vector<String>();
+            Vector<String> v = new Vector<>();
             try {
                 InetAddress[] addrs = InetAddress.getAllByName(fqdn);
                 for (InetAddress a : addrs) {
                     v.add(a.getHostAddress());
                 }
-            } catch (Exception e) {
+            } catch (UnknownHostException e) {
+                logger.debug("IsFrom: UnknownHostEx: " + e.toString(), e);
             }
             ips = v.toArray(new String[v.size()]);
+            logger.info("IsFrom: DNS ENTRIES FOR FQDN " + fqdn + " : " + Arrays.toString(ips));
         }
         for (String s : ips) {
-            if (s.equals(ip)) {
+            if (s.equals(ip) || s.equals(System.getenv("DMAAP_DR_PROV_SERVICE_HOST"))) {
                 return (true);
             }
         }

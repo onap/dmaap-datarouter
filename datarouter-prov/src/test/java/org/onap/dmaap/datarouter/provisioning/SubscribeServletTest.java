@@ -201,6 +201,7 @@ public class SubscribeServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_POST_And_POST_Fails_Bad_Request_Response_Is_Generated() throws Exception {
         PowerMockito.mockStatic(Subscription.class);
         PowerMockito.when(Subscription.getSubscriptionMatching(mock(Subscription.class))).thenReturn(null);
+        PowerMockito.when(Subscription.countActiveSubscriptions()).thenReturn(0);
         JSONObject JSObject = buildRequestJsonObject();
         SubscribeServlet subscribeServlet = new SubscribeServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
