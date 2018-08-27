@@ -1,0 +1,188 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_9421744f",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-27T10:02:25Z",
+      "side": 1,
+      "message": "Could potentially remove all the commented out code.",
+      "range": {
+        "startLine": 106,
+        "startChar": 6,
+        "endLine": 106,
+        "endChar": 16
+      },
+      "revId": "4204f49dcf53df8fd6547082566e0b84ebdbcb76",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b41cb014",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-27T10:02:25Z",
+      "side": 1,
+      "message": "Should prob use the logger instead of syso.",
+      "range": {
+        "startLine": 110,
+        "startChar": 8,
+        "endLine": 110,
+        "endChar": 47
+      },
+      "revId": "4204f49dcf53df8fd6547082566e0b84ebdbcb76",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_541bdc1a",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-27T10:02:25Z",
+      "side": 1,
+      "message": "Dead code",
+      "range": {
+        "startLine": 148,
+        "startChar": 0,
+        "endLine": 149,
+        "endChar": 32
+      },
+      "revId": "4204f49dcf53df8fd6547082566e0b84ebdbcb76",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_741618f3",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-27T10:02:25Z",
+      "side": 1,
+      "message": "Dead code",
+      "range": {
+        "startLine": 158,
+        "startChar": 0,
+        "endLine": 159,
+        "endChar": 12
+      },
+      "revId": "4204f49dcf53df8fd6547082566e0b84ebdbcb76",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_14d5641b",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-27T10:02:25Z",
+      "side": 1,
+      "message": "Dead code",
+      "range": {
+        "startLine": 233,
+        "startChar": 4,
+        "endLine": 233,
+        "endChar": 29
+      },
+      "revId": "4204f49dcf53df8fd6547082566e0b84ebdbcb76",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_d4de0c3f",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-27T10:02:25Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 294,
+        "startChar": 5,
+        "endLine": 294,
+        "endChar": 7
+      },
+      "revId": "4204f49dcf53df8fd6547082566e0b84ebdbcb76",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_94e894e3",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-27T10:02:25Z",
+      "side": 1,
+      "message": "Remove underscores in all var names",
+      "range": {
+        "startLine": 364,
+        "startChar": 12,
+        "endLine": 364,
+        "endChar": 20
+      },
+      "revId": "4204f49dcf53df8fd6547082566e0b84ebdbcb76",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_14bc84db",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 597,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-27T10:02:25Z",
+      "side": 1,
+      "message": "Dead code",
+      "range": {
+        "startLine": 596,
+        "startChar": 6,
+        "endLine": 597,
+        "endChar": 17
+      },
+      "revId": "4204f49dcf53df8fd6547082566e0b84ebdbcb76",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
