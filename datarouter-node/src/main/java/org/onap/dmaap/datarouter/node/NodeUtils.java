@@ -198,7 +198,7 @@ public class NodeUtils {
         if (i == -1) {
             return (null);
         }
-        return (new String[]{uriandparams.substring(i + 1, end - 1), uriandparams.substring(end + 1)});
+        return (new String[]{uriandparams.substring(i + 1, end), uriandparams.substring(end + 1)});
     }
 
     /**
