@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_7a303fe8",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/LogManager.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-27T15:00:45Z",
+      "side": 1,
+      "message": "Can probably delete this too I think",
+      "range": {
+        "startLine": 169,
+        "startChar": 16,
+        "endLine": 169,
+        "endChar": 26
+      },
+      "revId": "9a8bafbb8e03d5ee5b0be0554938bbb52183925e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
