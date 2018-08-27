@@ -45,7 +45,7 @@
         <sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
         <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
         <sonar.projectVersion>${project.version}</sonar.projectVersion>
-        <jetty.version>9.4.12.RC2</jetty.version>
+        <jetty.version>9.3.8.RC0</jetty.version>
         <jetty.websocket.version>8.2.0.v20160908</jetty.websocket.version>
         <thoughtworks.version>1.4.10</thoughtworks.version>
         <snapshotNexusPath>/content/repositories/snapshots/</snapshotNexusPath>
