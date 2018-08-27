@@ -25,6 +25,7 @@
 package org.onap.dmaap.datarouter.provisioning.beans;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import org.json.JSONArray;
@@ -100,5 +101,10 @@ public class FeedAuthorization implements JSONable {
         if (!endpoint_addrs.equals(of.endpoint_addrs))
             return false;
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(classification, endpoint_ids, endpoint_addrs);
     }
 }
