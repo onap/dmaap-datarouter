@@ -69,7 +69,7 @@ public class IntegrationTestInternalMisc extends IntegrationTestBase {
 
     @Test
     public void testInternalHalt() {
-        String url   = props.getProperty("test.host") + "/internal/halt";
+        String url   = props.getProperty("test.host") + "/halt";
         HttpGet httpPost = new HttpGet(url);
         try {
             httpPost.addHeader(FeedServlet.BEHALF_HEADER, "JUnit");

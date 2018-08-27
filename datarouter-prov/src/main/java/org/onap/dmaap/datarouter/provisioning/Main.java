@@ -127,7 +127,6 @@ public class Main {
         httpConfiguration.setSecurePort(httpsPort);
         httpConfiguration.setOutputBufferSize(32768);
         httpConfiguration.setRequestHeaderSize(2048);
-        httpConfiguration.setIdleTimeout(300000);
         httpConfiguration.setSendServerVersion(true);
         httpConfiguration.setSendDateHeader(false);
 
@@ -146,6 +145,7 @@ public class Main {
             new HttpConnectionFactory(httpConfiguration))) {
             httpServerConnector.setPort(httpPort);
             httpServerConnector.setAcceptQueueSize(2);
+            httpServerConnector.setIdleTimeout(300000);
 
             // HTTPS configuration
             HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);

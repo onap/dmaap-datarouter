@@ -94,7 +94,6 @@ public class NodeMain {
         Server server = new Server();
         // HTTP configuration
         HttpConfiguration httpConfiguration = new HttpConfiguration();
-        httpConfiguration.setIdleTimeout(2000);
         httpConfiguration.setRequestHeaderSize(2048);
 
         // HTTP connector
@@ -102,6 +101,7 @@ public class NodeMain {
         try (ServerConnector httpServerConnector = new ServerConnector(server,
             new HttpConnectionFactory(httpConfiguration))) {
             httpServerConnector.setPort(nodeConfigManager.getHttpPort());
+            httpServerConnector.setIdleTimeout(2000);
 
             // HTTPS configuration
             SslContextFactory sslContextFactory = new SslContextFactory();
