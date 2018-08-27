@@ -25,6 +25,7 @@
 package org.onap.dmaap.datarouter.provisioning.beans;
 
 import java.io.InvalidObjectException;
+import java.util.Objects;
 
 import org.json.JSONObject;
 
@@ -108,5 +109,10 @@ public class FeedLinks implements JSONable {
         if (!log.equals(of.log))
             return false;
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(self, publish, subscribe, log);
     }
 }
