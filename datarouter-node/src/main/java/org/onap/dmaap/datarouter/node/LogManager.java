@@ -22,22 +22,28 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.node;
 
-import java.util.*;
-import java.util.regex.*;
-import java.io.*;
-import java.nio.file.*;
-import java.text.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Cleanup of old log files.
  * <p>
- * Periodically scan the log directory for log files that are older than
- * the log file retention interval, and delete them.  In a future release,
- * This class will also be responsible for uploading events logs to the
- * log server to support the log query APIs.
+ * Periodically scan the log directory for log files that are older than the log file retention interval, and delete
+ * them.  In a future release, This class will also be responsible for uploading events logs to the log server to
+ * support the log query APIs.
  */
 
 public class LogManager extends TimerTask {
+
     private NodeConfigManager config;
     private Matcher isnodelog;
     private Matcher iseventlog;
@@ -46,6 +52,7 @@ public class LogManager extends TimerTask {
     private String logdir;
 
     private class Uploader extends Thread implements DeliveryQueueHelper {
+
         public long getInitFailureTimer() {
             return (10000L);
         }
@@ -92,7 +99,9 @@ public class LogManager extends TimerTask {
         private DeliveryQueue dq;
 
         public Uploader() {
-            dq = new DeliveryQueue(this, new DestInfo("LogUpload", uploaddir, null, null, null, config.getMyName(), config.getMyAuth(), false, false));
+            dq = new DeliveryQueue(this,
+                new DestInfo("LogUpload", uploaddir, null, null, null, config.getMyName(), config.getMyAuth(), false,
+                    false));
             setDaemon(true);
             setName("Log Uploader");
             start();
@@ -154,11 +163,9 @@ public class LogManager extends TimerTask {
                     f.delete();
                 }
             }
-            try {
+            try (Writer w = new FileWriter(uploaddir + "/.lastqueued")) {
                 (new File(uploaddir + "/.meta")).delete();
-                Writer w = new FileWriter(uploaddir + "/.lastqueued");
                 w.write(lastqueued + "\n");
-                w.close();
             } catch (Exception e) {
             }
         }
@@ -167,10 +174,8 @@ public class LogManager extends TimerTask {
     /**
      * Construct a log manager
      * <p>
-     * The log manager will check for expired log files every 5 minutes
-     * at 20 seconds after the 5 minute boundary.  (Actually, the
-     * interval is the event log rollover interval, which
-     * defaults to 5 minutes).
+     * The log manager will check for expired log files every 5 minutes at 20 seconds after the 5 minute boundary.
+     * (Actually, the interval is the event log rollover interval, which defaults to 5 minutes).
      */
     public LogManager(NodeConfigManager config) {
         this.config = config;

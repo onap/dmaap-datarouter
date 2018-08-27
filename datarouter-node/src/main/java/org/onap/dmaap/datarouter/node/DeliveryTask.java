@@ -79,33 +79,31 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
         boolean monly = di.isMetaDataOnly();
         date = Long.parseLong(pubid.substring(0, pubid.indexOf('.')));
         Vector<String[]> hdrv = new Vector<String[]>();
-        try {
-            try(BufferedReader br = new BufferedReader(new FileReader(metafile))){
-                String s = br.readLine();
-                int i = s.indexOf('\t');
-                method = s.substring(0, i);
-                if (!"DELETE".equals(method) && !monly) {
-                    length = datafile.length();
-                }
-                fileid = s.substring(i + 1);
-                while ((s = br.readLine()) != null) {
-                    i = s.indexOf('\t');
-                    String h = s.substring(0, i);
-                    String v = s.substring(i + 1);
-                    if ("x-att-dr-routing".equalsIgnoreCase(h)) {
-                        subid = v.replaceAll("[^ ]*/", "");
-                        feedid = dth.getFeedId(subid.replaceAll(" .*", ""));
-                    }
-                    if (length == 0 && h.toLowerCase().startsWith("content-")) {
-                        continue;
-                    }
-                    if (h.equalsIgnoreCase("content-type")) {
-                        ctype = v;
-                    }
-                    hdrv.add(new String[]{h, v});
-                }
-            }
 
+        try (BufferedReader br = new BufferedReader(new FileReader(metafile))) {
+            String s = br.readLine();
+            int i = s.indexOf('\t');
+            method = s.substring(0, i);
+            if (!"DELETE".equals(method) && !monly) {
+                length = datafile.length();
+            }
+            fileid = s.substring(i + 1);
+            while ((s = br.readLine()) != null) {
+                i = s.indexOf('\t');
+                String h = s.substring(0, i);
+                String v = s.substring(i + 1);
+                if ("x-att-dr-routing".equalsIgnoreCase(h)) {
+                    subid = v.replaceAll("[^ ]*/", "");
+                    feedid = dth.getFeedId(subid.replaceAll(" .*", ""));
+                }
+                if (length == 0 && h.toLowerCase().startsWith("content-")) {
+                    continue;
+                }
+                if (h.equalsIgnoreCase("content-type")) {
+                    ctype = v;
+                }
+                hdrv.add(new String[]{h, v});
+            }
         } catch (Exception e) {
             loggerDeliveryTask.error("Exception "+e.getStackTrace(),e);
         }
@@ -191,29 +189,24 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 }
                 if (os != null) {
                     long sofar = 0;
-                    try {
+                    try (InputStream is = new FileInputStream(datafile)) {
                         byte[] buf = new byte[1024 * 1024];
-                        try(InputStream is = new FileInputStream(datafile)){
-                            while (sofar < length) {
-                                int i = buf.length;
-                                if (sofar + i > length) {
-                                    i = (int) (length - sofar);
-                                }
-                                i = is.read(buf, 0, i);
-                                if (i <= 0) {
-                                    throw new IOException("Unexpected problem reading data file " + datafile);
-                                }
-                                sofar += i;
-                                os.write(buf, 0, i);
+                        while (sofar < length) {
+                            int i = buf.length;
+                            if (sofar + i > length) {
+                                i = (int) (length - sofar);
                             }
-                            is.close();
-                            os.close();
+                            i = is.read(buf, 0, i);
+                            if (i <= 0) {
+                                throw new IOException("Unexpected problem reading data file " + datafile);
+                            }
+                            sofar += i;
+                            os.write(buf, 0, i);
                         }
-
+                        os.close();
                     } catch (IOException ioe) {
                         dth.reportDeliveryExtra(this, sofar);
                         throw ioe;
-
                     }
                 }
             }
