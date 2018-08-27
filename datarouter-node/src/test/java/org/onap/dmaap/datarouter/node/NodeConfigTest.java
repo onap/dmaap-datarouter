@@ -28,6 +28,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.IOException;
@@ -35,6 +36,7 @@ import java.io.Reader;
 import java.io.StringReader;
 
 @RunWith(PowerMockRunner.class)
+@SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.node.ProvData", "org.onap.dmaap.datarouter.node.NodeUtils"})
 public class NodeConfigTest {
 
     private static NodeConfig nodeConfig;
