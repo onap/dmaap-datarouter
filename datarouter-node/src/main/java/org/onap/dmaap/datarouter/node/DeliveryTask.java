@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
  * the file and its delivery data as well as to attempt delivery.
  */
 public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
-    private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.DeliveryTask");
+    private static Logger loggerDeliveryTask = Logger.getLogger("org.onap.dmaap.datarouter.node.DeliveryTask");
     private DeliveryTaskHelper dth;
     private String pubid;
     private DestInfo di;
@@ -56,6 +56,62 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     private int attempts;
     private String[][] hdrs;
 
+
+    /**
+     * Create a delivery task for a given delivery queue and pub ID
+     *
+     * @param    dth    The delivery task helper for the queue this task is in.
+     * @param    pubid    The publish ID for this file.  This is used as
+     * the base for the file name in the spool directory and is of
+     * the form <milliseconds since 1970>.<fqdn of initial data router node>
+     */
+    public DeliveryTask(DeliveryTaskHelper dth, String pubid) {
+        this.dth = dth;
+        this.pubid = pubid;
+        di = dth.getDestInfo();
+        subid = di.getSubId();
+        feedid = di.getLogData();
+        spool = di.getSpool();
+        String dfn = spool + "/" + pubid;
+        String mfn = dfn + ".M";
+        datafile = new File(spool + "/" + pubid);
+        metafile = new File(mfn);
+        boolean monly = di.isMetaDataOnly();
+        date = Long.parseLong(pubid.substring(0, pubid.indexOf('.')));
+        Vector<String[]> hdrv = new Vector<String[]>();
+        try {
+            try(BufferedReader br = new BufferedReader(new FileReader(metafile))){
+                String s = br.readLine();
+                int i = s.indexOf('\t');
+                method = s.substring(0, i);
+                if (!"DELETE".equals(method) && !monly) {
+                    length = datafile.length();
+                }
+                fileid = s.substring(i + 1);
+                while ((s = br.readLine()) != null) {
+                    i = s.indexOf('\t');
+                    String h = s.substring(0, i);
+                    String v = s.substring(i + 1);
+                    if ("x-att-dr-routing".equalsIgnoreCase(h)) {
+                        subid = v.replaceAll("[^ ]*/", "");
+                        feedid = dth.getFeedId(subid.replaceAll(" .*", ""));
+                    }
+                    if (length == 0 && h.toLowerCase().startsWith("content-")) {
+                        continue;
+                    }
+                    if (h.equalsIgnoreCase("content-type")) {
+                        ctype = v;
+                    }
+                    hdrv.add(new String[]{h, v});
+                }
+            }
+
+        } catch (Exception e) {
+            loggerDeliveryTask.error("Exception "+e.getStackTrace(),e);
+        }
+        hdrs = hdrv.toArray(new String[hdrv.size()][]);
+        url = dth.getDestURL(fileid);
+    }
     /**
      * Is the object a DeliveryTask with the same publication ID?
      */
@@ -86,61 +142,6 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     public String toString() {
         return (pubid);
     }
-
-    /**
-     * Create a delivery task for a given delivery queue and pub ID
-     *
-     * @param    dth    The delivery task helper for the queue this task is in.
-     * @param    pubid    The publish ID for this file.  This is used as
-     * the base for the file name in the spool directory and is of
-     * the form <milliseconds since 1970>.<fqdn of initial data router node>
-     */
-    public DeliveryTask(DeliveryTaskHelper dth, String pubid) {
-        this.dth = dth;
-        this.pubid = pubid;
-        di = dth.getDestInfo();
-        subid = di.getSubId();
-        feedid = di.getLogData();
-        spool = di.getSpool();
-        String dfn = spool + "/" + pubid;
-        String mfn = dfn + ".M";
-        datafile = new File(spool + "/" + pubid);
-        metafile = new File(mfn);
-        boolean monly = di.isMetaDataOnly();
-        date = Long.parseLong(pubid.substring(0, pubid.indexOf('.')));
-        Vector<String[]> hdrv = new Vector<String[]>();
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(metafile));
-            String s = br.readLine();
-            int i = s.indexOf('\t');
-            method = s.substring(0, i);
-            if (!"DELETE".equals(method) && !monly) {
-                length = datafile.length();
-            }
-            fileid = s.substring(i + 1);
-            while ((s = br.readLine()) != null) {
-                i = s.indexOf('\t');
-                String h = s.substring(0, i);
-                String v = s.substring(i + 1);
-                if ("x-att-dr-routing".equalsIgnoreCase(h)) {
-                    subid = v.replaceAll("[^ ]*/", "");
-                    feedid = dth.getFeedId(subid.replaceAll(" .*", ""));
-                }
-                if (length == 0 && h.toLowerCase().startsWith("content-")) {
-                    continue;
-                }
-                if (h.equalsIgnoreCase("content-type")) {
-                    ctype = v;
-                }
-                hdrv.add(new String[]{h, v});
-            }
-            br.close();
-        } catch (Exception e) {
-        }
-        hdrs = hdrv.toArray(new String[hdrv.size()][]);
-        url = dth.getDestURL(fileid);
-    }
-
     /**
      * Get the publish ID
      */
@@ -186,29 +187,33 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 } catch (ProtocolException pe) {
                     dth.reportDeliveryExtra(this, -1L);
                     // Rcvd error instead of 100-continue
+                    loggerDeliveryTask.error("Exception "+pe.getStackTrace(),pe);
                 }
                 if (os != null) {
                     long sofar = 0;
                     try {
                         byte[] buf = new byte[1024 * 1024];
-                        InputStream is = new FileInputStream(datafile);
-                        while (sofar < length) {
-                            int i = buf.length;
-                            if (sofar + i > length) {
-                                i = (int) (length - sofar);
+                        try(InputStream is = new FileInputStream(datafile)){
+                            while (sofar < length) {
+                                int i = buf.length;
+                                if (sofar + i > length) {
+                                    i = (int) (length - sofar);
+                                }
+                                i = is.read(buf, 0, i);
+                                if (i <= 0) {
+                                    throw new IOException("Unexpected problem reading data file " + datafile);
+                                }
+                                sofar += i;
+                                os.write(buf, 0, i);
                             }
-                            i = is.read(buf, 0, i);
-                            if (i <= 0) {
-                                throw new IOException("Unexpected problem reading data file " + datafile);
-                            }
-                            sofar += i;
-                            os.write(buf, 0, i);
+                            is.close();
+                            os.close();
                         }
-                        is.close();
-                        os.close();
+
                     } catch (IOException ioe) {
                         dth.reportDeliveryExtra(this, sofar);
                         throw ioe;
+
                     }
                 }
             }
@@ -243,6 +248,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
             }
             dth.reportStatus(this, rc, xpubid, rmsg);
         } catch (Exception e) {
+            loggerDeliveryTask.error("Exception "+e.getStackTrace(),e);
             dth.reportException(this, e);
         }
     }
