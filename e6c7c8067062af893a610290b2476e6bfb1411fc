@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_f361d539",
+        "filename": "README.md",
+        "patchSetId": 16
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1111
+      },
+      "writtenOn": "2018-08-28T16:06:14Z",
+      "side": 1,
+      "message": "this is an AT\u0026T note that can be omitted for ONAP",
+      "range": {
+        "startLine": 77,
+        "startChar": 18,
+        "endLine": 77,
+        "endChar": 58
+      },
+      "revId": "e6c7c8067062af893a610290b2476e6bfb1411fc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_53e1a998",
+        "filename": "datarouter-node/src/main/resources/node.properties",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1111
+      },
+      "writtenOn": "2018-08-28T16:06:14Z",
+      "side": 1,
+      "message": "This seems to be a repeat of the same properties file in the misc directory.  Both needed?",
+      "revId": "e6c7c8067062af893a610290b2476e6bfb1411fc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_136811f4",
+        "filename": "datarouter-prov/src/main/resources/docker-compose/docker-compose.yml",
+        "patchSetId": 16
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1111
+      },
+      "writtenOn": "2018-08-28T16:06:14Z",
+      "side": 1,
+      "message": "might we add 443:8443 here too so that default https calls get mapped to the proper port?",
+      "range": {
+        "startLine": 29,
+        "startChar": 4,
+        "endLine": 29,
+        "endChar": 10
+      },
+      "revId": "e6c7c8067062af893a610290b2476e6bfb1411fc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
