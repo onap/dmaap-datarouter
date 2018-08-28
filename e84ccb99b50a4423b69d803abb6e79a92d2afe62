@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_3de87c0f",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/ProxyServlet.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-28T08:44:53Z",
+      "side": 1,
+      "message": "Can replace with try-with-resources block:\n\ntry (FileInputStream instream \u003d new FileInputStream(new File(store))){\n            ks.load(instream, pass.toCharArray());\n        } catch (Exception x) {\n            System.err.println(\"READING TRUSTSTORE: \" + x);\n        }\n        return ks;",
+      "range": {
+        "startLine": 109,
+        "startChar": 8,
+        "endLine": 120,
+        "endChar": 18
+      },
+      "revId": "e84ccb99b50a4423b69d803abb6e79a92d2afe62",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_5de3f832",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/beans/NodeClass.java",
+        "patchSetId": 11
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-28T08:44:53Z",
+      "side": 1,
+      "message": "This should be kept. It\u0027s the logic in the BaseClass that\u0027s causing the issue.",
+      "range": {
+        "startLine": 175,
+        "startChar": 0,
+        "endLine": 181,
+        "endChar": 11
+      },
+      "revId": "e84ccb99b50a4423b69d803abb6e79a92d2afe62",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_3d915c99",
+        "filename": "datarouter-prov/src/main/resources/docker-compose/prov_data/provserver.properties",
+        "patchSetId": 11
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-28T08:44:53Z",
+      "side": 1,
+      "message": "Keep default set to false",
+      "range": {
+        "startLine": 43,
+        "startChar": 60,
+        "endLine": 43,
+        "endChar": 64
+      },
+      "revId": "e84ccb99b50a4423b69d803abb6e79a92d2afe62",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_fdea040e",
+        "filename": "datarouter-prov/src/main/resources/provserver.properties",
+        "patchSetId": 11
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-28T08:44:53Z",
+      "side": 1,
+      "message": "Should be false",
+      "range": {
+        "startLine": 43,
+        "startChar": 60,
+        "endLine": 43,
+        "endChar": 64
+      },
+      "revId": "e84ccb99b50a4423b69d803abb6e79a92d2afe62",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
