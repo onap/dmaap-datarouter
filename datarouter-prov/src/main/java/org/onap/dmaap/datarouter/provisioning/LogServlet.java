@@ -417,13 +417,13 @@ public class LogServlet extends BaseServlet {
         Connection conn = null;
         try {
             conn = db.getConnection();
-            Statement  stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                rh.handleRow(rs);
-            }
-            rs.close();
-            stmt.close();
+           try( Statement  stmt = conn.createStatement()){
+             try(ResultSet rs = stmt.executeQuery(sql)){
+                 while (rs.next()) {
+                     rh.handleRow(rs);
+                 }
+             }
+           }
         } catch (SQLException sqlException) {
             intlogger.info("Failed to get Records. Exception = " +sqlException.getMessage(),sqlException);
         } finally {
