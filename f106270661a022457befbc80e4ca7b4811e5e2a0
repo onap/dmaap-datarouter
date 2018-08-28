@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_4ee34033",
+        "filename": "datarouter-node/src/main/resources/misc/node.properties",
+        "patchSetId": 17
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-08-28T16:45:59Z",
+      "side": 1,
+      "message": "I think this one should be removed instead.\nAnd leave the one under resources dir.",
+      "range": {
+        "startLine": 2,
+        "startChar": 4,
+        "endLine": 10,
+        "endChar": 3
+      },
+      "revId": "f106270661a022457befbc80e4ca7b4811e5e2a0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
