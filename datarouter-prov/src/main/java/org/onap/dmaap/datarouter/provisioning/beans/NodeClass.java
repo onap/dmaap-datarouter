@@ -3,7 +3,7 @@
  * * org.onap.dmaap
  * * ===========================================================================
  * * Copyright © 2017 AT&T Intellectual Property. All rights reserved.
- * * ===========================================================================
+  * * ===========================================================================
  * * Licensed under the Apache License, Version 2.0 (the "License");
  * * you may not use this file except in compliance with the License.
  * * You may obtain a copy of the License at
@@ -44,7 +44,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  */
 public abstract class NodeClass extends Syncable {
     private static Map<String, Integer> map;
-
+    private static Logger intLogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
     public NodeClass() {
         // init on first use
         if (map == null) {
@@ -68,11 +68,11 @@ public abstract class NodeClass extends Syncable {
                 nextid = n + 1;
         }
         // take | separated list, add domain if needed.
-        Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+
         for (String node : nodes) {
             node = normalizeNodename(node);
             if (!map.containsKey(node)) {
-                intlogger.info("..adding " + node + " to NODES with index " + nextid);
+                intLogger.info("..adding " + node + " to NODES with index " + nextid);
                 map.put(node, nextid);
                 PreparedStatement ps = null;
                 try {
@@ -86,13 +86,14 @@ public abstract class NodeClass extends Syncable {
                     ps.close();
                     db.release(conn);
                 } catch (SQLException e) {
-                    intlogger.warn("PROV0005 doInsert: " + e.getMessage());
-                    e.printStackTrace();
+                    intLogger.error("PROV0005 doInsert: " + e.getMessage(),e);
                 } finally {
                     try {
-                        ps.close();
+                        if(ps!=null){
+                            ps.close();
+                        }
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        intLogger.error("Error in closing PreparedStatement: " + e.getMessage(),e);
                     }
                 }
                 nextid++;
@@ -119,25 +120,28 @@ public abstract class NodeClass extends Syncable {
             ps.close();
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intLogger.error("PROV0005 doInsert: " + e.getMessage(),e);
         } finally {
             try {
-                ps.close();
+                if(ps!=null){
+                    ps.close();
+                }
+
             } catch (SQLException e) {
-                e.printStackTrace();
+                intLogger.error("PROV0005 doInsert: " + e.getMessage(),e);
             }
         }
         map = m;
     }
 
-    public static Integer lookupNodeName(final String name) throws IllegalArgumentException {
+    public static Integer lookupNodeName(final String name) {
         Integer n = map.get(name);
         if (n == null)
             throw new IllegalArgumentException("Invalid node name: " + name);
         return n;
     }
 
-    public static Collection<String> lookupNodeNames(String patt) throws IllegalArgumentException {
+    public static Collection<String> lookupNodeNames(String patt) {
         Collection<String> coll = new TreeSet<String>();
         final Set<String> keyset = map.keySet();
         for (String s : patt.toLowerCase().split(",")) {
@@ -173,7 +177,11 @@ public abstract class NodeClass extends Syncable {
                 String domain = p.getValue();
                 s += "." + domain;
             }
+            return s.toLowerCase();
         }
-        return s.toLowerCase();
+        else{
+            return s;
+        }
+
     }
 }
