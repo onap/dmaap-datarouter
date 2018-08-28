@@ -105,6 +105,8 @@ public class StatisticsServletTest extends DrServletTestBase {
     when(response.getOutputStream()).thenReturn(outStream);
     statisticsServlet = PowerMockito.mock(StatisticsServlet.class);
     PowerMockito.doReturn(null).when(statisticsServlet, "getRecordsForSQL", anyString());
+    PowerMockito.doCallRealMethod().when(statisticsServlet, "buildMapFromRequest", anyObject());
+    PowerMockito.doCallRealMethod().when(statisticsServlet, "getTimeFromParam", anyString());
     doNothing().when(statisticsServlet).rsToCSV(anyObject(), anyObject());
     doCallRealMethod().when(statisticsServlet).doGet(request, response);
     when(statisticsServlet.getFeedIdsByGroupId(anyInt())).thenReturn(new StringBuffer("1"));
@@ -116,10 +118,13 @@ public class StatisticsServletTest extends DrServletTestBase {
   public void Given_Request_Is_HTTP_GET_With_GroupId_And_FeedId_Parameters_Then_Request_Succeeds()
       throws Exception {
     when(request.getParameter("feedid")).thenReturn("1");
+    when(request.getParameter("statusCode")).thenReturn("500");
     ServletOutputStream outStream = mock(ServletOutputStream.class);
     when(response.getOutputStream()).thenReturn(outStream);
     statisticsServlet = PowerMockito.mock(StatisticsServlet.class);
     PowerMockito.doReturn(null).when(statisticsServlet, "getRecordsForSQL", anyString());
+    PowerMockito.doCallRealMethod().when(statisticsServlet, "buildMapFromRequest", anyObject());
+    PowerMockito.doCallRealMethod().when(statisticsServlet, "getTimeFromParam", anyString());
     doNothing().when(statisticsServlet).rsToCSV(anyObject(), anyObject());
     doCallRealMethod().when(statisticsServlet).doGet(request, response);
     doCallRealMethod().when(statisticsServlet).queryGeneretor(anyObject());
