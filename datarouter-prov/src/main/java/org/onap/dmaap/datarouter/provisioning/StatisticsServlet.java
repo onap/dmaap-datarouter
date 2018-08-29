@@ -293,13 +293,13 @@ public class StatisticsServlet extends BaseServlet {
   /**
    * getFeedIdsByGroupId - Getting FEEDID's by GROUP ID.
    *
-   * @throws SQL Query SQLException.
+   * @throws SQLException Query SQLException.
    */
   public StringBuffer getFeedIdsByGroupId(int groupIds) throws SQLException {
 
     DB db = null;
     Connection conn = null;
-    PreparedStatement prepareStatement = null;
+    //PreparedStatement prepareStatement = null;
     ResultSet resultSet = null;
     String sqlGoupid = null;
     StringBuffer feedIds = new StringBuffer();
@@ -308,16 +308,16 @@ public class StatisticsServlet extends BaseServlet {
       db = new DB();
       conn = db.getConnection();
       sqlGoupid = " SELECT FEEDID from FEEDS  WHERE GROUPID = ?";
-      prepareStatement = conn.prepareStatement(sqlGoupid);
-      prepareStatement.setInt(1, groupIds);
-      resultSet = prepareStatement.executeQuery();
-      while (resultSet.next()) {
-        feedIds.append(resultSet.getInt("FEEDID"));
-        feedIds.append(",");
+      try(PreparedStatement prepareStatement = conn.prepareStatement(sqlGoupid)) {
+          prepareStatement.setInt(1, groupIds);
+          resultSet = prepareStatement.executeQuery();
+          while (resultSet.next()) {
+              feedIds.append(resultSet.getInt("FEEDID"));
+              feedIds.append(",");
+          }
+          feedIds.deleteCharAt(feedIds.length() - 1);
+          System.out.println("feedIds" + feedIds.toString());
       }
-      feedIds.deleteCharAt(feedIds.length() - 1);
-      System.out.println("feedIds" + feedIds.toString());
-
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
@@ -326,13 +326,7 @@ public class StatisticsServlet extends BaseServlet {
           resultSet.close();
           resultSet = null;
         }
-
-        if (prepareStatement != null) {
-          prepareStatement.close();
-          prepareStatement = null;
-        }
-
-        if (conn != null) {
+          if (conn != null) {
           db.release(conn);
         }
       } catch (Exception e) {
@@ -571,33 +565,44 @@ public class StatisticsServlet extends BaseServlet {
     intlogger.info("Error parsing time=" + s);
     return -1;
   }
-
-
   private ResultSet getRecordsForSQL(String sql) {
-    intlogger.debug(sql);
-    long start = System.currentTimeMillis();
-    DB db = new DB();
-    Connection conn = null;
-    ResultSet rs = null;
+      intlogger.debug(sql);
+      long start = System.currentTimeMillis();
+      DB db = new DB();
+      Connection conn = null;
+      ResultSet rs = null;
+      Statement stmt = null;
+      PreparedStatement pst = null;
+      try {
+          conn = db.getConnection();
+          stmt = conn.createStatement();
+          pst = conn.prepareStatement(sql);
+          rs = pst.executeQuery();
+      } catch (SQLException e) {
+          e.printStackTrace();
+      } finally {
 
-    try {
-      conn = db.getConnection();
-      Statement stmt = conn.createStatement();
-      PreparedStatement pst = conn.prepareStatement(sql);
-      rs = pst.executeQuery();
-      //this.rsToJson(rs)
-      //rs.close();
-      stmt.close();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      if (conn != null) {
-        db.release(conn);
+          try {
+              if (conn != null) {
+                  db.release(conn);
+              }
+              if (stmt != null) {
+                  stmt.close();
+              }
+              if (pst != null) {
+                  pst.close();
+              }
+              if (rs != null) {
+                  rs.close();
+              }
+
+          } catch (SQLException sqlException) {
+              intlogger.error("Exception in getting SQl Records",sqlException);
+          }
+
+          intlogger.debug("Time: " + (System.currentTimeMillis() - start) + " ms");
+
+          return rs;
       }
-    }
-
-    intlogger.debug("Time: " + (System.currentTimeMillis() - start) + " ms");
-
-    return rs;
   }
 }
