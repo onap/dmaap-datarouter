@@ -26,7 +26,6 @@ package org.onap.dmaap.datarouter.subscriber;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,70 +36,49 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.PosixFilePermissions;
 
-import static org.onap.dmaap.datarouter.subscriber.Subscriber.props;
+public class SampleSubscriberServlet extends HttpServlet {
 
-public class SubscriberServlet extends HttpServlet {
-
-	private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.subscriber.SubscriberServlet");
+	private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.subscriber.SampleSubscriberServlet");
 	private String outputDirectory;
 	private String basicAuth;
 
-	/**
-	 *	Configure this subscriberservlet.  Configuration parameters from config.getInitParameter() are:
+    /**
+	 *	Configure the SampleSubscriberServlet.
 	 *	<ul>
 	 *	<li>Login - The login expected in the Authorization header (default "LOGIN").
 	 *	<li>Password - The password expected in the Authorization header (default "PASSWORD").
-	 *	<li>outputDirectory - The directory where files are placed (default "tmp").
+	 *	<li>outputDirectory - The directory where files are placed (default "/opt/app/subscriber/delivery").
 	 *	</ul>
 	 */
 	@Override
-    public void init(ServletConfig config) {
-        String login = props.getProperty("org.onap.dmaap.datarouter.subscriber.auth.user", "LOGIN");
-		String password = props.getProperty("org.onap.dmaap.datarouter.subscriber.auth.password", "PASSWORD");
-        outputDirectory = props.getProperty("org.onap.dmaap.datarouter.subscriber.delivery.dir", "/tmp");
+    public void init() {
+        SubscriberProps props = SubscriberProps.getInstance();
+        String login = props.getValue("org.onap.dmaap.datarouter.subscriber.auth.user", "LOGIN");
+		String password = props.getValue("org.onap.dmaap.datarouter.subscriber.auth.password", "PASSWORD");
+        outputDirectory = props.getValue("org.onap.dmaap.datarouter.subscriber.delivery.dir", "/opt/app/subscriber/delivery");
         try {
             Files.createDirectory(Paths.get(outputDirectory), PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxrwxrwx")));
         } catch (IOException e) {
             logger.info("SubServlet: Failed to create delivery dir: " + e.getMessage());
-            e.printStackTrace();
         }
 		basicAuth = "Basic " + Base64.encodeBase64String((login + ":" + password).getBytes());
 	}
 
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		File filesPath = new File(outputDirectory);
-		File[] filesArr = filesPath.listFiles();
-        assert filesArr != null;
-        for (File file: filesArr) {
-            try (BufferedReader in = new BufferedReader(new FileReader(file))) {
-                String line = in.readLine();
-                while (line != null) {
-                    line = in.readLine();
-                }
-            }
-		}
-	}
-	/**
-	 *	Invoke common(req, resp, false).
-	 */
-	@Override
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
         try {
             common(req, resp, false);
         } catch (IOException e) {
-            logger.info("SubServlet: Failed to doPut: " + req.getRemoteAddr() + " : " + req.getPathInfo(), e);
+            logger.info("SampleSubServlet: Failed to doPut: " + req.getRemoteAddr() + " : " + req.getPathInfo(), e);
         }
     }
-	/**
-	 *	Invoke common(req, resp, true).
-	 */
+
 	@Override
 	protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         try {
             common(req, resp, true);
         } catch (IOException e) {
-            logger.info("SubServlet: Failed to doDelete: " + req.getRemoteAddr() + " : " + req.getPathInfo(), e);
+            logger.info("SampleSubServlet: Failed to doDelete: " + req.getRemoteAddr() + " : " + req.getPathInfo(), e);
         }
     }
 	/**
@@ -122,12 +100,12 @@ public class SubscriberServlet extends HttpServlet {
     private void common(HttpServletRequest req, HttpServletResponse resp, boolean isdelete) throws IOException {
 		String authHeader = req.getHeader("Authorization");
 		if (authHeader == null) {
-			logger.info("Rejecting request with no Authorization header from " + req.getRemoteAddr() + ": " + req.getPathInfo());
+			logger.info("SampleSubServlet: Rejecting request with no Authorization header from " + req.getRemoteAddr() + ": " + req.getPathInfo());
 			resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 			return;
 		}
 		if (!basicAuth.equals(authHeader)) {
-			logger.info("Rejecting request with incorrect Authorization header from " + req.getRemoteAddr() + ": " + req.getPathInfo());
+			logger.info("SampleSubServlet: Rejecting request with incorrect Authorization header from " + req.getRemoteAddr() + ": " + req.getPathInfo());
 			resp.sendError(HttpServletResponse.SC_FORBIDDEN);
 			return;
 		}
@@ -144,7 +122,7 @@ public class SubscriberServlet extends HttpServlet {
 		try {
 			if (isdelete) {
 			    Files.deleteIfExists(Paths.get(fullPath));
-				logger.info("Received delete for file id " + fileid + " from " + req.getRemoteAddr() + " publish id " + publishid + " as " + fullPath);
+				logger.info("SampleSubServlet: Received delete for file id " + fileid + " from " + req.getRemoteAddr() + " publish id " + publishid + " as " + fullPath);
 			} else {
                 new File(tmpPath).createNewFile();
                 try (InputStream is = req.getInputStream(); OutputStream os = new FileOutputStream(tmpPath)) {
@@ -155,13 +133,13 @@ public class SubscriberServlet extends HttpServlet {
                     }
                 }
                 Files.move(Paths.get(tmpPath), Paths.get(fullPath), StandardCopyOption.REPLACE_EXISTING);
-				logger.info("Received file id " + fileid + " from " + req.getRemoteAddr() + " publish id " + publishid + " as " + fullPath);
+				logger.info("SampleSubServlet: Received file id " + fileid + " from " + req.getRemoteAddr() + " publish id " + publishid + " as " + fullPath);
 				resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
 			}
 			resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
 		} catch (IOException ioe) {
             Files.deleteIfExists(Paths.get(tmpPath));
-			logger.info("Failed to process file " + fullPath + " from " + req.getRemoteAddr() + ": " + req.getPathInfo());
+			logger.info("SampleSubServlet: Failed to process file " + fullPath + " from " + req.getRemoteAddr() + ": " + req.getPathInfo());
 			throw ioe;
 		}
 	}
