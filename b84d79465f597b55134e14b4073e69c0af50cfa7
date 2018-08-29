@@ -22,6 +22,30 @@
       "revId": "b84d79465f597b55134e14b4073e69c0af50cfa7",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_c6841460",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/utils/ThrottleFilterTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-08-29T13:34:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_23a5ba46",
+      "range": {
+        "startLine": 189,
+        "startChar": 17,
+        "endLine": 189,
+        "endChar": 40
+      },
+      "revId": "b84d79465f597b55134e14b4073e69c0af50cfa7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
