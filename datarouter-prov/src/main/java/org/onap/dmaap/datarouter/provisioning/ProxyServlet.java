@@ -181,7 +181,7 @@ public class ProxyServlet extends BaseServlet {
         if (inited) {
             String url = buildUrl(req);
             intlogger.info("ProxyServlet: proxying with fallback GET "+url);
-            AbstractHttpClient httpclient = new DefaultHttpClient();
+            try(AbstractHttpClient httpclient = new DefaultHttpClient()){
             HttpRequestBase proxy = new HttpGet(url);
             try {
                 httpclient.getConnectionManager().getSchemeRegistry().register(sch);
@@ -204,12 +204,14 @@ public class ProxyServlet extends BaseServlet {
                     in.close();
                 }
                 rv = true;
+
             } catch (IOException e) {
                 System.err.println("ProxyServlet: "+e);
                 e.printStackTrace();
             } finally {
                 proxy.releaseConnection();
                 httpclient.getConnectionManager().shutdown();
+            }
             }
         } else {
             intlogger.warn("ProxyServlet: proxy disabled");
@@ -220,41 +222,42 @@ public class ProxyServlet extends BaseServlet {
         if (inited && isProxyServer()) {
             String url = buildUrl(req);
             intlogger.info("ProxyServlet: proxying "+method + " "+url);
-            AbstractHttpClient httpclient = new DefaultHttpClient();
-            ProxyHttpRequest proxy = new ProxyHttpRequest(method, url);
-            try {
-                httpclient.getConnectionManager().getSchemeRegistry().register(sch);
+            try(AbstractHttpClient httpclient = new DefaultHttpClient()) {
+                ProxyHttpRequest proxy = new ProxyHttpRequest(method, url);
+                try {
+                    httpclient.getConnectionManager().getSchemeRegistry().register(sch);
 
-                // Copy request headers and request body
-                copyRequestHeaders(req, proxy);
-                if (method.equals("POST") || method.equals("PUT")){
-                    BasicHttpEntity body = new BasicHttpEntity();
-                    body.setContent(req.getInputStream());
-                    body.setContentLength(-1);    // -1 = unknown
-                    proxy.setEntity(body);
+                    // Copy request headers and request body
+                    copyRequestHeaders(req, proxy);
+                    if (method.equals("POST") || method.equals("PUT")) {
+                        BasicHttpEntity body = new BasicHttpEntity();
+                        body.setContent(req.getInputStream());
+                        body.setContentLength(-1);    // -1 = unknown
+                        proxy.setEntity(body);
+                    }
+
+                    // Execute the request
+                    HttpResponse pxy_response = httpclient.execute(proxy);
+
+                    // Get response headers and body
+                    int code = pxy_response.getStatusLine().getStatusCode();
+                    resp.setStatus(code);
+                    copyResponseHeaders(pxy_response, resp);
+
+                    HttpEntity entity = pxy_response.getEntity();
+                    if (entity != null) {
+                        InputStream in = entity.getContent();
+                        IOUtils.copy(in, resp.getOutputStream());
+                        in.close();
+                    }
+                } catch (IOException e) {
+                    intlogger.warn("ProxyServlet: " + e);
+                    resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                    e.printStackTrace();
+                } finally {
+                    proxy.releaseConnection();
+                    httpclient.getConnectionManager().shutdown();
                 }
-
-                // Execute the request
-                HttpResponse pxy_response = httpclient.execute(proxy);
-
-                // Get response headers and body
-                int code = pxy_response.getStatusLine().getStatusCode();
-                resp.setStatus(code);
-                copyResponseHeaders(pxy_response, resp);
-
-                HttpEntity entity = pxy_response.getEntity();
-                if (entity != null) {
-                    InputStream in = entity.getContent();
-                    IOUtils.copy(in, resp.getOutputStream());
-                    in.close();
-                }
-            } catch (IOException e) {
-                intlogger.warn("ProxyServlet: "+e);
-                resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-                e.printStackTrace();
-            } finally {
-                proxy.releaseConnection();
-                httpclient.getConnectionManager().shutdown();
             }
         } else {
             intlogger.warn("ProxyServlet: proxy disabled");
