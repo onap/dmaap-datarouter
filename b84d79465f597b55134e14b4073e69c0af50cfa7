@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_23a5ba46",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/utils/ThrottleFilterTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-29T13:15:47Z",
+      "side": 1,
+      "message": "Tests are much neater now alright just Java style for method names mockServletInputStream, same for below\nmockParametersWithValues\nmockContinuationSupport\nmockHttpConnectionHttpChannelAndRequest",
+      "range": {
+        "startLine": 189,
+        "startChar": 17,
+        "endLine": 189,
+        "endChar": 40
+      },
+      "revId": "b84d79465f597b55134e14b4073e69c0af50cfa7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
