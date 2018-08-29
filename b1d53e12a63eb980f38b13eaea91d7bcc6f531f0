@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_5f0d283d",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/utils/RLEBitSetTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-08-29T10:51:49Z",
+      "side": 1,
+      "message": "Not a split BitSet",
+      "range": {
+        "startLine": 130,
+        "startChar": 82,
+        "endLine": 130,
+        "endChar": 95
+      },
+      "revId": "b1d53e12a63eb980f38b13eaea91d7bcc6f531f0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
