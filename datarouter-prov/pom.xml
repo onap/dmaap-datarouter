@@ -277,7 +277,7 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>**/proserver.properties</include>
+                    <include>**/provserver.properties</include>
                 </includes>
             </resource>
             <resource>

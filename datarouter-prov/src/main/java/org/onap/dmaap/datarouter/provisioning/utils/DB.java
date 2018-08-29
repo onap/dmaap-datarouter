@@ -38,14 +38,12 @@ import java.util.*;
  */
 public class DB {
 
-    /**
-     * The name of the properties file (in CLASSPATH)
-     */
+    private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+
     private static String DB_URL;
     private static String DB_LOGIN;
     private static String DB_PASSWORD;
     private static Properties props;
-    private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
     private static final Queue<Connection> queue = new LinkedList<>();
 
     public static String HTTPS_PORT;

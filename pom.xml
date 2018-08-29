@@ -60,6 +60,7 @@
     <modules>
         <module>datarouter-prov</module>
         <module>datarouter-node</module>
+        <module>datarouter-subscriber</module>
     </modules>
     <build>
         <plugins>
