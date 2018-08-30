@@ -38,8 +38,8 @@ public class DrServletTestBase {
     public void setUp() throws Exception {
         Properties props = new Properties();
         props.setProperty("org.onap.dmaap.datarouter.provserver.isaddressauthenabled", "false");
-        props.setProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir", "datarouter-prov/unit-test-logs");
-        props.setProperty("org.onap.dmaap.datarouter.provserver.spooldir", "resources/spooldir");
+        props.setProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir", "unit-test-logs");
+        props.setProperty("org.onap.dmaap.datarouter.provserver.spooldir", "unit-test-logs/spool");
         props.setProperty("org.onap.dmaap.datarouter.provserver.https.relaxation", "false");
         FieldUtils.writeDeclaredStaticField(DB.class, "props", props, true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsgFlag", false, true);

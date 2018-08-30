@@ -31,6 +31,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
@@ -154,6 +155,19 @@ public class InternalServletTest extends DrServletTestBase {
   }
 
   @Test
+  public void Given_Request_Is_HTTP_GET_Starts_With_Logs_In_Endpoint_And_File_Exists_Then_Request_Returns_Ok()
+      throws Exception {
+    when(request.getPathInfo()).thenReturn("/logs/testFile.txt");
+    File testFile = new File("unit-test-logs/testFile.txt");
+    testFile.createNewFile();
+    testFile.deleteOnExit();
+    ServletOutputStream outStream = mock(ServletOutputStream.class);
+    when(response.getOutputStream()).thenReturn(outStream);
+    internalServlet.doGet(request, response);
+    verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+  }
+
+  @Test
   public void Given_Request_Is_HTTP_GET_With_Api_In_Endpoint_Request_Succeeds() throws Exception {
     when(request.getPathInfo()).thenReturn("/api/Key");
     setParametersToNotContactDb(false);
@@ -167,10 +181,7 @@ public class InternalServletTest extends DrServletTestBase {
   public void Given_Request_Is_HTTP_GET_With_Drlogs_In_Endpoint_Request_Succeeds()
       throws Exception {
     when(request.getPathInfo()).thenReturn("/drlogs/");
-    PowerMockito.mockStatic(LogfileLoader.class);
-    LogfileLoader logfileLoader = mock(LogfileLoader.class);
-    when(logfileLoader.getBitSet()).thenReturn(new RLEBitSet());
-    PowerMockito.when(LogfileLoader.getLoader()).thenReturn(logfileLoader);
+    mockLogfileLoader();
     ServletOutputStream outStream = mock(ServletOutputStream.class);
     when(response.getOutputStream()).thenReturn(outStream);
     internalServlet.doGet(request, response);
@@ -332,6 +343,21 @@ public class InternalServletTest extends DrServletTestBase {
   }
 
   @Test
+  public void Given_Request_Is_HTTP_POST_To_Logs_Then_Request_Succeeds()
+      throws Exception {
+    when(request.getHeader("Content-Encoding")).thenReturn("gzip");
+    when(request.getPathInfo()).thenReturn("/logs/");
+    ServletInputStream inStream = mock(ServletInputStream.class);
+    when(request.getInputStream()).thenReturn(inStream);
+    File testDir = new File("unit-test-logs/spool");
+    testDir.mkdirs();
+    testDir.deleteOnExit();
+    mockLogfileLoader();
+    internalServlet.doPost(request, response);
+    verify(response).setStatus(eq(HttpServletResponse.SC_CREATED));
+  }
+
+  @Test
   public void Given_Request_Is_HTTP_POST_To_Drlogs_And_Then_Unsupported_Media_Type_Response_Is_Generated()
       throws Exception {
     when(request.getHeader("Content-Type")).thenReturn("stub_contentType");
@@ -451,5 +477,12 @@ public class InternalServletTest extends DrServletTestBase {
     PowerMockito.when(Subscription.countActiveSubscriptions()).thenReturn(0);
     Map<String, Integer> map = new HashMap<>();
     FieldUtils.writeDeclaredStaticField(NodeClass.class, "map", map, true);
+  }
+
+  private void mockLogfileLoader() {
+    PowerMockito.mockStatic(LogfileLoader.class);
+    LogfileLoader logfileLoader = mock(LogfileLoader.class);
+    when(logfileLoader.getBitSet()).thenReturn(new RLEBitSet());
+    PowerMockito.when(LogfileLoader.getLoader()).thenReturn(logfileLoader);
   }
 }
