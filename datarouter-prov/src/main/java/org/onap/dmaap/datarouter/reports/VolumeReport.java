@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 
 /**
@@ -57,7 +58,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
 public class VolumeReport extends ReportBase {
     private static final String SELECT_SQL = "select EVENT_TIME, TYPE, FEEDID, CONTENT_LENGTH, RESULT" +
             " from LOG_RECORDS where EVENT_TIME >= ? and EVENT_TIME <= ? LIMIT ?, ?";
-
+    private Logger loggerVolumeReport=Logger.getLogger("org.onap.dmaap.datarouter.reports");
     private class Counters {
         public int filespublished, filesdelivered, filesexpired;
         public long bytespublished, bytesdelivered, bytesexpired;
@@ -83,58 +84,64 @@ public class VolumeReport extends ReportBase {
             final long stepsize = 6000000L;
             boolean go_again = true;
             for (long i = 0; go_again; i += stepsize) {
-                PreparedStatement ps = conn.prepareStatement(SELECT_SQL);
-                ps.setLong(1, from);
-                ps.setLong(2, to);
-                ps.setLong(3, i);
-                ps.setLong(4, stepsize);
-                ResultSet rs = ps.executeQuery();
-                go_again = false;
-                while (rs.next()) {
-                    go_again = true;
-                    long etime = rs.getLong("EVENT_TIME");
-                    String type = rs.getString("TYPE");
-                    int feed = rs.getInt("FEEDID");
-                    long clen = rs.getLong("CONTENT_LENGTH");
-                    String key = sdf.format(new Date(etime)) + ":" + feed;
-                    Counters c = map.get(key);
-                    if (c == null) {
-                        c = new Counters();
-                        map.put(key, c);
-                    }
-                    if (type.equalsIgnoreCase("pub")) {
-                        c.filespublished++;
-                        c.bytespublished += clen;
-                    } else if (type.equalsIgnoreCase("del")) {
-                        // Only count successful deliveries
-                        int statusCode = rs.getInt("RESULT");
-                        if (statusCode >= 200 && statusCode < 300) {
-                            c.filesdelivered++;
-                            c.bytesdelivered += clen;
+                try (PreparedStatement ps = conn.prepareStatement(SELECT_SQL)) {
+                    ps.setLong(1, from);
+                    ps.setLong(2, to);
+                    ps.setLong(3, i);
+                    ps.setLong(4, stepsize);
+                    try(ResultSet rs = ps.executeQuery()) {
+                        go_again = false;
+                        while (rs.next()) {
+                            go_again = true;
+                            long etime = rs.getLong("EVENT_TIME");
+                            String type = rs.getString("TYPE");
+                            int feed = rs.getInt("FEEDID");
+                            long clen = rs.getLong("CONTENT_LENGTH");
+                            String key = sdf.format(new Date(etime)) + ":" + feed;
+                            Counters c = map.get(key);
+                            if (c == null) {
+                                c = new Counters();
+                                map.put(key, c);
+                            }
+                            if (type.equalsIgnoreCase("pub")) {
+                                c.filespublished++;
+                                c.bytespublished += clen;
+                            } else if (type.equalsIgnoreCase("del")) {
+                                // Only count successful deliveries
+                                int statusCode = rs.getInt("RESULT");
+                                if (statusCode >= 200 && statusCode < 300) {
+                                    c.filesdelivered++;
+                                    c.bytesdelivered += clen;
+                                }
+                            } else if (type.equalsIgnoreCase("exp")) {
+                                c.filesexpired++;
+                                c.bytesexpired += clen;
+                            }
                         }
-                    } else if (type.equalsIgnoreCase("exp")) {
-                        c.filesexpired++;
-                        c.bytesexpired += clen;
                     }
+
                 }
-                rs.close();
-                ps.close();
+                catch (SQLException sqlException)
+                {
+                    loggerVolumeReport.error("SqlException",sqlException);
+                }
             }
+
             db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         logger.debug("Query time: " + (System.currentTimeMillis() - start) + " ms");
-        try {
-            PrintWriter os = new PrintWriter(outfile);
+        try (PrintWriter os = new PrintWriter(outfile)) {
             os.println("date,feedid,filespublished,bytespublished,filesdelivered,bytesdelivered,filesexpired,bytesexpired");
-            for (String key : new TreeSet<String>(map.keySet())) {
+            for(String key :new TreeSet<String>(map.keySet()))
+            {
                 Counters c = map.get(key);
                 String[] p = key.split(":");
                 os.println(String.format("%s,%s,%s", p[0], p[1], c.toString()));
             }
-            os.close();
-        } catch (FileNotFoundException e) {
+        }
+        catch (FileNotFoundException e) {
             System.err.println("File cannot be written: " + outfile);
         }
     }
