@@ -145,40 +145,38 @@ public class LatencyReport extends ReportBase {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            PreparedStatement ps = conn.prepareStatement(SELECT_SQL);
+            try(PreparedStatement ps = conn.prepareStatement(SELECT_SQL)){
             ps.setLong(1, from);
             ps.setLong(2, to);
-            ResultSet rs = ps.executeQuery();
-            PrintWriter os = new PrintWriter(outfile);
-            os.println("recordid,feedid,uri,size,min,max,avg,fanout");
-            Counters c = null;
-            while (rs.next()) {
-                long etime = rs.getLong("EVENT_TIME");
-                String type = rs.getString("TYPE");
-                String id = rs.getString("PUBLISH_ID");
-                String fid = rs.getString("FEED_FILEID");
-                int feed = rs.getInt("FEEDID");
-                long clen = rs.getLong("CONTENT_LENGTH");
-                if (c != null && !id.equals(c.id)) {
-                    String line = id + "," + c.toString();
-                    os.println(line);
-                    c = null;
+            try(ResultSet rs = ps.executeQuery()) {
+                try(PrintWriter os = new PrintWriter(outfile)) {
+                    os.println("recordid,feedid,uri,size,min,max,avg,fanout");
+                    Counters c = null;
+                    while (rs.next()) {
+                        long etime = rs.getLong("EVENT_TIME");
+                        String type = rs.getString("TYPE");
+                        String id = rs.getString("PUBLISH_ID");
+                        String fid = rs.getString("FEED_FILEID");
+                        int feed = rs.getInt("FEEDID");
+                        long clen = rs.getLong("CONTENT_LENGTH");
+                        if (c != null && !id.equals(c.id)) {
+                            String line = id + "," + c.toString();
+                            os.println(line);
+                            c = null;
+                        }
+                        if (c == null) {
+                            c = new Counters(id, feed, clen, fid);
+                        }
+                        if (feed != c.feedid)
+                            System.err.println("Feed ID mismatch, " + feed + " <=> " + c.feedid);
+                        if (clen != c.clen)
+                            System.err.println("Cont Len mismatch, " + clen + " <=> " + c.clen);
+                        c.addEvent(type, etime);
+                    }
                 }
-                if (c == null) {
-                    c = new Counters(id, feed, clen, fid);
-                }
-                if (feed != c.feedid)
-                    System.err.println("Feed ID mismatch, " + feed + " <=> " + c.feedid);
-                if (clen != c.clen)
-                    System.err.println("Cont Len mismatch, " + clen + " <=> " + c.clen);
-//                if (fid != c.fileid)
-//                    System.err.println("File ID mismatch, "+fid+" <=> "+c.fileid);
-                c.addEvent(type, etime);
+             db.release(conn);
             }
-            rs.close();
-            ps.close();
-            db.release(conn);
-            os.close();
+            }
         } catch (FileNotFoundException e) {
             System.err.println("File cannot be written: " + outfile);
         } catch (SQLException e) {
