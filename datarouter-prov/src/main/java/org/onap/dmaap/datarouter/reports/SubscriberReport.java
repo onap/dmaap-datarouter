@@ -98,62 +98,61 @@ public class SubscriberReport extends ReportBase {
     public void run() {
         Map<String, Counters> map = new HashMap<String, Counters>();
         long start = System.currentTimeMillis();
+
         try {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            PreparedStatement ps = conn.prepareStatement(SELECT_SQL);
-            ps.setLong(1, from);
-            ps.setLong(2, to);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                String date = rs.getString("DATE");
-                int sub = rs.getInt("DELIVERY_SUBID");
-                int res = rs.getInt("RESULT");
-                int count = rs.getInt("COUNT");
-                String key = date + "," + sub;
-                Counters c = map.get(key);
-                if (c == null) {
-                    c = new Counters(date, sub);
-                    map.put(key, c);
+            try(PreparedStatement ps = conn.prepareStatement(SELECT_SQL)) {
+                ps.setLong(1, from);
+                ps.setLong(2, to);
+                try(ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String date = rs.getString("DATE");
+                        int sub = rs.getInt("DELIVERY_SUBID");
+                        int res = rs.getInt("RESULT");
+                        int count = rs.getInt("COUNT");
+                        String key = date + "," + sub;
+                        Counters c = map.get(key);
+                        if (c == null) {
+                            c = new Counters(date, sub);
+                            map.put(key, c);
+                        }
+                        c.addCounts(res, count);
+                    }
                 }
-                c.addCounts(res, count);
             }
-            rs.close();
-            ps.close();
 
-            ps = conn.prepareStatement(SELECT_SQL2);
-            ps.setLong(1, from);
-            ps.setLong(2, to);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                String date = rs.getString("DATE");
-                int sub = rs.getInt("DELIVERY_SUBID");
-                int count = rs.getInt("COUNT");
-                String key = date + "," + sub;
-                Counters c = map.get(key);
-                if (c == null) {
-                    c = new Counters(date, sub);
-                    map.put(key, c);
-                }
-                c.addDlxCount(count);
-            }
-            rs.close();
-            ps.close();
+           try( PreparedStatement ps2 = conn.prepareStatement(SELECT_SQL2)) {
+               ps2.setLong(1, from);
+               ps2.setLong(2, to);
+               try(ResultSet rs2 = ps2.executeQuery()) {
+                   while (rs2.next()) {
+                       String date = rs2.getString("DATE");
+                       int sub = rs2.getInt("DELIVERY_SUBID");
+                       int count = rs2.getInt("COUNT");
+                       String key = date + "," + sub;
+                       Counters c = map.get(key);
+                       if (c == null) {
+                           c = new Counters(date, sub);
+                           map.put(key, c);
+                       }
+                       c.addDlxCount(count);
+                   }
+                  }
+           }
 
             db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         logger.debug("Query time: " + (System.currentTimeMillis() - start) + " ms");
-        try {
-            PrintWriter os = new PrintWriter(outfile);
+        try (PrintWriter os = new PrintWriter(outfile)){
             os.println("date,subid,count100,count200,count300,count400,count500,countminus1,countdlx");
             for (String key : new TreeSet<String>(map.keySet())) {
                 Counters c = map.get(key);
                 os.println(c.toString());
             }
-            os.close();
         } catch (FileNotFoundException e) {
             System.err.println("File cannot be written: " + outfile);
         }
