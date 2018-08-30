@@ -152,41 +152,40 @@ public class DailyLatencyReport extends ReportBase {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            PreparedStatement ps = conn.prepareStatement(SELECT_SQL);
-            ps.setLong(1, from);
-            ps.setLong(2, to);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                String id   = rs.getString("PUBLISH_ID");
-                int feed    = rs.getInt("FEEDID");
-                long etime  = rs.getLong("EVENT_TIME");
-                String type = rs.getString("TYPE");
-                String fid  = rs.getString("FEED_FILEID");
-                long clen   = rs.getLong("CONTENT_LENGTH");
-                String date = sdf.format(new Date(getPstart(id)));
-                String key  = date + "," + feed;
-                Counters c = map.get(key);
-                if (c == null) {
-                    c = new Counters(date, feed);
-                    map.put(key, c);
+            try(PreparedStatement ps = conn.prepareStatement(SELECT_SQL)) {
+                ps.setLong(1, from);
+                ps.setLong(2, to);
+                try(ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String id = rs.getString("PUBLISH_ID");
+                        int feed = rs.getInt("FEEDID");
+                        long etime = rs.getLong("EVENT_TIME");
+                        String type = rs.getString("TYPE");
+                        String fid = rs.getString("FEED_FILEID");
+                        long clen = rs.getLong("CONTENT_LENGTH");
+                        String date = sdf.format(new Date(getPstart(id)));
+                        String key = date + "," + feed;
+                        Counters c = map.get(key);
+                        if (c == null) {
+                            c = new Counters(date, feed);
+                            map.put(key, c);
+                        }
+                        c.addEvent(etime, type, id, fid, clen);
+                    }
                 }
-                c.addEvent(etime, type, id, fid, clen);
+
+                db.release(conn);
             }
-            rs.close();
-            ps.close();
-            db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         logger.debug("Query time: " + (System.currentTimeMillis()-start) + " ms");
-        try {
-            PrintWriter os = new PrintWriter(outfile);
+        try (PrintWriter os = new PrintWriter(outfile)){
             os.println("date,feedid,minsize,maxsize,avgsize,minlat,maxlat,avglat,fanout");
             for (String key : new TreeSet<String>(map.keySet())) {
                 Counters c = map.get(key);
                 os.println(c.toString());
             }
-            os.close();
         } catch (FileNotFoundException e) {
             System.err.println("File cannot be written: "+outfile);
         }
