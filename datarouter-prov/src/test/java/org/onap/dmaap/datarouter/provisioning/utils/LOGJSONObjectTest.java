@@ -26,6 +26,7 @@ package org.onap.dmaap.datarouter.provisioning.utils;
 import java.io.CharArrayWriter;
 import java.io.Writer;
 import org.json.JSONArray;
+import org.json.JSONTokener;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,6 +47,39 @@ public class LOGJSONObjectTest {
     Map<String, Object> map = new HashMap<>();
     map.put("key", null);
     logJO = new LOGJSONObject(map);
+  }
+
+  @Test
+  public void Construct_JSONObject_From_A_Subset_Of_Values_From_Another_JSONObject()
+      throws Exception {
+    Map<String, Object> map = new HashMap<>();
+    map.put("key1", "value1");
+    map.put("key2", "value2");
+    map.put("key3", "value3");
+    LOGJSONObject ljo= new LOGJSONObject(map);
+    String[] sA = {"key1", "key3"};
+    LOGJSONObject logJObject = new LOGJSONObject(ljo, sA);
+    assertThat(logJObject.toString(), is("{\"key1\":\"value1\",\"key3\":\"value3\"}"));
+  }
+
+  @Test
+  public void Construct_JSONObject_From_A_JSONTokener()
+      throws Exception {
+    JSONTokener x = new JSONTokener("{\"key1\":\"value1\",\"key3\":\"value3\"}");
+    LOGJSONObject logJObject = new LOGJSONObject(x);
+    assertThat(logJObject.toString(), is("{\"key1\":\"value1\",\"key3\":\"value3\"}"));
+  }
+
+  @Test
+  public void Construct_JSONObject_From_A_Bean_Object_And_Populate_From_Its_Getters_And_Setters()
+      throws Exception {
+    Map<String, Object> map = new HashMap<>();
+    map.put("key1", "value1");
+    map.put("key2", "value2");
+    map.put("key3", "value3");
+    Object bean = map;
+    LOGJSONObject logJObject = new LOGJSONObject(bean);
+    assertThat(logJObject.toString(), is("{\"empty\":false}"));
   }
 
   @Test
@@ -171,14 +205,11 @@ public class LOGJSONObjectTest {
   public void Given_Method_Is_getNames_And_Value_Is_A_LOGJSONObject_Return_StringArray()
       throws Exception {
     LOGJSONObject logJObj = new LOGJSONObject();
-    logJObj.put("name", "stub_name");
+    logJObj.put("name1", "elyk");
     String[] sArray = new String[logJObj.length()];
-    sArray[0] = "name";
-    Map<String, Object> map = new HashMap<>();
-    map.put("key", sArray);
-    LOGJSONObject logJObject = new LOGJSONObject(map);
+    sArray[0] = "name1";
+    LOGJSONObject logJObject = new LOGJSONObject();
 
-    String s = "key";
     assertThat(logJObject.getNames(logJObj), is(sArray));
   }
 
