@@ -105,13 +105,14 @@ public abstract class NodeClass extends Syncable {
     public static void reload() {
         Map<String, Integer> m = new HashMap<String, Integer>();
         PreparedStatement ps = null;
+        ResultSet rs=null;
         try {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
             String sql = "select NODEID, NAME from NODES";
             ps = conn.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt("NODEID");
                 String name = rs.getString("NAME");
@@ -126,6 +127,9 @@ public abstract class NodeClass extends Syncable {
             try {
                 if(ps!=null){
                     ps.close();
+                }
+                if(rs!=null){
+                    rs.close();
                 }
 
             } catch (SQLException e) {
