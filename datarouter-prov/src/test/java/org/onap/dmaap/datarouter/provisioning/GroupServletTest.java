@@ -24,20 +24,23 @@ package org.onap.dmaap.datarouter.provisioning;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.json.JSONObject;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.Group;
 import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
+import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -46,17 +49,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 @RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor("org.onap.dmaap.datarouter.provisioning.beans.Group")
-public class GroupServletTest extends DrServletTestBase {
-
+public class GroupServletTest {
+    private static EntityManagerFactory emf;
+    private static EntityManager em;
     private GroupServlet groupServlet;
+    private DB db;
 
     @Mock
     private HttpServletRequest request;
@@ -64,10 +67,26 @@ public class GroupServletTest extends DrServletTestBase {
     @Mock
     private HttpServletResponse response;
 
+    @BeforeClass
+    public static void init() {
+        emf = Persistence.createEntityManagerFactory("dr-unit-tests");
+        em = emf.createEntityManager();
+        System.setProperty(
+            "org.onap.dmaap.datarouter.provserver.properties",
+            "src/test/resources/h2Database.properties");
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+        em.clear();
+        em.close();
+        emf.close();
+    }
+
     @Before
     public void setUp() throws Exception {
-        super.setUp();
         groupServlet = new GroupServlet();
+        db = new DB();
         setAuthoriserToReturnRequestIsAuthorized();
         setPokerToNotCreateTimers();
         setUpValidAuthorisedRequest();
@@ -76,7 +95,6 @@ public class GroupServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_GET_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated() throws Exception {
         when(request.isSecure()).thenReturn(false);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         groupServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
@@ -106,7 +124,6 @@ public class GroupServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated() throws Exception {
         when(request.isSecure()).thenReturn(false);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         groupServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
@@ -127,7 +144,7 @@ public class GroupServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Group_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated() throws Exception {
-        setGroupToReturnInvalidGroupIdSupplied();
+        when(request.getPathInfo()).thenReturn("/3");
         groupServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
     }
@@ -157,15 +174,6 @@ public class GroupServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Group_Name_Matches_Group_In_Db_Then_Bad_Request_Response_Is_Generated() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
-        GroupServlet groupServlet = overideGetJSONFromInputToReturnAValidGroup();
-        setGroupToReturnNonNullValueForGetGroupMatching();
-        groupServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
-    }
-
-    @Test
     public void Given_Request_Is_HTTP_PUT_And_PUT_Fails_Then_Internal_Server_Error_Response_Is_Generated() throws Exception {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
         GroupServlet groupServlet = overideGetJSONFromInputToReturnAValidGroupWithFail();
@@ -176,7 +184,7 @@ public class GroupServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Request_Succeeds() throws Exception {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
-        GroupServlet groupServlet = overideGetJSONFromInputToReturnAValidGroup();
+        GroupServlet groupServlet = overideGetJSONFromInputToReturnGroupInDb();
         ServletOutputStream outStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outStream);
         groupServlet.doPut(request, response);
@@ -186,7 +194,6 @@ public class GroupServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_POST_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated() throws Exception {
         when(request.isSecure()).thenReturn(false);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         groupServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
@@ -223,6 +230,14 @@ public class GroupServletTest extends DrServletTestBase {
     }
 
     @Test
+    public void Given_Request_Is_HTTP_POST_And_Group_Name_Already_Exists_Then_Bad_Request_Response_Is_Generated() throws Exception {
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
+        GroupServlet groupServlet = overideGetJSONFromInputToReturnGroupInDb();
+        groupServlet.doPost(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+    }
+
+    @Test
     public void Given_Request_Is_HTTP_POST_And_POST_Fails_Then_Internal_Server_Error_Response_Is_Generated() throws Exception {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
         GroupServlet groupServlet = overideGetJSONFromInputToReturnAValidGroupWithFail();
@@ -233,7 +248,7 @@ public class GroupServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_POST_And_Request_Succeeds() throws Exception {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
-        GroupServlet groupServlet = overideGetJSONFromInputToReturnAValidGroup();
+        GroupServlet groupServlet = overideGetJSONFromInputToReturnNewGroupToInsert();
         ServletOutputStream outStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outStream);
         groupServlet.doPost(request, response);
@@ -263,7 +278,6 @@ public class GroupServletTest extends DrServletTestBase {
         setUpValidSecurityOnHttpRequest();
         setBehalfHeader("Stub_Value");
         setValidPathInfoInHttpHeader();
-        setGroupToReturnValidGroupIdSupplied();
     }
 
     private void setUpValidSecurityOnHttpRequest() throws Exception {
@@ -279,19 +293,7 @@ public class GroupServletTest extends DrServletTestBase {
     }
 
     private void setValidPathInfoInHttpHeader() {
-        when(request.getPathInfo()).thenReturn("/123");
-    }
-
-    private void setGroupToReturnValidGroupIdSupplied() {
-        PowerMockito.mockStatic(Group.class);
-        Group group = mock(Group.class);
-        PowerMockito.when(Group.getGroupById(anyInt())).thenReturn(group);
-        when(group.asJSONObject()).thenReturn(mock(JSONObject.class));
-    }
-
-    private void setGroupToReturnInvalidGroupIdSupplied() {
-        PowerMockito.mockStatic(Group.class);
-        PowerMockito.when(Group.getGroupById(anyInt())).thenReturn(null);
+        when(request.getPathInfo()).thenReturn("/1");
     }
 
     private GroupServlet overideGetJSONFromInputToReturnAnInvalidGroup(Boolean invalidName) {
@@ -341,34 +343,35 @@ public class GroupServletTest extends DrServletTestBase {
         return groupServlet;
     }
 
-    private GroupServlet overideGetJSONFromInputToReturnAValidGroup() {
+    private GroupServlet overideGetJSONFromInputToReturnGroupInDb() {
         GroupServlet groupServlet = new GroupServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject validGroup = new JSONObject();
-                validGroup.put("name", "groupName");
+                validGroup.put("name", "Group1");
                 validGroup.put("groupid", 2);
-                validGroup.put("description", "Group Description");
-                validGroup.put("authid", "User1");
-                validGroup.put("classification", "class");
-                validGroup.put("members", "stub_members");
+                validGroup.put("description", "Update to the Group");
+                validGroup.put("authid", "Basic dXNlcjE6cGFzc3dvcmQx");
+                validGroup.put("classification", "Class1");
+                validGroup.put("members", "Member1");
                 return validGroup;
-            }
-
-            protected boolean doUpdate(Updateable bean) {
-                return true;
-            }
-
-            protected boolean doInsert(Insertable bean) {
-                return true;
             }
         };
         return groupServlet;
     }
 
-    private void setGroupToReturnNonNullValueForGetGroupMatching() {
-        PowerMockito.mockStatic(Group.class);
-        Group group = mock(Group.class);
-        PowerMockito.when(Group.getGroupById(anyInt())).thenReturn(group);
-        PowerMockito.when(Group.getGroupMatching(Matchers.any(Group.class), anyInt())).thenReturn(group);
+    private GroupServlet overideGetJSONFromInputToReturnNewGroupToInsert() {
+        GroupServlet groupServlet = new GroupServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                JSONObject validGroup = new JSONObject();
+                validGroup.put("name", "Group2");
+                validGroup.put("groupid", 2);
+                validGroup.put("description", "Second group to be added");
+                validGroup.put("authid", "Basic dXNlcjE6cGFzc3dvcmQx");
+                validGroup.put("classification", "Class2");
+                validGroup.put("members", "Member2");
+                return validGroup;
+            }
+        };
+        return groupServlet;
     }
 }
