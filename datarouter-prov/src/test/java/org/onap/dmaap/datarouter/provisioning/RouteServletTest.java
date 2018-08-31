@@ -273,6 +273,7 @@ public class RouteServletTest extends DrServletTestBase
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Is_Not_Authorized() throws Exception {
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         routeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
@@ -291,8 +292,8 @@ public class RouteServletTest extends DrServletTestBase
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Is_Not_Authorized() throws Exception {
-        routeServlet.doPost(request, response);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
+        routeServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
 
