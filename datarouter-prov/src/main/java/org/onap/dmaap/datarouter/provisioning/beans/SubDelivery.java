@@ -26,6 +26,7 @@ package org.onap.dmaap.datarouter.provisioning.beans;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 
 import org.json.JSONObject;
 
@@ -117,5 +118,10 @@ public class SubDelivery implements JSONable {
         if (use100 != os.use100)
             return false;
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(url, user, password, use100);
     }
 }
