@@ -60,7 +60,7 @@ public class Group extends Syncable {
 
     public static Group getGroupMatching(Group gup) {
         String sql = String.format(
-                "select * from GROUPS where  NAME = \"%s\"",
+                "select * from GROUPS where NAME='%s'",
                 gup.getName()
         );
         List<Group> list = getGroupsForSQL(sql);
@@ -69,7 +69,7 @@ public class Group extends Syncable {
 
     public static Group getGroupMatching(Group gup, int groupid) {
         String sql = String.format(
-                "select * from GROUPS where  NAME = \"%s\" and GROUPID != %d ",
+                "select * from GROUPS where  NAME = '%s' and GROUPID != %d ",
                 gup.getName(),
                 gup.getGroupid()
         );
