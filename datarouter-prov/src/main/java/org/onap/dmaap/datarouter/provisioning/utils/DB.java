@@ -112,13 +112,16 @@ public class DB {
                                 throw sqlEx;
                             }
                         }
+                        finally {
+                            if (connection != null && !connection.isValid(1)) {
+                                connection.close();
+                                connection = null;
+                            }
+                        }
                     } while (connection == null);
                 }
             }
-            if (connection != null && !connection.isValid(1)) {
-                connection.close();
-                connection = null;
-            }
+
         }
         return connection;
     }
