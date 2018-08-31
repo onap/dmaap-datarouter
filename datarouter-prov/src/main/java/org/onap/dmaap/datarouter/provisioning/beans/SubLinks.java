@@ -25,6 +25,7 @@
 package org.onap.dmaap.datarouter.provisioning.beans;
 
 import java.io.InvalidObjectException;
+import java.util.Objects;
 
 import org.json.JSONObject;
 
@@ -101,5 +102,10 @@ public class SubLinks implements JSONable {
         if (!log.equals(os.log))
             return false;
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(self, feed, log);
     }
 }
