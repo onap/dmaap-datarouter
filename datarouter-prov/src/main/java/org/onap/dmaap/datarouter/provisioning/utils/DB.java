@@ -113,11 +113,10 @@ public class DB {
                             }
                         }
                         finally {
-                            if (connection != null && !connection.isValid(1)) {
+                            if (connection != null ) {
                                 connection.close();
-                                connection = null;
                             }
-                        }
+                            }
                     } while (connection == null);
                 }
             }
