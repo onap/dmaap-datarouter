@@ -569,40 +569,17 @@ public class StatisticsServlet extends BaseServlet {
       intlogger.debug(sql);
       long start = System.currentTimeMillis();
       DB db = new DB();
-      Connection conn = null;
       ResultSet rs = null;
-      Statement stmt = null;
-      PreparedStatement pst = null;
-      try {
-          conn = db.getConnection();
-          stmt = conn.createStatement();
-          pst = conn.prepareStatement(sql);
-          rs = pst.executeQuery();
+      try (
+          Connection conn = db.getConnection()){
+          try(PreparedStatement pst = conn.prepareStatement(sql)){
+              rs = pst.executeQuery();
+          }
       } catch (SQLException e) {
           e.printStackTrace();
-      } finally {
-
-          try {
-              if (conn != null) {
-                  db.release(conn);
-              }
-              if (stmt != null) {
-                  stmt.close();
-              }
-              if (pst != null) {
-                  pst.close();
-              }
-              if (rs != null) {
-                  rs.close();
-              }
-
-          } catch (SQLException sqlException) {
-              intlogger.error("Exception in getting SQl Records",sqlException);
-          }
-
+      }
           intlogger.debug("Time: " + (System.currentTimeMillis() - start) + " ms");
-
           return rs;
       }
   }
-}
+
