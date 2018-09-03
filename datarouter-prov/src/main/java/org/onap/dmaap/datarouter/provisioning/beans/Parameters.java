@@ -122,7 +122,7 @@ public class Parameters extends Syncable {
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = "select KEYNAME, VALUE from PARAMETERS where KEYNAME = \"" + k + "\"";
+            String sql = "select KEYNAME, VALUE from PARAMETERS where KEYNAME = '" + k + "'";
             ResultSet rs = stmt.executeQuery(sql);
             if (rs.next()) {
                 v = new Parameters(rs);

@@ -25,21 +25,21 @@ package org.onap.dmaap.datarouter.provisioning;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.json.JSONObject;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
-import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.*;
+import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletOutputStream;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -56,8 +56,8 @@ import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
  */
 
 @RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor("org.onap.dmaap.datarouter.provisioning.beans.Feed")
-public class PublishServletTest extends DrServletTestBase {
+//@SuppressStaticInitializationFor("org.onap.dmaap.datarouter.provisioning.beans.Feed")
+public class PublishServletTest {
     private PublishServlet publishServlet;
 
     private static String START_JSON_STRING = "{";
@@ -72,10 +72,32 @@ public class PublishServletTest extends DrServletTestBase {
     @Mock
     private HttpServletResponse response;
 
+    private static EntityManagerFactory emf;
+    private static EntityManager em;
+    private DB db;
+
+    @BeforeClass
+    public static void init() {
+        emf = Persistence.createEntityManagerFactory("dr-unit-tests");
+        em = emf.createEntityManager();
+        System.setProperty(
+                "org.onap.dmaap.datarouter.provserver.properties",
+                "src/test/resources/h2Database.properties");
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+        em.clear();
+        em.close();
+        emf.close();
+    }
+
+
     @Before
     public void setUp() throws Exception {
-        super.setUp();
+//        super.setUp();
         publishServlet = new PublishServlet();
+        db = new DB();
     }
 
     @Test
@@ -107,9 +129,9 @@ public class PublishServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_DELETE_And_Feed_Is_Not_Valid_Then_Not_Found_Error_Is_Returned()
             throws Exception {
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "nodes", new String[1], true);
-        when(request.getPathInfo()).thenReturn("/123/fileName.txt");
-        PowerMockito.mockStatic(Feed.class);
-        PowerMockito.when(Feed.isFeedValid(anyInt())).thenReturn(false);
+        when(request.getPathInfo()).thenReturn("/122/fileName.txt");
+//        PowerMockito.mockStatic(Feed.class);
+//        PowerMockito.when(Feed.isFeedValid(anyInt())).thenReturn(false);
         publishServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
     }
@@ -119,8 +141,8 @@ public class PublishServletTest extends DrServletTestBase {
             throws Exception {
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "nodes", new String[1], true);
         when(request.getPathInfo()).thenReturn("/abc/fileName.txt");
-        PowerMockito.mockStatic(Feed.class);
-        PowerMockito.when(Feed.isFeedValid(anyInt())).thenReturn(false);
+//        PowerMockito.mockStatic(Feed.class);
+//        PowerMockito.when(Feed.isFeedValid(anyInt())).thenReturn(false);
         publishServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
     }
@@ -169,16 +191,16 @@ public class PublishServletTest extends DrServletTestBase {
         FieldUtils.writeDeclaredField(publishServlet, "irt", new ArrayList<IngressRoute>(), true);
         FieldUtils.writeDeclaredStaticField(NodeClass.class, "map", new HashMap<String,String>(), true);
         when(request.getPathInfo()).thenReturn("/123/fileName.txt");
-        PowerMockito.mockStatic(Feed.class);
-        PowerMockito.when(Feed.isFeedValid(anyInt())).thenReturn(true);
-        setPokerToNotCreateTimersWhenDeleteFeedIsCalled();
+//        PowerMockito.mockStatic(Feed.class);
+//        PowerMockito.when(Feed.isFeedValid(anyInt())).thenReturn(true);
+//        setPokerToNotCreateTimersWhenDeleteFeedIsCalled();
     }
 
-    private void setPokerToNotCreateTimersWhenDeleteFeedIsCalled() throws Exception {
-        Poker poker = mock(Poker.class);
-        FieldUtils.writeDeclaredStaticField(Poker.class, "poker", poker, true);
-        when(poker.getProvisioningString()).thenReturn(buildProvisioningString());
-    }
+//    private void setPokerToNotCreateTimersWhenDeleteFeedIsCalled() throws Exception {
+//        Poker poker = mock(Poker.class);
+//        FieldUtils.writeDeclaredStaticField(Poker.class, "poker", poker, true);
+//        when(poker.getProvisioningString()).thenReturn(buildProvisioningString());
+//    }
 
 
     private String buildProvisioningString(){
