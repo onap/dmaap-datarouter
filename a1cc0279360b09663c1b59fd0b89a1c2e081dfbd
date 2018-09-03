@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_e486d6da",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/LogServletTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-03T15:14:54Z",
+      "side": 0,
+      "message": "Looks like for the subscription log tests you need to add a subscription to the db, and maybe then these tests will work",
+      "range": {
+        "startLine": 190,
+        "startChar": 16,
+        "endLine": 190,
+        "endChar": 87
+      },
+      "revId": "a1cc0279360b09663c1b59fd0b89a1c2e081dfbd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
