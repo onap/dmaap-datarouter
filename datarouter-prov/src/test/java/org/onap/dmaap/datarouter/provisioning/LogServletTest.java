@@ -24,30 +24,33 @@ package org.onap.dmaap.datarouter.provisioning;
 
 
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.when;
 
+
 @RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.provisioning.beans.Subscription"})
 public class LogServletTest extends DrServletTestBase {
 
+    private static EntityManagerFactory emf;
+    private static EntityManager em;
     private static LogServlet logServlet;
 
     @Mock
@@ -55,9 +58,24 @@ public class LogServletTest extends DrServletTestBase {
     @Mock
     private HttpServletResponse response;
 
+    @BeforeClass
+    public static void init() {
+        emf = Persistence.createEntityManagerFactory("dr-unit-tests");
+        em = emf.createEntityManager();
+        System.setProperty(
+                "org.onap.dmaap.datarouter.provserver.properties",
+                "src/test/resources/h2Database.properties");
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+        em.clear();
+        em.close();
+        emf.close();
+    }
+
     @Before
     public void setUp() throws Exception {
-        super.setUp();
         logServlet = new LogServlet(true);
         setUpValidParameterValuesForMap();
     }
@@ -133,16 +151,6 @@ public class LogServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_GET_And_Is_Not_FeedLog()
-            throws Exception {
-        LogServlet logServletNotFeedlog = new LogServlet(false);
-        PowerMockito.mockStatic(Subscription.class);
-        PowerMockito.when(Subscription.getSubscriptionById(anyInt())).thenReturn(mock(Subscription.class));
-        logServletNotFeedlog.doGet(request, response);
-        verify(response).setStatus(eq(HttpServletResponse.SC_OK));
-    }
-
-    @Test
     public void Given_Request_Is_HTTP_PUT_And_Is_Not_Allowed_Then_Forbidden_Response_Is_Generated()
             throws Exception {
         logServlet.doPut(request, response);
@@ -183,32 +191,6 @@ public class LogServletTest extends DrServletTestBase {
         ServletOutputStream s = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(s);
         logServlet.doGet(request, response);
-        verify(response).setStatus(eq(HttpServletResponse.SC_OK));
-    }
-
-    @Test
-    public void Given_Request_Is_getDeliveryRecordsForSubscription_And_Type_Is_Delivery()
-            throws Exception {
-        LogServlet logServletNotFeedlog = new LogServlet(false);
-        when(request.getParameter("type")).thenReturn("del");
-        when(request.getParameter("statusCode")).thenReturn(null);
-        when(request.getParameter("expiryReason")).thenReturn(null);
-        PowerMockito.mockStatic(Subscription.class);
-        PowerMockito.when(Subscription.getSubscriptionById(anyInt())).thenReturn(mock(Subscription.class));
-        logServletNotFeedlog.doGet(request, response);
-        verify(response).setStatus(eq(HttpServletResponse.SC_OK));
-    }
-
-    @Test
-    public void Given_Request_Is_getExpiryRecordsForSubscription_And_Type_Is_Expiry()
-            throws Exception {
-        LogServlet logServletNotFeedlog = new LogServlet(false);
-        when(request.getParameter("type")).thenReturn("exp");
-        when(request.getParameter("statusCode")).thenReturn(null);
-        when(request.getParameter("expiryReason")).thenReturn(null);
-        PowerMockito.mockStatic(Subscription.class);
-        PowerMockito.when(Subscription.getSubscriptionById(anyInt())).thenReturn(mock(Subscription.class));
-        logServletNotFeedlog.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
     }
 
