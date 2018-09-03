@@ -22,6 +22,30 @@
       "revId": "d3858a280e81d32f9a487e73fc451f8477f48059",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_44a8ea1f",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/PublishServletTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-09-03T16:34:35Z",
+      "side": 1,
+      "message": "yeah didn\u0027t need most of them anymore, done",
+      "parentUuid": "1a76adc5_292027ab",
+      "range": {
+        "startLine": 177,
+        "startChar": 0,
+        "endLine": 181,
+        "endChar": 104
+      },
+      "revId": "d3858a280e81d32f9a487e73fc451f8477f48059",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
