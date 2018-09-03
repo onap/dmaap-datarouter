@@ -144,3 +144,6 @@ INSERT INTO PARAMETERS VALUES
 
 INSERT INTO GROUPS(GROUPID, AUTHID, NAME, DESCRIPTION, CLASSIFICATION, MEMBERS)
 VALUES (1, 'Basic dXNlcjE6cGFzc3dvcmQx', 'Group1', 'First Group for testing', 'Class1', 'Member1');
+
+INSERT INTO FEEDS(FEEDID, GROUPID, NAME, VERSION, DESCRIPTION, BUSINESS_DESCRIPTION, AUTH_CLASS, PUBLISHER, SELF_LINK, PUBLISH_LINK, SUBSCRIBE_LINK, LOG_LINK)
+VALUES (123, 1,'Feed1','v0.1', 'First Feed for testing', 'First Feed for testing', 'auth_class', 'pub','self_link','publish_link','subscribe_link','log_link');
