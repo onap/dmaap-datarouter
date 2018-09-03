@@ -25,23 +25,29 @@ package org.onap.dmaap.datarouter.provisioning;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.Deleteable;
+import org.onap.dmaap.datarouter.provisioning.beans.SubDelivery;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
+import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -51,19 +57,37 @@ import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 
 @RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor("org.onap.dmaap.datarouter.provisioning.beans.Subscription")
-public class SubscriptionServletTest extends DrServletTestBase {
+public class SubscriptionServletTest {
+    private static EntityManagerFactory emf;
+    private static EntityManager em;
     private SubscriptionServlet subscriptionServlet;
+    private DB db;
 
     @Mock
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
 
+    @BeforeClass
+    public static void init() {
+        emf = Persistence.createEntityManagerFactory("dr-unit-tests");
+        em = emf.createEntityManager();
+        System.setProperty(
+            "org.onap.dmaap.datarouter.provserver.properties",
+            "src/test/resources/h2Database.properties");
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+        em.clear();
+        em.close();
+        emf.close();
+    }
+
     @Before
     public void setUp() throws Exception {
-        super.setUp();
         subscriptionServlet = new SubscriptionServlet();
+        db = new DB();
         setAuthoriserToReturnRequestIsAuthorized();
         setPokerToNotCreateTimersWhenDeleteSubscriptionIsCalled();
         setupValidAuthorisedRequest();
@@ -73,7 +97,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_DELETE_SC_Forbidden_Response_Is_Generated() throws Exception {
         when(request.isSecure()).thenReturn(false);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         subscriptionServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
@@ -94,7 +117,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Subscription_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated() throws Exception {
-        setSubscriptionToReturnInvalidSubscriptionIdSupplied();
+        when(request.getPathInfo()).thenReturn("/3");
         subscriptionServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
     }
@@ -119,19 +142,14 @@ public class SubscriptionServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Delete_On_Database_Succeeds_A_NO_CONTENT_Response_Is_Generated() throws Exception {
-        SubscriptionServlet subscriptionServlet = new SubscriptionServlet(){
-            public boolean doDelete(Deleteable deletable){
-                return true;
-            }
-        };
         subscriptionServlet.doDelete(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_NO_CONTENT));
+        insertSubscriptionIntoDb();
     }
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated() throws Exception {
         when(request.isSecure()).thenReturn(false);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         subscriptionServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
@@ -152,7 +170,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_Subscription_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated() throws Exception {
-        setSubscriptionToReturnInvalidSubscriptionIdSupplied();
+        when(request.getPathInfo()).thenReturn("/3");
         subscriptionServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
     }
@@ -166,17 +184,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_Request_Succeeds() throws Exception {
-        JSONObject JSObject = buildRequestJsonObject();
-        JSONObject jo = new JSONObject();
-        jo.put("name", "stub_name");
-        jo.put("version", "2.0");
-        jo.put("metadataOnly", true);
-        jo.put("suspend", true);
-        jo.put("delivery", JSObject);
-        jo.put("sync", true);
-        Subscription sub = new Subscription(jo);
-        PowerMockito.mockStatic(Subscription.class);
-        PowerMockito.when(Subscription.getSubscriptionById(anyInt())).thenReturn(sub);
         ServletOutputStream outStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outStream);
         subscriptionServlet.doGet(request, response);
@@ -186,7 +193,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated() throws Exception {
         when(request.isSecure()).thenReturn(false);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         subscriptionServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
@@ -207,7 +213,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Subscription_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated() throws Exception {
-        setSubscriptionToReturnInvalidSubscriptionIdSupplied();
+        when(request.getPathInfo()).thenReturn("/3");
         subscriptionServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
     }
@@ -249,7 +255,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Subscriber_Modified_By_Different_Creator() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Subscriber_Modified_By_Different_Creator_Then_Bad_Request_Is_Generated() throws Exception {
         when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn(null);
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.subscription; version=1.0");
         JSONObject JSObject = buildRequestJsonObject();
@@ -261,6 +267,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
                 jo.put("delivery", JSObject);
+                jo.put("subscriber", "differentSubscriber");
                 jo.put("sync", true);
                 return jo;
             }
@@ -311,12 +318,8 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("suspend", true);
                 jo.put("delivery", JSObject);
                 jo.put("sync", true);
+                jo.put("changeowner", true);
                 return jo;
-            }
-
-            @Override
-            protected boolean doUpdate(Updateable bean) {
-                return true;
             }
         };
         subscriptionServlet.doPut(request, response);
@@ -326,7 +329,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_POST_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated() throws Exception {
         when(request.isSecure()).thenReturn(false);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         subscriptionServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
@@ -347,7 +349,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Subscription_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated() throws Exception {
-        setSubscriptionToReturnInvalidSubscriptionIdSupplied();
+        when(request.getPathInfo()).thenReturn("/3");
         subscriptionServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
     }
@@ -442,20 +444,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
     }
 
     private void setValidPathInfoInHttpHeader() {
-        when(request.getPathInfo()).thenReturn("/123");
-    }
-
-    private void setSubscriptionToReturnInvalidSubscriptionIdSupplied() {
-        PowerMockito.mockStatic(Subscription.class);
-        PowerMockito.when(Subscription.getSubscriptionById(anyInt())).thenReturn(null);
-    }
-
-    private void setSubscriptionToReturnValidSubscriptionForSuppliedId() {
-        PowerMockito.mockStatic(Subscription.class);
-        Subscription subscription = mock(Subscription.class);
-        PowerMockito.when(Subscription.getSubscriptionById(anyInt())).thenReturn(subscription);
-        when(subscription.getSubscriber()).thenReturn("Stub_Value");
-        when(subscription.asJSONObject()).thenReturn(mock(JSONObject.class));
+        when(request.getPathInfo()).thenReturn("/1");
     }
 
     private void setAuthoriserToReturnRequestNotAuthorized() throws IllegalAccessException {
@@ -483,6 +472,18 @@ public class SubscriptionServletTest extends DrServletTestBase {
         setUpValidSecurityOnHttpRequest();
         setBehalfHeader("Stub_Value");
         setValidPathInfoInHttpHeader();
-        setSubscriptionToReturnValidSubscriptionForSuppliedId();
+    }
+
+    private void insertSubscriptionIntoDb() throws SQLException {
+        Subscription subscription = new Subscription("https://172.100.0.5", "user1", "password1");
+        subscription.setSubid(1);
+        subscription.setSubscriber("user1");
+        subscription.setFeedid(1);
+        SubDelivery subDelivery = new SubDelivery("https://172.100.0.5:8080", "user1", "password1", true);
+        subscription.setDelivery(subDelivery);
+        subscription.setGroupid(1);
+        subscription.setMetadataOnly(false);
+        subscription.setSuspended(false);
+        subscription.doInsert(db.getConnection());
     }
 }
