@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_292027ab",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/PublishServletTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-03T13:13:34Z",
+      "side": 1,
+      "message": "Do we still need to write to these values? I don\u0027t think the nodes one is necessary but not sure about the rest",
+      "range": {
+        "startLine": 177,
+        "startChar": 0,
+        "endLine": 181,
+        "endChar": 104
+      },
+      "revId": "d3858a280e81d32f9a487e73fc451f8477f48059",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
