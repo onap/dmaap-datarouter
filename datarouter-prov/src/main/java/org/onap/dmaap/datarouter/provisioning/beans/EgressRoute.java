@@ -29,6 +29,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -59,15 +60,16 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("select SUBID, NODEID from EGRESS_ROUTES");
-            while (rs.next()) {
-                int subid = rs.getInt("SUBID");
-                int nodeid = rs.getInt("NODEID");
-                set.add(new EgressRoute(subid, nodeid));
-            }
-            rs.close();
-            stmt.close();
+           try( Statement stmt = conn.createStatement()) {
+               try(ResultSet rs = stmt.executeQuery("select SUBID, NODEID from EGRESS_ROUTES")) {
+                   while (rs.next()) {
+                       int subid = rs.getInt("SUBID");
+                       int nodeid = rs.getInt("NODEID");
+                       set.add(new EgressRoute(subid, nodeid));
+                   }
+               }
+           }
+
             db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -91,19 +93,21 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             String sql = "select NODEID from EGRESS_ROUTES where SUBID = ?";
             ps = conn.prepareStatement(sql);
             ps.setInt(1, sub);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                int node = rs.getInt("NODEID");
-                v = new EgressRoute(sub, node);
+            try(ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int node = rs.getInt("NODEID");
+                    v = new EgressRoute(sub, node);
+                }
             }
-            rs.close();
             ps.close();
             db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -139,7 +143,9 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -165,7 +171,9 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -189,7 +197,9 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -225,5 +235,10 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
     @Override
     public String toString() {
         return String.format("EGRESS: sub=%d, node=%d", subid, nodeid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(subid, nodeid);
     }
 }
