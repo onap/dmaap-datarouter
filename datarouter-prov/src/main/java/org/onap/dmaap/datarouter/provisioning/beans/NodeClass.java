@@ -105,20 +105,20 @@ public abstract class NodeClass extends Syncable {
     public static void reload() {
         Map<String, Integer> m = new HashMap<String, Integer>();
         PreparedStatement ps = null;
-        ResultSet rs=null;
+
         try {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
             String sql = "select NODEID, NAME from NODES";
             ps = conn.prepareStatement(sql);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                int id = rs.getInt("NODEID");
-                String name = rs.getString("NAME");
-                m.put(name, id);
+            try(ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("NODEID");
+                    String name = rs.getString("NAME");
+                    m.put(name, id);
+                }
             }
-            rs.close();
             ps.close();
             db.release(conn);
         } catch (SQLException e) {
@@ -128,10 +128,6 @@ public abstract class NodeClass extends Syncable {
                 if(ps!=null){
                     ps.close();
                 }
-                if(rs!=null){
-                    rs.close();
-                }
-
             } catch (SQLException e) {
                 intLogger.error("PROV0005 doInsert: " + e.getMessage(),e);
             }
