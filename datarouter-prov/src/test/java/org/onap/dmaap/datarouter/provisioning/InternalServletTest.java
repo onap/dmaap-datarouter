@@ -33,43 +33,35 @@ import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 import java.io.File;
 import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.Map;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.BeforeClass;
+import org.junit.AfterClass;
 import org.mockito.Mock;
-import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
-import org.onap.dmaap.datarouter.authz.Authorizer;
+
 import org.onap.dmaap.datarouter.provisioning.beans.Deleteable;
-import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
 import org.onap.dmaap.datarouter.provisioning.beans.LogRecord;
-import org.onap.dmaap.datarouter.provisioning.beans.NodeClass;
-import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
-import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
-import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
-import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(LogRecord.class)
-@SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.provisioning.beans.Feed",
-    "org.onap.dmaap.datarouter.provisioning.beans.Parameters",
-    "org.onap.dmaap.datarouter.provisioning.beans.NodeClass",
-    "org.onap.dmaap.datarouter.provisioning.beans.Subscription",
-    "org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader"})
 public class InternalServletTest extends DrServletTestBase {
-
+  private static EntityManagerFactory emf;
+  private static EntityManager em;
   private InternalServlet internalServlet;
 
   @Mock
@@ -78,11 +70,25 @@ public class InternalServletTest extends DrServletTestBase {
   @Mock
   private HttpServletResponse response;
 
+  @BeforeClass
+  public static void init() {
+    emf = Persistence.createEntityManagerFactory("dr-unit-tests");
+    em = emf.createEntityManager();
+    System.setProperty(
+            "org.onap.dmaap.datarouter.provserver.properties",
+            "src/test/resources/h2Database.properties");
+  }
+
+  @AfterClass
+  public static void tearDownClass() {
+    em.clear();
+    em.close();
+    emf.close();
+  }
+
   @Before
   public void setUp() throws Exception {
-    super.setUp();
     internalServlet = new InternalServlet();
-    setAuthoriserToReturnRequestIsAuthorized();
     setUpValidAuthorisedRequest();
   }
 
@@ -90,8 +96,6 @@ public class InternalServletTest extends DrServletTestBase {
   public void Given_Request_Is_HTTP_GET_And_Address_Not_Authorized_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated()
       throws Exception {
     when(request.getRemoteAddr()).thenReturn("127.100.0.3");
-    FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
-
     internalServlet.doGet(request, response);
     verify(response)
         .sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
@@ -108,7 +112,7 @@ public class InternalServletTest extends DrServletTestBase {
   }
 
   @Test
-  public void Given_Request_Is_HTTP_GET_With_Halt_In_Endpoint_Request_Succeeds() throws Exception {
+  public void Given_Request_Is_HTTP_GET_With_Halt_In_Endpoint_Then_Request_Succeeds() throws Exception {
     when(request.getPathInfo()).thenReturn("/halt");
     when(request.isSecure()).thenReturn(false);
     when(request.getRemoteAddr()).thenReturn("127.0.0.1");
@@ -117,7 +121,7 @@ public class InternalServletTest extends DrServletTestBase {
   }
 
   @Test
-  public void Given_Request_Is_HTTP_GET_With_FetchProv_In_Endpoint_Request_Succeeds()
+  public void Given_Request_Is_HTTP_GET_With_FetchProv_In_Endpoint_Then_Request_Succeeds()
       throws Exception {
     when(request.getPathInfo()).thenReturn("/fetchProv");
     when(request.isSecure()).thenReturn(false);
@@ -126,7 +130,7 @@ public class InternalServletTest extends DrServletTestBase {
   }
 
   @Test
-  public void Given_Request_Is_HTTP_GET_With_Prov_In_Endpoint_Request_Succeeds() throws Exception {
+  public void Given_Request_Is_HTTP_GET_With_Prov_In_Endpoint_Then_Request_Succeeds() throws Exception {
     when(request.getPathInfo()).thenReturn("/prov");
     when(request.getQueryString()).thenReturn(null);
     setPokerToNotCreateTimers();
@@ -137,7 +141,7 @@ public class InternalServletTest extends DrServletTestBase {
   }
 
   @Test
-  public void Given_Request_Is_HTTP_GET_With_Logs_In_Endpoint_Request_Succeeds() throws Exception {
+  public void Given_Request_Is_HTTP_GET_With_Logs_In_Endpoint_Then_Request_Succeeds() throws Exception {
     when(request.getPathInfo()).thenReturn("/logs/");
     ServletOutputStream outStream = mock(ServletOutputStream.class);
     when(response.getOutputStream()).thenReturn(outStream);
@@ -146,7 +150,7 @@ public class InternalServletTest extends DrServletTestBase {
   }
 
   @Test
-  public void Given_Request_Is_HTTP_GET_Starts_With_Logs_In_Endpoint_Request_Succeeds()
+  public void Given_Request_Is_HTTP_GET_Starts_With_Logs_In_Endpoint_Then_Request_Succeeds()
       throws Exception {
     when(request.getPathInfo()).thenReturn("/logs/TestFile");
     internalServlet.doGet(request, response);
@@ -168,9 +172,8 @@ public class InternalServletTest extends DrServletTestBase {
   }
 
   @Test
-  public void Given_Request_Is_HTTP_GET_With_Api_In_Endpoint_Request_Succeeds() throws Exception {
-    when(request.getPathInfo()).thenReturn("/api/Key");
-    setParametersToNotContactDb(false);
+  public void Given_Request_Is_HTTP_GET_With_Api_In_Endpoint_Then_Request_Succeeds() throws Exception {
+    when(request.getPathInfo()).thenReturn("/api/DELIVERY_MAX_RETRY_INTERVAL");
     ServletOutputStream outStream = mock(ServletOutputStream.class);
     when(response.getOutputStream()).thenReturn(outStream);
     internalServlet.doGet(request, response);
@@ -178,10 +181,9 @@ public class InternalServletTest extends DrServletTestBase {
   }
 
   @Test
-  public void Given_Request_Is_HTTP_GET_With_Drlogs_In_Endpoint_Request_Succeeds()
+  public void Given_Request_Is_HTTP_GET_With_Drlogs_In_Endpoint_Then_Request_Succeeds()
       throws Exception {
     when(request.getPathInfo()).thenReturn("/drlogs/");
-    mockLogfileLoader();
     ServletOutputStream outStream = mock(ServletOutputStream.class);
     when(response.getOutputStream()).thenReturn(outStream);
     internalServlet.doGet(request, response);
@@ -189,7 +191,7 @@ public class InternalServletTest extends DrServletTestBase {
   }
 
   @Test
-  public void Given_Request_Is_HTTP_GET_Incorrect_Endpoint_Then_No_Content_Response_Is_Generated()
+  public void Given_Request_Is_HTTP_GET_With_Incorrect_Endpoint_Then_No_Content_Response_Is_Generated()
       throws Exception {
     when(request.getPathInfo()).thenReturn("/incorrect/");
     internalServlet.doGet(request, response);
@@ -209,13 +211,11 @@ public class InternalServletTest extends DrServletTestBase {
 
   @Test
   public void Given_Request_Is_HTTP_PUT_With_Api_In_Endpoint_Request_Succeeds() throws Exception {
-    when(request.getPathInfo()).thenReturn("/api/Key");
-    setParametersToNotContactDb(false);
+    when(request.getPathInfo()).thenReturn("/api/NODES");
     String[] values = {"V", "a", "l", "u", "e", "s"};
     when(request.getParameterValues(anyString())).thenReturn(values);
     internalServlet = internalServerSuccess();
     setPokerToNotCreateTimers();
-    mockProvisioningParametersChanged();
     internalServlet.doPut(request, response);
     verify(response).setStatus(eq(HttpServletResponse.SC_OK));
   }
@@ -223,8 +223,7 @@ public class InternalServletTest extends DrServletTestBase {
   @Test
   public void Given_Request_Is_HTTP_PUT_With_Api_In_Endpoint_And_Update_Fails_Then_Internal_Server_Error_Is_Generated()
       throws Exception {
-    when(request.getPathInfo()).thenReturn("/api/Key");
-    setParametersToNotContactDb(false);
+    when(request.getPathInfo()).thenReturn("/api/NODES");
     String[] values = {"V", "a", "l", "u", "e", "s"};
     when(request.getParameterValues(anyString())).thenReturn(values);
     internalServlet = internalServerFailure();
@@ -255,13 +254,11 @@ public class InternalServletTest extends DrServletTestBase {
   @Test
   public void Given_Request_Is_HTTP_DELETE_With_Api_In_Endpoint_Request_Succeeds()
       throws Exception {
-    when(request.getPathInfo()).thenReturn("/api/Key");
-    setParametersToNotContactDb(false);
+    when(request.getPathInfo()).thenReturn("/api/NODES");
     String[] values = {"V", "a", "l", "u", "e", "s"};
     when(request.getParameterValues(anyString())).thenReturn(values);
     internalServlet = internalServerSuccess();
     setPokerToNotCreateTimers();
-    mockProvisioningParametersChanged();
     internalServlet.doDelete(request, response);
     verify(response).setStatus(eq(HttpServletResponse.SC_OK));
   }
@@ -269,8 +266,7 @@ public class InternalServletTest extends DrServletTestBase {
   @Test
   public void Given_Request_Is_HTTP_DELETE_With_Api_In_Endpoint_And_Delete_Fails_Then_Internal_Server_Error_Is_Generated()
       throws Exception {
-    when(request.getPathInfo()).thenReturn("/api/Key");
-    setParametersToNotContactDb(false);
+    when(request.getPathInfo()).thenReturn("/api/NODES");
     String[] values = {"V", "a", "l", "u", "e", "s"};
     when(request.getParameterValues(anyString())).thenReturn(values);
     internalServlet = internalServerFailure();
@@ -293,20 +289,17 @@ public class InternalServletTest extends DrServletTestBase {
       throws Exception {
     when(request.getRemoteAddr()).thenReturn("127.100.0.3");
     internalServlet.doPost(request, response);
-    FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
     verify(response)
         .sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
   }
 
   @Test
   public void Given_Request_Is_HTTP_POST_With_Api_In_Endpoint_Request_Succeeds() throws Exception {
-    when(request.getPathInfo()).thenReturn("/api/Key");
-    setParametersToNotContactDb(true);
+    when(request.getPathInfo()).thenReturn("/api/key");
     String[] values = {"V", "a", "l", "u", "e", "s"};
     when(request.getParameterValues(anyString())).thenReturn(values);
     internalServlet = internalServerSuccess();
     setPokerToNotCreateTimers();
-    mockProvisioningParametersChanged();
     internalServlet.doPost(request, response);
     verify(response).setStatus(eq(HttpServletResponse.SC_OK));
   }
@@ -315,7 +308,6 @@ public class InternalServletTest extends DrServletTestBase {
   public void Given_Request_Is_HTTP_POST_With_Api_In_Endpoint_And_Insert_Fails_Then_Internal_Server_Error_Is_Generated()
       throws Exception {
     when(request.getPathInfo()).thenReturn("/api/Key");
-    setParametersToNotContactDb(true);
     String[] values = {"V", "a", "l", "u", "e", "s"};
     when(request.getParameterValues(anyString())).thenReturn(values);
     internalServlet = internalServerFailure();
@@ -352,7 +344,6 @@ public class InternalServletTest extends DrServletTestBase {
     File testDir = new File("unit-test-logs/spool");
     testDir.mkdirs();
     testDir.deleteOnExit();
-    mockLogfileLoader();
     internalServlet.doPost(request, response);
     verify(response).setStatus(eq(HttpServletResponse.SC_CREATED));
   }
@@ -386,14 +377,6 @@ public class InternalServletTest extends DrServletTestBase {
         .sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
   }
 
-  private void setAuthoriserToReturnRequestIsAuthorized() throws IllegalAccessException {
-    AuthorizationResponse authResponse = mock(AuthorizationResponse.class);
-    Authorizer authorizer = mock(Authorizer.class);
-    FieldUtils.writeDeclaredStaticField(BaseServlet.class, "authz", authorizer, true);
-    when(authorizer.decide(request)).thenReturn(authResponse);
-    when(authResponse.isAuthorized()).thenReturn(true);
-  }
-
   private void setUpValidAuthorisedRequest() throws Exception {
     setUpValidSecurityOnHttpRequest();
     setBehalfHeader("Stub_Value");
@@ -422,16 +405,6 @@ public class InternalServletTest extends DrServletTestBase {
   private void setPokerToNotCreateTimers() throws Exception {
     Poker poker = mock(Poker.class);
     FieldUtils.writeDeclaredStaticField(Poker.class, "poker", poker, true);
-  }
-
-  private void setParametersToNotContactDb(boolean isPost) {
-    PowerMockito.mockStatic(Parameters.class);
-    Parameters parameters = mock(Parameters.class);
-    if (isPost) {
-      PowerMockito.when(Parameters.getParameter(anyString())).thenReturn(null);
-    } else {
-      PowerMockito.when(Parameters.getParameter(anyString())).thenReturn(parameters);
-    }
   }
 
   private InternalServlet internalServerSuccess() {
@@ -468,21 +441,5 @@ public class InternalServletTest extends DrServletTestBase {
       }
     };
     return internalServlet;
-  }
-
-  private void mockProvisioningParametersChanged() throws IllegalAccessException {
-    PowerMockito.mockStatic(Feed.class);
-    PowerMockito.mockStatic(Subscription.class);
-    PowerMockito.when(Feed.countActiveFeeds()).thenReturn(0);
-    PowerMockito.when(Subscription.countActiveSubscriptions()).thenReturn(0);
-    Map<String, Integer> map = new HashMap<>();
-    FieldUtils.writeDeclaredStaticField(NodeClass.class, "map", map, true);
-  }
-
-  private void mockLogfileLoader() {
-    PowerMockito.mockStatic(LogfileLoader.class);
-    LogfileLoader logfileLoader = mock(LogfileLoader.class);
-    when(logfileLoader.getBitSet()).thenReturn(new RLEBitSet());
-    PowerMockito.when(LogfileLoader.getLoader()).thenReturn(logfileLoader);
   }
 }
