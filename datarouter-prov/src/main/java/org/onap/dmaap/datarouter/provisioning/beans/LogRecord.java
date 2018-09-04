@@ -59,23 +59,23 @@ public class LogRecord extends BaseLogRecord {
         Connection conn = null;
         try {
             conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            Iterator<Long[]> iter = bs.getRangeIterator();
-            PreparedStatement ps = conn.prepareStatement(sql);
-            while (iter.hasNext()) {
-                Long[] n = iter.next();
-                ps.setLong(1, n[0]);
-                ps.setLong(2, n[1]);
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                    LogRecord lr = new LogRecord(rs);
-                    os.write(lr.toString().getBytes());
+            try(Statement stmt = conn.createStatement()) {
+                Iterator<Long[]> iter = bs.getRangeIterator();
+                try(PreparedStatement ps = conn.prepareStatement(sql)) {
+                    while (iter.hasNext()) {
+                        Long[] n = iter.next();
+                        ps.setLong(1, n[0]);
+                        ps.setLong(2, n[1]);
+                        try(ResultSet rs = ps.executeQuery()) {
+                            while (rs.next()) {
+                                LogRecord lr = new LogRecord(rs);
+                                os.write(lr.toString().getBytes());
+                            }
+                            ps.clearParameters();
+                        }
+                    }
                 }
-                rs.close();
-                ps.clearParameters();
             }
-            ps.close();
-            stmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
