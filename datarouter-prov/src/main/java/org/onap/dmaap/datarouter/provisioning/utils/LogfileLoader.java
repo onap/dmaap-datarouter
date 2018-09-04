@@ -254,24 +254,24 @@ public class LogfileLoader extends Thread {
             try {
                 // Limit to a million at a time to avoid typing up the DB for too long.
                 conn = db.getConnection();
-                PreparedStatement ps = conn.prepareStatement("DELETE from LOG_RECORDS where EVENT_TIME < ? limit 1000000");
-                ps.setLong(1, cutoff);
-                while (count > 0) {
-                    if (!ps.execute()) {
-                        int dcount = ps.getUpdateCount();
-                        count -= dcount;
-                        logger.debug("  " + dcount + " rows deleted.");
-                        did1 |= (dcount != 0);
-                        if (dcount == 0)
-                            count = 0;    // prevent inf. loops
-                    } else {
-                        count = 0;    // shouldn't happen!
+                try(PreparedStatement ps = conn.prepareStatement("DELETE from LOG_RECORDS where EVENT_TIME < ? limit 1000000")) {
+                    ps.setLong(1, cutoff);
+                    while (count > 0) {
+                        if (!ps.execute()) {
+                            int dcount = ps.getUpdateCount();
+                            count -= dcount;
+                            logger.debug("  " + dcount + " rows deleted.");
+                            did1 |= (dcount != 0);
+                            if (dcount == 0)
+                                count = 0;    // prevent inf. loops
+                        } else {
+                            count = 0;    // shouldn't happen!
+                        }
                     }
                 }
-                ps.close();
-                Statement stmt = conn.createStatement();
-                stmt.execute("OPTIMIZE TABLE LOG_RECORDS");
-                stmt.close();
+             try(Statement stmt = conn.createStatement()) {
+                 stmt.execute("OPTIMIZE TABLE LOG_RECORDS");
+             }
             } catch (SQLException e) {
                 System.err.println(e);
                 e.printStackTrace();
@@ -287,14 +287,14 @@ public class LogfileLoader extends Thread {
         Connection conn = null;
         try {
             conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) as COUNT from LOG_RECORDS");
-            if (rs.next()) {
-                count = rs.getLong("COUNT");
-            }
-            rs.close();
-            stmt.close();
-        } catch (SQLException e) {
+           try(Statement stmt = conn.createStatement()) {
+               try(ResultSet rs = stmt.executeQuery("SELECT COUNT(*) as COUNT from LOG_RECORDS")) {
+                   if (rs.next()) {
+                       count = rs.getLong("COUNT");
+                   }
+               }
+           }
+         } catch (SQLException e) {
             System.err.println(e);
             e.printStackTrace();
         } finally {
@@ -309,17 +309,17 @@ public class LogfileLoader extends Thread {
         try {
             logger.debug("  LOG_RECORD table histogram...");
             conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT FLOOR(EVENT_TIME/86400000) AS DAY, COUNT(*) AS COUNT FROM LOG_RECORDS GROUP BY DAY");
-            while (rs.next()) {
-                long day = rs.getLong("DAY");
-                long cnt = rs.getLong("COUNT");
-                map.put(day, cnt);
-                logger.debug("  " + day + "  " + cnt);
+            try(Statement stmt = conn.createStatement()) {
+                try(ResultSet rs = stmt.executeQuery("SELECT FLOOR(EVENT_TIME/86400000) AS DAY, COUNT(*) AS COUNT FROM LOG_RECORDS GROUP BY DAY")) {
+                    while (rs.next()) {
+                        long day = rs.getLong("DAY");
+                        long cnt = rs.getLong("COUNT");
+                        map.put(day, cnt);
+                        logger.debug("  " + day + "  " + cnt);
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
-        } catch (SQLException e) {
+           } catch (SQLException e) {
             System.err.println(e);
             e.printStackTrace();
         } finally {
@@ -340,14 +340,14 @@ public class LogfileLoader extends Thread {
             boolean go_again = true;
             for (long i = 0; go_again; i += stepsize) {
                 String sql = String.format("select RECORD_ID from LOG_RECORDS LIMIT %d,%d", i, stepsize);
-                ResultSet rs = stmt.executeQuery(sql);
-                go_again = false;
-                while (rs.next()) {
-                    long n = rs.getLong("RECORD_ID");
-                    nbs.set(n);
-                    go_again = true;
+                try(ResultSet rs = stmt.executeQuery(sql)) {
+                    go_again = false;
+                    while (rs.next()) {
+                        long n = rs.getLong("RECORD_ID");
+                        nbs.set(n);
+                        go_again = true;
+                    }
                 }
-                rs.close();
             }
             stmt.close();
             seq_set = nbs;
@@ -391,49 +391,49 @@ public class LogfileLoader extends Thread {
             Reader r = f.getPath().endsWith(".gz")
                     ? new InputStreamReader(new GZIPInputStream(new FileInputStream(f)))
                     : new FileReader(f);
-            LineNumberReader in = new LineNumberReader(r);
-            String line;
-            while ((line = in.readLine()) != null) {
-                try {
-                    for (Loadable rec : buildRecords(line)) {
-                        rec.load(ps);
-                        if (rec instanceof LogRecord) {
-                            LogRecord lr = ((LogRecord) rec);
-                            if (!seq_set.get(lr.getRecordId())) {
+            try(LineNumberReader in = new LineNumberReader(r)) {
+                String line;
+                while ((line = in.readLine()) != null) {
+                    try {
+                        for (Loadable rec : buildRecords(line)) {
+                            rec.load(ps);
+                            if (rec instanceof LogRecord) {
+                                LogRecord lr = ((LogRecord) rec);
+                                if (!seq_set.get(lr.getRecordId())) {
+                                    ps.executeUpdate();
+                                    seq_set.set(lr.getRecordId());
+                                } else
+                                    logger.debug("Duplicate record ignored: " + lr.getRecordId());
+                            } else {
+                                if (++nextid > set_end)
+                                    nextid = set_start;
+                                ps.setLong(18, nextid);
                                 ps.executeUpdate();
-                                seq_set.set(lr.getRecordId());
-                            } else
-                                logger.debug("Duplicate record ignored: " + lr.getRecordId());
-                        } else {
-                            if (++nextid > set_end)
-                                nextid = set_start;
-                            ps.setLong(18, nextid);
-                            ps.executeUpdate();
-                            seq_set.set(nextid);
+                                seq_set.set(nextid);
+                            }
+                            ps.clearParameters();
+                            ok++;
                         }
-                        ps.clearParameters();
-                        ok++;
+                    } catch (SQLException e) {
+                        logger.warn("PROV8003 Invalid value in record: " + line);
+                        logger.debug(e);
+                        e.printStackTrace();
+                    } catch (NumberFormatException e) {
+                        logger.warn("PROV8004 Invalid number in record: " + line);
+                        logger.debug(e);
+                        e.printStackTrace();
+                    } catch (ParseException e) {
+                        logger.warn("PROV8005 Invalid date in record: " + line);
+                        logger.debug(e);
+                        e.printStackTrace();
+                    } catch (Exception e) {
+                        logger.warn("PROV8006 Invalid pattern in record: " + line);
+                        logger.debug(e);
+                        e.printStackTrace();
                     }
-                } catch (SQLException e) {
-                    logger.warn("PROV8003 Invalid value in record: " + line);
-                    logger.debug(e);
-                    e.printStackTrace();
-                } catch (NumberFormatException e) {
-                    logger.warn("PROV8004 Invalid number in record: " + line);
-                    logger.debug(e);
-                    e.printStackTrace();
-                } catch (ParseException e) {
-                    logger.warn("PROV8005 Invalid date in record: " + line);
-                    logger.debug(e);
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    logger.warn("PROV8006 Invalid pattern in record: " + line);
-                    logger.debug(e);
-                    e.printStackTrace();
+                    total++;
                 }
-                total++;
             }
-            in.close();
             ps.close();
             db.release(conn);
             conn = null;
