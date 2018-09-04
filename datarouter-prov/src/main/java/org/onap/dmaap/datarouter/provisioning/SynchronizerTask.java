@@ -153,34 +153,35 @@ public class SynchronizerTask extends TimerTask {
             String store = props.getProperty(Main.KEYSTORE_PATH_PROPERTY);
             String pass = props.getProperty(Main.KEYSTORE_PASSWORD_PROPERTY);
             KeyStore keyStore = KeyStore.getInstance(type);
-            FileInputStream instream = new FileInputStream(new File(store));
-            keyStore.load(instream, pass.toCharArray());
-            instream.close();
+            try(FileInputStream instream = new FileInputStream(new File(store))) {
+                keyStore.load(instream, pass.toCharArray());
 
-            store = props.getProperty(Main.TRUSTSTORE_PATH_PROPERTY);
-            pass = props.getProperty(Main.TRUSTSTORE_PASSWORD_PROPERTY);
-            KeyStore trustStore = null;
-            if (store != null && store.length() > 0) {
-                trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                instream = new FileInputStream(new File(store));
-                trustStore.load(instream, pass.toCharArray());
-                instream.close();
             }
+                store = props.getProperty(Main.TRUSTSTORE_PATH_PROPERTY);
+                pass = props.getProperty(Main.TRUSTSTORE_PASSWORD_PROPERTY);
+                KeyStore trustStore = null;
+                if (store != null && store.length() > 0) {
+                    trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                    try(FileInputStream instream = new FileInputStream(new File(store))){
+                        trustStore.load(instream, pass.toCharArray());
+
+                    }
+                }
 
             // We are connecting with the node name, but the certificate will have the CNAME
             // So we need to accept a non-matching certificate name
             String keystorepass = props.getProperty(
                 Main.KEYSTORE_PASSWORD_PROPERTY); //itrack.web.att.com/browse/DATARTR-6 for changing hard coded passphase ref
-            AbstractHttpClient hc = new DefaultHttpClient();
-            SSLSocketFactory socketFactory =
-                (trustStore == null)
-                    ? new SSLSocketFactory(keyStore, keystorepass)
-                    : new SSLSocketFactory(keyStore, keystorepass, trustStore);
-            socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-            Scheme sch = new Scheme("https", 443, socketFactory);
-            hc.getConnectionManager().getSchemeRegistry().register(sch);
+           try(AbstractHttpClient hc = new DefaultHttpClient()) {
+               SSLSocketFactory socketFactory =
+                       (trustStore == null)
+                               ? new SSLSocketFactory(keyStore, keystorepass)
+                               : new SSLSocketFactory(keyStore, keystorepass, trustStore);
+               socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+               Scheme sch = new Scheme("https", 443, socketFactory);
+               hc.getConnectionManager().getSchemeRegistry().register(sch);
             httpclient = hc;
-
+           }
             // Run once every 5 seconds to check DNS, etc.
             long interval = 0;
             try {
