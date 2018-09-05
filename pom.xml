@@ -48,6 +48,7 @@
         <jetty.version>9.3.8.RC0</jetty.version>
         <jetty.websocket.version>8.2.0.v20160908</jetty.websocket.version>
         <thoughtworks.version>1.4.10</thoughtworks.version>
+        <qos.logback.version>1.2.3</qos.logback.version>
         <snapshotNexusPath>/content/repositories/snapshots/</snapshotNexusPath>
         <releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
         <stagingNexusPath>/content/repositories/staging/</stagingNexusPath>
