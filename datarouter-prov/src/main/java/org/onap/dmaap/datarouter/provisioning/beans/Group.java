@@ -29,10 +29,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -99,14 +96,14 @@ public class Group extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                Group group = new Group(rs);
-                list.add(group);
+            try(Statement stmt = conn.createStatement()) {
+                try(ResultSet rs = stmt.executeQuery(sql)) {
+                    while (rs.next()) {
+                        Group group = new Group(rs);
+                        list.add(group);
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
             db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -120,13 +117,13 @@ public class Group extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("select MAX(groupid) from GROUPS");
-            if (rs.next()) {
-                max = rs.getInt(1);
+            try(Statement stmt = conn.createStatement()) {
+                try(ResultSet rs = stmt.executeQuery("select MAX(groupid) from GROUPS")) {
+                    if (rs.next()) {
+                        max = rs.getInt(1);
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
             db.release(conn);
         } catch (SQLException e) {
             intlogger.info("getMaxSubID: " + e.getMessage());
@@ -142,14 +139,14 @@ public class Group extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                int groupid = rs.getInt("groupid");
-                //list.add(URLUtilities.generateSubscriptionURL(groupid));
+            try(Statement stmt = conn.createStatement()) {
+                try(ResultSet rs = stmt.executeQuery(sql)) {
+                    while (rs.next()) {
+                        int groupid = rs.getInt("groupid");
+
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
             db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -168,13 +165,13 @@ public class Group extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("select count(*) from SUBSCRIPTIONS");
-            if (rs.next()) {
-                count = rs.getInt(1);
+            try(Statement stmt = conn.createStatement()) {
+                try(ResultSet rs = stmt.executeQuery("select count(*) from SUBSCRIPTIONS")) {
+                    if (rs.next()) {
+                        count = rs.getInt(1);
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
             db.release(conn);
         } catch (SQLException e) {
             intlogger.warn("PROV0008 countActiveSubscriptions: " + e.getMessage());
@@ -351,7 +348,9 @@ public class Group extends Syncable {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -379,7 +378,9 @@ public class Group extends Syncable {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -402,7 +403,9 @@ public class Group extends Syncable {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -439,5 +442,10 @@ public class Group extends Syncable {
     @Override
     public String toString() {
         return "GROUP: groupid=" + groupid;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(groupid, authid, name, description, classification, members, last_mod);
     }
 }
