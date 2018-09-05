@@ -26,7 +26,9 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -34,14 +36,17 @@ import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
+import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -51,7 +56,6 @@ import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 
 @RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor("org.onap.dmaap.datarouter.provisioning.beans.Feed")
 public class FeedServletTest extends DrServletTestBase {
 
     private static FeedServlet feedServlet;
@@ -61,12 +65,31 @@ public class FeedServletTest extends DrServletTestBase {
     @Mock
     private HttpServletResponse response;
 
+    private static EntityManagerFactory emf;
+    private static EntityManager em;
+    private DB db;
+
+    @BeforeClass
+    public static void init() {
+        emf = Persistence.createEntityManagerFactory("dr-unit-tests");
+        em = emf.createEntityManager();
+        System.setProperty(
+                "org.onap.dmaap.datarouter.provserver.properties",
+                "src/test/resources/h2Database.properties");
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+        em.clear();
+        em.close();
+        emf.close();
+    }
+
     @Before
     public void setUp() throws Exception {
-        super.setUp();
         feedServlet = new FeedServlet();
+        db = new DB();
         setAuthoriserToReturnRequestIsAuthorized();
-        setPokerToNotCreateTimersWhenDeleteFeedIsCalled();
         setUpValidAuthorisedRequest();
         setUpValidSecurityOnHttpRequest();
         setUpValidContentHeadersAndJSONOnHttpRequest();
@@ -76,7 +99,6 @@ public class FeedServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_DELETE_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated()
         throws Exception {
         when(request.isSecure()).thenReturn(false);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         feedServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
@@ -103,7 +125,7 @@ public class FeedServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Feed_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated()
         throws Exception {
-        setFeedToReturnInvalidFeedIdSupplied();
+        when(request.getPathInfo()).thenReturn("/123");
         feedServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
     }
@@ -135,20 +157,15 @@ public class FeedServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Delete_On_Database_Succeeds_A_NO_CONTENT_Response_Is_Generated()
         throws Exception {
-        FeedServlet feedServlet = new FeedServlet() {
-            protected boolean doUpdate(Updateable bean) {
-                return true;
-            }
-        };
         feedServlet.doDelete(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_NO_CONTENT));
+        reinsertFeedIntoDb();
     }
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated()
         throws Exception {
         when(request.isSecure()).thenReturn(false);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         feedServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
@@ -174,7 +191,7 @@ public class FeedServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_GET_And_Feed_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated()
         throws Exception {
-        setFeedToReturnInvalidFeedIdSupplied();
+        when(request.getPathInfo()).thenReturn("/123");
         feedServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
     }
@@ -202,7 +219,7 @@ public class FeedServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_PUT_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated()
         throws Exception {
         when(request.isSecure()).thenReturn(false);
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
+//        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         feedServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
@@ -228,7 +245,7 @@ public class FeedServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Feed_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated()
         throws Exception {
-        setFeedToReturnInvalidFeedIdSupplied();
+        when(request.getPathInfo()).thenReturn("/123");
         feedServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
     }
@@ -319,8 +336,8 @@ public class FeedServletTest extends DrServletTestBase {
         FeedServlet feedServlet = new FeedServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
-                jo.put("name", "stub_name");
-                jo.put("version", "1.0");
+                jo.put("name", "Feed1");
+                jo.put("version", "v0.1");
                 jo.put("authorization", JSObject);
                 return jo;
             }
@@ -339,8 +356,8 @@ public class FeedServletTest extends DrServletTestBase {
         FeedServlet feedServlet = new FeedServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
-                jo.put("name", "stub_name");
-                jo.put("version", "1.0");
+                jo.put("name", "Feed1");
+                jo.put("version", "v0.1");
                 jo.put("authorization", JSObject);
                 return jo;
             }
@@ -362,8 +379,8 @@ public class FeedServletTest extends DrServletTestBase {
         FeedServlet feedServlet = new FeedServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
-                jo.put("name", "stub_name");
-                jo.put("version", "1.0");
+                jo.put("name", "Feed1");
+                jo.put("version", "v0.1");
                 jo.put("authorization", JSObject);
                 return jo;
             }
@@ -416,24 +433,7 @@ public class FeedServletTest extends DrServletTestBase {
     }
 
     private void setValidPathInfoInHttpHeader() {
-        when(request.getPathInfo()).thenReturn("/123");
-    }
-
-    private void setFeedToReturnInvalidFeedIdSupplied() {
-        PowerMockito.mockStatic(Feed.class);
-        PowerMockito.when(Feed.getFeedById(anyInt())).thenReturn(null);
-    }
-
-    private void setFeedToReturnValidFeedForSuppliedId() {
-        PowerMockito.mockStatic(Feed.class);
-        Feed feed = mock(Feed.class);
-        PowerMockito.when(Feed.getFeedById(anyInt())).thenReturn(feed);
-        when(feed.isDeleted()).thenReturn(false);
-        when(feed.asJSONObject(true)).thenReturn(mock(JSONObject.class));
-        when(feed.getPublisher()).thenReturn("Stub_Value");
-        when(feed.getName()).thenReturn("stub_name");
-        when(feed.getVersion()).thenReturn("1.0");
-        when(feed.asLimitedJSONObject()).thenReturn(mock(JSONObject.class));
+        when(request.getPathInfo()).thenReturn("/1");
     }
 
     private void setAuthoriserToReturnRequestNotAuthorized() throws IllegalAccessException {
@@ -452,20 +452,22 @@ public class FeedServletTest extends DrServletTestBase {
         when(authResponse.isAuthorized()).thenReturn(true);
     }
 
-    private void setPokerToNotCreateTimersWhenDeleteFeedIsCalled() throws Exception {
-        Poker poker = mock(Poker.class);
-        FieldUtils.writeDeclaredStaticField(Poker.class, "poker", poker, true);
-    }
-
     private void setUpValidAuthorisedRequest() throws Exception {
         setUpValidSecurityOnHttpRequest();
         setBehalfHeader("Stub_Value");
         setValidPathInfoInHttpHeader();
-        setFeedToReturnValidFeedForSuppliedId();
     }
 
     private void setUpValidContentHeadersAndJSONOnHttpRequest() {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.feed; version=1.0");
         when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
+    }
+
+    private void reinsertFeedIntoDb() throws SQLException {
+        Feed feed = new Feed("Feed1","v0.1", "First Feed for testing", "First Feed for testing");
+        feed.setFeedid(1);
+        feed.setGroupid(1);
+        feed.setDeleted(false);
+        feed.doUpdate(db.getConnection());
     }
 }
