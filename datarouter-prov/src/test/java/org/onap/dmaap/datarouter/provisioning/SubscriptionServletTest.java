@@ -62,6 +62,9 @@ public class SubscriptionServletTest {
     private static EntityManager em;
     private SubscriptionServlet subscriptionServlet;
     private DB db;
+    private String URL= "https://172.100.0.5";
+    private String USER = "user1";
+    private String PASSWORD="password1";
 
     @Mock
     private HttpServletRequest request;
@@ -324,6 +327,7 @@ public class SubscriptionServletTest {
         };
         subscriptionServlet.doPut(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+        changeSubscriptionBackToNormal();
     }
 
     @Test
@@ -475,15 +479,29 @@ public class SubscriptionServletTest {
     }
 
     private void insertSubscriptionIntoDb() throws SQLException {
-        Subscription subscription = new Subscription("https://172.100.0.5", "user1", "password1");
+        Subscription subscription = new Subscription(URL, USER, PASSWORD);
         subscription.setSubid(1);
         subscription.setSubscriber("user1");
         subscription.setFeedid(1);
-        SubDelivery subDelivery = new SubDelivery("https://172.100.0.5:8080", "user1", "password1", true);
+        SubDelivery subDelivery = new SubDelivery(URL, USER, PASSWORD, true);
         subscription.setDelivery(subDelivery);
         subscription.setGroupid(1);
         subscription.setMetadataOnly(false);
         subscription.setSuspended(false);
         subscription.doInsert(db.getConnection());
+    }
+
+    private void changeSubscriptionBackToNormal() throws SQLException {
+        Subscription subscription = new Subscription("https://172.100.0.5", "user1", "password1");
+        subscription.setSubid(1);
+        subscription.setSubscriber("user1");
+        subscription.setFeedid(1);
+        SubDelivery subDelivery = new SubDelivery(URL, USER, PASSWORD, true);
+        subscription.setDelivery(subDelivery);
+        subscription.setGroupid(1);
+        subscription.setMetadataOnly(false);
+        subscription.setSuspended(false);
+        subscription.changeOwnerShip();
+        subscription.doUpdate(db.getConnection());
     }
 }
