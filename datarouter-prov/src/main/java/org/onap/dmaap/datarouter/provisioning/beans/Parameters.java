@@ -191,7 +191,9 @@ public class Parameters extends Syncable {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+            	if(null!=ps) {
+            		ps.close();
+            	}
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -216,7 +218,9 @@ public class Parameters extends Syncable {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+            	if(null!=ps) {
+            		ps.close();
+            	}
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -240,7 +244,9 @@ public class Parameters extends Syncable {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+            	if(null!=ps) {
+            		ps.close();
+            	}
             } catch (SQLException e) {
                 e.printStackTrace();
             }
