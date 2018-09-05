@@ -151,6 +151,9 @@ VALUES (1, 1, 'https://172.100.0.5:8080', 'user1', 'password1', true, false, 'us
 INSERT INTO SUBSCRIPTIONS(SUBID, FEEDID, DELIVERY_URL, DELIVERY_USER, DELIVERY_PASSWORD, SUBSCRIBER, SELF_LINK, LOG_LINK)
 VALUES (23, 1, 'http://delivery_url', 'user1', 'somepassword', 'sub123', 'selflink', 'loglink');
 
+INSERT INTO FEED_ENDPOINT_IDS(FEEDID, USERID, PASSWORD)
+VALUES (1, 'USER', 'PASSWORD');
+
 INSERT INTO FEEDS(FEEDID, GROUPID, NAME, VERSION, DESCRIPTION, BUSINESS_DESCRIPTION, AUTH_CLASS, PUBLISHER, SELF_LINK, PUBLISH_LINK, SUBSCRIBE_LINK, LOG_LINK)
 VALUES (1, 1,'Feed1','v0.1', 'First Feed for testing', 'First Feed for testing', 'auth_class', 'pub','self_link','publish_link','subscribe_link','log_link');
 
