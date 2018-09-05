@@ -1,0 +1,9 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Ronan Keogh <ronan.keogh@ericsson.com>
+Code-Review+1: Mariusz Sobucki <mariusz.sobucki@ericsson.com>
+Code-Review+2: Ram Koya <rk541m@att.com>
+Submitted-by: Ram Koya <rk541m@att.com>
+Submitted-at: Wed, 05 Sep 2018 17:13:54 +0000
+Reviewed-on: https://gerrit.onap.org/r/64799
+Project: dmaap/datarouter
+Branch: refs/heads/master
