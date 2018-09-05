@@ -28,10 +28,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -93,15 +90,15 @@ public class Parameters extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "select * from PARAMETERS";
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                Parameters p = new Parameters(rs);
-                coll.add(p);
+            try(Statement stmt = conn.createStatement()) {
+                String sql = "select * from PARAMETERS";
+                try(ResultSet rs = stmt.executeQuery(sql)) {
+                    while (rs.next()) {
+                        Parameters p = new Parameters(rs);
+                        coll.add(p);
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
             db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -121,14 +118,14 @@ public class Parameters extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "select KEYNAME, VALUE from PARAMETERS where KEYNAME = '" + k + "'";
-            ResultSet rs = stmt.executeQuery(sql);
-            if (rs.next()) {
-                v = new Parameters(rs);
+            try(Statement stmt = conn.createStatement()) {
+                String sql = "select KEYNAME, VALUE from PARAMETERS where KEYNAME = '" + k + "'";
+                try(ResultSet rs = stmt.executeQuery(sql)) {
+                    if (rs.next()) {
+                        v = new Parameters(rs);
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
             db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -191,7 +188,9 @@ public class Parameters extends Syncable {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -216,7 +215,9 @@ public class Parameters extends Syncable {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -240,7 +241,9 @@ public class Parameters extends Syncable {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -263,6 +266,11 @@ public class Parameters extends Syncable {
         if (!value.equals(of.value))
             return false;
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(keyname, value);
     }
 
     @Override
