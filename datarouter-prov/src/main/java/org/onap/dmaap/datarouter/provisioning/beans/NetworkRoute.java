@@ -29,6 +29,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -60,16 +61,16 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("select FROMNODE, TONODE, VIANODE from NETWORK_ROUTES");
-            while (rs.next()) {
-                int fromnode = rs.getInt("FROMNODE");
-                int tonode = rs.getInt("TONODE");
-                int vianode = rs.getInt("VIANODE");
-                set.add(new NetworkRoute(fromnode, tonode, vianode));
+            try(Statement stmt = conn.createStatement()) {
+                try(ResultSet rs = stmt.executeQuery("select FROMNODE, TONODE, VIANODE from NETWORK_ROUTES")) {
+                    while (rs.next()) {
+                        int fromnode = rs.getInt("FROMNODE");
+                        int tonode = rs.getInt("TONODE");
+                        int vianode = rs.getInt("VIANODE");
+                        set.add(new NetworkRoute(fromnode, tonode, vianode));
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
             db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -129,7 +130,9 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -157,7 +160,9 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
                 e.printStackTrace();
             } finally {
                 try {
-                    ps.close();
+                    if(ps!=null) {
+                        ps.close();
+                    }
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -183,7 +188,9 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -211,6 +218,11 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
             return false;
         NetworkRoute on = (NetworkRoute) obj;
         return (fromnode == on.fromnode) && (tonode == on.tonode) && (vianode == on.vianode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fromnode, tonode, vianode);
     }
 
     @Override
