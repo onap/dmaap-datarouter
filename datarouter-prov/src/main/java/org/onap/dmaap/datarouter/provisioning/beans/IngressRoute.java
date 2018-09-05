@@ -85,18 +85,18 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                int seq = rs.getInt("SEQUENCE");
-                int feedid = rs.getInt("FEEDID");
-                String user = rs.getString("USERID");
-                String subnet = rs.getString("SUBNET");
-                int nodeset = rs.getInt("NODESET");
-                set.add(new IngressRoute(seq, feedid, user, subnet, nodeset));
+            try(Statement stmt = conn.createStatement()) {
+                try(ResultSet rs = stmt.executeQuery(sql)) {
+                    while (rs.next()) {
+                        int seq = rs.getInt("SEQUENCE");
+                        int feedid = rs.getInt("FEEDID");
+                        String user = rs.getString("USERID");
+                        String subnet = rs.getString("SUBNET");
+                        int nodeset = rs.getInt("NODESET");
+                        set.add(new IngressRoute(seq, feedid, user, subnet, nodeset));
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
             db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -128,13 +128,13 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            if (rs.next()) {
-                rv = rs.getInt("MAX");
+            try(Statement stmt = conn.createStatement()) {
+               try(ResultSet rs = stmt.executeQuery(sql)) {
+                   if (rs.next()) {
+                       rv = rs.getInt("MAX");
+                   }
+               }
             }
-            rs.close();
-            stmt.close();
             db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -162,20 +162,22 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             ps.setInt(1, feedid);
             ps.setString(2, user);
             ps.setString(3, subnet);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                int seq = rs.getInt("SEQUENCE");
-                int nodeset = rs.getInt("NODESET");
-                v = new IngressRoute(seq, feedid, user, subnet, nodeset);
+            try(ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int seq = rs.getInt("SEQUENCE");
+                    int nodeset = rs.getInt("NODESET");
+                    v = new IngressRoute(seq, feedid, user, subnet, nodeset);
+                }
             }
-            rs.close();
             ps.close();
             db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -191,33 +193,26 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
      */
     public static Collection<IngressRoute> getIngressRoute(int seq) {
         Collection<IngressRoute> rv = new ArrayList<IngressRoute>();
-        PreparedStatement ps = null;
         try {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
             String sql = "select FEEDID, USERID, SUBNET, NODESET from INGRESS_ROUTES where SEQUENCE = ?";
-            ps = conn.prepareStatement(sql);
-            ps.setInt(1, seq);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                int feedid = rs.getInt("FEEDID");
-                String user = rs.getString("USERID");
-                String subnet = rs.getString("SUBNET");
-                int nodeset = rs.getInt("NODESET");
-                rv.add(new IngressRoute(seq, feedid, user, subnet, nodeset));
+            try(PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, seq);
+                try(ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        int feedid = rs.getInt("FEEDID");
+                        String user = rs.getString("USERID");
+                        String subnet = rs.getString("SUBNET");
+                        int nodeset = rs.getInt("NODESET");
+                        rv.add(new IngressRoute(seq, feedid, user, subnet, nodeset));
+                    }
+                }
             }
-            rs.close();
-            ps.close();
             db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
         return rv;
     }
@@ -386,31 +381,23 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
 
     private Collection<String> readNodes() {
         Collection<String> set = new TreeSet<String>();
-        PreparedStatement ps = null;
         try {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
             String sql = "select NODEID from NODESETS where SETID = ?";
-            ps = conn.prepareStatement(sql);
-            ps.setInt(1, nodelist);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                int id = rs.getInt("NODEID");
-                set.add(lookupNodeID(id));
+            try(PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, nodelist);
+                try(ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        int id = rs.getInt("NODEID");
+                        set.add(lookupNodeID(id));
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
             db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                ps.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
         return set;
     }
@@ -441,7 +428,9 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -482,7 +471,9 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
