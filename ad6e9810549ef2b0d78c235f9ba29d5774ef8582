@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_a1067e1b",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/authz/impl/ProvAuthorizer.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-06T10:15:00Z",
+      "side": 1,
+      "message": "Use 4 spaces to indent",
+      "range": {
+        "startLine": 143,
+        "startChar": 8,
+        "endLine": 143,
+        "endChar": 10
+      },
+      "revId": "ad6e9810549ef2b0d78c235f9ba29d5774ef8582",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
