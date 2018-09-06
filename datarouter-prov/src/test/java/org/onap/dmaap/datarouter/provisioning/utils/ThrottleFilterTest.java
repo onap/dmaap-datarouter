@@ -31,15 +31,8 @@ import org.eclipse.jetty.server.HttpChannel;
 import org.eclipse.jetty.server.HttpConnection;
 import org.eclipse.jetty.server.Request;
 import org.junit.Test;
-
 import org.junit.runner.RunWith;
-import static org.junit.Assert.*;
-import static org.hamcrest.core.Is.is;
 import org.mockito.Mock;
-
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
 import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
@@ -51,13 +44,22 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.provisioning.beans.Parameters",
-                                  "org.eclipse.jetty.server.Request",
-                                  "org.eclipse.jetty.continuation.ContinuationSupport",
-                                  "org.eclipse.jetty.server.HttpConnection"})
+    "org.eclipse.jetty.server.Request",
+    "org.eclipse.jetty.continuation.ContinuationSupport",
+    "org.eclipse.jetty.server.HttpConnection"})
 public class ThrottleFilterTest {
 
     @Mock
@@ -73,9 +75,6 @@ public class ThrottleFilterTest {
     private HttpConnection httpconnection;
 
     @Mock
-    private ContinuationSupport continuationsupport;
-
-    @Mock
     private Request req;
 
     @Mock
@@ -83,7 +82,6 @@ public class ThrottleFilterTest {
 
     @Mock
     private Continuation continuation;
-
 
 
     @Test
@@ -104,7 +102,7 @@ public class ThrottleFilterTest {
         ThrottleFilter.configure();
         mockServletInputStream();
         FieldUtils.writeDeclaredStaticField(ThrottleFilter.class, "action", 1, true);
-        Map<String, List<Continuation>> suspended_requests = new HashMap<String, List<Continuation>>();
+        Map<String, List<Continuation>> suspended_requests = new HashMap<>();
         List<Continuation> continuation_list = new ArrayList<>();
         continuation_list.add(continuation);
         suspended_requests.put("null/-1", continuation_list);
@@ -132,7 +130,7 @@ public class ThrottleFilterTest {
     public void Given_Do_Filter_Run_and_enabled_and_action_is_true_and_rate_is_greater_than_0_and_getFeedId_returns_id_then_continuation_will_call_suspend_and_dispatch_once() throws Exception {
         mockParametersWithValues("0,5,thing");
         PowerMockito.mockStatic(ContinuationSupport.class);
-        PowerMockito.when(continuationsupport.getContinuation(any())).thenReturn(continuation);
+        PowerMockito.when(ContinuationSupport.getContinuation(any())).thenReturn(continuation);
         ThrottleFilter.configure();
         mockServletInputStream();
         FieldUtils.writeDeclaredStaticField(ThrottleFilter.class, "action", 1, true);
@@ -159,7 +157,7 @@ public class ThrottleFilterTest {
     @Test
     public void Given_run_is_called_then_continuation_will_call_prune_once() throws Exception {
         ThrottleFilter tf = new ThrottleFilter();
-        Map<String, ThrottleFilter.Counter> map = new HashMap<String, ThrottleFilter.Counter>();
+        Map<String, ThrottleFilter.Counter> map = new HashMap<>();
         ThrottleFilter.Counter tfc = mock(ThrottleFilter.Counter.class);
         map.put("Key", tfc);
         when(tfc.prune()).thenReturn(-1);
@@ -169,13 +167,12 @@ public class ThrottleFilterTest {
     }
 
     @Test
-    public void Given_destroy_is_called_then_map_is_empty() throws Exception
-    {
+    public void Given_destroy_is_called_then_map_is_empty() throws Exception {
         ThrottleFilter throttleFilter = new ThrottleFilter();
         FilterConfig filterconfig = mock(FilterConfig.class);
         mockParametersWithValues("0,5,thing");
         PowerMockito.mockStatic(ContinuationSupport.class);
-        PowerMockito.when(continuationsupport.getContinuation(any())).thenReturn(continuation);
+        PowerMockito.when(ContinuationSupport.getContinuation(any())).thenReturn(continuation);
 
         throttleFilter.init(filterconfig);
         throttleFilter.destroy();
@@ -199,17 +196,17 @@ public class ThrottleFilterTest {
 
     private void mockContinuationSupport() {
         PowerMockito.mockStatic(ContinuationSupport.class);
-        PowerMockito.when(continuationsupport.getContinuation(any())).thenReturn(continuation);
+        PowerMockito.when(ContinuationSupport.getContinuation(any())).thenReturn(continuation);
     }
 
     private void mockHttpConnectionHttpChannelAndRequest(ServletInputStream serverinputstream) throws IOException {
         PowerMockito.mockStatic(ContinuationSupport.class);
-        PowerMockito.when(continuationsupport.getContinuation(any())).thenReturn(continuation);
+        PowerMockito.when(ContinuationSupport.getContinuation(any())).thenReturn(continuation);
         when(serverinputstream.read(any())).thenReturn(2).thenReturn(1).thenReturn(0);
         when(request.getInputStream()).thenReturn(serverinputstream);
         PowerMockito.mockStatic(HttpConnection.class);
         EndPoint endpoint = mock(EndPoint.class);
-        PowerMockito.when(httpconnection.getCurrentConnection()).thenReturn(httpconnection);
+        PowerMockito.when(HttpConnection.getCurrentConnection()).thenReturn(httpconnection);
         PowerMockito.when(httpconnection.getHttpChannel()).thenReturn(httpchannel);
         when(httpchannel.getRequest()).thenReturn(req);
         when(req.getHttpChannel()).thenReturn(httpchannel);
