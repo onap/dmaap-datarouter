@@ -27,6 +27,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+
 import java.util.Properties;
 
 import static org.mockito.Mockito.mock;
@@ -49,7 +50,7 @@ public class DrServletTestBase {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
 
     }
 }

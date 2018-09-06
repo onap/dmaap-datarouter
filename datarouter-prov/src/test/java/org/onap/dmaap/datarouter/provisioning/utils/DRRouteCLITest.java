@@ -41,9 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static org.mockito.Matchers.anyObject;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(PowerMockRunner.class)
 public class DRRouteCLITest {
@@ -63,74 +61,74 @@ public class DRRouteCLITest {
     private DRRouteCLI drRouteCLI;
 
     @Before
-    public void setUp() throws IllegalAccessException{
+    public void setUp() throws IllegalAccessException {
         drRouteCLI = mock(DRRouteCLI.class);
         doCallRealMethod().when(drRouteCLI).runCommand(anyObject());
         FieldUtils.writeField(drRouteCLI, "server", "prov.datarouternew.com", true);
     }
 
     @Test
-    public void Given_Add_Egress_Then_RunCommand_Returns_True() throws Exception{
+    public void Given_Add_Egress_Then_RunCommand_Returns_True() throws Exception {
         mockHttpClientForRestCall();
         Assert.assertTrue(drRouteCLI.runCommand(new String[]{"add", "egress", "1", "node.datarouternew.com"}));
     }
 
     @Test
-    public void Given_Add_Network_Then_RunCommand_Returns_True() throws Exception{
+    public void Given_Add_Network_Then_RunCommand_Returns_True() throws Exception {
         mockHttpClientForRestCall();
         Assert.assertTrue(drRouteCLI.runCommand(new String[]{"add", "network", "prov.datarouternew.com", "node.datarouternew.com", "172.100.0.1"}));
     }
 
     @Test
-    public void Given_Add_Egress_With_Incorrect_Args_Then_RunCommand_Returns_False() throws Exception{
+    public void Given_Add_Egress_With_Incorrect_Args_Then_RunCommand_Returns_False() throws Exception {
         mockHttpClientForRestCall();
         Assert.assertFalse(drRouteCLI.runCommand(new String[]{"add", "egress", "1", "user1", "172.100.0.0", "node.datarouternew.com"}));
     }
 
     @Test
-    public void Given_Error_On_Post_Rest_Call_RunCommand_Returns_False() throws Exception{
+    public void Given_Error_On_Post_Rest_Call_RunCommand_Returns_False() throws Exception {
         mockErrorResponseFromRestCall();
         Assert.assertFalse(drRouteCLI.runCommand(new String[]{"add", "network", "prov.datarouternew.com", "node.datarouternew.com"}));
     }
 
     @Test
-    public void Given_Delete_Ingress_Then_RunCommand_Returns_True() throws Exception{
+    public void Given_Delete_Ingress_Then_RunCommand_Returns_True() throws Exception {
         mockHttpClientForRestCall();
         Assert.assertTrue(drRouteCLI.runCommand(new String[]{"del", "ingress", "1", "user1", "172.100.0.0"}));
     }
 
     @Test
-    public void Given_Delete_Egress_Then_RunCommand_Returns_True() throws Exception{
+    public void Given_Delete_Egress_Then_RunCommand_Returns_True() throws Exception {
         mockHttpClientForRestCall();
         Assert.assertTrue(drRouteCLI.runCommand(new String[]{"del", "egress", "1"}));
     }
 
     @Test
-    public void Given_Delete_Network_Then_RunCommand_Returns_True() throws Exception{
+    public void Given_Delete_Network_Then_RunCommand_Returns_True() throws Exception {
         mockHttpClientForRestCall();
         Assert.assertTrue(drRouteCLI.runCommand(new String[]{"del", "network", "prov.datarouternew.com", "node.datarouternew.com"}));
     }
 
     @Test
-    public void Given_Delete_Ingress_With_Incorrect_Args_Then_RunCommand_Returns_False() throws Exception{
+    public void Given_Delete_Ingress_With_Incorrect_Args_Then_RunCommand_Returns_False() throws Exception {
         mockHttpClientForRestCall();
         Assert.assertFalse(drRouteCLI.runCommand(new String[]{"del", "ingress", "prov.datarouternew.com", "node.datarouternew.com"}));
     }
 
     @Test
-    public void Given_Error_On_Delete_Rest_Call_RunCommand_Returns_False() throws Exception{
+    public void Given_Error_On_Delete_Rest_Call_RunCommand_Returns_False() throws Exception {
         mockErrorResponseFromRestCall();
         Assert.assertFalse(drRouteCLI.runCommand(new String[]{"del", "network", "prov.datarouternew.com", "node.datarouternew.com"}));
     }
 
     @Test
-    public void Given_List_Args_Then_RunCommand_Returns_True() throws Exception{
+    public void Given_List_Args_Then_RunCommand_Returns_True() throws Exception {
         mockHttpClientForGetRequest();
         Assert.assertTrue(drRouteCLI.runCommand(new String[]{"list"}));
     }
 
     @Test
-    public void Given_Error_On_Get_Rest_Call_RunCommand_Returns_True() throws Exception{
+    public void Given_Error_On_Get_Rest_Call_RunCommand_Returns_True() throws Exception {
         mockErrorResponseFromRestCall();
         Assert.assertTrue(drRouteCLI.runCommand(new String[]{"list"}));
     }
@@ -145,7 +143,7 @@ public class DRRouteCLITest {
         Assert.assertFalse(drRouteCLI.runCommand(new String[]{"usage"}));
     }
 
-    private void mockHttpClientForRestCall() throws Exception{
+    private void mockHttpClientForRestCall() throws Exception {
         when(httpResponse.getEntity()).thenReturn(httpEntity);
         when(statusLine.getStatusCode()).thenReturn(200);
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
@@ -153,7 +151,7 @@ public class DRRouteCLITest {
         FieldUtils.writeField(drRouteCLI, "httpclient", httpClient, true);
     }
 
-    private void mockHttpClientForGetRequest() throws Exception{
+    private void mockHttpClientForGetRequest() throws Exception {
         mockResponseFromGet();
         when(httpResponse.getEntity()).thenReturn(httpEntity);
         when(statusLine.getStatusCode()).thenReturn(200);
@@ -203,7 +201,7 @@ public class DRRouteCLITest {
         return ingresses;
     }
 
-    private void mockErrorResponseFromRestCall() throws Exception{
+    private void mockErrorResponseFromRestCall() throws Exception {
         InputStream in = new ByteArrayInputStream("<pre> Server Not Found </pre>".getBytes());
         when(httpEntity.getContent()).thenReturn(in);
         when(httpResponse.getEntity()).thenReturn(httpEntity);
