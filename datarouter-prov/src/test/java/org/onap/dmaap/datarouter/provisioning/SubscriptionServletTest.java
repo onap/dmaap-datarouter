@@ -60,12 +60,11 @@ import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 public class SubscriptionServletTest {
     private static EntityManagerFactory emf;
     private static EntityManager em;
+    private final String URL = "https://172.100.0.5";
+    private final String USER = "user1";
+    private final String PASSWORD = "password1";
     private SubscriptionServlet subscriptionServlet;
     private DB db;
-    private final String URL= "https://172.100.0.5";
-    private final String USER = "user1";
-    private final String PASSWORD="password1";
-
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -134,8 +133,8 @@ public class SubscriptionServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Delete_On_Database_Fails_An_Internal_Server_Error_Is_Reported() throws Exception {
-        SubscriptionServlet subscriptionServlet = new SubscriptionServlet(){
-            public boolean doDelete(Deleteable deletable){
+        SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
+            public boolean doDelete(Deleteable deletable) {
                 return false;
             }
         };
@@ -249,8 +248,7 @@ public class SubscriptionServletTest {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.subscription; version=1.0");
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                return jo;
+                return new JSONObject();
             }
         };
         subscriptionServlet.doPut(request, response);
@@ -437,7 +435,7 @@ public class SubscriptionServletTest {
 
     private void setUpValidSecurityOnHttpRequest() throws Exception {
         when(request.isSecure()).thenReturn(true);
-        Set<String> authAddressesAndNetworks = new HashSet<String>();
+        Set<String> authAddressesAndNetworks = new HashSet<>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks, true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", false, true);

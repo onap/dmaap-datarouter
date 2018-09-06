@@ -32,46 +32,46 @@ import java.util.LinkedHashMap;
 
 public class PublishRecordTest {
 
-  private PublishRecord publishRecord;
+    private PublishRecord publishRecord;
 
-  @Before
-  public void setUp() throws ParseException {
-    String[] args = {"2018-08-29-10-10-10-543.", "PUB", "238465493.fileName",
-        "1", "/publish/1/fileName", "PUT", "application/octet-stream", "285",
-        "172.100.0.3", "user1", "301"};
-    publishRecord = new PublishRecord(args);
-  }
+    @Before
+    public void setUp() throws ParseException {
+        String[] args = {"2018-08-29-10-10-10-543.", "PUB", "238465493.fileName",
+            "1", "/publish/1/fileName", "PUT", "application/octet-stream", "285",
+            "172.100.0.3", "user1", "301"};
+        publishRecord = new PublishRecord(args);
+    }
 
-  @Test
-  public void Validate_Contructor_Creates_Object_With_Get_Methods() {
-    Assert.assertEquals("fileName", publishRecord.getFeedFileid());
-    Assert.assertEquals("172.100.0.3", publishRecord.getRemoteAddr());
-    Assert.assertEquals("user1", publishRecord.getUser());
-    Assert.assertEquals(301, publishRecord.getStatus());
-  }
+    @Test
+    public void Validate_Contructor_Creates_Object_With_Get_Methods() {
+        Assert.assertEquals("fileName", publishRecord.getFeedFileid());
+        Assert.assertEquals("172.100.0.3", publishRecord.getRemoteAddr());
+        Assert.assertEquals("user1", publishRecord.getUser());
+        Assert.assertEquals(301, publishRecord.getStatus());
+    }
 
-  @Test
-  public void Validate_AsJsonObject_Correct_Json_Object_After_Set_Methods() {
-    publishRecord.setFeedFileid("fileName2");
-    publishRecord.setRemoteAddr("172.100.0.4");
-    publishRecord.setStatus(201);
-    publishRecord.setUser("user2");
-    LOGJSONObject publishRecordJson = createPublishRecordJson();
-    Assert.assertEquals(publishRecordJson.toString(), publishRecord.asJSONObject().toString());
-  }
+    @Test
+    public void Validate_AsJsonObject_Correct_Json_Object_After_Set_Methods() {
+        publishRecord.setFeedFileid("fileName2");
+        publishRecord.setRemoteAddr("172.100.0.4");
+        publishRecord.setStatus(201);
+        publishRecord.setUser("user2");
+        LOGJSONObject publishRecordJson = createPublishRecordJson();
+        Assert.assertEquals(publishRecordJson.toString(), publishRecord.asJSONObject().toString());
+    }
 
-  private LOGJSONObject createPublishRecordJson() {
-    LinkedHashMap<String, Object> publishRecordMap = new LinkedHashMap<>();
-    publishRecordMap.put("statusCode", 201);
-    publishRecordMap.put("publishId", "238465493.fileName");
-    publishRecordMap.put("requestURI", "/publish/1/fileName");
-    publishRecordMap.put("sourceIP", "172.100.0.4");
-    publishRecordMap.put("method", "PUT");
-    publishRecordMap.put("contentType", "application/octet-stream");
-    publishRecordMap.put("endpointId", "user2");
-    publishRecordMap.put("type", "pub");
-    publishRecordMap.put("date", "2018-08-29T10:10:10.543Z");
-    publishRecordMap.put("contentLength", 285);
-    return  new LOGJSONObject(publishRecordMap);
-  }
+    private LOGJSONObject createPublishRecordJson() {
+        LinkedHashMap<String, Object> publishRecordMap = new LinkedHashMap<>();
+        publishRecordMap.put("statusCode", 201);
+        publishRecordMap.put("publishId", "238465493.fileName");
+        publishRecordMap.put("requestURI", "/publish/1/fileName");
+        publishRecordMap.put("sourceIP", "172.100.0.4");
+        publishRecordMap.put("method", "PUT");
+        publishRecordMap.put("contentType", "application/octet-stream");
+        publishRecordMap.put("endpointId", "user2");
+        publishRecordMap.put("type", "pub");
+        publishRecordMap.put("date", "2018-08-29T10:10:10.543Z");
+        publishRecordMap.put("contentLength", 285);
+        return new LOGJSONObject(publishRecordMap);
+    }
 }

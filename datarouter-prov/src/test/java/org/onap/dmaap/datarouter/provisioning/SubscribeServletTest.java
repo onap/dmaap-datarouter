@@ -135,6 +135,7 @@ public class SubscribeServletTest extends DrServletTestBase {
         subscribeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), argThat(notNullValue(String.class)));
     }
+
     @Test
     public void Given_Request_Is_HTTP_POST_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated() throws Exception {
         when(request.isSecure()).thenReturn(false);

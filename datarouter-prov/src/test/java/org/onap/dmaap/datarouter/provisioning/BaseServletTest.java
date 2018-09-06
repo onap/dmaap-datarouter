@@ -35,9 +35,11 @@ import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.Set;
+
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertNull;
@@ -48,8 +50,8 @@ import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.provisioning.beans.Feed",
-        "org.onap.dmaap.datarouter.provisioning.beans.Subscription",
-        "org.onap.dmaap.datarouter.provisioning.beans.Group"})
+    "org.onap.dmaap.datarouter.provisioning.beans.Subscription",
+    "org.onap.dmaap.datarouter.provisioning.beans.Group"})
 public class BaseServletTest extends DrServletTestBase {
 
     private BaseServlet baseServlet;
@@ -81,7 +83,7 @@ public class BaseServletTest extends DrServletTestBase {
     @Test
     public void Given_Remote_Address_Is_Known_And_RequireCerts_Is_True() throws Exception {
         when(request.isSecure()).thenReturn(true);
-        Set<String> authAddressesAndNetworks = new HashSet<String>();
+        Set<String> authAddressesAndNetworks = new HashSet<>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks, true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", true, true);
@@ -89,7 +91,7 @@ public class BaseServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_GetFeedOwner_And_Feed_Exists() throws Exception {
+    public void Given_Request_Is_GetFeedOwner_And_Feed_Exists() {
         PowerMockito.mockStatic(Feed.class);
         Feed feed = mock(Feed.class);
         PowerMockito.when(Feed.getFeedById(anyInt())).thenReturn(feed);
@@ -98,14 +100,14 @@ public class BaseServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_GetFeedOwner_And_Feed_Does_Not_Exist() throws Exception {
+    public void Given_Request_Is_GetFeedOwner_And_Feed_Does_Not_Exist() {
         PowerMockito.mockStatic(Feed.class);
         PowerMockito.when(Feed.getFeedById(anyInt())).thenReturn(null);
         assertThat(baseServlet.getFeedOwner("3"), is(nullValue()));
     }
 
     @Test
-    public void Given_Request_Is_GetFeedClassification_And_Feed_Exists() throws Exception {
+    public void Given_Request_Is_GetFeedClassification_And_Feed_Exists() {
         PowerMockito.mockStatic(Feed.class);
         Feed feed = mock(Feed.class);
         PowerMockito.when(Feed.getFeedById(anyInt())).thenReturn(feed);
@@ -116,14 +118,14 @@ public class BaseServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_GetFeedClassification_And_Feed_Does_Not_Exist() throws Exception {
+    public void Given_Request_Is_GetFeedClassification_And_Feed_Does_Not_Exist() {
         PowerMockito.mockStatic(Feed.class);
         PowerMockito.when(Feed.getFeedById(anyInt())).thenReturn(null);
         assertThat(baseServlet.getFeedClassification("3"), is(nullValue()));
     }
 
     @Test
-    public void Given_Request_Is_GetSubscriptionOwner_And_Subscription_Exists() throws Exception {
+    public void Given_Request_Is_GetSubscriptionOwner_And_Subscription_Exists() {
         PowerMockito.mockStatic(Subscription.class);
         Subscription subscription = mock(Subscription.class);
         PowerMockito.when(Subscription.getSubscriptionById(anyInt())).thenReturn(subscription);
@@ -132,14 +134,14 @@ public class BaseServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_GetSubscriptionOwner_And_Subscription_Does_Not_Exist() throws Exception {
+    public void Given_Request_Is_GetSubscriptionOwner_And_Subscription_Does_Not_Exist() {
         PowerMockito.mockStatic(Subscription.class);
         PowerMockito.when(Subscription.getSubscriptionById(anyInt())).thenReturn(null);
         assertThat(baseServlet.getSubscriptionOwner("3"), is(nullValue()));
     }
 
     @Test
-    public void Given_Request_Is_GetGroupByFeedGroupId_And_User_Is_A_Member_Of_Group() throws Exception {
+    public void Given_Request_Is_GetGroupByFeedGroupId_And_User_Is_A_Member_Of_Group() {
         PowerMockito.mockStatic(Feed.class);
         Feed feed = mock(Feed.class);
         PowerMockito.when(Feed.getFeedById(anyInt())).thenReturn(feed);
@@ -153,7 +155,7 @@ public class BaseServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_GetGroupByFeedGroupId_And_User_Is_Not_A_Member_Of_Group() throws Exception {
+    public void Given_Request_Is_GetGroupByFeedGroupId_And_User_Is_Not_A_Member_Of_Group() {
         PowerMockito.mockStatic(Feed.class);
         Feed feed = mock(Feed.class);
         PowerMockito.when(Feed.getFeedById(anyInt())).thenReturn(feed);
@@ -167,7 +169,7 @@ public class BaseServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_GetGroupBySubGroupId_And_User_Is_A_Member_Of_Group() throws Exception {
+    public void Given_Request_Is_GetGroupBySubGroupId_And_User_Is_A_Member_Of_Group() {
         PowerMockito.mockStatic(Subscription.class);
         Subscription subscription = mock(Subscription.class);
         PowerMockito.when(Subscription.getSubscriptionById(anyInt())).thenReturn(subscription);
@@ -181,7 +183,7 @@ public class BaseServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_GetGroupBySubGroupId_And_User_Is_Not_A_Member_Of_Group() throws Exception {
+    public void Given_Request_Is_GetGroupBySubGroupId_And_User_Is_Not_A_Member_Of_Group() {
         PowerMockito.mockStatic(Subscription.class);
         Subscription subscription = mock(Subscription.class);
         PowerMockito.when(Subscription.getSubscriptionById(anyInt())).thenReturn(subscription);

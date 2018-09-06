@@ -22,21 +22,6 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.argThat;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
-
-import java.util.HashSet;
-import java.util.Set;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -52,6 +37,16 @@ import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.*;
+import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 
 @RunWith(PowerMockRunner.class)
@@ -225,12 +220,10 @@ public class DRFeedsServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_POST_And_Feed_Is_Not_Valid_Object_Bad_Request_Response_Is_Generated()
         throws Exception {
         when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn(null);
-        JSONObject JSObject = buildRequestJsonObject();
 
         DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                return jo;
+                return new JSONObject();
             }
         };
 
@@ -323,7 +316,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
 
     private void setUpValidSecurityOnHttpRequest() throws Exception {
         when(request.isSecure()).thenReturn(true);
-        Set<String> authAddressesAndNetworks = new HashSet<String>();
+        Set<String> authAddressesAndNetworks = new HashSet<>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils
             .writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks,
@@ -356,7 +349,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         when(feed.getName()).thenReturn("stub_name");
         when(feed.getVersion()).thenReturn("1.0");
         when(feed.asLimitedJSONObject()).thenReturn(mock(JSONObject.class));
-        PowerMockito.when(feed.getFeedByNameVersion(anyString(), anyString())).thenReturn(null);
+        PowerMockito.when(Feed.getFeedByNameVersion(anyString(), anyString())).thenReturn(null);
     }
 
     private void setAuthoriserToReturnRequestNotAuthorized() throws IllegalAccessException {

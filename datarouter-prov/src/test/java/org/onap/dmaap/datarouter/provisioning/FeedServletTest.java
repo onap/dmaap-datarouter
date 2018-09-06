@@ -59,14 +59,12 @@ import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 public class FeedServletTest extends DrServletTestBase {
 
     private static FeedServlet feedServlet;
-
+    private static EntityManagerFactory emf;
+    private static EntityManager em;
     @Mock
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
-
-    private static EntityManagerFactory emf;
-    private static EntityManager em;
     private DB db;
 
     @BeforeClass
@@ -74,8 +72,8 @@ public class FeedServletTest extends DrServletTestBase {
         emf = Persistence.createEntityManagerFactory("dr-unit-tests");
         em = emf.createEntityManager();
         System.setProperty(
-                "org.onap.dmaap.datarouter.provserver.properties",
-                "src/test/resources/h2Database.properties");
+            "org.onap.dmaap.datarouter.provserver.properties",
+            "src/test/resources/h2Database.properties");
     }
 
     @AfterClass
@@ -415,7 +413,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     private void setUpValidSecurityOnHttpRequest() throws Exception {
         when(request.isSecure()).thenReturn(true);
-        Set<String> authAddressesAndNetworks = new HashSet<String>();
+        Set<String> authAddressesAndNetworks = new HashSet<>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils
             .writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks,
@@ -459,7 +457,7 @@ public class FeedServletTest extends DrServletTestBase {
     }
 
     private void reinsertFeedIntoDb() throws SQLException {
-        Feed feed = new Feed("Feed1","v0.1", "First Feed for testing", "First Feed for testing");
+        Feed feed = new Feed("Feed1", "v0.1", "First Feed for testing", "First Feed for testing");
         feed.setFeedid(1);
         feed.setGroupid(1);
         feed.setDeleted(false);

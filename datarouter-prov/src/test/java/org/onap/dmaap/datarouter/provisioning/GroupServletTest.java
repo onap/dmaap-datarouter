@@ -278,7 +278,7 @@ public class GroupServletTest {
 
     private void setUpValidSecurityOnHttpRequest() throws Exception {
         when(request.isSecure()).thenReturn(true);
-        Set<String> authAddressesAndNetworks = new HashSet<String>();
+        Set<String> authAddressesAndNetworks = new HashSet<>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks, true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", false, true);
