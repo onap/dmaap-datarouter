@@ -126,21 +126,21 @@ public class ProvAuthorizer implements Authorizer {
     private boolean allowFeedsCollectionAccess(AuthzResource resource,    String method, String subject, String subjectgroup) {
 
         // Allow GET or POST unconditionally
-        return method != null && (method.equalsIgnoreCase("GET") || method.equalsIgnoreCase("POST"));
+        return method != null && ("GET".equalsIgnoreCase(method) || "POST".equalsIgnoreCase(method));
     }
 
     private boolean allowSubsCollectionAccess(AuthzResource resource, String method, String subject, String subjectgroup) {
 
         // Allow GET or POST unconditionally
-        return method != null && (method.equalsIgnoreCase("GET") || method.equalsIgnoreCase("POST"));
+        return method != null && ("GET".equalsIgnoreCase(method) || "POST".equalsIgnoreCase(method));
     }
 
     private boolean allowFeedAccess(AuthzResource resource, String method,    String subject, String subjectgroup) {
         boolean decision = false;
 
         // Allow GET, PUT, or DELETE if requester (subject) is the owner (publisher) of the feed
-        if ( method != null && (method.equalsIgnoreCase("GET") || method.equalsIgnoreCase("PUT") ||
-                method.equalsIgnoreCase("DELETE"))) {
+        if ( method != null && ("GET".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method) ||
+        		"DELETE".equalsIgnoreCase(method))) {
 
             String owner = provData.getFeedOwner(resource.getId());
             decision = (owner != null) && owner.equals(subject);
@@ -159,8 +159,8 @@ public class ProvAuthorizer implements Authorizer {
         boolean decision = false;
 
         // Allow GET, PUT, or DELETE if requester (subject) is the owner of the subscription (subscriber)
-        if (method != null && (method.equalsIgnoreCase("GET") || method.equalsIgnoreCase("PUT") ||
-                method.equalsIgnoreCase("DELETE") || method.equalsIgnoreCase("POST"))) {
+        if (method != null && ("GET".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method) ||
+        		"DELETE".equalsIgnoreCase(method) || "POST".equalsIgnoreCase(method))) {
 
             String owner = provData.getSubscriptionOwner(resource.getId());
             decision = (owner != null) && owner.equals(subject);
