@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_617066dc",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-06T13:29:04Z",
+      "side": 1,
+      "message": "Add in spaces after the commas",
+      "range": {
+        "startLine": 183,
+        "startChar": 29,
+        "endLine": 183,
+        "endChar": 30
+      },
+      "revId": "d61eefee0a612a32cfff4aef7ca57cfed99613b1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_814ca29f",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 548,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-06T13:29:04Z",
+      "side": 1,
+      "message": "Think this can be kept on the same line as the try(",
+      "range": {
+        "startLine": 547,
+        "startChar": 11,
+        "endLine": 548,
+        "endChar": 14
+      },
+      "revId": "d61eefee0a612a32cfff4aef7ca57cfed99613b1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
