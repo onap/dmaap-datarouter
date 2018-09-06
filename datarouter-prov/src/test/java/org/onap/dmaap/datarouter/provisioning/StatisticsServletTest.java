@@ -23,32 +23,31 @@
 package org.onap.dmaap.datarouter.provisioning;
 
 import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doCallRealMethod;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(StatisticsServlet.class)
-public class StatisticsServletTest extends DrServletTestBase {
+public class StatisticsServletTest {
 
   private StatisticsServlet statisticsServlet;
 
@@ -58,10 +57,31 @@ public class StatisticsServletTest extends DrServletTestBase {
   @Mock
   private HttpServletResponse response;
 
+  private DB db;
+
+  private static EntityManagerFactory emf;
+  private static EntityManager em;
+
+  @BeforeClass
+  public static void init() {
+    emf = Persistence.createEntityManagerFactory("dr-unit-tests");
+    em = emf.createEntityManager();
+    System.setProperty(
+            "org.onap.dmaap.datarouter.provserver.properties",
+            "src/test/resources/h2Database.properties");
+  }
+
+  @AfterClass
+  public static void tearDownClass() {
+    em.clear();
+    em.close();
+    emf.close();
+  }
+
   @Before
   public void setUp() throws Exception {
-    super.setUp();
     statisticsServlet = new StatisticsServlet();
+    db = new DB();
     buildRequestParameters();
   }
 
@@ -103,13 +123,6 @@ public class StatisticsServletTest extends DrServletTestBase {
       throws Exception {
     ServletOutputStream outStream = mock(ServletOutputStream.class);
     when(response.getOutputStream()).thenReturn(outStream);
-    statisticsServlet = PowerMockito.mock(StatisticsServlet.class);
-    PowerMockito.doReturn(null).when(statisticsServlet, "getRecordsForSQL", anyString());
-    PowerMockito.doCallRealMethod().when(statisticsServlet, "buildMapFromRequest", anyObject());
-    PowerMockito.doCallRealMethod().when(statisticsServlet, "getTimeFromParam", anyString());
-    doNothing().when(statisticsServlet).rsToCSV(anyObject(), anyObject());
-    doCallRealMethod().when(statisticsServlet).doGet(request, response);
-    when(statisticsServlet.getFeedIdsByGroupId(anyInt())).thenReturn(new StringBuffer("1"));
     statisticsServlet.doGet(request, response);
     verify(response).setStatus(eq(HttpServletResponse.SC_OK));
   }
@@ -121,14 +134,6 @@ public class StatisticsServletTest extends DrServletTestBase {
     when(request.getParameter("statusCode")).thenReturn("500");
     ServletOutputStream outStream = mock(ServletOutputStream.class);
     when(response.getOutputStream()).thenReturn(outStream);
-    statisticsServlet = PowerMockito.mock(StatisticsServlet.class);
-    PowerMockito.doReturn(null).when(statisticsServlet, "getRecordsForSQL", anyString());
-    PowerMockito.doCallRealMethod().when(statisticsServlet, "buildMapFromRequest", anyObject());
-    PowerMockito.doCallRealMethod().when(statisticsServlet, "getTimeFromParam", anyString());
-    doNothing().when(statisticsServlet).rsToCSV(anyObject(), anyObject());
-    doCallRealMethod().when(statisticsServlet).doGet(request, response);
-    doCallRealMethod().when(statisticsServlet).queryGeneretor(anyObject());
-    when(statisticsServlet.getFeedIdsByGroupId(anyInt())).thenReturn(new StringBuffer("1"));
     statisticsServlet.doGet(request, response);
     verify(response).setStatus(eq(HttpServletResponse.SC_OK));
   }
