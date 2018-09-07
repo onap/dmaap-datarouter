@@ -29,17 +29,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
-
-import java.util.Properties;
 
 /**
  * The representation of a Subscription.  Subscriptions can be retrieved from the DB, or stored/updated in the DB.
@@ -93,14 +88,14 @@ public class Subscription extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                Subscription sub = new Subscription(rs);
-                list.add(sub);
+            try(Statement stmt = conn.createStatement()) {
+                try(ResultSet rs = stmt.executeQuery(sql)) {
+                    while (rs.next()) {
+                        Subscription sub = new Subscription(rs);
+                        list.add(sub);
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
             db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -114,13 +109,13 @@ public class Subscription extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("select MAX(subid) from SUBSCRIPTIONS");
-            if (rs.next()) {
-                max = rs.getInt(1);
+            try(Statement stmt = conn.createStatement()) {
+                try(ResultSet rs = stmt.executeQuery("select MAX(subid) from SUBSCRIPTIONS")) {
+                    if (rs.next()) {
+                        max = rs.getInt(1);
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
             db.release(conn);
         } catch (SQLException e) {
             intlogger.info("getMaxSubID: " + e.getMessage());
@@ -136,14 +131,14 @@ public class Subscription extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                int subid = rs.getInt("SUBID");
-                list.add(URLUtilities.generateSubscriptionURL(subid));
+            try(Statement stmt = conn.createStatement()) {
+                try(ResultSet rs = stmt.executeQuery(sql)) {
+                    while (rs.next()) {
+                        int subid = rs.getInt("SUBID");
+                        list.add(URLUtilities.generateSubscriptionURL(subid));
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
             db.release(conn);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -162,13 +157,13 @@ public class Subscription extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("select count(*) from SUBSCRIPTIONS");
-            if (rs.next()) {
-                count = rs.getInt(1);
+            try(Statement stmt = conn.createStatement()) {
+                try(ResultSet rs = stmt.executeQuery("select count(*) from SUBSCRIPTIONS")) {
+                    if (rs.next()) {
+                        count = rs.getInt(1);
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
             db.release(conn);
         } catch (SQLException e) {
             intlogger.warn("PROV0008 countActiveSubscriptions: " + e.getMessage());
@@ -391,11 +386,6 @@ public class Subscription extends Syncable {
             ps.setInt(10, groupid); //New field is added - Groups feature Rally:US708115 - 1610
             ps.execute();
             ps.close();
-//            ResultSet rs = ps.getGeneratedKeys();
-//            rs.first();
-//            setSubid(rs.getInt(1));    // side effect - sets the link URLs
-//            ps.close();
-
             // Update the row to set the URLs
             sql = "update SUBSCRIPTIONS set SELF_LINK = ?, LOG_LINK = ? where SUBID = ?";
             ps = c.prepareStatement(sql);
@@ -410,7 +400,9 @@ public class Subscription extends Syncable {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -440,7 +432,9 @@ public class Subscription extends Syncable {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -473,7 +467,9 @@ public class Subscription extends Syncable {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -497,7 +493,9 @@ public class Subscription extends Syncable {
             e.printStackTrace();
         } finally {
             try {
-                ps.close();
+                if(ps!=null) {
+                    ps.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -532,6 +530,11 @@ public class Subscription extends Syncable {
         if (suspended != os.suspended)
             return false;
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(subid, feedid, groupid, delivery, metadataOnly, subscriber, links, suspended, last_mod, created_date);
     }
 
     @Override
