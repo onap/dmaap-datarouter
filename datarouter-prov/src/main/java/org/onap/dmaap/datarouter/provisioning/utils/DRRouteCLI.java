@@ -339,8 +339,11 @@ public class DRRouteCLI {
             sb.append("Egress Routing Table\n");
             sb.append(String.format("%s  Node\n", ext("SubID", cw1)));
             for (int i = 0; i < subs.length; i++) {
-                String node = ert.getString(subs[i]);
-                sb.append(String.format("%s  %s\n", ext(subs[i], cw1), node));
+                if(ert!=null&&ert.length()!=0) {
+                    String node = ert.getString(subs[i]);
+                    sb.append(String.format("%s  %s\n", ext(subs[i], cw1), node));
+                }
+
             }
         }
         if (tbl.startsWith("al") || tbl.startsWith("ne")) {
