@@ -165,3 +165,12 @@ VALUES (2,1,'user',null,2);
 
 insert into NODESETS(SETID, NODEID)
 VALUES (2,0);
+
+insert into LOG_RECORDS(RECORD_ID,TYPE,EVENT_TIME,PUBLISH_ID,FEEDID,REQURI,METHOD,CONTENT_TYPE,CONTENT_LENGTH,FEED_FILEID,REMOTE_ADDR,USER,STATUS,DELIVERY_SUBID,DELIVERY_FILEID,RESULT,ATTEMPTS,REASON)
+VALUES(1,'pub',2536159564422,'ID',1,'URL','GET','application/vnd.att-dr.log-list; version=1.0',100,1,'172.0.0.8','user',204,1,1,204,0,'other');
+
+CREATE ALIAS IF NOT EXISTS `SUBSTRING_INDEX` AS $$
+    String Function(String one, String two, String three){
+        return "url";
+    }
+$$;

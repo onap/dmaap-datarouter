@@ -180,39 +180,8 @@ public class StatisticsServlet extends BaseServlet {
       outputType = req.getParameter("output_type");
     }
 
-    try {
+    this.getRecordsForSQL(map, outputType, out, resp);
 
-      String filterQuery = this.queryGeneretor(map);
-      eventlogger.debug("SQL Query for Statistics resultset. " + filterQuery);
-
-      ResultSet rs = this.getRecordsForSQL(filterQuery);
-
-      if (outputType.equals("csv")) {
-        resp.setContentType("application/octet-stream");
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY HH:mm:ss");
-        resp.setHeader("Content-Disposition",
-            "attachment; filename=\"result:" + dateFormat.format(date) + ".csv\"");
-        eventlogger.info("Generating CSV file from Statistics resultset");
-
-        rsToCSV(rs, out);
-      } else {
-        eventlogger.info("Generating JSON for Statistics resultset");
-        this.rsToJson(rs, out);
-      }
-    } catch (IOException e) {
-      eventlogger.error("IOException - Generating JSON/CSV:" + e);
-      e.printStackTrace();
-    } catch (JSONException e) {
-      eventlogger.error("JSONException - executing SQL query:" + e);
-      e.printStackTrace();
-    } catch (SQLException e) {
-      eventlogger.error("SQLException - executing SQL query:" + e);
-      e.printStackTrace();
-    } catch (ParseException e) {
-      eventlogger.error("ParseException - executing SQL query:" + e);
-      e.printStackTrace();
-    }
   }
 
 
@@ -565,21 +534,47 @@ public class StatisticsServlet extends BaseServlet {
     intlogger.info("Error parsing time=" + s);
     return -1;
   }
-  private ResultSet getRecordsForSQL(String sql) {
-      intlogger.debug(sql);
+
+  private void getRecordsForSQL(Map<String, String> map, String outputType, ServletOutputStream out, HttpServletResponse resp) {
+    try {
+
+      String filterQuery = this.queryGeneretor(map);
+      eventlogger.debug("SQL Query for Statistics resultset. " + filterQuery);
+      intlogger.debug(filterQuery);
       long start = System.currentTimeMillis();
       DB db = new DB();
       ResultSet rs = null;
-      try (
-          Connection conn = db.getConnection()){
-          try(PreparedStatement pst = conn.prepareStatement(sql)){
-              rs = pst.executeQuery();
+      try (Connection conn = db.getConnection()) {
+        try (PreparedStatement pst = conn.prepareStatement(filterQuery)) {
+          rs = pst.executeQuery();
+          if (outputType.equals("csv")) {
+            resp.setContentType("application/octet-stream");
+            Date date = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY HH:mm:ss");
+            resp.setHeader("Content-Disposition",
+                    "attachment; filename=\"result:" + dateFormat.format(date) + ".csv\"");
+            eventlogger.info("Generating CSV file from Statistics resultset");
+
+            rsToCSV(rs, out);
+          } else {
+            eventlogger.info("Generating JSON for Statistics resultset");
+            this.rsToJson(rs, out);
           }
+        }
       } catch (SQLException e) {
-          e.printStackTrace();
+        e.printStackTrace();
       }
-          intlogger.debug("Time: " + (System.currentTimeMillis() - start) + " ms");
-          return rs;
-      }
+      intlogger.debug("Time: " + (System.currentTimeMillis() - start) + " ms");
+    } catch (IOException e) {
+      eventlogger.error("IOException - Generating JSON/CSV:" + e);
+      e.printStackTrace();
+    } catch (JSONException e) {
+      eventlogger.error("JSONException - executing SQL query:" + e);
+      e.printStackTrace();
+    } catch (ParseException e) {
+      eventlogger.error("ParseException - executing SQL query:" + e);
+      e.printStackTrace();
+    }
   }
+}
 
