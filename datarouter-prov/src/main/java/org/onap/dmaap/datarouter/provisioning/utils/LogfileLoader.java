@@ -188,6 +188,7 @@ public class LogfileLoader extends Thread {
                         try {
                             Thread.sleep(1000L);
                         } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
                         }
                         idle = false;
                     } else {
@@ -332,26 +333,25 @@ public class LogfileLoader extends Thread {
         Connection conn = null;
         try {
             conn = db.getConnection();
-            Statement stmt = conn.createStatement();
-            // Build a bitset of all records in the LOG_RECORDS table
-            // We need to run this SELECT in stages, because otherwise we run out of memory!
             RLEBitSet nbs = new RLEBitSet();
-            final long stepsize = 6000000L;
-            boolean go_again = true;
-            for (long i = 0; go_again; i += stepsize) {
-                String sql = String.format("select RECORD_ID from LOG_RECORDS LIMIT %d,%d", i, stepsize);
-                try(ResultSet rs = stmt.executeQuery(sql)) {
-                    go_again = false;
-                    while (rs.next()) {
-                        long n = rs.getLong("RECORD_ID");
-                        nbs.set(n);
-                        go_again = true;
+            try(Statement stmt = conn.createStatement()) {
+                // Build a bitset of all records in the LOG_RECORDS table
+                // We need to run this SELECT in stages, because otherwise we run out of memory!
+                final long stepsize = 6000000L;
+                boolean go_again = true;
+                for (long i = 0; go_again; i += stepsize) {
+                    String sql = String.format("select RECORD_ID from LOG_RECORDS LIMIT %d,%d", i, stepsize);
+                    try (ResultSet rs = stmt.executeQuery(sql)) {
+                        go_again = false;
+                        while (rs.next()) {
+                            long n = rs.getLong("RECORD_ID");
+                            nbs.set(n);
+                            go_again = true;
+                        }
                     }
                 }
             }
-            stmt.close();
             seq_set = nbs;
-
             // Compare with the range for this server
             // Determine the next ID for this set of record IDs
             RLEBitSet tbs = (RLEBitSet) nbs.clone();
