@@ -164,7 +164,7 @@ insert into INGRESS_ROUTES(SEQUENCE, FEEDID , USERID, SUBNET, NODESET)
 VALUES (2,1,'user',null,2);
 
 insert into NODESETS(SETID, NODEID)
-VALUES (2,0);
+VALUES (2,2);
 
 insert into LOG_RECORDS(RECORD_ID,TYPE,EVENT_TIME,PUBLISH_ID,FEEDID,REQURI,METHOD,CONTENT_TYPE,CONTENT_LENGTH,FEED_FILEID,REMOTE_ADDR,USER,STATUS,DELIVERY_SUBID,DELIVERY_FILEID,RESULT,ATTEMPTS,REASON)
 VALUES(1,'pub',2536159564422,'ID',1,'URL','GET','application/vnd.att-dr.log-list; version=1.0',100,1,'172.0.0.8','user',204,1,1,204,0,'other');
@@ -174,3 +174,17 @@ CREATE ALIAS IF NOT EXISTS `SUBSTRING_INDEX` AS $$
         return "url";
     }
 $$;
+
+insert into NETWORK_ROUTES(FROMNODE, TONODE, VIANODE)
+VALUES (1, 3, 2);
+
+insert into NODES(NODEID, NAME) values
+    (1, 'stub_from.'),
+    (2, 'stub_via.'),
+    (3, 'stub_to.'),
+    (4, 'node01.'),
+    (5, 'node02.'),
+    (6, 'node03.')
+;
+insert into EGRESS_ROUTES(SUBID, NODEID) values (1, 1);
+
