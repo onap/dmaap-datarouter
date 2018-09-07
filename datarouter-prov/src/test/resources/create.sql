@@ -161,4 +161,17 @@ insert into INGRESS_ROUTES(SEQUENCE, FEEDID , USERID, SUBNET, NODESET)
 VALUES (2,1,'user',null,2);
 
 insert into NODESETS(SETID, NODEID)
-VALUES (2,0);
+VALUES (2,2);
+
+insert into NETWORK_ROUTES(FROMNODE, TONODE, VIANODE)
+VALUES (1, 3, 2);
+
+insert into NODES(NODEID, NAME) values
+    (1, 'stub_from.'),
+    (2, 'stub_via.'),
+    (3, 'stub_to.'),
+    (4, 'node01.'),
+    (5, 'node02.'),
+    (6, 'node03.')
+;
+insert into EGRESS_ROUTES(SUBID, NODEID) values (1, 1);
