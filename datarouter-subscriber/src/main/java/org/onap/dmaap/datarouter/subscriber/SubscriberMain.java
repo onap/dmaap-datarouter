@@ -24,45 +24,23 @@
 package org.onap.dmaap.datarouter.subscriber;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jetty.servlet.*;
-import org.eclipse.jetty.util.ssl.*;
-import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Properties;
 
-public class Subscriber {
+public class SubscriberMain {
 
-    private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.subscriber.Subscriber");
-
-    private static final String CONTEXT_PATH = "/";
-    private static final String URL_PATTERN = "/*";
-
-    static Properties props;
-
-    private static void loadProps() {
-        if (props == null) {
-            props = new Properties();
-            try {
-                props.load(new FileInputStream(System.getProperty(
-                        "org.onap.dmaap.datarouter.subscriber.properties",
-                        "/opt/app/subscriber/etc/subscriber.properties")));
-            } catch (IOException e) {
-                logger.fatal("SubServlet: Exception opening properties: " + e.getMessage());
-                System.exit(1);
-            }
-        }
-    }
+    private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.subscriber.SubscriberMain");
 
     public static void main(String[] args) throws Exception {
-        //Load the properties
-        loadProps();
-
-        int httpsPort = Integer.parseInt(props.getProperty("org.onap.dmaap.datarouter.subscriber.https.port", "8443"));
-        int httpPort = Integer.parseInt(props.getProperty("org.onap.dmaap.datarouter.subscriber.http.port", "8080"));
+        SubscriberProps props = SubscriberProps.getInstance(
+                System.getProperty("org.onap.dmaap.datarouter.subscriber.properties", "subscriber.properties"));
+        int httpsPort = Integer.parseInt(props.getValue("org.onap.dmaap.datarouter.subscriber.https.port", "8443"));
+        int httpPort = Integer.parseInt(props.getValue("org.onap.dmaap.datarouter.subscriber.http.port", "8080"));
 
         Server server = new Server();
         HttpConfiguration httpConfig = new HttpConfiguration();
@@ -91,7 +69,7 @@ public class Subscriber {
 
             /*Skip SSLv3 Fixes*/
             sslContextFactory.addExcludeProtocols("SSLv3");
-            logger.info("Excluded protocols for Subscriber:" + Arrays.toString(sslContextFactory.getExcludeProtocols()));
+            logger.info("Excluded protocols for SubscriberMain:" + Arrays.toString(sslContextFactory.getExcludeProtocols()));
             /*End of SSLv3 Fixes*/
 
             // HTTPS Configuration
@@ -104,17 +82,17 @@ public class Subscriber {
             server.setConnectors(new Connector[]{ httpServerConnector });
         }
         ctxt = new ServletContextHandler(0);
-        ctxt.setContextPath(CONTEXT_PATH);
+        ctxt.setContextPath("/");
         server.setHandler(ctxt);
 
-        ctxt.addServlet(new ServletHolder(new SubscriberServlet()), URL_PATTERN);
+        ctxt.addServlet(new ServletHolder(new SampleSubscriberServlet()), "/*");
         try {
             server.start();
         } catch ( Exception e ) {
             logger.info("Jetty failed to start. Reporting will be unavailable-"+e);
         }
         server.join();
-        logger.info("org.onap.dmaap.datarouter.subscriber.Subscriber started-"+ server.getState());
+        logger.info("org.onap.dmaap.datarouter.subscriber.SubscriberMain started-"+ server.getState());
 
     }
 }
