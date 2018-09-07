@@ -23,7 +23,9 @@
 package org.onap.dmaap.datarouter.provisioning.beans;
 
 import org.junit.*;
+import org.junit.runner.RunWith;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -32,6 +34,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+@RunWith(PowerMockRunner.class)
 public class GroupTest {
   private static EntityManagerFactory emf;
   private static EntityManager em;
