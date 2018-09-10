@@ -47,6 +47,7 @@
         <sonar.projectVersion>${project.version}</sonar.projectVersion>
         <jetty.version>9.3.8.RC0</jetty.version>
         <jetty.websocket.version>8.2.0.v20160908</jetty.websocket.version>
+        <dom4j.version>1.6</dom4j.version>
         <thoughtworks.version>1.4.10</thoughtworks.version>
         <google.guava.version>26.0-jre</google.guava.version>
         <qos.logback.version>1.2.3</qos.logback.version>
