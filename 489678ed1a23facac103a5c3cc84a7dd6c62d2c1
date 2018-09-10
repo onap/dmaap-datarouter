@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_7f0a317a",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/beans/FeedTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-09-10T09:19:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_3fd0391e",
+      "range": {
+        "startLine": 90,
+        "startChar": 16,
+        "endLine": 90,
+        "endChar": 87
+      },
+      "revId": "489678ed1a23facac103a5c3cc84a7dd6c62d2c1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_7fb23107",
         "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/beans/FeedTest.java",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2018-09-10T08:25:53Z",
       "side": 1,
       "message": "Do you mean to set bool equal to this as well?",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 42
+      },
+      "revId": "489678ed1a23facac103a5c3cc84a7dd6c62d2c1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_9f0f0d88",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/beans/FeedTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-09-10T09:19:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_7fb23107",
       "range": {
         "startLine": 99,
         "startChar": 0,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_3f2839e1",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/beans/FeedTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-09-10T09:19:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_5fcdf583",
+      "range": {
+        "startLine": 104,
+        "startChar": 16,
+        "endLine": 104,
+        "endChar": 37
+      },
+      "revId": "489678ed1a23facac103a5c3cc84a7dd6c62d2c1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_ffc5e15b",
         "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/beans/FeedTest.java",
         "patchSetId": 1
@@ -82,6 +154,30 @@
       "writtenOn": "2018-09-10T08:25:53Z",
       "side": 1,
       "message": "Given_Feeds_Are_Equal_Then_Equals_Returns_True",
+      "range": {
+        "startLine": 111,
+        "startChar": 16,
+        "endLine": 111,
+        "endChar": 28
+      },
+      "revId": "489678ed1a23facac103a5c3cc84a7dd6c62d2c1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_5f25f506",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/beans/FeedTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-09-10T09:19:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_ffc5e15b",
       "range": {
         "startLine": 111,
         "startChar": 16,
