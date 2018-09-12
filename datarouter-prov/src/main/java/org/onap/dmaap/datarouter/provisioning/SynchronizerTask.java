@@ -302,7 +302,7 @@ public class SynchronizerTask extends TimerTask {
             String thisPod = myaddr.getHostName();
             Set<String> pods = new TreeSet<>(Arrays.asList(BaseServlet.getPods()));
             if (pods.contains(thisPod)) {
-                InetAddress pserver = InetAddress.getByName(BaseServlet.activeProvName);
+                InetAddress pserver = InetAddress.getByName(BaseServlet.getActiveProvName());
                 newstate = myaddr.equals(pserver) ? ACTIVE : STANDBY;
                 if (logger.isDebugEnabled() && System.currentTimeMillis() >= nextMsg) {
                     logger.debug("Active POD = " + pserver + ", Current state is " + stnames[newstate]);

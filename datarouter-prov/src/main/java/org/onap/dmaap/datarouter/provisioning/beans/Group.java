@@ -34,7 +34,6 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
-import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 
 /**
  * The representation of a Subscription.  Subscriptions can be retrieved from the DB, or stored/updated in the DB.
@@ -55,10 +54,59 @@ public class Group extends Syncable {
     private Date last_mod;
 
 
+    public Group() {
+        this("", "", "");
+    }
+
+    public Group(String name, String desc, String members) {
+        this.groupid = -1;
+        this.authid = "";
+        this.name = name;
+        this.description = desc;
+        this.members = members;
+        this.classification = "";
+        this.last_mod = new Date();
+    }
+
+    public Group(ResultSet rs) throws SQLException {
+        this.groupid = rs.getInt("GROUPID");
+        this.authid = rs.getString("AUTHID");
+        this.name = rs.getString("NAME");
+        this.description = rs.getString("DESCRIPTION");
+        this.classification = rs.getString("CLASSIFICATION");
+        this.members = rs.getString("MEMBERS");
+        this.last_mod = rs.getDate("LAST_MOD");
+    }
+
+    public Group(JSONObject jo) throws InvalidObjectException {
+        this("", "", "");
+        try {
+            // The JSONObject is assumed to contain a vnd.att-dr.group representation
+            this.groupid = jo.optInt("groupid", -1);
+            String gname = jo.getString("name");
+            String gdescription = jo.getString("description");
+
+            this.authid = jo.getString("authid");
+            this.name = gname;
+            this.description = gdescription;
+            this.classification = jo.getString("classification");
+            this.members = jo.getString("members");
+
+            if (gname.length() > 50)
+                throw new InvalidObjectException("Group name is too long");
+            if (gdescription.length() > 256)
+                throw new InvalidObjectException("Group Description is too long");
+        } catch (InvalidObjectException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new InvalidObjectException("invalid JSON: " + e.getMessage());
+        }
+    }
+
     public static Group getGroupMatching(Group gup) {
         String sql = String.format(
-                "select * from GROUPS where NAME='%s'",
-                gup.getName()
+            "select * from GROUPS where NAME='%s'",
+            gup.getName()
         );
         List<Group> list = getGroupsForSQL(sql);
         return list.size() > 0 ? list.get(0) : null;
@@ -66,9 +114,9 @@ public class Group extends Syncable {
 
     public static Group getGroupMatching(Group gup, int groupid) {
         String sql = String.format(
-                "select * from GROUPS where  NAME = '%s' and GROUPID != %d ",
-                gup.getName(),
-                gup.getGroupid()
+            "select * from GROUPS where  NAME = '%s' and GROUPID != %d ",
+            gup.getName(),
+            gup.getGroupid()
         );
         List<Group> list = getGroupsForSQL(sql);
         return list.size() > 0 ? list.get(0) : null;
@@ -96,8 +144,8 @@ public class Group extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            try(Statement stmt = conn.createStatement()) {
-                try(ResultSet rs = stmt.executeQuery(sql)) {
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery(sql)) {
                     while (rs.next()) {
                         Group group = new Group(rs);
                         list.add(group);
@@ -117,8 +165,8 @@ public class Group extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            try(Statement stmt = conn.createStatement()) {
-                try(ResultSet rs = stmt.executeQuery("select MAX(groupid) from GROUPS")) {
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("select MAX(groupid) from GROUPS")) {
                     if (rs.next()) {
                         max = rs.getInt(1);
                     }
@@ -139,8 +187,9 @@ public class Group extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            try(Statement stmt = conn.createStatement()) {
-                try(ResultSet rs = stmt.executeQuery(sql)) {
+            try (PreparedStatement stmt = conn.prepareStatement("select * from GROUPS where classification = '?'")) {
+                stmt.setString(1, classfication);
+                try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
                         int groupid = rs.getInt("groupid");
 
@@ -165,8 +214,8 @@ public class Group extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            try(Statement stmt = conn.createStatement()) {
-                try(ResultSet rs = stmt.executeQuery("select count(*) from SUBSCRIPTIONS")) {
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("select count(*) from SUBSCRIPTIONS")) {
                     if (rs.next()) {
                         count = rs.getInt(1);
                     }
@@ -180,67 +229,8 @@ public class Group extends Syncable {
         return count;
     }
 
-    public Group() {
-        this("", "", "");
-    }
-
-    public Group(String name, String desc, String members) {
-        this.groupid = -1;
-        this.authid = "";
-        this.name = name;
-        this.description = desc;
-        this.members = members;
-        this.classification = "";
-        this.last_mod = new Date();
-    }
-
-
-    public Group(ResultSet rs) throws SQLException {
-        this.groupid = rs.getInt("GROUPID");
-        this.authid = rs.getString("AUTHID");
-        this.name = rs.getString("NAME");
-        this.description = rs.getString("DESCRIPTION");
-        this.classification = rs.getString("CLASSIFICATION");
-        this.members = rs.getString("MEMBERS");
-        this.last_mod = rs.getDate("LAST_MOD");
-    }
-
-
-    public Group(JSONObject jo) throws InvalidObjectException {
-        this("", "", "");
-        try {
-            // The JSONObject is assumed to contain a vnd.att-dr.group representation
-            this.groupid = jo.optInt("groupid", -1);
-            String gname = jo.getString("name");
-            String gdescription = jo.getString("description");
-
-            this.authid = jo.getString("authid");
-            this.name = gname;
-            this.description = gdescription;
-            this.classification = jo.getString("classification");
-            this.members = jo.getString("members");
-
-            if (gname.length() > 50)
-                throw new InvalidObjectException("Group name is too long");
-            if (gdescription.length() > 256)
-                throw new InvalidObjectException("Group Description is too long");
-        } catch (InvalidObjectException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new InvalidObjectException("invalid JSON: " + e.getMessage());
-        }
-    }
-
-    public int getGroupid() {
-        return groupid;
-    }
-
     public static Logger getIntlogger() {
         return intlogger;
-    }
-
-    public void setGroupid(int groupid) {
-        this.groupid = groupid;
     }
 
     public static void setIntlogger(Logger intlogger) {
@@ -253,6 +243,14 @@ public class Group extends Syncable {
 
     public static void setNext_groupid(int next_groupid) {
         Group.next_groupid = next_groupid;
+    }
+
+    public int getGroupid() {
+        return groupid;
+    }
+
+    public void setGroupid(int groupid) {
+        this.groupid = groupid;
     }
 
     public String getAuthid() {
@@ -348,7 +346,7 @@ public class Group extends Syncable {
             e.printStackTrace();
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
@@ -378,7 +376,7 @@ public class Group extends Syncable {
             e.printStackTrace();
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
@@ -403,7 +401,7 @@ public class Group extends Syncable {
             e.printStackTrace();
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {

@@ -26,37 +26,41 @@ package org.onap.dmaap.datarouter.subscriber;
 import java.io.IOException;
 import java.util.Properties;
 
-public class SubscriberProps {
+import org.apache.log4j.Logger;
+
+class SubscriberProps {
 
     private static SubscriberProps instance = null;
+    private static Logger subLogger = Logger.getLogger("org.onap.dmaap.datarouter.subscriber.internal");
     private Properties properties;
 
-    private SubscriberProps(String propsPath) throws IOException{
+    private SubscriberProps(String propsPath) throws IOException {
         properties = new Properties();
         properties.load(getClass().getClassLoader().getResourceAsStream(propsPath));
 
     }
 
-    public static SubscriberProps getInstance(String propsPath) {
-        if(instance == null) {
+    static SubscriberProps getInstance(String propsPath) {
+        if (instance == null) {
             try {
                 instance = new SubscriberProps(propsPath);
             } catch (IOException ioe) {
+                subLogger.error("IO Exception: " + ioe.getMessage());
                 ioe.printStackTrace();
             }
         }
         return instance;
     }
 
-    public static SubscriberProps getInstance() {
+    static SubscriberProps getInstance() {
         return instance;
     }
 
-    public String getValue(String key) {
+    String getValue(String key) {
         return properties.getProperty(key);
     }
 
-    public String getValue(String key, String defaultValue) {
+    String getValue(String key, String defaultValue) {
         return properties.getProperty(key, defaultValue);
     }
 

@@ -52,10 +52,9 @@ import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 
 /**
- * <p>
  * This servlet handles requests to URLs under /internal on the provisioning server. These include:
- * </p>
  * <div class="contentContainer">
+ *
  * <table class="packageSummary" border="0" cellpadding="3" cellspacing="0">
  * <caption><span>URL Path Summary</span><span class="tabEnd">&nbsp;</span></caption>
  * <tr>
@@ -129,24 +128,24 @@ import com.att.eelf.configuration.EELFManager;
  * <td class="colLast">URLs under this path are handled via the {@link org.onap.dmaap.datarouter.provisioning.RouteServlet}</td>
  * </tr>
  * </table>
+ *
  * </div>
- * <p>
- * Authorization to use these URLs is a little different than for other URLs on the provisioning server. For the most
- * part, the IP address that the request comes from should be either:
- * </p>
+ *
+ * <p>Authorization to use these URLs is a little different than for other URLs on the provisioning
+ * server. For the most part, the IP address that the request comes from should be either:
+ *
  * <ol>
- * <li>an IP address of a provisioning server, or</li>
- * <li>the IP address of a node (to allow access to /internal/prov), or</li>
- * <li>an IP address from the "<i>special subnet</i>" which is configured with
- * the PROV_SPECIAL_SUBNET parameter.
+ * <li>an IP address of a provisioning server, or
+ * <li>the IP address of a node (to allow access to /internal/prov), or
+ * <li>an IP address from the "<i>special subnet</i>" which is configured with the
+ * PROV_SPECIAL_SUBNET parameter.
  * </ol>
- * <p>
- * In addition, requests to /internal/halt can ONLY come from localhost (127.0.0.1) on the HTTP port.
- * </p>
- * <p>
- * All DELETE/GET/PUT/POST requests made to /internal/api on this servlet on the standby server are proxied to the
- * active server (using the {@link ProxyServlet}) if it is up and reachable.
- * </p>
+ *
+ * <p>In addition, requests to /internal/halt can ONLY come from localhost (127.0.0.1) on the HTTP
+ * port.
+ *
+ * <p>All DELETE/GET/PUT/POST requests made to /internal/api on this servlet on the standby server
+ * are proxied to the active server (using the {@link ProxyServlet}) if it is up and reachable.
  *
  * @author Robert Eby
  * @version $Id: InternalServlet.java,v 1.23 2014/03/24 18:47:10 eby Exp $
@@ -155,18 +154,21 @@ import com.att.eelf.configuration.EELFManager;
 public class InternalServlet extends ProxyServlet {
 
     private static Integer logseq = 0; // another piece of info to make log spool file names unique
-    //Adding EELF Logger Rally:US664892
-    private static EELFLogger eelflogger = EELFManager.getInstance()
-        .getLogger("org.onap.dmaap.datarouter.provisioning.InternalServlet");
+    // Adding EELF Logger Rally:US664892
+    private static EELFLogger eelflogger =
+        EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.provisioning.InternalServlet");
 
     /**
-     * Delete a parameter at the address /internal/api/&lt;parameter&gt;. See the <b>Internal API</b> document for
-     * details on how this method should be invoked.
+     * Delete a parameter at the address /internal/api/&lt;parameter&gt;. See the <b>Internal API</b>
+     * document for details on how this method should be invoked.
      */
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         setIpAndFqdnForEelf("doDelete");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+        eelflogger.info(
+            EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID,
+            req.getHeader(BEHALF_HEADER),
+            getIdFromPath(req) + "");
         EventLogRecord elr = new EventLogRecord(req);
         if (!isAuthorizedForInternal(req)) {
             elr.setMessage("Unauthorized.");
@@ -206,13 +208,16 @@ public class InternalServlet extends ProxyServlet {
     }
 
     /**
-     * Get some information (such as a parameter) underneath the /internal/ namespace. See the <b>Internal API</b>
-     * document for details on how this method should be invoked.
+     * Get some information (such as a parameter) underneath the /internal/ namespace. See the
+     * <b>Internal API</b> document for details on how this method should be invoked.
      */
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         setIpAndFqdnForEelf("doGet");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+        eelflogger.info(
+            EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID,
+            req.getHeader(BEHALF_HEADER),
+            getIdFromPath(req) + "");
         String path = req.getPathInfo();
         if (path.equals("/halt") && !req.isSecure()) {
             // request to halt the server - can ONLY come from localhost
@@ -245,8 +250,13 @@ public class InternalServlet extends ProxyServlet {
         }
         if (path.equals("/prov")) {
             if (isProxyOK(req) && isProxyServer()) {
-                if (super.doGetWithFallback(req, resp)) {
-                    return;
+                try {
+                    if (super.doGetWithFallback(req, resp)) {
+                        return;
+                    }
+                } catch (IOException ioe) {
+                    intlogger.error("Error: " + ioe.getMessage());
+                    ioe.printStackTrace();
                 }
                 // fall back to returning the local data if the remote is unreachable
                 intlogger.info("Active server unavailable; falling back to local copy.");
@@ -308,13 +318,16 @@ public class InternalServlet extends ProxyServlet {
     }
 
     /**
-     * Modify a parameter at the address /internal/api/&lt;parameter&gt;. See the <b>Internal API</b> document for
-     * details on how this method should be invoked.
+     * Modify a parameter at the address /internal/api/&lt;parameter&gt;. See the <b>Internal API</b>
+     * document for details on how this method should be invoked.
      */
     @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         setIpAndFqdnForEelf("doPut");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+        eelflogger.info(
+            EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID,
+            req.getHeader(BEHALF_HEADER),
+            getIdFromPath(req) + "");
         EventLogRecord elr = new EventLogRecord(req);
         if (!isAuthorizedForInternal(req)) {
             elr.setMessage("Unauthorized.");
@@ -355,8 +368,9 @@ public class InternalServlet extends ProxyServlet {
     }
 
     /**
-     * Create some new information (such as a parameter or log entries) underneath the /internal/ namespace. See the
-     * <b>Internal API</b> document for details on how this method should be invoked.
+     * Create some new information (such as a parameter or log entries) underneath the /internal/
+     * namespace. See the <b>Internal API</b> document for details on how this method should be
+     * invoked.
      */
     @SuppressWarnings("resource")
     @Override
@@ -410,8 +424,10 @@ public class InternalServlet extends ProxyServlet {
                 eventlogger.info(elr);
                 return;
             }
-            String spooldir = (new DB()).getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
-            String spoolname = String.format("%d-%d-", System.currentTimeMillis(), Thread.currentThread().getId());
+            String spooldir =
+                (new DB()).getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
+            String spoolname =
+                String.format("%d-%d-", System.currentTimeMillis(), Thread.currentThread().getId());
             synchronized (logseq) {
                 // perhaps unnecessary, but it helps make the name unique
                 spoolname += logseq.toString();
@@ -448,12 +464,15 @@ public class InternalServlet extends ProxyServlet {
             }
             Path tmppath = Paths.get(spooldir, spoolname);
             Path donepath = Paths.get(spooldir, "IN." + spoolname);
-            Files.copy(req.getInputStream(), Paths.get(spooldir, spoolname), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(
+                req.getInputStream(),
+                Paths.get(spooldir, spoolname),
+                StandardCopyOption.REPLACE_EXISTING);
             Files.move(tmppath, donepath, StandardCopyOption.REPLACE_EXISTING);
             elr.setResult(HttpServletResponse.SC_CREATED);
             resp.setStatus(HttpServletResponse.SC_CREATED);
             eventlogger.info(elr);
-            LogfileLoader.getLoader();    // This starts the logfile loader "task"
+            LogfileLoader.getLoader(); // This starts the logfile loader "task"
             return;
         }
 
@@ -469,11 +488,17 @@ public class InternalServlet extends ProxyServlet {
             }
             InputStream is = req.getInputStream();
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            int ch = 0;
-            while ((ch = is.read()) >= 0) {
-                bos.write(ch);
+            int ch;
+            try {
+                while ((ch = is.read()) >= 0) {
+                    bos.write(ch);
+                }
+            } catch (IOException ioe) {
+                intlogger.error("Error: " + ioe.getMessage());
+                ioe.printStackTrace();
             }
-            RLEBitSet bs = new RLEBitSet(bos.toString());    // The set of records to retrieve
+
+            RLEBitSet bs = new RLEBitSet(bos.toString()); // The set of records to retrieve
             elr.setResult(HttpServletResponse.SC_OK);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType("text/plain");
