@@ -134,13 +134,14 @@ public class Group extends Syncable {
 
     public static Collection<String> getGroupsByClassfication(String classfication) {
         List<String> list = new ArrayList<String>();
-        String sql = "select * from GROUPS where classification = '" + classfication + "'";
+        String sql = "select * from GROUPS where classification = ?";
         try {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            try(Statement stmt = conn.createStatement()) {
-                try(ResultSet rs = stmt.executeQuery(sql)) {
+            try(PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, classfication);
+                try(ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
                         int groupid = rs.getInt("groupid");
 

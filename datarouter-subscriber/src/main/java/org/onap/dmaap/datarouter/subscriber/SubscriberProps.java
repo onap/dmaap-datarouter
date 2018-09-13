@@ -26,9 +26,12 @@ package org.onap.dmaap.datarouter.subscriber;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 public class SubscriberProps {
 
     private static SubscriberProps instance = null;
+    private static Logger subLogger = Logger.getLogger("org.onap.dmaap.datarouter.subscriber.internal");
     private Properties properties;
 
     private SubscriberProps(String propsPath) throws IOException{
@@ -42,6 +45,7 @@ public class SubscriberProps {
             try {
                 instance = new SubscriberProps(propsPath);
             } catch (IOException ioe) {
+                subLogger.error("IO Exception: " + ioe.getMessage());
                 ioe.printStackTrace();
             }
         }
