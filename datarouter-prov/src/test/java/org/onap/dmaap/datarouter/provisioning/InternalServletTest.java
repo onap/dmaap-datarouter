@@ -59,7 +59,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(LogRecord.class)
-public class InternalServletTest extends DrServletTestBase {
+public class InternalServletTest {
   private static EntityManagerFactory emf;
   private static EntityManager em;
   private InternalServlet internalServlet;
