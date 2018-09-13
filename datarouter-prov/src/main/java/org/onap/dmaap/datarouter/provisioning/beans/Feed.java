@@ -72,8 +72,9 @@ public class Feed extends Syncable {
         try {
             DB db = new DB();
             Connection conn = db.getConnection();
-            try(Statement stmt = conn.createStatement()) {
-                try(ResultSet rs = stmt.executeQuery("select COUNT(*) from FEEDS where FEEDID = " + id)) {
+            try(PreparedStatement stmt = conn.prepareStatement("select COUNT(*) from FEEDS where FEEDID = ?")) {
+                stmt.setInt(1, id);
+                try(ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         count = rs.getInt(1);
                     }
