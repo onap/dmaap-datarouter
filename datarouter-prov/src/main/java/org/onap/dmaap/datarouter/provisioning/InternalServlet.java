@@ -245,8 +245,13 @@ public class InternalServlet extends ProxyServlet {
         }
         if (path.equals("/prov")) {
             if (isProxyOK(req) && isProxyServer()) {
-                if (super.doGetWithFallback(req, resp)) {
-                    return;
+                try {
+                    if (super.doGetWithFallback(req, resp)) {
+                        return;
+                    }
+                } catch (IOException ioe) {
+                    intlogger.error("Error: " + ioe.getMessage());
+                    ioe.printStackTrace();
                 }
                 // fall back to returning the local data if the remote is unreachable
                 intlogger.info("Active server unavailable; falling back to local copy.");
@@ -469,9 +474,14 @@ public class InternalServlet extends ProxyServlet {
             }
             InputStream is = req.getInputStream();
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            int ch = 0;
-            while ((ch = is.read()) >= 0) {
-                bos.write(ch);
+            int ch;
+            try {
+                while ((ch = is.read()) >= 0) {
+                    bos.write(ch);
+                }
+            } catch (IOException ioe) {
+                intlogger.error("Error: " + ioe.getMessage());
+                ioe.printStackTrace();
             }
             RLEBitSet bs = new RLEBitSet(bos.toString());    // The set of records to retrieve
             elr.setResult(HttpServletResponse.SC_OK);
