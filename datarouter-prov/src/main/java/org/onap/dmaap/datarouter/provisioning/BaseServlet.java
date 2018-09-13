@@ -121,7 +121,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     private static final int DEFAULT_POKETIMER2 = 30;
     private static final String DEFAULT_DOMAIN = "onap";
     private static final String DEFAULT_PROVSRVR_NAME = "dmaap-dr-prov";
-    private static final String RESEARCH_SUBNET = "10.42.0.0/16";
     private static final String STATIC_ROUTING_NODES = ""; //Adding new param for static Routing - Rally:US664862-1610
 
     /**
@@ -139,11 +138,11 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     /**
      * The set of authorized addresses and networks; pulled from the DB (PROV_AUTH_ADDRESSES)
      */
-    private static Set<String> authorizedAddressesAndNetworks = new HashSet<String>();
+    private static Set<String> authorizedAddressesAndNetworks = new HashSet<>();
     /**
      * The set of authorized names; pulled from the DB (PROV_AUTH_SUBJECTS)
      */
-    private static Set<String> authorizedNames = new HashSet<String>();
+    private static Set<String> authorizedNames = new HashSet<>();
     /**
      * The FQDN of the initially "active" provisioning server in this Data Router ecosystem
      */
@@ -199,19 +198,13 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     /**
      * The standard FQDN of the provisioning server in this Data Router ecosystem
      */
-    public static String provName = "feeds-drtr.web.att.com";
+    private static String provName = "feeds-drtr.web.att.com";
+
     /**
      * The standard FQDN of the ACTIVE provisioning server in this Data Router ecosystem
      */
-    public static String activeProvName = "feeds-drtr.web.att.com";
-    /**
-     * Special subnet that is allowed access to /internal
-     */
-    private static String researchSubnet = RESEARCH_SUBNET;
-    /**
-     * Special subnet that is allowed access to /internal to Lab Machine
-     */
-    private static String researchSubnet1 = RESEARCH_SUBNET;
+    private static String activeProvName = "feeds-drtr.web.att.com";
+
     private static String staticRoutingNodes = STATIC_ROUTING_NODES; //Adding new param for static Routing - Rally:US664862-1610
 
     /**
@@ -389,13 +382,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             if (loopback != null && ip.equals(loopback)) {
                 return true;
             }
-            // Also allow the "special subnet" access
-            if (addressMatchesNetwork(ip, researchSubnet1)) {
-                return true;
-            }
-            if (addressMatchesNetwork(ip, researchSubnet)) {
-                return true;
-            }
         } catch (UnknownHostException e) {
             // ignore
         }
@@ -473,7 +459,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         provDomain = getString(map, Parameters.PROV_DOMAIN, DEFAULT_DOMAIN);
         provName = getString(map, Parameters.PROV_NAME, DEFAULT_PROVSRVR_NAME);
         activeProvName = getString(map, Parameters.PROV_ACTIVE_NAME, provName);
-        researchSubnet = getString(map, Parameters.PROV_SPECIAL_SUBNET, RESEARCH_SUBNET);
         staticRoutingNodes = getString(map, Parameters.STATIC_ROUTING_NODES,
             ""); //Adding new param for static Routing - Rally:US664862-1610
         initialActivePod = getString(map, Parameters.ACTIVE_POD, "");
@@ -630,6 +615,13 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         }
     }
 
+    public static String getProvName() {
+        return provName;
+    }
+
+    public static String getActiveProvName() {
+        return activeProvName;
+    }
 
     /**
      * Get an array of all node names in the DR network.
@@ -784,7 +776,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     }
 
     private static Set<String> getSet(Map<String, String> map, String name) {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         String s = map.get(name);
         if (s != null) {
             String[] pp = s.split("\\|");
@@ -807,7 +799,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     public class ContentHeader {
 
         private String type = "";
-        private Map<String, String> map = new HashMap<String, String>();
+        private Map<String, String> map = new HashMap<>();
 
         ContentHeader() {
             this("", "1.0");
