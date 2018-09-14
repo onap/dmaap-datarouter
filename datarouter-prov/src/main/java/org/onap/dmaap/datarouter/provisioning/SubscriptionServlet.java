@@ -75,11 +75,15 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message);
             return;
         }
         if (isProxyServer()) {
-            super.doDelete(req, resp);
+            try {
+                super.doDelete(req, resp);
+            } catch (IOException ioe) {
+                eventlogger.error("IOException: " + ioe.getMessage());
+            }
             return;
         }
         String bhdr = req.getHeader(BEHALF_HEADER);
@@ -88,7 +92,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
         int subid = getIdFromPath(req);
@@ -97,7 +101,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
         Subscription sub = Subscription.getSubscriptionById(subid);
@@ -106,7 +110,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_NOT_FOUND);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, message);
+            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message);
             return;
         }
         // Check with the Authorizer
@@ -116,7 +120,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message);
             return;
         }
 
@@ -132,7 +136,7 @@ public class SubscriptionServlet extends ProxyServlet {
             // Something went wrong with the DELETE
             elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG);
+            sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG);
         }
     }
 
@@ -151,11 +155,15 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message);
             return;
         }
         if (isProxyServer()) {
-            super.doGet(req, resp);
+            try {
+                super.doGet(req, resp);
+            } catch (IOException ioe) {
+                eventlogger.error("IOException: " + ioe.getMessage());
+            }
             return;
         }
         String bhdr = req.getHeader(BEHALF_HEADER);
@@ -164,7 +172,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
         int subid = getIdFromPath(req);
@@ -173,7 +181,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
         Subscription sub = Subscription.getSubscriptionById(subid);
@@ -182,7 +190,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_NOT_FOUND);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, message);
+            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message);
             return;
         }
         // Check with the Authorizer
@@ -192,7 +200,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message);
             return;
         }
 
@@ -201,7 +209,11 @@ public class SubscriptionServlet extends ProxyServlet {
         eventlogger.info(elr);
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType(SUBFULL_CONTENT_TYPE);
-        resp.getOutputStream().print(sub.asJSONObject(true).toString());
+        try {
+            resp.getOutputStream().print(sub.asJSONObject(true).toString());
+        } catch (IOException ioe) {
+            eventlogger.error("IOException: " + ioe.getMessage());
+        }
     }
 
     /**
@@ -209,7 +221,7 @@ public class SubscriptionServlet extends ProxyServlet {
      * the <b>Provisioning API</b> document for details on how this method should be invoked.
      */
     @Override
-    public void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPut(HttpServletRequest req, HttpServletResponse resp) {
         setIpAndFqdnForEelf("doPut");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         EventLogRecord elr = new EventLogRecord(req);
@@ -218,11 +230,15 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message);
             return;
         }
         if (isProxyServer()) {
-            super.doPut(req, resp);
+            try {
+                super.doPut(req, resp);
+            } catch (IOException ioe) {
+                eventlogger.error("IOException: " + ioe.getMessage());
+            }
             return;
         }
         String bhdr = req.getHeader(BEHALF_HEADER);
@@ -231,7 +247,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
         int subid = getIdFromPath(req);
@@ -240,7 +256,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
         Subscription oldsub = Subscription.getSubscriptionById(subid);
@@ -249,7 +265,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_NOT_FOUND);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, message);
+            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message);
             return;
         }
         // Check with the Authorizer
@@ -259,7 +275,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message);
             return;
         }
         // check content type is SUB_CONTENT_TYPE, version 1.0
@@ -270,7 +286,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message);
+            sendResponseError(resp, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message);
             return;
         }
         JSONObject jo = getJSONfromInput(req);
@@ -279,7 +295,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
         if (intlogger.isDebugEnabled()) {
@@ -293,7 +309,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
         sub.setSubid(oldsub.getSubid());
@@ -306,7 +322,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
 
@@ -317,14 +333,22 @@ public class SubscriptionServlet extends ProxyServlet {
             eventlogger.info(elr);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType(SUBFULL_CONTENT_TYPE);
-            resp.getOutputStream().print(sub.asLimitedJSONObject().toString());
+            try {
+                resp.getOutputStream().print(sub.asLimitedJSONObject().toString());
+            } catch (IOException ioe) {
+                eventlogger.error("IOException: " + ioe.getMessage());
+            }
 
             /**Change Owner ship of Subscriber     Adding for group feature:Rally US708115*/
             if (jo.has("changeowner") && subjectgroup != null) {
-                Boolean changeowner = (Boolean) jo.get("changeowner");
-                if (changeowner != null && changeowner.equals(true)) {
-                    sub.setSubscriber(req.getHeader(BEHALF_HEADER));
-                    sub.changeOwnerShip();
+                try {
+                    Boolean changeowner = (Boolean) jo.get("changeowner");
+                    if (changeowner != null && changeowner.equals(true)) {
+                        sub.setSubscriber(req.getHeader(BEHALF_HEADER));
+                        sub.changeOwnerShip();
+                    }
+                } catch (JSONException je) {
+                    eventlogger.error("JSONException: " + je.getMessage());
                 }
             }
             /***End of change ownership*/
@@ -334,7 +358,7 @@ public class SubscriptionServlet extends ProxyServlet {
             // Something went wrong with the UPDATE
             elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG);
+            sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG);
         }
     }
 
@@ -360,11 +384,15 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message);
             return;
         }
         if (isProxyServer()) {
-            super.doPost(req, resp);
+            try {
+                super.doPost(req, resp);
+            } catch (IOException ioe) {
+                eventlogger.error("IOException: " + ioe.getMessage());
+            }
             return;
         }
         String bhdr = req.getHeader(BEHALF_HEADER);
@@ -373,7 +401,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
         final int subid = getIdFromPath(req);
@@ -382,7 +410,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
         // check content type is SUBCNTRL_CONTENT_TYPE, version 1.0
@@ -393,7 +421,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message);
+            sendResponseError(resp, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message);
             return;
         }
         // Check with the Authorizer
@@ -403,7 +431,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message);
             return;
         }
         JSONObject jo = getJSONfromInput(req);
@@ -412,7 +440,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message);
             return;
         }
         try {
@@ -434,7 +462,7 @@ public class SubscriptionServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message);
         }
     }
 
@@ -474,8 +502,15 @@ public class SubscriptionServlet extends ProxyServlet {
                 }
             } catch (Exception e) {
                 intlogger.warn("Caught exception in SubscriberNotifyThread: " + e);
-                e.printStackTrace();
             }
+        }
+    }
+
+    private void sendResponseError(HttpServletResponse response, int errorCode, String message) {
+        try {
+            response.sendError(errorCode, message);
+        } catch (IOException ioe) {
+            intlogger.error("IOException" + ioe.getMessage());
         }
     }
 }
