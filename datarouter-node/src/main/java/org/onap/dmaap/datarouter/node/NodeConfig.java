@@ -431,18 +431,18 @@ public class NodeConfig {
     }
 
     private static class Redirection {
-        public SubnetMatcher snm;
-        public String user;
-        public String[] nodes;
+        SubnetMatcher snm;
+        String user;
+        String[] nodes;
     }
 
     private static class Feed {
-        public String loginfo;
-        public String status;
-        public SubnetMatcher[] subnets;
-        public Hashtable<String, String> authusers = new Hashtable<String, String>();
-        public Redirection[] redirections;
-        public Target[] targets;
+        String loginfo;
+        String status;
+        SubnetMatcher[] subnets;
+        Hashtable<String, String> authusers = new Hashtable<String, String>();
+        Redirection[] redirections;
+        Target[] targets;
     }
 
     private Hashtable<String, String> params = new Hashtable<String, String>();
