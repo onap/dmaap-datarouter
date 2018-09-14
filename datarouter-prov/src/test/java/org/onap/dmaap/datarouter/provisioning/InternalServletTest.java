@@ -32,6 +32,7 @@ import static org.mockito.Mockito.when;
 import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -42,11 +43,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
-import org.junit.BeforeClass;
-import org.junit.AfterClass;
 import org.mockito.Mock;
 
 import org.onap.dmaap.datarouter.provisioning.beans.Deleteable;
@@ -59,9 +57,12 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(LogRecord.class)
-public class InternalServletTest extends DrServletTestBase {
+public class InternalServletTest {
   private static EntityManagerFactory emf;
   private static EntityManager em;
+  private static File testDir = new File("unit-test-logs/spool");
+  private static File testFile = new File("unit-test-logs/spool/IN.spoolnumber.gz");
+  private static boolean fileCreatedAndDeletedSuccessfully;
   private InternalServlet internalServlet;
 
   @Mock
@@ -71,16 +72,24 @@ public class InternalServletTest extends DrServletTestBase {
   private HttpServletResponse response;
 
   @BeforeClass
-  public static void init() {
+  public static void init() throws IOException {
     emf = Persistence.createEntityManagerFactory("dr-unit-tests");
     em = emf.createEntityManager();
     System.setProperty(
             "org.onap.dmaap.datarouter.provserver.properties",
             "src/test/resources/h2Database.properties");
+    fileCreatedAndDeletedSuccessfully = testDir.mkdirs();
+    fileCreatedAndDeletedSuccessfully = testFile.createNewFile() && fileCreatedAndDeletedSuccessfully;
   }
 
   @AfterClass
   public static void tearDownClass() {
+    fileCreatedAndDeletedSuccessfully = testFile.delete();
+    for (File f: testDir.listFiles()) {
+      fileCreatedAndDeletedSuccessfully = f.delete() && fileCreatedAndDeletedSuccessfully;
+    }
+    fileCreatedAndDeletedSuccessfully = testDir.delete() && fileCreatedAndDeletedSuccessfully;
+    System.out.println("Directory cleared: " + fileCreatedAndDeletedSuccessfully);
     em.clear();
     em.close();
     emf.close();
@@ -341,9 +350,6 @@ public class InternalServletTest extends DrServletTestBase {
     when(request.getPathInfo()).thenReturn("/logs/");
     ServletInputStream inStream = mock(ServletInputStream.class);
     when(request.getInputStream()).thenReturn(inStream);
-    File testDir = new File("unit-test-logs/spool");
-    testDir.mkdirs();
-    testDir.deleteOnExit();
     internalServlet.doPost(request, response);
     verify(response).setStatus(eq(HttpServletResponse.SC_CREATED));
   }
