@@ -118,9 +118,9 @@ public class Parameters extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            try(Statement stmt = conn.createStatement()) {
-                String sql = "select KEYNAME, VALUE from PARAMETERS where KEYNAME = '" + k + "'";
-                try(ResultSet rs = stmt.executeQuery(sql)) {
+            try(PreparedStatement stmt = conn.prepareStatement("select KEYNAME, VALUE from PARAMETERS where KEYNAME = ?")) {
+                stmt.setString(1, k);
+                try(ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         v = new Parameters(rs);
                     }
