@@ -32,9 +32,9 @@ import java.util.*;
 
 public class PathFinder {
     private static class Hop {
-        public boolean mark;
-        public boolean bad;
-        public NodeConfig.ProvHop basis;
+        boolean mark;
+        boolean bad;
+        NodeConfig.ProvHop basis;
     }
 
     private Vector<String> errors = new Vector<String>();
