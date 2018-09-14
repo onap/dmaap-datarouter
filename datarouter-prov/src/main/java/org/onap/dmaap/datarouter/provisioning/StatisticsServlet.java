@@ -28,7 +28,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -43,6 +42,8 @@ import org.json.JSONException;
 import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
+
+import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.sendResponseError;
 
 /**
  * This Servlet handles requests to the &lt;Statistics API&gt; and  &lt;Statistics consilidated
@@ -64,13 +65,13 @@ public class StatisticsServlet extends BaseServlet {
    * DELETE a logging URL -- not supported.
    */
   @Override
-  public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+  public void doDelete(HttpServletRequest req, HttpServletResponse resp) {
     String message = "DELETE not allowed for the logURL.";
     EventLogRecord elr = new EventLogRecord(req);
     elr.setMessage(message);
     elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     eventlogger.info(elr);
-    resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, message);
+    sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
   }
 
   /**
@@ -78,24 +79,27 @@ public class StatisticsServlet extends BaseServlet {
    * <b>Statistics API</b> document for details on how this     method should be invoked.
    */
   @Override
-  public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+  public void doGet(HttpServletRequest req, HttpServletResponse resp) {
 
     Map<String, String> map = buildMapFromRequest(req);
     if (map.get("err") != null) {
-      resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments: " + map.get("err"));
+      sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments: " + map.get("err"), eventlogger);
       return;
     }
     // check Accept: header??
 
     resp.setStatus(HttpServletResponse.SC_OK);
     resp.setContentType(LOGLIST_CONTENT_TYPE);
-    ServletOutputStream out = resp.getOutputStream();
 
     String outputType = "json";
     String feedids = null;
 
     if (req.getParameter("feedid") == null && req.getParameter("groupid") == null) {
-      out.print("Invalid request, Feedid or Group ID is required.");
+      try {
+        resp.getOutputStream().print("Invalid request, Feedid or Group ID is required.");
+      } catch (IOException ioe) {
+        eventlogger.error("IOException: " + ioe.getMessage());
+      }
     }
 
     if (req.getParameter("feedid") != null && req.getParameter("groupid") == null) {
@@ -114,10 +118,8 @@ public class StatisticsServlet extends BaseServlet {
         System.out.println("groupid1" + groupid1.toString());
 
 
-      } catch (NumberFormatException e) {
-        e.printStackTrace();
-      } catch (SQLException e) {
-        e.printStackTrace();
+      } catch (NumberFormatException | SQLException e) {
+        eventlogger.error(e.getMessage());
       }
     }
     if (req.getParameter("groupid") != null && req.getParameter("feedid") != null) {
@@ -135,10 +137,8 @@ public class StatisticsServlet extends BaseServlet {
         System.out.println("groupid1" + groupid1.toString());
 
 
-      } catch (NumberFormatException e) {
-        e.printStackTrace();
-      } catch (SQLException e) {
-        e.printStackTrace();
+      } catch (NumberFormatException | SQLException e) {
+        eventlogger.error(e.getMessage());
       }
     }
 
@@ -179,8 +179,11 @@ public class StatisticsServlet extends BaseServlet {
     if (req.getParameter("output_type") != null) {
       outputType = req.getParameter("output_type");
     }
-
-    this.getRecordsForSQL(map, outputType, out, resp);
+    try {
+      this.getRecordsForSQL(map, outputType, resp.getOutputStream(), resp);
+    } catch (IOException ioe) {
+      eventlogger.error("IOException: " + ioe.getMessage());
+    }
 
   }
 
@@ -288,7 +291,7 @@ public class StatisticsServlet extends BaseServlet {
           System.out.println("feedIds" + feedIds.toString());
       }
     } catch (SQLException e) {
-      e.printStackTrace();
+      eventlogger.error(e.getMessage());
     } finally {
       try {
         if (resultSet != null) {
@@ -299,7 +302,7 @@ public class StatisticsServlet extends BaseServlet {
           db.release(conn);
         }
       } catch (Exception e) {
-        e.printStackTrace();
+        eventlogger.error(e.getMessage());
       }
     }
     return feedIds;
@@ -399,26 +402,26 @@ public class StatisticsServlet extends BaseServlet {
    * PUT a Statistics URL -- not supported.
    */
   @Override
-  public void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+  public void doPut(HttpServletRequest req, HttpServletResponse resp) {
     String message = "PUT not allowed for the StatisticsURL.";
     EventLogRecord elr = new EventLogRecord(req);
     elr.setMessage(message);
     elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     eventlogger.info(elr);
-    resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, message);
+    sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
   }
 
   /**
    * POST a Statistics URL -- not supported.
    */
   @Override
-  public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+  public void doPost(HttpServletRequest req, HttpServletResponse resp) {
     String message = "POST not allowed for the StatisticsURL.";
     EventLogRecord elr = new EventLogRecord(req);
     elr.setMessage(message);
     elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     eventlogger.info(elr);
-    resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, message);
+    sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
   }
 
   private Map<String, String> buildMapFromRequest(HttpServletRequest req) {
@@ -562,18 +565,15 @@ public class StatisticsServlet extends BaseServlet {
           }
         }
       } catch (SQLException e) {
-        e.printStackTrace();
+        eventlogger.error("SQLException:" + e);
       }
       intlogger.debug("Time: " + (System.currentTimeMillis() - start) + " ms");
     } catch (IOException e) {
       eventlogger.error("IOException - Generating JSON/CSV:" + e);
-      e.printStackTrace();
     } catch (JSONException e) {
       eventlogger.error("JSONException - executing SQL query:" + e);
-      e.printStackTrace();
     } catch (ParseException e) {
       eventlogger.error("ParseException - executing SQL query:" + e);
-      e.printStackTrace();
     }
   }
 }
