@@ -94,15 +94,6 @@ public class NodeServletTest {
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND));
     }
 
-    @Test
-    public void Given_Request_Is_HTTP_GET_And_Endpoint_Is_Internal_Rtt_And_Error_Connecting_To_Socket_Occurs_Then_Ok_Response_Is_Generated() throws Exception {
-        when(request.getPathInfo()).thenReturn("/internal/rtt/0.0.0.0");
-        when(request.getRemoteAddr()).thenReturn("135.207.136.128");
-        ServletOutputStream outStream = mock(ServletOutputStream.class);
-        when(response.getOutputStream()).thenReturn(outStream);
-        nodeServlet.doGet(request, response);
-        verify(response).setStatus(eq(200));
-    }
 
     @Test
     public void Given_Request_Is_HTTP_GET_To_Invalid_Endpoint_Then_Not_Found_Response_Is_Generated() throws Exception {
