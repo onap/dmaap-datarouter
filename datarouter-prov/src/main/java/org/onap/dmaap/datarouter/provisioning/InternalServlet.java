@@ -51,6 +51,8 @@ import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 
+import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.sendResponseError;
+
 /**
  * <p>
  * This servlet handles requests to URLs under /internal on the provisioning server. These include:
@@ -164,7 +166,7 @@ public class InternalServlet extends ProxyServlet {
      * details on how this method should be invoked.
      */
     @Override
-    public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         setIpAndFqdnForEelf("doDelete");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         EventLogRecord elr = new EventLogRecord(req);
@@ -172,14 +174,18 @@ public class InternalServlet extends ProxyServlet {
             elr.setMessage("Unauthorized.");
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized.");
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
             return;
         }
 
         String path = req.getPathInfo();
         if (path.startsWith("/api/")) {
             if (isProxyOK(req) && isProxyServer()) {
-                super.doDelete(req, resp);
+                try {
+                    super.doDelete(req, resp);
+                } catch (IOException ioe) {
+                    intlogger.error("IOException" + ioe.getMessage());
+                }
                 return;
             }
             String key = path.substring(5);
@@ -196,13 +202,13 @@ public class InternalServlet extends ProxyServlet {
                         // Something went wrong with the DELETE
                         elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                         eventlogger.info(elr);
-                        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG);
+                        sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
                     }
                     return;
                 }
             }
         }
-        resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bad URL.");
+        sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", eventlogger);
     }
 
     /**
@@ -210,14 +216,15 @@ public class InternalServlet extends ProxyServlet {
      * document for details on how this method should be invoked.
      */
     @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         setIpAndFqdnForEelf("doGet");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         String path = req.getPathInfo();
+        Properties props = (new DB()).getProperties();
         if (path.equals("/halt") && !req.isSecure()) {
             // request to halt the server - can ONLY come from localhost
             String remote = req.getRemoteAddr();
-            if (remote.equals("127.0.0.1")) {
+            if (remote.equals(props.getProperty("org.onap.dmaap.datarouter.provserver.localhost"))) {
                 intlogger.info("PROV0009 Request to HALT received.");
                 resp.setStatus(HttpServletResponse.SC_OK);
                 Main.shutdown();
@@ -233,7 +240,7 @@ public class InternalServlet extends ProxyServlet {
             elr.setMessage("Unauthorized.");
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized.");
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
             return;
         }
         if (path.equals("/fetchProv") && !req.isSecure()) {
@@ -250,7 +257,7 @@ public class InternalServlet extends ProxyServlet {
                         return;
                     }
                 } catch (IOException ioe) {
-                    intlogger.error("Error: " + ioe.getMessage());
+                    intlogger.error("IOException" + ioe.getMessage());
                 }
                 // fall back to returning the local data if the remote is unreachable
                 intlogger.info("Active server unavailable; falling back to local copy.");
@@ -258,18 +265,25 @@ public class InternalServlet extends ProxyServlet {
             Poker p = Poker.getPoker();
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType(PROVFULL_CONTENT_TYPE2);
-            resp.getOutputStream().print(p.getProvisioningString());
+            try {
+                resp.getOutputStream().print(p.getProvisioningString());
+            } catch (IOException ioe) {
+                intlogger.error("IOException" + ioe.getMessage());
+            }
             return;
         }
         if (path.equals("/logs") || path.equals("/logs/")) {
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType("application/json");
-            resp.getOutputStream().print(generateLogfileList().toString());
+            try {
+                resp.getOutputStream().print(generateLogfileList().toString());
+            } catch (IOException ioe) {
+                intlogger.error("IOException" + ioe.getMessage());
+            }
             return;
         }
         if (path.startsWith("/logs/")) {
-            Properties p = (new DB()).getProperties();
-            String logdir = p.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
+            String logdir = props.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
             String logfile = path.substring(6);
             if (logdir != null && logfile != null && logfile.indexOf('/') < 0) {
                 File log = new File(logdir + "/" + logfile);
@@ -277,16 +291,24 @@ public class InternalServlet extends ProxyServlet {
                     resp.setStatus(HttpServletResponse.SC_OK);
                     resp.setContentType("text/plain");
                     Path logpath = Paths.get(log.getAbsolutePath());
-                    Files.copy(logpath, resp.getOutputStream());
+                    try {
+                        Files.copy(logpath, resp.getOutputStream());
+                    } catch (IOException ioe) {
+                        intlogger.error("IOException" + ioe.getMessage());
+                    }
                     return;
                 }
             }
-            resp.sendError(HttpServletResponse.SC_NO_CONTENT, "No file.");
+            sendResponseError(resp, HttpServletResponse.SC_NO_CONTENT, "No file.", eventlogger);
             return;
         }
         if (path.startsWith("/api/")) {
             if (isProxyOK(req) && isProxyServer()) {
-                super.doGet(req, resp);
+                try {
+                    super.doGet(req, resp);
+                } catch (IOException ioe) {
+                    intlogger.error("IOException" + ioe.getMessage());
+                }
                 return;
             }
             String key = path.substring(5);
@@ -295,7 +317,11 @@ public class InternalServlet extends ProxyServlet {
                 if (param != null) {
                     resp.setStatus(HttpServletResponse.SC_OK);
                     resp.setContentType("text/plain");
-                    resp.getOutputStream().print(param.getValue() + "\n");
+                    try {
+                        resp.getOutputStream().print(param.getValue() + "\n");
+                    } catch (IOException ioe) {
+                        intlogger.error("IOException" + ioe.getMessage());
+                    }
                     return;
                 }
             }
@@ -305,10 +331,14 @@ public class InternalServlet extends ProxyServlet {
             LogfileLoader lfl = LogfileLoader.getLoader();
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType("text/plain");
-            resp.getOutputStream().print(lfl.getBitSet().toString());
+            try {
+                resp.getOutputStream().print(lfl.getBitSet().toString());
+            } catch (IOException ioe) {
+                intlogger.error("IOException" + ioe.getMessage());
+            }
             return;
         }
-        resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bad URL.");
+        sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", eventlogger);
     }
 
     /**
@@ -316,7 +346,7 @@ public class InternalServlet extends ProxyServlet {
      * details on how this method should be invoked.
      */
     @Override
-    public void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPut(HttpServletRequest req, HttpServletResponse resp) {
         setIpAndFqdnForEelf("doPut");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         EventLogRecord elr = new EventLogRecord(req);
@@ -324,13 +354,17 @@ public class InternalServlet extends ProxyServlet {
             elr.setMessage("Unauthorized.");
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized.");
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
             return;
         }
         String path = req.getPathInfo();
         if (path.startsWith("/api/")) {
             if (isProxyOK(req) && isProxyServer()) {
-                super.doPut(req, resp);
+                try {
+                    super.doPut(req, resp);
+                } catch (IOException ioe) {
+                    intlogger.error("IOException" + ioe.getMessage());
+                }
                 return;
             }
             String key = path.substring(5);
@@ -349,13 +383,13 @@ public class InternalServlet extends ProxyServlet {
                         // Something went wrong with the UPDATE
                         elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                         eventlogger.info(elr);
-                        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG);
+                        sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
                     }
                     return;
                 }
             }
         }
-        resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bad URL.");
+        sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", eventlogger);
     }
 
     /**
@@ -364,7 +398,7 @@ public class InternalServlet extends ProxyServlet {
      */
     @SuppressWarnings("resource")
     @Override
-    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) {
         setIpAndFqdnForEelf("doPost");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
         EventLogRecord elr = new EventLogRecord(req);
@@ -372,14 +406,18 @@ public class InternalServlet extends ProxyServlet {
             elr.setMessage("Unauthorized.");
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Unauthorized.");
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
             return;
         }
 
         String path = req.getPathInfo();
         if (path.startsWith("/api/")) {
             if (isProxyOK(req) && isProxyServer()) {
-                super.doPost(req, resp);
+                try {
+                    super.doPost(req, resp);
+                } catch (IOException ioe) {
+                    intlogger.error("IOException" + ioe.getMessage());
+                }
                 return;
             }
             String key = path.substring(5);
@@ -398,7 +436,7 @@ public class InternalServlet extends ProxyServlet {
                         // Something went wrong with the INSERT
                         elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                         eventlogger.info(elr);
-                        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG);
+                        sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
                     }
                     return;
                 }
@@ -437,8 +475,12 @@ public class InternalServlet extends ProxyServlet {
             long total = 0;
             long avail = 0;
             for (FileStore store : fs.getFileStores()) {
-                total += store.getTotalSpace();
-                avail += store.getUsableSpace();
+                try {
+                    total += store.getTotalSpace();
+                    avail += store.getUsableSpace();
+                } catch (IOException ioe) {
+                    intlogger.error("IOException" + ioe.getMessage());
+                }
             }
             try {
                 fs.close();
@@ -452,12 +494,16 @@ public class InternalServlet extends ProxyServlet {
             }
             Path tmppath = Paths.get(spooldir, spoolname);
             Path donepath = Paths.get(spooldir, "IN." + spoolname);
-            Files.copy(req.getInputStream(), Paths.get(spooldir, spoolname), StandardCopyOption.REPLACE_EXISTING);
-            Files.move(tmppath, donepath, StandardCopyOption.REPLACE_EXISTING);
-            elr.setResult(HttpServletResponse.SC_CREATED);
-            resp.setStatus(HttpServletResponse.SC_CREATED);
-            eventlogger.info(elr);
-            LogfileLoader.getLoader();    // This starts the logfile loader "task"
+            try {
+                Files.copy(req.getInputStream(), Paths.get(spooldir, spoolname), StandardCopyOption.REPLACE_EXISTING);
+                Files.move(tmppath, donepath, StandardCopyOption.REPLACE_EXISTING);
+                elr.setResult(HttpServletResponse.SC_CREATED);
+                resp.setStatus(HttpServletResponse.SC_CREATED);
+                eventlogger.info(elr);
+                LogfileLoader.getLoader();    // This starts the logfile loader "task"
+            } catch (IOException ioe) {
+                intlogger.error("IOException" + ioe.getMessage());
+            }
             return;
         }
 
@@ -471,27 +517,27 @@ public class InternalServlet extends ProxyServlet {
                 eventlogger.info(elr);
                 return;
             }
-            InputStream is = req.getInputStream();
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            int ch;
             try {
+                InputStream is = req.getInputStream();
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                int ch;
                 while ((ch = is.read()) >= 0) {
                     bos.write(ch);
                 }
+                RLEBitSet bs = new RLEBitSet(bos.toString());    // The set of records to retrieve
+                elr.setResult(HttpServletResponse.SC_OK);
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.setContentType("text/plain");
+                LogRecord.printLogRecords(resp.getOutputStream(), bs);
+                eventlogger.info(elr);
             } catch (IOException ioe) {
-                intlogger.error("Error: " + ioe.getMessage());
+                intlogger.error("IOException" + ioe.getMessage());
             }
-            RLEBitSet bs = new RLEBitSet(bos.toString());    // The set of records to retrieve
-            elr.setResult(HttpServletResponse.SC_OK);
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.setContentType("text/plain");
-            LogRecord.printLogRecords(resp.getOutputStream(), bs);
-            eventlogger.info(elr);
             return;
         }
 
         elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-        resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Bad URL.");
+        sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", eventlogger);
         eventlogger.info(elr);
     }
 
