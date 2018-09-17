@@ -21,8 +21,18 @@ work to interact with the Data Router.
 
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
    
-   data-router/data-router
+   data-router/data-router.rst
+   data-router/administration.rst
+   data-router/architecture.rst
+   data-router/configuration.rst
+   data-router/consumedapis.rst
+   data-router/DataRouterUserGuide.rst
+   data-router/delivery.rst
+   data-router/humaninterfaces.rst
+   data-router/logging.rst
+   data-router/release-notes.rst
+
 
 
