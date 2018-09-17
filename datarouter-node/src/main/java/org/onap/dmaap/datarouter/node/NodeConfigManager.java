@@ -257,7 +257,6 @@ public class NodeConfigManager implements DeliveryQueueHelper {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             NodeUtils.setIpAndFqdnForEelf("fetchconfigs");
             eelflogger.error(EelfMsgs.MESSAGE_CONF_FAILED, e.toString());
             logger.error("NODE0306 Configuration failed " + e.toString() + " - try again later", e);
