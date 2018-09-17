@@ -1,3 +1,5 @@
+.. _data_router_api_guide:
+
 ==========================
 Data Router (DR) API Guide
 ==========================
