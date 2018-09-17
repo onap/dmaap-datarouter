@@ -14,15 +14,24 @@ The DataRouter(DR)provisioning API is an HTTPS-based,REST-like API for creating 
 HTTP Service APIs
 ------------------
 
-DMaaP Message Router utilizes an HTTP REST API to service all transactions. HTTP and REST standards are followed so
-clients as varied as CURL, Java applications and even Web Browsers will
-work to interact with the Data Router.
+DMaaP Data Router utilizes an HTTPS REST API to service all transactions. HTTPS and REST standards are followed so
+clients as varied as CURL, Java applications and even Web Browsers will work to interact with the Data Router.
 
 
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
    
-   data-router/data-router
+   data-router/data-router.rst
+   data-router/administration.rst
+   data-router/architecture.rst
+   data-router/configuration.rst
+   data-router/consumedapis.rst
+   data-router/DataRouterUserGuide.rst
+   data-router/delivery.rst
+   data-router/humaninterfaces.rst
+   data-router/logging.rst
+   data-router/release-notes.rst
+
 
 
