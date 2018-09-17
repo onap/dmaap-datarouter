@@ -109,8 +109,7 @@ public class ProxyServlet extends BaseServlet {
         try (FileInputStream instream = new FileInputStream(new File(store))) {
             ks.load(instream, pass.toCharArray());
         } catch (FileNotFoundException fileNotFoundException) {
-            System.err.println("ProxyServlet: " + fileNotFoundException);
-            fileNotFoundException.printStackTrace();
+            intlogger.error("ProxyServlet: " + fileNotFoundException.getMessage());
         } catch (Exception x) {
             System.err.println("READING TRUSTSTORE: " + x);
         }
