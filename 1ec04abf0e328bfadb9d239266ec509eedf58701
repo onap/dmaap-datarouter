@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_e3051e11",
+        "filename": "docs/data-router/DataRouterUserGuide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T15:09:36Z",
+      "side": 1,
+      "message": "Maybe Data Router API Guide, sorry missed it first time around",
+      "range": {
+        "startLine": 29,
+        "startChar": 59,
+        "endLine": 29,
+        "endChar": 80
+      },
+      "revId": "1ec04abf0e328bfadb9d239266ec509eedf58701",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_49b2f14c",
+        "filename": "docs/data-router/delivery.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T15:09:36Z",
+      "side": 1,
+      "message": "C",
+      "range": {
+        "startLine": 18,
+        "startChar": 18,
+        "endLine": 18,
+        "endChar": 19
+      },
+      "revId": "1ec04abf0e328bfadb9d239266ec509eedf58701",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_e9889d72",
+        "filename": "docs/data-router/release-notes.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T15:09:36Z",
+      "side": 1,
+      "message": "maybe lowercase here, creating",
+      "range": {
+        "startLine": 15,
+        "startChar": 38,
+        "endLine": 15,
+        "endChar": 46
+      },
+      "revId": "1ec04abf0e328bfadb9d239266ec509eedf58701",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
