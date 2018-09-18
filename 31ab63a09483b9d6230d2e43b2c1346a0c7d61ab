@@ -1,0 +1,464 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_95ea6072",
+        "filename": "docs/data-router/DataRouterUserGuide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "Maybe should be docker-compose as that is the folder",
+      "range": {
+        "startLine": 21,
+        "startChar": 15,
+        "endLine": 21,
+        "endChar": 29
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_35058c45",
+        "filename": "docs/data-router/DataRouterUserGuide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "docker-compose up",
+      "range": {
+        "startLine": 21,
+        "startChar": 48,
+        "endLine": 21,
+        "endChar": 65
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_f5fab441",
+        "filename": "docs/data-router/DataRouterUserGuide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "Just need to decide if we should call it Data Router or data router and be consistent with that. I think Data Router",
+      "range": {
+        "startLine": 29,
+        "startChar": 35,
+        "endLine": 29,
+        "endChar": 46
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_55004833",
+        "filename": "docs/data-router/DataRouterUserGuide.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "extra space",
+      "range": {
+        "startLine": 29,
+        "startChar": 22,
+        "endLine": 29,
+        "endChar": 23
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b598bc1c",
+        "filename": "docs/data-router/architecture.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "for the transfer of data",
+      "range": {
+        "startLine": 10,
+        "startChar": 45,
+        "endLine": 10,
+        "endChar": 55
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_d59bf815",
+        "filename": "docs/data-router/architecture.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "Router",
+      "range": {
+        "startLine": 14,
+        "startChar": 9,
+        "endLine": 14,
+        "endChar": 15
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_759ea408",
+        "filename": "docs/data-router/architecture.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "and Published Files",
+      "range": {
+        "startLine": 14,
+        "startChar": 80,
+        "endLine": 14,
+        "endChar": 90
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_95a10048",
+        "filename": "docs/data-router/architecture.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "receive",
+      "range": {
+        "startLine": 15,
+        "startChar": 7,
+        "endLine": 15,
+        "endChar": 14
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_f59154f1",
+        "filename": "docs/data-router/architecture.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "receive",
+      "range": {
+        "startLine": 19,
+        "startChar": 125,
+        "endLine": 19,
+        "endChar": 132
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_358cacd9",
+        "filename": "docs/data-router/architecture.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "Router",
+      "range": {
+        "startLine": 19,
+        "startChar": 39,
+        "endLine": 19,
+        "endChar": 45
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_158df0d2",
+        "filename": "docs/data-router/consumedapis.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "does?",
+      "range": {
+        "startLine": 7,
+        "startChar": 12,
+        "endLine": 7,
+        "endChar": 14
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b5bf5c60",
+        "filename": "docs/data-router/delivery.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "Router",
+      "range": {
+        "startLine": 7,
+        "startChar": 5,
+        "endLine": 7,
+        "endChar": 11
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_15a41049",
+        "filename": "docs/data-router/logging.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "Data",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 7
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_b5667c28",
+        "filename": "docs/data-router/logging.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "Not sure about this",
+      "range": {
+        "startLine": 10,
+        "startChar": 59,
+        "endLine": 10,
+        "endChar": 98
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_357a6cbd",
+        "filename": "docs/data-router/release-notes.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "Possibly should be HTTPS",
+      "range": {
+        "startLine": 15,
+        "startChar": 24,
+        "endLine": 15,
+        "endChar": 28
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_d569b8f9",
+        "filename": "docs/data-router/release-notes.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "creating",
+      "range": {
+        "startLine": 15,
+        "startChar": 37,
+        "endLine": 15,
+        "endChar": 45
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_956fc0fb",
+        "filename": "docs/data-router/release-notes.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "Should crud be in all caps, same goes for below",
+      "range": {
+        "startLine": 16,
+        "startChar": 22,
+        "endLine": 16,
+        "endChar": 26
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_5575a8c8",
+        "filename": "docs/data-router/release-notes.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "Might make more sense to say on the published files",
+      "range": {
+        "startLine": 18,
+        "startChar": 85,
+        "endLine": 18,
+        "endChar": 104
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_f57f14a9",
+        "filename": "docs/index.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "HTTPS, same across",
+      "range": {
+        "startLine": 17,
+        "startChar": 33,
+        "endLine": 17,
+        "endChar": 37
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_157bb0be",
+        "filename": "docs/index.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T08:29:00Z",
+      "side": 1,
+      "message": "Data Router",
+      "range": {
+        "startLine": 17,
+        "startChar": 6,
+        "endLine": 17,
+        "endChar": 20
+      },
+      "revId": "31ab63a09483b9d6230d2e43b2c1346a0c7d61ab",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
