@@ -41,6 +41,8 @@ import org.onap.dmaap.datarouter.provisioning.utils.JSONUtilities;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 
+import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.sendResponseError;
+
 /**
  * This servlet handles provisioning for the &lt;drFeedsURL&gt; which is the URL on the provisioning server used to
  * create new feeds.  It supports POST to create new feeds, and GET to support the Feeds Collection Query function.
@@ -59,7 +61,7 @@ public class DRFeedsServlet extends ProxyServlet {
      * DELETE on the &lt;drFeedsURL&gt; -- not supported.
      */
     @Override
-    public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         setIpAndFqdnForEelf("doDelete");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         String message = "DELETE not allowed for the drFeedsURL.";
@@ -67,7 +69,7 @@ public class DRFeedsServlet extends ProxyServlet {
         elr.setMessage(message);
         elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         eventlogger.info(elr);
-        resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, message);
+        sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
     }
 
     /**
@@ -75,7 +77,7 @@ public class DRFeedsServlet extends ProxyServlet {
      * Queries</i> section in the <b>Provisioning API</b> document for details on how this method should be invoked.
      */
     @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         setIpAndFqdnForEelf("doGet");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         EventLogRecord elr = new EventLogRecord(req);
@@ -84,11 +86,15 @@ public class DRFeedsServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
             return;
         }
         if (isProxyServer()) {
-            super.doGet(req, resp);
+            try {
+                super.doGet(req, resp);
+            } catch (IOException ioe) {
+                eventlogger.error("IOException" + ioe.getMessage());
+            }
             return;
         }
         String bhdr = req.getHeader(BEHALF_HEADER);
@@ -97,7 +103,7 @@ public class DRFeedsServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
             return;
         }
         String path = req
@@ -107,7 +113,7 @@ public class DRFeedsServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_NOT_FOUND);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, message);
+            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
             return;
         }
         // Check with the Authorizer
@@ -117,7 +123,7 @@ public class DRFeedsServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
             return;
         }
 
@@ -133,14 +139,18 @@ public class DRFeedsServlet extends ProxyServlet {
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.info(elr);
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
             } else {
                 // send response
                 elr.setResult(HttpServletResponse.SC_OK);
                 eventlogger.info(elr);
                 resp.setStatus(HttpServletResponse.SC_OK);
                 resp.setContentType(FEEDFULL_CONTENT_TYPE);
-                resp.getOutputStream().print(feed.asJSONObject(true).toString());
+                try {
+                    resp.getOutputStream().print(feed.asJSONObject(true).toString());
+                } catch (IOException ioe) {
+                    eventlogger.error("IOException" + ioe.getMessage());
+                }
             }
         } else {
             // Display a list of URLs
@@ -160,7 +170,11 @@ public class DRFeedsServlet extends ProxyServlet {
             eventlogger.info(elr);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType(FEEDLIST_CONTENT_TYPE);
-            resp.getOutputStream().print(t);
+            try {
+                resp.getOutputStream().print(t);
+            } catch (IOException ioe) {
+                eventlogger.error("IOException" + ioe.getMessage());
+            }
         }
     }
 
@@ -168,7 +182,7 @@ public class DRFeedsServlet extends ProxyServlet {
      * PUT on the &lt;drFeedsURL&gt; -- not supported.
      */
     @Override
-    public void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPut(HttpServletRequest req, HttpServletResponse resp) {
         setIpAndFqdnForEelf("doPut");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         String message = "PUT not allowed for the drFeedsURL.";
@@ -176,7 +190,7 @@ public class DRFeedsServlet extends ProxyServlet {
         elr.setMessage(message);
         elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         eventlogger.info(elr);
-        resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, message);
+        sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
     }
 
     /**
@@ -184,7 +198,7 @@ public class DRFeedsServlet extends ProxyServlet {
      * <b>Provisioning API</b> document for details on how this method should be invoked.
      */
     @Override
-    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) {
         setIpAndFqdnForEelf("doPost");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
         EventLogRecord elr = new EventLogRecord(req);
@@ -193,11 +207,15 @@ public class DRFeedsServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
             return;
         }
         if (isProxyServer()) {
-            super.doPost(req, resp);
+            try {
+                super.doPost(req, resp);
+            } catch (IOException ioe) {
+                eventlogger.error("IOException" + ioe.getMessage());
+            }
             return;
         }
         String bhdr = req.getHeader(BEHALF_HEADER);
@@ -206,7 +224,7 @@ public class DRFeedsServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
             return;
         }
         String path = req
@@ -216,7 +234,7 @@ public class DRFeedsServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_NOT_FOUND);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, message);
+            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
             return;
         }
         // check content type is FEED_CONTENT_TYPE, version 1.0
@@ -227,7 +245,7 @@ public class DRFeedsServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message);
+            sendResponseError(resp, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message, eventlogger);
             return;
         }
         // Check with the Authorizer
@@ -237,7 +255,7 @@ public class DRFeedsServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
             return;
         }
         JSONObject jo = getJSONfromInput(req);
@@ -246,7 +264,7 @@ public class DRFeedsServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
             return;
         }
         if (intlogger.isDebugEnabled()) {
@@ -258,7 +276,7 @@ public class DRFeedsServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_CONFLICT);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_CONFLICT, message);
+            sendResponseError(resp, HttpServletResponse.SC_CONFLICT, message, eventlogger);
             return;
         }
         Feed feed = null;
@@ -269,7 +287,7 @@ public class DRFeedsServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
             return;
         }
         feed.setPublisher(bhdr);    // set from X-ATT-DR-ON-BEHALF-OF header
@@ -281,7 +299,7 @@ public class DRFeedsServlet extends ProxyServlet {
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
             return;
         }
 
@@ -293,13 +311,17 @@ public class DRFeedsServlet extends ProxyServlet {
             resp.setStatus(HttpServletResponse.SC_CREATED);
             resp.setContentType(FEEDFULL_CONTENT_TYPE);
             resp.setHeader("Location", feed.getLinks().getSelf());
-            resp.getOutputStream().print(feed.asLimitedJSONObject().toString());
+            try {
+                resp.getOutputStream().print(feed.asLimitedJSONObject().toString());
+            } catch (IOException ioe) {
+                eventlogger.error("IOException" + ioe.getMessage());
+            }
             provisioningDataChanged();
         } else {
             // Something went wrong with the INSERT
             elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             eventlogger.info(elr);
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG);
+            sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
         }
     }
 }
