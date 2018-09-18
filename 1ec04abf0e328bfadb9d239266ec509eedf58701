@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_09acf98a",
+        "filename": "docs/data-router/DataRouterUserGuide.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-09-18T15:31:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_e3051e11",
+      "range": {
+        "startLine": 29,
+        "startChar": 59,
+        "endLine": 29,
+        "endChar": 80
+      },
+      "revId": "1ec04abf0e328bfadb9d239266ec509eedf58701",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_49b2f14c",
         "filename": "docs/data-router/delivery.rst",
         "patchSetId": 3
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "1a76adc5_69a1ed92",
+        "filename": "docs/data-router/delivery.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-09-18T15:31:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_49b2f14c",
+      "range": {
+        "startLine": 18,
+        "startChar": 18,
+        "endLine": 18,
+        "endChar": 19
+      },
+      "revId": "1ec04abf0e328bfadb9d239266ec509eedf58701",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a76adc5_e9889d72",
         "filename": "docs/data-router/release-notes.rst",
         "patchSetId": 3
@@ -59,6 +107,30 @@
       "writtenOn": "2018-09-18T15:09:36Z",
       "side": 1,
       "message": "maybe lowercase here, creating",
+      "range": {
+        "startLine": 15,
+        "startChar": 38,
+        "endLine": 15,
+        "endChar": 46
+      },
+      "revId": "1ec04abf0e328bfadb9d239266ec509eedf58701",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_49a671af",
+        "filename": "docs/data-router/release-notes.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-09-18T15:31:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_e9889d72",
       "range": {
         "startLine": 15,
         "startChar": 38,
