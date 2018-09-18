@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_15ec10ba",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T07:36:02Z",
+      "side": 1,
+      "message": "Space between , and logger",
+      "revId": "e8fbb315311c874f4c84fd59cfc6bb9854b59614",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_35fb4c7a",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T07:36:02Z",
+      "side": 1,
+      "message": "should be false",
+      "range": {
+        "startLine": 163,
+        "startChar": 30,
+        "endLine": 163,
+        "endChar": 34
+      },
+      "revId": "e8fbb315311c874f4c84fd59cfc6bb9854b59614",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_d531b85a",
+        "filename": "datarouter-node/src/test/java/org/onap/dmaap/datarouter/node/NodeServletTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-18T07:36:02Z",
+      "side": 1,
+      "message": "Should remove this test as well",
+      "range": {
+        "startLine": 89,
+        "startChar": 0,
+        "endLine": 95,
+        "endChar": 5
+      },
+      "revId": "e8fbb315311c874f4c84fd59cfc6bb9854b59614",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
