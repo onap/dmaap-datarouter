@@ -64,6 +64,7 @@ public class PublishServlet extends BaseServlet {
     private List<IngressRoute> irt;
     //Adding EELF Logger Rally:US664892
     private static EELFLogger eelflogger = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.provisioning.PublishServlet");
+    private static final Object lock = new Object();
 
 
     @Override
@@ -138,7 +139,7 @@ public class PublishServlet extends BaseServlet {
         // Check to see if the IRT needs to be updated
         Poker p = Poker.getPoker();
         String s = p.getProvisioningString();
-        synchronized (provstring) {
+        synchronized (lock) {
             if (irt == null || (s.length() != provstring.length()) || !s.equals(provstring)) {
                 // Provisioning string has changed -- update the IRT
                 provstring = s;

@@ -69,18 +69,15 @@ public class NodeServlet extends HttpServlet {
         .getLogger("org.onap.dmaap.datarouter.node.NodeServlet");
 
     static {
-        try {
-            final String ws = "\\s*";
-            // assume that \\ and \" have been replaced by X
-            final String string = "\"[^\"]*\"";
-            //String string = "\"(?:[^\"\\\\]|\\\\.)*\"";
-            final String number = "[+-]?(?:\\.\\d+|(?:0|[1-9]\\d*)(?:\\.\\d*)?)(?:[eE][+-]?\\d+)?";
-            final String value = "(?:" + string + "|" + number + "|null|true|false)";
-            final String item = string + ws + ":" + ws + value + ws;
-            final String object = ws + "\\{" + ws + "(?:" + item + "(?:" + "," + ws + item + ")*)?\\}" + ws;
-            MetaDataPattern = Pattern.compile(object, Pattern.DOTALL);
-        } catch (Exception e) {
-        }
+        final String ws = "\\s*";
+        // assume that \\ and \" have been replaced by X
+        final String string = "\"[^\"]*\"";
+        //String string = "\"(?:[^\"\\\\]|\\\\.)*\"";
+        final String number = "[+-]?(?:\\.\\d+|(?:0|[1-9]\\d*)(?:\\.\\d*)?)(?:[eE][+-]?\\d+)?";
+        final String value = "(?:" + string + "|" + number + "|null|true|false)";
+        final String item = string + ws + ":" + ws + value + ws;
+        final String object = ws + "\\{" + ws + "(?:" + item + "(?:" + "," + ws + item + ")*)?\\}" + ws;
+        MetaDataPattern = Pattern.compile(object, Pattern.DOTALL);
     }
 
     /**

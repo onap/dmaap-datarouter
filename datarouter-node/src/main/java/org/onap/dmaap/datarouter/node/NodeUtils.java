@@ -53,12 +53,6 @@ public class NodeUtils {
     private static EELFLogger eelfLogger = EELFManager.getInstance()
         .getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
     private static Logger nodeUtilsLogger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
-    private static SimpleDateFormat logDate;
-
-    static {
-        logDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        logDate.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
 
     private NodeUtils() {
     }
@@ -241,6 +235,8 @@ public class NodeUtils {
      * Format a logging timestamp as yyyy-mm-ddThh:mm:ss.mmmZ
      */
     public static synchronized String logts(Date when) {
+        SimpleDateFormat logDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        logDate.setTimeZone(TimeZone.getTimeZone("GMT"));
         return (logDate.format(when));
     }
 
