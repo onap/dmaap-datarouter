@@ -38,8 +38,8 @@ public class SampleSubscriberServlet extends HttpServlet {
 
   private static Logger logger =
       Logger.getLogger("org.onap.dmaap.datarouter.subscriber.SampleSubscriberServlet");
-  private String outputDirectory;
-  private String basicAuth;
+  private static String outputDirectory;
+  private static String basicAuth;
 
   /**
    * Configure the SampleSubscriberServlet.

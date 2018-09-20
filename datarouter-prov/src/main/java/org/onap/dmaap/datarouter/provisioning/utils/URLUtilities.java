@@ -115,7 +115,7 @@ public class URLUtilities {
     public static String generatePeerLogsURL() {
         //Fixes for Itrack ticket - DATARTR-4#Fixing if only one Prov is configured, not to give exception to fill logs.
         String peerPodUrl = getPeerPodName();
-        if (peerPodUrl.equals("") || peerPodUrl==null) {
+        if (peerPodUrl == null || peerPodUrl.equals("")) {
             return "";
         }
 

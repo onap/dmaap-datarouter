@@ -156,6 +156,7 @@ import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.send
 @SuppressWarnings("serial")
 public class InternalServlet extends ProxyServlet {
 
+    private static final Object lock = new Object();
     private static Integer logseq = 0; // another piece of info to make log spool file names unique
     //Adding EELF Logger Rally:US664892
     private static EELFLogger eelflogger = EELFManager.getInstance()
@@ -454,7 +455,7 @@ public class InternalServlet extends ProxyServlet {
             }
             String spooldir = (new DB()).getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
             String spoolname = String.format("%d-%d-", System.currentTimeMillis(), Thread.currentThread().getId());
-            synchronized (logseq) {
+            synchronized (lock) {
                 // perhaps unnecessary, but it helps make the name unique
                 spoolname += logseq.toString();
                 logseq++;

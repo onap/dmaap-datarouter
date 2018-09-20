@@ -546,10 +546,8 @@ public class StatisticsServlet extends BaseServlet {
       intlogger.debug(filterQuery);
       long start = System.currentTimeMillis();
       DB db = new DB();
-      ResultSet rs = null;
       try (Connection conn = db.getConnection()) {
-        try (PreparedStatement pst = conn.prepareStatement(filterQuery)) {
-          rs = pst.executeQuery();
+        try (ResultSet rs = conn.prepareStatement(filterQuery).executeQuery()) {
           if (outputType.equals("csv")) {
             resp.setContentType("application/octet-stream");
             Date date = new Date();

@@ -64,6 +64,8 @@ public class Poker extends TimerTask {
      */
     private static final String POKE_URL_TEMPLATE = "http://%s/internal/fetchProv";
 
+    private static final Object lock = new Object();
+
     /**
      * This is a singleton -- there is only one Poker object in the server
      */
@@ -109,7 +111,7 @@ public class Poker extends TimerTask {
      * @param t2 the second timer set the outer bound on how long to wait.  It cannot be reset.
      */
     public void setTimers(long t1, long t2) {
-        synchronized (thisPod) {
+        synchronized (lock) {
             if (timer1 == 0 || t1 > timer1) {
                 timer1 = t1;
             }
@@ -144,7 +146,7 @@ public class Poker extends TimerTask {
             if (timer1 > 0) {
                 long now = System.currentTimeMillis();
                 boolean fire = false;
-                synchronized (thisPod) {
+                synchronized (lock) {
                     if (now > timer1 || now > timer2) {
                         timer1 = timer2 = 0;
                         fire = true;

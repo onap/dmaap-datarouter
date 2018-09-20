@@ -72,36 +72,12 @@ public class FeedReport extends ReportBase {
            try( PreparedStatement ps = conn.prepareStatement(SELECT_SQL)) {
                try (ResultSet rs = ps.executeQuery()) {
                    while (rs.next()) {
-                       if (alg1) {
-                           String date = rs.getString("date");
-                           String type = rs.getString("type");
-                           int feedid = rs.getInt("feedid");
-                           int subid = type.equals("del") ? rs.getInt("delivery_subid") : 0;
-                           int count = rs.getInt("count");
-                           sb.append(date + "," + type + "," + feedid + "," + subid + "," + count + "\n");
-                       } else {
-                           String date = rs.getString("date");
-                           JSONObject datemap = jo.optJSONObject(date);
-                           if (datemap == null) {
-                               datemap = new JSONObject();
-                               jo.put(date, datemap);
-                           }
-                           int feed = rs.getInt("FEEDID");
-                           JSONObject feedmap = datemap.optJSONObject("" + feed);
-                           if (feedmap == null) {
-                               feedmap = new JSONObject();
-                               feedmap.put("pubcount", 0);
-                               datemap.put("" + feed, feedmap);
-                           }
-                           String type = rs.getString("TYPE");
-                           int count = rs.getInt("count");
-                           if (type.equals("pub")) {
-                               feedmap.put("pubcount", count);
-                           } else if (type.equals("del")) {
-                               String subid = "" + rs.getInt("DELIVERY_SUBID");
-                               feedmap.put(subid, count);
-                           }
-                       }
+                       String date = rs.getString("date");
+                       String type = rs.getString("type");
+                       int feedid = rs.getInt("feedid");
+                       int subid = type.equals("del") ? rs.getInt("delivery_subid") : 0;
+                       int count = rs.getInt("count");
+                       sb.append(date + "," + type + "," + feedid + "," + subid + "," + count + "\n");
                    }
                }
            }
@@ -110,15 +86,9 @@ public class FeedReport extends ReportBase {
             e.printStackTrace();
         }
         logger.debug("Query time: " + (System.currentTimeMillis() - start) + " ms");
-        try {
-            PrintWriter os = new PrintWriter(outfile);
-            if (alg1) {
-                os.print("date,type,feedid,subid,count\n");
-                os.print(sb.toString());
-            } else {
-                os.println(toHTML(jo));
-            }
-            os.close();
+        try (PrintWriter os = new PrintWriter(outfile)) {
+            os.print("date,type,feedid,subid,count\n");
+            os.print(sb.toString());
         } catch (FileNotFoundException e) {
             System.err.println("File cannot be written: " + outfile);
         }
