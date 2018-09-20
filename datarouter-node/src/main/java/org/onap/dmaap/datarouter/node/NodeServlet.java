@@ -27,14 +27,12 @@ package org.onap.dmaap.datarouter.node;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
-import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,8 +42,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
+
+import static org.onap.dmaap.datarouter.node.NodeUtils.sendResponseError;
 
 /**
  * Servlet for handling all http and https requests to the data router node
@@ -59,11 +60,9 @@ import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
  * PUT/DELETE https://<i>node</i>/publish/<i>feedid</i>/<i>fileid</i> - publsh request
  */
 public class NodeServlet extends HttpServlet {
-
     private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeServlet");
     private static NodeConfigManager config;
     private static Pattern MetaDataPattern;
-    private static SubnetMatcher internalsubnet = new SubnetMatcher("135.207.136.128/25");
     //Adding EELF Logger Rally:US664892
     private static EELFLogger eelflogger = EELFManager.getInstance()
         .getLogger("org.onap.dmaap.datarouter.node.NodeServlet");
@@ -90,7 +89,7 @@ public class NodeServlet extends HttpServlet {
 
     private boolean down(HttpServletResponse resp) throws IOException {
         if (config.isShutdown() || !config.isConfigured()) {
-            resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            sendResponseError(resp, HttpServletResponse.SC_SERVICE_UNAVAILABLE, logger);
             logger.info("NODE0102 Rejecting request: Service is being quiesced");
             return (true);
         }
@@ -100,12 +99,17 @@ public class NodeServlet extends HttpServlet {
     /**
      * Handle a GET for /internal/fetchProv
      */
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp){
         NodeUtils.setIpAndFqdnForEelf("doGet");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader("X-ATT-DR-ON-BEHALF-OF"),
             getIdFromPath(req) + "");
-        if (down(resp)) {
-            return;
+        try{
+            if (down(resp)) {
+                return;
+            }
+
+        } catch (IOException ioe) {
+            logger.error("IOException" + ioe.getMessage());
         }
         String path = req.getPathInfo();
         String qs = req.getQueryString();
@@ -125,50 +129,9 @@ public class NodeServlet extends HttpServlet {
                 return;
             }
         }
-        if (internalsubnet.matches(NodeUtils.getInetAddress(ip))) {
-            if (path.startsWith("/internal/logs/")) {
-                String f = path.substring(15);
-                File fn = new File(config.getLogDir() + "/" + f);
-                if (f.indexOf('/') != -1 || !fn.isFile()) {
-                    logger.info("NODE0103 Rejecting invalid GET of " + path + " from " + ip);
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    return;
-                }
-                byte[] buf = new byte[65536];
-                resp.setContentType("text/plain");
-                resp.setContentLength((int) fn.length());
-                resp.setStatus(200);
-                try (InputStream is = new FileInputStream(fn)) {
-                    OutputStream os = resp.getOutputStream();
-                    int i;
-                    while ((i = is.read(buf)) > 0) {
-                        os.write(buf, 0, i);
-                    }
-                }
-                return;
-            }
-            if (path.startsWith("/internal/rtt/")) {
-                String xip = path.substring(14);
-                long st = System.currentTimeMillis();
-                String status = " unknown";
-                try {
-                    Socket s = new Socket(xip, 443);
-                    s.close();
-                    status = " connected";
-                } catch (Exception e) {
-                    status = " error " + e.toString();
-                }
-                long dur = System.currentTimeMillis() - st;
-                resp.setContentType("text/plain");
-                resp.setStatus(200);
-                byte[] buf = (dur + status + "\n").getBytes();
-                resp.setContentLength(buf.length);
-                resp.getOutputStream().write(buf);
-                return;
-            }
-        }
+
         logger.info("NODE0103 Rejecting invalid GET of " + path + " from " + ip);
-        resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+        sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, logger);
     }
 
     /**
@@ -178,7 +141,12 @@ public class NodeServlet extends HttpServlet {
         NodeUtils.setIpAndFqdnForEelf("doPut");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader("X-ATT-DR-ON-BEHALF-OF"),
             getIdFromPath(req) + "");
-        common(req, resp, true);
+        try {
+            common(req, resp, true);
+        }
+        catch(IOException ioe){
+            logger.error("IOException" + ioe.getMessage());
+        }
     }
 
     /**
@@ -188,7 +156,12 @@ public class NodeServlet extends HttpServlet {
         NodeUtils.setIpAndFqdnForEelf("doDelete");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader("X-ATT-DR-ON-BEHALF-OF"),
             getIdFromPath(req) + "");
-        common(req, resp, false);
+        try {
+            common(req, resp, false);
+        }
+        catch(IOException ioe){
+            logger.error("IOException" + ioe.getMessage());
+        }
     }
 
     private void common(HttpServletRequest req, HttpServletResponse resp, boolean isput)

@@ -45,6 +45,8 @@ import org.apache.log4j.Logger;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 import org.slf4j.MDC;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Utility functions for the data router node
  */
@@ -255,6 +257,14 @@ public class NodeUtils {
                 .error("Exception in generating byte array for given IP address := " + exception.toString(), exception);
         }
 
+    }
+
+    public static void sendResponseError(HttpServletResponse response, int errorCode, Logger intlogger) {
+        try {
+            response.sendError(errorCode);
+        } catch (IOException ioe) {
+            intlogger.error("IOException" + ioe.getMessage());
+        }
     }
 
 
