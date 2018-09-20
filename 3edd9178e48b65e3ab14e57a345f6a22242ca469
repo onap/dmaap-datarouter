@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_fb27f1c7",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4419
+      },
+      "writtenOn": "2018-09-20T09:52:18Z",
+      "side": 1,
+      "message": "Can keep the same column width for paragraphs. It is easier to read and looks better i think.",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 103
+      },
+      "revId": "3edd9178e48b65e3ab14e57a345f6a22242ca469",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
