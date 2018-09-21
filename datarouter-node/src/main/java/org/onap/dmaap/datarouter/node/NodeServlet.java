@@ -137,15 +137,16 @@ public class NodeServlet extends HttpServlet {
     /**
      * Handle all PUT requests
      */
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
         NodeUtils.setIpAndFqdnForEelf("doPut");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader("X-ATT-DR-ON-BEHALF-OF"),
             getIdFromPath(req) + "");
         try {
             common(req, resp, true);
-        }
-        catch(IOException ioe){
+        } catch(IOException ioe){
             logger.error("IOException" + ioe.getMessage());
+        } catch(ServletException se){
+            logger.error("ServletException" + se.getMessage());
         }
     }
 
@@ -158,9 +159,10 @@ public class NodeServlet extends HttpServlet {
             getIdFromPath(req) + "");
         try {
             common(req, resp, false);
-        }
-        catch(IOException ioe){
+        } catch(IOException ioe){
             logger.error("IOException" + ioe.getMessage());
+        } catch(ServletException se){
+            logger.error("ServletException" + se.getMessage());
         }
     }
 
@@ -277,9 +279,8 @@ public class NodeServlet extends HttpServlet {
         File data = new File(fbase);
         File meta = new File(fbase + ".M");
         OutputStream dos = null;
-        Writer mw = null;
         InputStream is = null;
-        try {
+        try (Writer mw = new FileWriter(meta)){
             StringBuffer mx = new StringBuffer();
             mx.append(req.getMethod()).append('\t').append(fileid).append('\n');
             Enumeration hnames = req.getHeaderNames();
@@ -353,12 +354,10 @@ public class NodeServlet extends HttpServlet {
                 }
                 String dbase = di.getSpool() + "/" + pubid;
                 Files.createLink(Paths.get(dbase), dpath);
-                mw = new FileWriter(meta);
                 mw.write(metadata);
                 if (di.getSubId() == null) {
                     mw.write("X-ATT-DR-ROUTING\t" + t.getRouting() + "\n");
                 }
-                mw.close();
                 meta.renameTo(new File(dbase + ".M"));
             }
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -380,12 +379,6 @@ public class NodeServlet extends HttpServlet {
             if (dos != null) {
                 try {
                     dos.close();
-                } catch (Exception e) {
-                }
-            }
-            if (mw != null) {
-                try {
-                    mw.close();
                 } catch (Exception e) {
                 }
             }
