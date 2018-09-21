@@ -143,11 +143,7 @@ public class RouteServlet extends ProxyServlet {
             return;
         }
         if (isProxyOK(req) && isProxyServer()) {
-            try {
-                super.doDelete(req, resp);
-            } catch (IOException ioe) {
-                eventlogger.error("IOException" + ioe.getMessage());
-            }
+            super.doDelete(req, resp);
             return;
         }
 
@@ -255,11 +251,7 @@ public class RouteServlet extends ProxyServlet {
             return;
         }
         if (isProxyOK(req) && isProxyServer()) {
-            try {
-                super.doGet(req, resp);
-            } catch (IOException ioe) {
-                eventlogger.error("IOException" + ioe.getMessage());
-            }
+            super.doGet(req, resp);
             return;
         }
 
@@ -355,11 +347,7 @@ public class RouteServlet extends ProxyServlet {
             return;
         }
         if (isProxyOK(req) && isProxyServer()) {
-            try {
-                super.doPost(req, resp);
-            } catch (IOException ioe) {
-                intlogger.error("IOException" + ioe.getMessage());
-            }
+            super.doPost(req, resp);
             return;
         }
         String path = req.getPathInfo();

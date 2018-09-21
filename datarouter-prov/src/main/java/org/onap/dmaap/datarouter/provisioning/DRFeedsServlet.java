@@ -90,11 +90,7 @@ public class DRFeedsServlet extends ProxyServlet {
             return;
         }
         if (isProxyServer()) {
-            try {
-                super.doGet(req, resp);
-            } catch (IOException ioe) {
-                eventlogger.error("IOException" + ioe.getMessage());
-            }
+            super.doGet(req, resp);
             return;
         }
         String bhdr = req.getHeader(BEHALF_HEADER);
@@ -211,11 +207,7 @@ public class DRFeedsServlet extends ProxyServlet {
             return;
         }
         if (isProxyServer()) {
-            try {
-                super.doPost(req, resp);
-            } catch (IOException ioe) {
-                eventlogger.error("IOException" + ioe.getMessage());
-            }
+            super.doPost(req, resp);
             return;
         }
         String bhdr = req.getHeader(BEHALF_HEADER);

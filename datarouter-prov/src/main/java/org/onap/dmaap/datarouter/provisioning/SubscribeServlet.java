@@ -91,11 +91,7 @@ public class SubscribeServlet extends ProxyServlet {
             return;
         }
         if (isProxyServer()) {
-            try {
-                super.doGet(req, resp);
-            } catch (IOException ioe) {
-                eventlogger.error("IOException: " + ioe.getMessage());
-            }
+            super.doGet(req, resp);
             return;
         }
         String bhdr = req.getHeader(BEHALF_HEADER);
@@ -172,7 +168,7 @@ public class SubscribeServlet extends ProxyServlet {
      * section in the <b>Provisioning API</b> document for details on how this method should be invoked.
      */
     @Override
-    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) {
         setIpAndFqdnForEelf("doPost");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
         EventLogRecord elr = new EventLogRecord(req);
@@ -185,11 +181,7 @@ public class SubscribeServlet extends ProxyServlet {
             return;
         }
         if (isProxyServer()) {
-            try {
-                super.doPost(req, resp);
-            } catch (IOException ioe) {
-                eventlogger.error("IOException: " + ioe.getMessage());
-            }
+            super.doPost(req, resp);
             return;
         }
         String bhdr = req.getHeader(BEHALF_HEADER);
