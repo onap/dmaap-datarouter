@@ -54,6 +54,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 
+import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.sendResponseError;
+
 /**
  * This class is the base class for those servlets that need to proxy their requests from the standby to active server.
  * Its methods perform the proxy function to the active server. If the active server is not reachable, a 503
@@ -80,11 +82,11 @@ public class ProxyServlet extends BaseServlet {
             Properties props = (new DB()).getProperties();
             String type = props.getProperty(Main.KEYSTORE_TYPE_PROPERTY, "jks");
             String store = props.getProperty(Main.KEYSTORE_PATH_PROPERTY);
-            String pass = props.getProperty(Main.KEYSTORE_PASSWORD_PROPERTY);
+            String pass = props.getProperty(Main.KEYSTORE_PASS_PROPERTY);
             KeyStore keyStore = readStore(store, pass, type);
 
             store = props.getProperty(Main.TRUSTSTORE_PATH_PROPERTY);
-            pass = props.getProperty(Main.TRUSTSTORE_PASSWORD_PROPERTY);
+            pass = props.getProperty(Main.TRUSTSTORE_PASS_PROPERTY);
             if (store == null || store.length() == 0) {
                 store = Main.DEFAULT_TRUSTSTORE;
                 pass = "changeit";
@@ -94,12 +96,12 @@ public class ProxyServlet extends BaseServlet {
             // We are connecting with the node name, but the certificate will have the CNAME
             // So we need to accept a non-matching certificate name
             SSLSocketFactory socketFactory = new SSLSocketFactory(keyStore,
-                props.getProperty(Main.KEYSTORE_PASSWORD_PROPERTY), trustStore);
+                props.getProperty(Main.KEYSTORE_PASS_PROPERTY), trustStore);
             socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
             sch = new Scheme("https", 443, socketFactory);
             inited = true;
         } catch (Exception e) {
-            e.printStackTrace();
+            intlogger.error("ProxyServlet: " + e.getMessage());
         }
         intlogger.info("ProxyServlet: inited = " + inited);
     }
@@ -111,7 +113,7 @@ public class ProxyServlet extends BaseServlet {
         } catch (FileNotFoundException fileNotFoundException) {
             intlogger.error("ProxyServlet: " + fileNotFoundException.getMessage());
         } catch (Exception x) {
-            System.err.println("READING TRUSTSTORE: " + x);
+            intlogger.error("READING TRUSTSTORE: " + x);
         }
         return ks;
     }
@@ -151,7 +153,7 @@ public class ProxyServlet extends BaseServlet {
      * Issue a proxy DELETE to the active provisioning server.
      */
     @Override
-    public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         doProxy(req, resp, "DELETE");
     }
 
@@ -159,7 +161,7 @@ public class ProxyServlet extends BaseServlet {
      * Issue a proxy GET to the active provisioning server.
      */
     @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         doProxy(req, resp, "GET");
     }
 
@@ -167,7 +169,7 @@ public class ProxyServlet extends BaseServlet {
      * Issue a proxy PUT to the active provisioning server.
      */
     @Override
-    public void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPut(HttpServletRequest req, HttpServletResponse resp) {
         doProxy(req, resp, "PUT");
     }
 
@@ -175,7 +177,7 @@ public class ProxyServlet extends BaseServlet {
      * Issue a proxy POST to the active provisioning server.
      */
     @Override
-    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) {
         doProxy(req, resp, "POST");
     }
 
@@ -185,7 +187,7 @@ public class ProxyServlet extends BaseServlet {
      *
      * @return true if the proxy succeeded
      */
-    public boolean doGetWithFallback(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public boolean doGetWithFallback(HttpServletRequest req, HttpServletResponse resp) {
         boolean rv = false;
         if (inited) {
             String url = buildUrl(req);
@@ -199,24 +201,17 @@ public class ProxyServlet extends BaseServlet {
                     copyRequestHeaders(req, proxy);
 
                     // Execute the request
-                    HttpResponse pxy_response = httpclient.execute(proxy);
+                    HttpResponse pxyResponse = httpclient.execute(proxy);
 
                     // Get response headers and body
-                    int code = pxy_response.getStatusLine().getStatusCode();
+                    int code = pxyResponse.getStatusLine().getStatusCode();
                     resp.setStatus(code);
-                    copyResponseHeaders(pxy_response, resp);
-
-                    HttpEntity entity = pxy_response.getEntity();
-                    if (entity != null) {
-                        InputStream in = entity.getContent();
-                        IOUtils.copy(in, resp.getOutputStream());
-                        in.close();
-                    }
+                    copyResponseHeaders(pxyResponse, resp);
+                    copyEntityContent(resp, pxyResponse);
                     rv = true;
 
                 } catch (IOException e) {
-                    System.err.println("ProxyServlet: " + e);
-                    e.printStackTrace();
+                    intlogger.error("ProxyServlet: " + e.getMessage());
                 } finally {
                     proxy.releaseConnection();
                     httpclient.getConnectionManager().shutdown();
@@ -228,7 +223,7 @@ public class ProxyServlet extends BaseServlet {
         return rv;
     }
 
-    private void doProxy(HttpServletRequest req, HttpServletResponse resp, final String method) throws IOException {
+    private void doProxy(HttpServletRequest req, HttpServletResponse resp, final String method) {
         if (inited && isProxyServer()) {
             String url = buildUrl(req);
             intlogger.info("ProxyServlet: proxying " + method + " " + url);
@@ -253,17 +248,10 @@ public class ProxyServlet extends BaseServlet {
                     int code = pxy_response.getStatusLine().getStatusCode();
                     resp.setStatus(code);
                     copyResponseHeaders(pxy_response, resp);
-
-                    HttpEntity entity = pxy_response.getEntity();
-                    if (entity != null) {
-                        InputStream in = entity.getContent();
-                        IOUtils.copy(in, resp.getOutputStream());
-                        in.close();
-                    }
+                    copyEntityContent(resp, pxy_response);
                 } catch (IOException e) {
                     intlogger.warn("ProxyServlet: " + e);
-                    resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-                    e.printStackTrace();
+                    sendResponseError(resp, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "", intlogger);
                 } finally {
                     proxy.releaseConnection();
                     httpclient.getConnectionManager().shutdown();
@@ -271,7 +259,7 @@ public class ProxyServlet extends BaseServlet {
             }
         } else {
             intlogger.warn("ProxyServlet: proxy disabled");
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, intlogger);
         }
     }
 
@@ -302,6 +290,17 @@ public class ProxyServlet extends BaseServlet {
             // Don't copy Date: our Jetty will add another Date header
             if (!hdr.getName().equals("Date")) {
                 to.addHeader(hdr.getName(), hdr.getValue());
+            }
+        }
+    }
+
+    private void copyEntityContent(HttpServletResponse resp, HttpResponse pxyResponse) {
+        HttpEntity entity = pxyResponse.getEntity();
+        if (entity != null) {
+            try (InputStream in = entity.getContent()) {
+                IOUtils.copy(in, resp.getOutputStream());
+            } catch (Exception e) {
+                intlogger.error("Exception: " + e.getMessage());
             }
         }
     }

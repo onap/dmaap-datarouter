@@ -151,14 +151,14 @@ public class SynchronizerTask extends TimerTask {
             Properties props = (new DB()).getProperties();
             String type = props.getProperty(Main.KEYSTORE_TYPE_PROPERTY, "jks");
             String store = props.getProperty(Main.KEYSTORE_PATH_PROPERTY);
-            String pass = props.getProperty(Main.KEYSTORE_PASSWORD_PROPERTY);
+            String pass = props.getProperty(Main.KEYSTORE_PASS_PROPERTY);
             KeyStore keyStore = KeyStore.getInstance(type);
             try(FileInputStream instream = new FileInputStream(new File(store))) {
                 keyStore.load(instream, pass.toCharArray());
 
             }
                 store = props.getProperty(Main.TRUSTSTORE_PATH_PROPERTY);
-                pass = props.getProperty(Main.TRUSTSTORE_PASSWORD_PROPERTY);
+                pass = props.getProperty(Main.TRUSTSTORE_PASS_PROPERTY);
                 KeyStore trustStore = null;
                 if (store != null && store.length() > 0) {
                     trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -171,7 +171,7 @@ public class SynchronizerTask extends TimerTask {
             // We are connecting with the node name, but the certificate will have the CNAME
             // So we need to accept a non-matching certificate name
             String keystorepass = props.getProperty(
-                Main.KEYSTORE_PASSWORD_PROPERTY); //itrack.web.att.com/browse/DATARTR-6 for changing hard coded passphase ref
+                Main.KEYSTORE_PASS_PROPERTY); //itrack.web.att.com/browse/DATARTR-6 for changing hard coded passphase ref
            try(AbstractHttpClient hc = new DefaultHttpClient()) {
                SSLSocketFactory socketFactory =
                        (trustStore == null)
@@ -282,7 +282,6 @@ public class SynchronizerTask extends TimerTask {
             }
         } catch (Exception e) {
             logger.warn("PROV0020: Caught exception in SynchronizerTask: " + e);
-            e.printStackTrace();
         }
     }
 
@@ -328,7 +327,7 @@ public class SynchronizerTask extends TimerTask {
      * Synchronize the Feeds in the JSONArray, with the Feeds in the DB.
      */
     private void syncFeeds(JSONArray ja) {
-        Collection<Syncable> coll = new ArrayList<Syncable>();
+        Collection<Syncable> coll = new ArrayList<>();
         for (int n = 0; n < ja.length(); n++) {
             try {
                 Feed f = new Feed(ja.getJSONObject(n));
@@ -346,7 +345,7 @@ public class SynchronizerTask extends TimerTask {
      * Synchronize the Subscriptions in the JSONArray, with the Subscriptions in the DB.
      */
     private void syncSubs(JSONArray ja) {
-        Collection<Syncable> coll = new ArrayList<Syncable>();
+        Collection<Syncable> coll = new ArrayList<>();
         for (int n = 0; n < ja.length(); n++) {
             try {
                 //Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
@@ -367,7 +366,7 @@ public class SynchronizerTask extends TimerTask {
      * Rally:US708115  - Synchronize the Groups in the JSONArray, with the Groups in the DB.
      */
     private void syncGroups(JSONArray ja) {
-        Collection<Syncable> coll = new ArrayList<Syncable>();
+        Collection<Syncable> coll = new ArrayList<>();
         for (int n = 0; n < ja.length(); n++) {
             try {
                 Group g = new Group(ja.getJSONObject(n));
@@ -386,7 +385,7 @@ public class SynchronizerTask extends TimerTask {
      * Synchronize the Parameters in the JSONObject, with the Parameters in the DB.
      */
     private void syncParams(JSONObject jo) {
-        Collection<Syncable> coll = new ArrayList<Syncable>();
+        Collection<Syncable> coll = new ArrayList<>();
         for (String k : jo.keySet()) {
             String v = "";
             try {
@@ -413,7 +412,7 @@ public class SynchronizerTask extends TimerTask {
     }
 
     private void syncIngressRoutes(JSONArray ja) {
-        Collection<Syncable> coll = new ArrayList<Syncable>();
+        Collection<Syncable> coll = new ArrayList<>();
         for (int n = 0; n < ja.length(); n++) {
             try {
                 IngressRoute in = new IngressRoute(ja.getJSONObject(n));
@@ -428,7 +427,7 @@ public class SynchronizerTask extends TimerTask {
     }
 
     private void syncEgressRoutes(JSONObject jo) {
-        Collection<Syncable> coll = new ArrayList<Syncable>();
+        Collection<Syncable> coll = new ArrayList<>();
         for (String key : jo.keySet()) {
             try {
                 int sub = Integer.parseInt(key);
@@ -447,7 +446,7 @@ public class SynchronizerTask extends TimerTask {
     }
 
     private void syncNetworkRoutes(JSONArray ja) {
-        Collection<Syncable> coll = new ArrayList<Syncable>();
+        Collection<Syncable> coll = new ArrayList<>();
         for (int n = 0; n < ja.length(); n++) {
             try {
                 NetworkRoute nr = new NetworkRoute(ja.getJSONObject(n));
@@ -466,7 +465,7 @@ public class SynchronizerTask extends TimerTask {
         try {
             Map<String, Syncable> newmap = getMap(newc);
             Map<String, Syncable> oldmap = getMap(oldc);
-            Set<String> union = new TreeSet<String>(newmap.keySet());
+            Set<String> union = new TreeSet<>(newmap.keySet());
             union.addAll(oldmap.keySet());
             DB db = new DB();
             @SuppressWarnings("resource")
@@ -503,13 +502,12 @@ public class SynchronizerTask extends TimerTask {
             db.release(conn);
         } catch (SQLException e) {
             logger.warn("PROV5009: problem during sync, exception: " + e);
-            e.printStackTrace();
         }
         return changes;
     }
 
     private Map<String, Syncable> getMap(Collection<? extends Syncable> c) {
-        Map<String, Syncable> map = new HashMap<String, Syncable>();
+        Map<String, Syncable> map = new HashMap<>();
         for (Syncable v : c) {
             map.put(v.getKey(), v);
         }
