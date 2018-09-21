@@ -535,7 +535,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 mailprops.load(inStream);
             } catch (IOException e) {
                 intlogger.fatal("PROV9003 Opening properties: " + e.getMessage());
-                e.printStackTrace();
                 System.exit(1);
             } finally {
                 try {
@@ -560,7 +559,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 try {
                     notifyPSTeam(p.get("org.onap.dmaap.datarouter.provserver.https.relax.notify").toString());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    intlogger.warn("Exception: " + e.getMessage());
                 }
             }
             mailSendFlag = true;
@@ -697,7 +696,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0005 doInsert: " + e.getMessage());
-            e.printStackTrace();
         } finally {
             if (conn != null) {
                 db.release(conn);
@@ -722,7 +720,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
-            e.printStackTrace();
         } finally {
             if (conn != null) {
                 db.release(conn);
@@ -747,7 +744,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0007 doDelete: " + e.getMessage());
-            e.printStackTrace();
         } finally {
             if (conn != null) {
                 db.release(conn);
@@ -910,7 +906,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                     return true;
                 }
             } catch (JSONException e) {
-                e.printStackTrace();
+                intlogger.error("JSONException: " + e.getMessage());
             }
         }
         return false;
@@ -980,7 +976,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             MDC.put(MDC_SERVER_FQDN, InetAddress.getLocalHost().getHostName());
             MDC.put(MDC_SERVER_IP_ADDRESS, InetAddress.getLocalHost().getHostAddress());
         } catch (Exception e) {
-            e.printStackTrace();
+            intlogger.error("Exception: " + e.getMessage());
         }
 
     }
