@@ -75,11 +75,7 @@ public class GroupServlet extends ProxyServlet {
             return;
         }
         if (isProxyServer()) {
-            try {
-                super.doGet(req, resp);
-            } catch (IOException ioe) {
-                eventlogger.error("IOException" + ioe.getMessage());
-            }
+            super.doGet(req, resp);
             return;
         }
         String bhdr = req.getHeader(BEHALF_HEADER);
@@ -165,11 +161,7 @@ public class GroupServlet extends ProxyServlet {
             return;
         }
         if (isProxyServer()) {
-            try {
-                super.doPut(req, resp);
-            } catch (IOException ioe) {
-                eventlogger.error("IOException" + ioe.getMessage());
-            }
+            super.doPut(req, resp);
             return;
         }
         String bhdr = req.getHeader(BEHALF_HEADER);
@@ -288,11 +280,7 @@ public class GroupServlet extends ProxyServlet {
             return;
         }
         if (isProxyServer()) {
-            try {
-                super.doPost(req, resp);
-            } catch (IOException ioe) {
-                eventlogger.error("IOException" + ioe.getMessage());
-            }
+            super.doPost(req, resp);
             return;
         }
         String bhdr = req.getHeader(BEHALF_HEADER);

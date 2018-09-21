@@ -182,11 +182,7 @@ public class InternalServlet extends ProxyServlet {
         String path = req.getPathInfo();
         if (path.startsWith("/api/")) {
             if (isProxyOK(req) && isProxyServer()) {
-                try {
-                    super.doDelete(req, resp);
-                } catch (IOException ioe) {
-                    intlogger.error("IOException" + ioe.getMessage());
-                }
+                super.doDelete(req, resp);
                 return;
             }
             String key = path.substring(5);
@@ -253,12 +249,8 @@ public class InternalServlet extends ProxyServlet {
         }
         if (path.equals("/prov")) {
             if (isProxyOK(req) && isProxyServer()) {
-                try {
-                    if (super.doGetWithFallback(req, resp)) {
-                        return;
-                    }
-                } catch (IOException ioe) {
-                    intlogger.error("IOException" + ioe.getMessage());
+                if (super.doGetWithFallback(req, resp)) {
+                    return;
                 }
                 // fall back to returning the local data if the remote is unreachable
                 intlogger.info("Active server unavailable; falling back to local copy.");
@@ -305,11 +297,7 @@ public class InternalServlet extends ProxyServlet {
         }
         if (path.startsWith("/api/")) {
             if (isProxyOK(req) && isProxyServer()) {
-                try {
-                    super.doGet(req, resp);
-                } catch (IOException ioe) {
-                    intlogger.error("IOException" + ioe.getMessage());
-                }
+                super.doGet(req, resp);
                 return;
             }
             String key = path.substring(5);
@@ -361,11 +349,7 @@ public class InternalServlet extends ProxyServlet {
         String path = req.getPathInfo();
         if (path.startsWith("/api/")) {
             if (isProxyOK(req) && isProxyServer()) {
-                try {
-                    super.doPut(req, resp);
-                } catch (IOException ioe) {
-                    intlogger.error("IOException" + ioe.getMessage());
-                }
+                super.doPut(req, resp);
                 return;
             }
             String key = path.substring(5);
@@ -414,11 +398,7 @@ public class InternalServlet extends ProxyServlet {
         String path = req.getPathInfo();
         if (path.startsWith("/api/")) {
             if (isProxyOK(req) && isProxyServer()) {
-                try {
-                    super.doPost(req, resp);
-                } catch (IOException ioe) {
-                    intlogger.error("IOException" + ioe.getMessage());
-                }
+                super.doPost(req, resp);
                 return;
             }
             String key = path.substring(5);
