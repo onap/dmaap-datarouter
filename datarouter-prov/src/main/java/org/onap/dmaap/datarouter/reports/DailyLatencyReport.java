@@ -138,7 +138,7 @@ public class DailyLatencyReport extends ReportBase {
         }
     }
     private long getPstart(String t) {
-        if (t.indexOf('.') > 0)
+        if (t.indexOf('.') >= 0)
             t = t.substring(0, t.indexOf('.'));
         return Long.parseLong(t);
     }
