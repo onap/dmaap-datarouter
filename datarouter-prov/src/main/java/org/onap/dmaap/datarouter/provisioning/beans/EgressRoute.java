@@ -72,7 +72,7 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
 
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return set;
     }
@@ -102,14 +102,14 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             ps.close();
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
                 if(ps!=null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return v;
@@ -140,14 +140,14 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0007 doDelete: " + e.getMessage());
-            e.printStackTrace();
+            intlogger.error("SQLException" + e.getMessage());
         } finally {
             try {
                 if(ps!=null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return rv;
@@ -168,14 +168,14 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             rv = true;
         } catch (SQLException e) {
             intlogger.warn("PROV0005 doInsert: " + e.getMessage());
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
                 if(ps!=null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return rv;
@@ -194,14 +194,14 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
                 if(ps!=null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return rv;
