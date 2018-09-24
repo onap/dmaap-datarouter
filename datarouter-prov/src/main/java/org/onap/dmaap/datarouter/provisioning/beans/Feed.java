@@ -82,7 +82,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return count != 0;
     }
@@ -133,7 +133,7 @@ public class Feed extends Syncable {
             db.release(conn);
         } catch (SQLException e) {
             intlogger.info("countActiveFeeds: " + e.getMessage());
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return count;
     }
@@ -154,7 +154,7 @@ public class Feed extends Syncable {
             db.release(conn);
         } catch (SQLException e) {
             intlogger.info("getMaxFeedID: " + e.getMessage());
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return max;
     }
@@ -200,7 +200,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return map.values();
     }
@@ -234,7 +234,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return list;
     }
@@ -271,7 +271,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return feed;
     }
@@ -534,14 +534,14 @@ public class Feed extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0007 doDelete: " + e.getMessage());
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
                 if(ps!=null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return rv;
@@ -602,7 +602,7 @@ public class Feed extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0005 doInsert: " + e.getMessage());
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return rv;
     }
@@ -683,13 +683,13 @@ public class Feed extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
                 if (ps != null)
                     ps.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return rv;
@@ -716,14 +716,14 @@ public class Feed extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
                 if(ps!=null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return rv;
