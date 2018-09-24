@@ -25,11 +25,9 @@
 package org.onap.dmaap.datarouter.provisioning;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -98,41 +96,47 @@ public class PublishServlet extends BaseServlet {
         setIpAndFqdnForEelf("doPost");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
         redirect(req, resp);
+
     }
-    private void redirect(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String[] nodes = getNodes();
-        if (nodes == null || nodes.length == 0) {
-            resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "There are no nodes defined in the DR network.");
-        } else {
-            EventLogRecord elr = new EventLogRecord(req);
-            int feedid = checkPath(req);
-            if (feedid < 0) {
-                String message = (feedid == -1)
-                    ? "Invalid request - Missing or bad feed number."
-                    : "Invalid request - Missing file ID.";
-                elr.setMessage(message);
-                elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-                eventlogger.info(elr);
-
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND, message);
+    private void redirect(HttpServletRequest req, HttpServletResponse resp)  {
+        try {
+            String[] nodes = getNodes();
+            if (nodes == null || nodes.length == 0) {
+                resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "There are no nodes defined in the DR network.");
             } else {
-                // Generate new URL
-                String nextnode = getRedirectNode(feedid, req);
-                nextnode = nextnode+":"+DB.HTTPS_PORT;
-                String newurl = "https://" + nextnode + "/publish" + req.getPathInfo();
-                String qs = req.getQueryString();
-                if (qs != null)
-                    newurl += "?" + qs;
+                EventLogRecord elr = new EventLogRecord(req);
+                int feedid = checkPath(req);
+                if (feedid < 0) {
+                    String message = (feedid == -1)
+                            ? "Invalid request - Missing or bad feed number."
+                            : "Invalid request - Missing file ID.";
+                    elr.setMessage(message);
+                    elr.setResult(HttpServletResponse.SC_NOT_FOUND);
+                    eventlogger.info(elr);
 
-                // Log redirect in event log
-                String message = "Redirected to: "+newurl;
-                elr.setMessage(message);
-                elr.setResult(HttpServletResponse.SC_MOVED_PERMANENTLY);
-                eventlogger.info(elr);
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, message);
+                } else {
+                    // Generate new URL
+                    String nextnode = getRedirectNode(feedid, req);
+                    nextnode = nextnode + ":" + DB.HTTPS_PORT;
+                    String newurl = "https://" + nextnode + "/publish" + req.getPathInfo();
+                    String qs = req.getQueryString();
+                    if (qs != null)
+                        newurl += "?" + qs;
 
-                resp.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-                resp.setHeader("Location", newurl);
+                    // Log redirect in event log
+                    String message = "Redirected to: " + newurl;
+                    elr.setMessage(message);
+                    elr.setResult(HttpServletResponse.SC_MOVED_PERMANENTLY);
+                    eventlogger.info(elr);
+
+                    resp.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+                    resp.setHeader("Location", newurl);
+                }
             }
+        } catch (IOException ioe) {
+            eventlogger.error("IOException" + ioe.getMessage());
+
         }
     }
     private String getRedirectNode(int feedid, HttpServletRequest req) {
