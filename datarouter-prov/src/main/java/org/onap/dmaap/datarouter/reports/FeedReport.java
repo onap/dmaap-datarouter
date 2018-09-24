@@ -83,7 +83,7 @@ public class FeedReport extends ReportBase {
            }
         db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
         logger.debug("Query time: " + (System.currentTimeMillis() - start) + " ms");
         try (PrintWriter os = new PrintWriter(outfile)) {
@@ -91,6 +91,7 @@ public class FeedReport extends ReportBase {
             os.print(sb.toString());
         } catch (FileNotFoundException e) {
             System.err.println("File cannot be written: " + outfile);
+            logger.error(e);
         }
     }
 
@@ -129,6 +130,7 @@ public class FeedReport extends ReportBase {
                                 feedmap.put("pubcount", n + 1);
                             } catch (JSONException e) {
                                 feedmap.put("pubcount", 1);
+                                logger.error(e);
                             }
                         } else if (type.equals("del")) {
                             String subid = "" + rs.getInt("DELIVERY_SUBID");
@@ -137,6 +139,7 @@ public class FeedReport extends ReportBase {
                                 feedmap.put(subid, n + 1);
                             } catch (JSONException e) {
                                 feedmap.put(subid, 1);
+                                logger.error(e);
                             }
                         }
                     }
@@ -144,7 +147,7 @@ public class FeedReport extends ReportBase {
             }
              db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
         logger.debug("Query time: " + (System.currentTimeMillis() - start) + " ms");
         try {
@@ -153,6 +156,7 @@ public class FeedReport extends ReportBase {
             os.close();
         } catch (FileNotFoundException e) {
             System.err.println("File cannot be written: " + outfile);
+            logger.error(e);
         }
     }
 
@@ -350,6 +354,7 @@ public class FeedReport extends ReportBase {
                                 feedmap.put("pubcount", n + count);
                             } catch (JSONException e) {
                                 feedmap.put("pubcount", count);
+				logger.error(e);
                             }
                         } else if (type.equals("del")) {
                             String subid = tt[3];
@@ -358,6 +363,7 @@ public class FeedReport extends ReportBase {
                                 feedmap.put(subid, n + count);
                             } catch (JSONException e) {
                                 feedmap.put(subid, count);
+				logger.error(e);
                             }
                         }
                     }
@@ -379,7 +385,7 @@ public class FeedReport extends ReportBase {
             System.out.println(t);
         } catch (Exception e) {
             System.err.println(e);
-            e.printStackTrace();
+	    logger.error(e);
         }
     }
 }
