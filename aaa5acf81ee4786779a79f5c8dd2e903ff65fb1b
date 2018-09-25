@@ -16,6 +16,24 @@
       "revId": "aaa5acf81ee4786779a79f5c8dd2e903ff65fb1b",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_922fadf6",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/beans/EgressRoute.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 4419
+      },
+      "writtenOn": "2018-09-25T09:50:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a76adc5_92080d93",
+      "revId": "aaa5acf81ee4786779a79f5c8dd2e903ff65fb1b",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
