@@ -90,9 +90,9 @@ public class Main {
     public static final String DEFAULT_TRUSTSTORE = "/opt/java/jdk/jdk180/jre/lib/security/cacerts";
     public static final String KEYSTORE_TYPE_PROPERTY = "org.onap.dmaap.datarouter.provserver.keystore.type";
     public static final String KEYSTORE_PATH_PROPERTY = "org.onap.dmaap.datarouter.provserver.keystore.path";
-    public static final String KEYSTORE_PASSWORD_PROPERTY = "org.onap.dmaap.datarouter.provserver.keystore.password";
+    public static final String KEYSTORE_PASS_PROPERTY = "org.onap.dmaap.datarouter.provserver.keystore.password";
     public static final String TRUSTSTORE_PATH_PROPERTY = "org.onap.dmaap.datarouter.provserver.truststore.path";
-    public static final String TRUSTSTORE_PASSWORD_PROPERTY = "org.onap.dmaap.datarouter.provserver.truststore.password";
+    public static final String TRUSTSTORE_PASS_PROPERTY = "org.onap.dmaap.datarouter.provserver.truststore.password";
 
     /**
      * The one and only {@link Server} instance in this JVM
@@ -110,7 +110,7 @@ public class Main {
         Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
 
         // Check DB is accessible and contains the expected tables
-        if (!checkDatabase(logger)) {
+        if (!checkDatabase()) {
             System.exit(1);
         }
 
@@ -154,7 +154,7 @@ public class Main {
             // HTTPS connector
             SslContextFactory sslContextFactory = new SslContextFactory();
             sslContextFactory.setKeyStorePath(p.getProperty(KEYSTORE_PATH_PROPERTY));
-            sslContextFactory.setKeyStorePassword(p.getProperty(KEYSTORE_PASSWORD_PROPERTY));
+            sslContextFactory.setKeyStorePassword(p.getProperty(KEYSTORE_PASS_PROPERTY));
             sslContextFactory
                     .setKeyManagerPassword(p.getProperty("org.onap.dmaap.datarouter.provserver.keymanager.password"));
             // SSL stuff
@@ -172,15 +172,15 @@ public class Main {
 
                 sslContextFactory.setKeyStoreType(p.getProperty(KEYSTORE_TYPE_PROPERTY, "jks"));
                 sslContextFactory.setKeyStorePath(p.getProperty(KEYSTORE_PATH_PROPERTY));
-                sslContextFactory.setKeyStorePassword(p.getProperty(KEYSTORE_PASSWORD_PROPERTY));
+                sslContextFactory.setKeyStorePassword(p.getProperty(KEYSTORE_PASS_PROPERTY));
                 sslContextFactory
                         .setKeyManagerPassword(p.getProperty("org.onap.dmaap.datarouter.provserver.keymanager.password"));
 
                 String ts = p.getProperty(TRUSTSTORE_PATH_PROPERTY);
                 if (ts != null && ts.length() > 0) {
-                    System.out.println("@@ TS -> " + ts);
+                    logger.info("@@ TS -> " + ts);
                     sslContextFactory.setTrustStorePath(ts);
-                    sslContextFactory.setTrustStorePassword(p.getProperty(TRUSTSTORE_PASSWORD_PROPERTY));
+                    sslContextFactory.setTrustStorePassword(p.getProperty(TRUSTSTORE_PASS_PROPERTY));
                 } else {
                     sslContextFactory.setTrustStorePath(DEFAULT_TRUSTSTORE);
                     sslContextFactory.setTrustStorePassword("changeit");
@@ -255,7 +255,7 @@ public class Main {
         logger.info("PROV0001 **** AT&T Data Router Provisioning Server halted.");
     }
 
-    private static boolean checkDatabase(Logger logger) {
+    private static boolean checkDatabase() {
         DB db = new DB();
         return db.runRetroFits();
     }
