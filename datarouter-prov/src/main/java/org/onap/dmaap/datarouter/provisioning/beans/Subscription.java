@@ -29,8 +29,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
@@ -43,8 +47,16 @@ import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
  * @version $Id: Subscription.java,v 1.9 2013/10/28 18:06:53 eby Exp $
  */
 public class Subscription extends Syncable {
+
+    public static final String SQLEXCEPTION = "SQLException: ";
+    public static final String SUBID_KEY = "subid";
+    public static final String SUBID_COL = "SUBID";
+    public static final String FEEDID_KEY = "feedid";
+    public static final String GROUPID_KEY = "groupid";
+    public static final String LAST_MOD_KEY = "last_mod";
+    public static final String CREATED_DATE = "created_date";
     private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
-    private static int next_subid = getMaxSubID() + 1;
+    private int nextSubid = getMaxSubID() + 1;
 
     private int subid;
     private int feedid;
@@ -54,8 +66,8 @@ public class Subscription extends Syncable {
     private String subscriber;
     private SubLinks links;
     private boolean suspended;
-    private Date last_mod;
-    private Date created_date;
+    private Date lastMod;
+    private Date createdDate;
 
     public static Subscription getSubscriptionMatching(Subscription sub) {
         SubDelivery deli = sub.getDelivery();
@@ -69,13 +81,13 @@ public class Subscription extends Syncable {
                 sub.isMetadataOnly() ? 1 : 0
         );
         List<Subscription> list = getSubscriptionsForSQL(sql);
-        return list.size() > 0 ? list.get(0) : null;
+        return !list.isEmpty() ? list.get(0) : null;
     }
 
     public static Subscription getSubscriptionById(int id) {
         String sql = "select * from SUBSCRIPTIONS where SUBID = " + id;
         List<Subscription> list = getSubscriptionsForSQL(sql);
-        return list.size() > 0 ? list.get(0) : null;
+        return !list.isEmpty() ? list.get(0) : null;
     }
 
     public static Collection<Subscription> getAllSubscriptions() {
@@ -83,13 +95,13 @@ public class Subscription extends Syncable {
     }
 
     private static List<Subscription> getSubscriptionsForSQL(String sql) {
-        List<Subscription> list = new ArrayList<Subscription>();
+        List<Subscription> list = new ArrayList<>();
         try {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            try(Statement stmt = conn.createStatement()) {
-                try(ResultSet rs = stmt.executeQuery(sql)) {
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery(sql)) {
                     while (rs.next()) {
                         Subscription sub = new Subscription(rs);
                         list.add(sub);
@@ -98,7 +110,7 @@ public class Subscription extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error(e);
         }
         return list;
     }
@@ -109,8 +121,8 @@ public class Subscription extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            try(Statement stmt = conn.createStatement()) {
-                try(ResultSet rs = stmt.executeQuery("select MAX(subid) from SUBSCRIPTIONS")) {
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("select MAX(subid) from SUBSCRIPTIONS")) {
                     if (rs.next()) {
                         max = rs.getInt(1);
                     }
@@ -119,29 +131,31 @@ public class Subscription extends Syncable {
             db.release(conn);
         } catch (SQLException e) {
             intlogger.info("getMaxSubID: " + e.getMessage());
-            e.printStackTrace();
         }
         return max;
     }
 
     public static Collection<String> getSubscriptionUrlList(int feedid) {
-        List<String> list = new ArrayList<String>();
-        String sql = "select SUBID from SUBSCRIPTIONS where FEEDID = " + feedid;
+        List<String> list = new ArrayList<>();
+        String sql = "select SUBID from SUBSCRIPTIONS where FEEDID = ?";
+
         try {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            try(Statement stmt = conn.createStatement()) {
-                try(ResultSet rs = stmt.executeQuery(sql)) {
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, String.valueOf(feedid));
+                try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
-                        int subid = rs.getInt("SUBID");
+                        int subid = rs.getInt(SUBID_COL);
                         list.add(URLUtilities.generateSubscriptionURL(subid));
                     }
                 }
             }
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error(SQLEXCEPTION + e.getMessage());
         }
         return list;
     }
@@ -157,8 +171,8 @@ public class Subscription extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            try(Statement stmt = conn.createStatement()) {
-                try(ResultSet rs = stmt.executeQuery("select count(*) from SUBSCRIPTIONS")) {
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("select count(*) from SUBSCRIPTIONS")) {
                     if (rs.next()) {
                         count = rs.getInt(1);
                     }
@@ -167,7 +181,6 @@ public class Subscription extends Syncable {
             db.release(conn);
         } catch (SQLException e) {
             intlogger.warn("PROV0008 countActiveSubscriptions: " + e.getMessage());
-            e.printStackTrace();
         }
         return count;
     }
@@ -185,30 +198,31 @@ public class Subscription extends Syncable {
         this.subscriber = "";
         this.links = new SubLinks();
         this.suspended = false;
-        this.last_mod = new Date();
-        this.created_date = new Date();
+        this.lastMod = new Date();
+        this.createdDate = new Date();
     }
 
     public Subscription(ResultSet rs) throws SQLException {
-        this.subid = rs.getInt("SUBID");
+        this.subid = rs.getInt(SUBID_COL);
         this.feedid = rs.getInt("FEEDID");
         this.groupid = rs.getInt("GROUPID"); //New field is added - Groups feature Rally:US708115 - 1610
         this.delivery = new SubDelivery(rs);
         this.metadataOnly = rs.getBoolean("METADATA_ONLY");
         this.subscriber = rs.getString("SUBSCRIBER");
-        this.links = new SubLinks(rs.getString("SELF_LINK"), URLUtilities.generateFeedURL(feedid), rs.getString("LOG_LINK"));
+        this.links = new SubLinks(rs.getString("SELF_LINK"), URLUtilities.generateFeedURL(feedid),
+                rs.getString("LOG_LINK"));
         this.suspended = rs.getBoolean("SUSPENDED");
-        this.last_mod = rs.getDate("LAST_MOD");
-        this.created_date = rs.getDate("CREATED_DATE");
+        this.lastMod = rs.getDate("LAST_MOD");
+        this.createdDate = rs.getDate("CREATED_DATE");
     }
 
     public Subscription(JSONObject jo) throws InvalidObjectException {
         this("", "", "");
         try {
             // The JSONObject is assumed to contain a vnd.att-dr.subscription representation
-            this.subid = jo.optInt("subid", -1);
-            this.feedid = jo.optInt("feedid", -1);
-            this.groupid = jo.optInt("groupid", -1); //New field is added - Groups feature Rally:US708115 - 1610
+            this.subid = jo.optInt(SUBID_KEY, -1);
+            this.feedid = jo.optInt(FEEDID_KEY, -1);
+            this.groupid = jo.optInt(GROUPID_KEY, -1); //New field is added - Groups feature Rally:US708115 - 1610
 
             JSONObject jdeli = jo.getJSONObject("delivery");
             String url = jdeli.getString("url");
@@ -216,20 +230,21 @@ public class Subscription extends Syncable {
             String password = jdeli.getString("password");
             boolean use100 = jdeli.getBoolean("use100");
 
-
             //Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
             Properties p = (new DB()).getProperties();
-            if (p.get("org.onap.dmaap.datarouter.provserver.https.relaxation").toString().equals("false") && !jo.has("sync")) {
-                if (!url.startsWith("https://"))
-                    throw new InvalidObjectException("delivery URL is not HTTPS");
+            if (!url.startsWith("https://") && isHttpsRelaxationFalseAndHasSyncKey(jo, p)) {
+                throw new InvalidObjectException("delivery URL is not HTTPS");
             }
 
-            if (url.length() > 256)
+            if (url.length() > 256) {
                 throw new InvalidObjectException("delivery url field is too long");
-            if (user.length() > 20)
+            }
+            if (user.length() > 20) {
                 throw new InvalidObjectException("delivery user field is too long");
-            if (password.length() > 32)
+            }
+            if (password.length() > 32) {
                 throw new InvalidObjectException("delivery password field is too long");
+            }
             this.delivery = new SubDelivery(url, user, password, use100);
 
             this.metadataOnly = jo.getBoolean("metadataOnly");
@@ -243,6 +258,11 @@ public class Subscription extends Syncable {
         } catch (Exception e) {
             throw new InvalidObjectException("invalid JSON: " + e.getMessage());
         }
+    }
+
+    private boolean isHttpsRelaxationFalseAndHasSyncKey(JSONObject jo, Properties p) {
+        return p.get("org.onap.dmaap.datarouter.provserver.https.relaxation").toString().equals("false") && !jo
+                .has("sync");
     }
 
     public int getSubid() {
@@ -309,8 +329,9 @@ public class Subscription extends Syncable {
 
     public void setSubscriber(String subscriber) {
         if (subscriber != null) {
-            if (subscriber.length() > 8)
+            if (subscriber.length() > 8) {
                 subscriber = subscriber.substring(0, 8);
+            }
             this.subscriber = subscriber;
         }
     }
@@ -326,34 +347,34 @@ public class Subscription extends Syncable {
     @Override
     public JSONObject asJSONObject() {
         JSONObject jo = new JSONObject();
-        jo.put("subid", subid);
-        jo.put("feedid", feedid);
-        jo.put("groupid", groupid); //New field is added - Groups feature Rally:US708115 - 1610
+        jo.put(SUBID_KEY, subid);
+        jo.put(FEEDID_KEY, feedid);
+        jo.put(GROUPID_KEY, groupid); //New field is added - Groups feature Rally:US708115 - 1610
         jo.put("delivery", delivery.asJSONObject());
         jo.put("metadataOnly", metadataOnly);
         jo.put("subscriber", subscriber);
         jo.put("links", links.asJSONObject());
         jo.put("suspend", suspended);
-        jo.put("last_mod", last_mod.getTime());
-        jo.put("created_date", created_date.getTime());
+        jo.put(LAST_MOD_KEY, lastMod.getTime());
+        jo.put(CREATED_DATE, createdDate.getTime());
         return jo;
     }
 
     public JSONObject asLimitedJSONObject() {
         JSONObject jo = asJSONObject();
-        jo.remove("subid");
-        jo.remove("feedid");
-        jo.remove("last_mod");
+        jo.remove(SUBID_KEY);
+        jo.remove(FEEDID_KEY);
+        jo.remove(LAST_MOD_KEY);
         return jo;
     }
 
     public JSONObject asJSONObject(boolean hidepasswords) {
         JSONObject jo = asJSONObject();
         if (hidepasswords) {
-            jo.remove("subid");    // we no longer hide passwords, however we do hide these
-            jo.remove("feedid");
-            jo.remove("last_mod");
-            jo.remove("created_date");
+            jo.remove(SUBID_KEY);    // we no longer hide passwords, however we do hide these
+            jo.remove(FEEDID_KEY);
+            jo.remove(LAST_MOD_KEY);
+            jo.remove(CREATED_DATE);
         }
         return jo;
     }
@@ -365,15 +386,16 @@ public class Subscription extends Syncable {
         try {
             if (subid == -1) {
                 // No feed ID assigned yet, so assign the next available one
-                setSubid(next_subid++);
+                setSubid(nextSubid++);
             }
             // In case we insert a feed from synchronization
-            if (subid > next_subid)
-                next_subid = subid + 1;
+            if (subid > nextSubid) {
+                nextSubid = subid + 1;
+            }
 
             // Create the SUBSCRIPTIONS row
             String sql = "insert into SUBSCRIPTIONS (SUBID, FEEDID, DELIVERY_URL, DELIVERY_USER, DELIVERY_PASSWORD, DELIVERY_USE100, METADATA_ONLY, SUBSCRIBER, SUSPENDED, GROUPID) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            ps = c.prepareStatement(sql, new String[]{"SUBID"});
+            ps = c.prepareStatement(sql, new String[]{SUBID_COL});
             ps.setInt(1, subid);
             ps.setInt(2, feedid);
             ps.setString(3, getDelivery().getUrl());
@@ -397,14 +419,13 @@ public class Subscription extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0005 doInsert: " + e.getMessage());
-            e.printStackTrace();
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error(SQLEXCEPTION + e.getMessage());
             }
         }
         return rv;
@@ -429,14 +450,13 @@ public class Subscription extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
-            e.printStackTrace();
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error(SQLEXCEPTION + e.getMessage());
             }
         }
         return rv;
@@ -444,8 +464,7 @@ public class Subscription extends Syncable {
 
 
     /**
-     * Rally US708115
-     * Change Ownership of Subscription - 1610
+     * Rally US708115 Change Ownership of Subscription - 1610
      */
     public boolean changeOwnerShip() {
         boolean rv = true;
@@ -464,14 +483,13 @@ public class Subscription extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
-            e.printStackTrace();
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error(SQLEXCEPTION + e.getMessage());
             }
         }
         return rv;
@@ -490,14 +508,13 @@ public class Subscription extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0007 doDelete: " + e.getMessage());
-            e.printStackTrace();
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error(SQLEXCEPTION + e.getMessage());
             }
         }
         return rv;
@@ -510,31 +527,39 @@ public class Subscription extends Syncable {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Subscription))
+        if (!(obj instanceof Subscription)) {
             return false;
+        }
         Subscription os = (Subscription) obj;
-        if (subid != os.subid)
+        if (subid != os.subid) {
             return false;
-        if (feedid != os.feedid)
+        }
+        if (feedid != os.feedid) {
             return false;
+        }
         if (groupid != os.groupid) //New field is added - Groups feature Rally:US708115 - 1610
+        {
             return false;
-        if (!delivery.equals(os.delivery))
+        }
+        if (!delivery.equals(os.delivery)) {
             return false;
-        if (metadataOnly != os.metadataOnly)
+        }
+        if (metadataOnly != os.metadataOnly) {
             return false;
-        if (!subscriber.equals(os.subscriber))
+        }
+        if (!subscriber.equals(os.subscriber)) {
             return false;
-        if (!links.equals(os.links))
+        }
+        if (!links.equals(os.links)) {
             return false;
-        if (suspended != os.suspended)
-            return false;
-        return true;
+        }
+        return suspended == os.suspended;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(subid, feedid, groupid, delivery, metadataOnly, subscriber, links, suspended, last_mod, created_date);
+        return Objects.hash(subid, feedid, groupid, delivery, metadataOnly, subscriber, links, suspended, lastMod,
+                createdDate);
     }
 
     @Override
