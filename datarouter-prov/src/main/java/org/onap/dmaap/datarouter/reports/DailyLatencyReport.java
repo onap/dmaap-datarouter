@@ -37,7 +37,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 
 /**
@@ -65,42 +64,54 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  * @version $Id: DailyLatencyReport.java,v 1.2 2013/11/06 16:23:54 eby Exp $
  */
 public class DailyLatencyReport extends ReportBase {
+
     private static final String SELECT_SQL =
         "select EVENT_TIME, TYPE, PUBLISH_ID, FEED_FILEID, FEEDID, CONTENT_LENGTH from LOG_RECORDS" +
-        " where EVENT_TIME >= ? and EVENT_TIME <= ?";
+            " where EVENT_TIME >= ? and EVENT_TIME <= ?";
 
     private class Job {
+
         public long pubtime = 0;
         public long clen = 0;
         public List<Long> deltime = new ArrayList<Long>();
+
         public long minLatency() {
             long n = deltime.isEmpty() ? 0 : Long.MAX_VALUE;
-            for (Long l : deltime)
-                n = Math.min(n, l-pubtime);
+            for (Long l : deltime) {
+                n = Math.min(n, l - pubtime);
+            }
             return n;
         }
+
         public long maxLatency() {
             long n = 0;
-            for (Long l : deltime)
-                n = Math.max(n, l-pubtime);
+            for (Long l : deltime) {
+                n = Math.max(n, l - pubtime);
+            }
             return n;
         }
+
         public long totalLatency() {
             long n = 0;
-            for (Long l : deltime)
-                n += (l-pubtime);
+            for (Long l : deltime) {
+                n += (l - pubtime);
+            }
             return n;
         }
     }
+
     private class Counters {
+
         public final String date;
         public final int feedid;
         public final Map<String, Job> jobs;
+
         public Counters(String d, int fid) {
             date = d;
             feedid = fid;
-            jobs = new HashMap<String, Job>();
+            jobs = new HashMap<>();
         }
+
         public void addEvent(long etime, String type, String id, String fid, long clen) {
             Job j = jobs.get(id);
             if (j == null) {
@@ -114,48 +125,52 @@ public class DailyLatencyReport extends ReportBase {
                 j.deltime.add(etime);
             }
         }
+
         @Override
         public String toString() {
             long minsize = Long.MAX_VALUE, maxsize = 0, avgsize = 0;
-            long minl    = Long.MAX_VALUE, maxl    = 0;
-            long fanout  = 0, totall = 0, totaln = 0;
+            long minl = Long.MAX_VALUE, maxl = 0;
+            long fanout = 0, totall = 0, totaln = 0;
             for (Job j : jobs.values()) {
                 minsize = Math.min(minsize, j.clen);
                 maxsize = Math.max(maxsize, j.clen);
                 avgsize += j.clen;
-                minl    = Math.min(minl, j.minLatency());
-                maxl    = Math.max(maxl, j.maxLatency());
-                totall  += j.totalLatency();
-                totaln  += j.deltime.size();
-                fanout  += j.deltime.size();
+                minl = Math.min(minl, j.minLatency());
+                maxl = Math.max(maxl, j.maxLatency());
+                totall += j.totalLatency();
+                totaln += j.deltime.size();
+                fanout += j.deltime.size();
             }
             if (jobs.size() > 0) {
                 avgsize /= jobs.size();
-                fanout  /= jobs.size();
+                fanout /= jobs.size();
             }
             long avgl = (totaln > 0) ? (totall / totaln) : 0;
-            return date + "," + feedid + "," + minsize + "," + maxsize + "," + avgsize + "," + minl + "," + maxl + "," + avgl + "," + fanout;
+            return date + "," + feedid + "," + minsize + "," + maxsize + "," + avgsize + "," + minl + "," + maxl + ","
+                + avgl + "," + fanout;
         }
     }
+
     private long getPstart(String t) {
-        if (t.indexOf('.') >= 0)
+        if (t.indexOf('.') >= 0) {
             t = t.substring(0, t.indexOf('.'));
+        }
         return Long.parseLong(t);
     }
 
     @Override
     public void run() {
-        Map<String, Counters> map = new HashMap<String, Counters>();
+        Map<String, Counters> map = new HashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         long start = System.currentTimeMillis();
         try {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            try(PreparedStatement ps = conn.prepareStatement(SELECT_SQL)) {
+            try (PreparedStatement ps = conn.prepareStatement(SELECT_SQL)) {
                 ps.setLong(1, from);
                 ps.setLong(2, to);
-                try(ResultSet rs = ps.executeQuery()) {
+                try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         String id = rs.getString("PUBLISH_ID");
                         int feed = rs.getInt("FEEDID");
@@ -177,17 +192,18 @@ public class DailyLatencyReport extends ReportBase {
                 db.release(conn);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("SQLException: " + e.getMessage());
         }
-        logger.debug("Query time: " + (System.currentTimeMillis()-start) + " ms");
-        try (PrintWriter os = new PrintWriter(outfile)){
+        logger.debug("Query time: " + (System.currentTimeMillis() - start) + " ms");
+        try (PrintWriter os = new PrintWriter(outfile)) {
             os.println("date,feedid,minsize,maxsize,avgsize,minlat,maxlat,avglat,fanout");
-            for (String key : new TreeSet<String>(map.keySet())) {
+            for (String key : new TreeSet<>(map.keySet())) {
                 Counters c = map.get(key);
                 os.println(c.toString());
             }
         } catch (FileNotFoundException e) {
-            System.err.println("File cannot be written: "+outfile);
+            System.err.println("File cannot be written: " + outfile);
+            logger.error("FileNotFoundException: " + e.getMessage());
         }
     }
 }
