@@ -144,7 +144,7 @@ public class SubscriberReport extends ReportBase {
 
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("SQLException: " + e.getMessage());
         }
         logger.debug("Query time: " + (System.currentTimeMillis() - start) + " ms");
         try (PrintWriter os = new PrintWriter(outfile)){
@@ -155,6 +155,7 @@ public class SubscriberReport extends ReportBase {
             }
         } catch (FileNotFoundException e) {
             System.err.println("File cannot be written: " + outfile);
+            logger.error("FileNotFoundException: " + e.getMessage());
         }
     }
 }
