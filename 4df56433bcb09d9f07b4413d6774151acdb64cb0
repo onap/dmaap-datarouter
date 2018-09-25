@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_90c6c515",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/beans/Parameters.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-25T15:19:13Z",
+      "side": 1,
+      "message": "It sounds like from Dom\u0027s email now that there is no need for this extra logging and I would agree. Same for all above.",
+      "range": {
+        "startLine": 243,
+        "startChar": 12,
+        "endLine": 243,
+        "endChar": 62
+      },
+      "revId": "4df56433bcb09d9f07b4413d6774151acdb64cb0",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
