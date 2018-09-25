@@ -214,7 +214,6 @@ public class LogfileLoader extends Thread {
                 }
             } catch (Exception e) {
                 logger.warn("PROV0020: Caught exception in LogfileLoader: " + e);
-                e.printStackTrace();
             }
         }
     }
@@ -275,7 +274,7 @@ public class LogfileLoader extends Thread {
              }
             } catch (SQLException e) {
                 System.err.println(e);
-                e.printStackTrace();
+                logger.error(e);
             } finally {
                 db.release(conn);
             }
@@ -297,7 +296,7 @@ public class LogfileLoader extends Thread {
            }
          } catch (SQLException e) {
             System.err.println(e);
-            e.printStackTrace();
+            logger.error(e);
         } finally {
             db.release(conn);
         }
@@ -322,7 +321,7 @@ public class LogfileLoader extends Thread {
             }
            } catch (SQLException e) {
             System.err.println(e);
-            e.printStackTrace();
+            logger.error(e);
         } finally {
             db.release(conn);
         }
@@ -376,7 +375,7 @@ public class LogfileLoader extends Thread {
             logger.debug(String.format("initializeNextid, next ID is %d (%x)", nextid, nextid));
         } catch (SQLException e) {
             System.err.println(e);
-            e.printStackTrace();
+            logger.error(e);
         } finally {
             db.release(conn);
         }
@@ -417,19 +416,15 @@ public class LogfileLoader extends Thread {
                     } catch (SQLException e) {
                         logger.warn("PROV8003 Invalid value in record: " + line);
                         logger.debug(e);
-                        e.printStackTrace();
                     } catch (NumberFormatException e) {
                         logger.warn("PROV8004 Invalid number in record: " + line);
                         logger.debug(e);
-                        e.printStackTrace();
                     } catch (ParseException e) {
                         logger.warn("PROV8005 Invalid date in record: " + line);
                         logger.debug(e);
-                        e.printStackTrace();
                     } catch (Exception e) {
                         logger.warn("PROV8006 Invalid pattern in record: " + line);
                         logger.debug(e);
-                        e.printStackTrace();
                     }
                     total++;
                 }
