@@ -101,7 +101,7 @@ public class Parameters extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return coll;
     }
@@ -128,7 +128,7 @@ public class Parameters extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return v;
     }
@@ -185,14 +185,14 @@ public class Parameters extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0005 doInsert: " + e.getMessage());
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
                 if(ps!=null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return rv;
@@ -212,14 +212,14 @@ public class Parameters extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
                 if(ps!=null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return rv;
@@ -238,14 +238,14 @@ public class Parameters extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0007 doDelete: " + e.getMessage());
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
                 if(ps!=null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return rv;
