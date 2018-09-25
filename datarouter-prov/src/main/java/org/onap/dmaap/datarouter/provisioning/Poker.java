@@ -36,7 +36,6 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,7 +47,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.IngressRoute;
 import org.onap.dmaap.datarouter.provisioning.beans.NetworkRoute;
 import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
-import org.onap.dmaap.datarouter.provisioning.utils.*;
+import org.onap.dmaap.datarouter.provisioning.utils.DB;
 
 /**
  * This class handles the two timers (described in R1 Design Notes), and takes care of issuing the GET to each node of
@@ -70,19 +69,6 @@ public class Poker extends TimerTask {
      * This is a singleton -- there is only one Poker object in the server
      */
     private static Poker poker;
-
-    /**
-     * Get the singleton Poker object.
-     *
-     * @return the Poker
-     */
-    public static synchronized Poker getPoker() {
-        if (poker == null) {
-            poker = new Poker();
-        }
-        return poker;
-    }
-
     private long timer1;
     private long timer2;
     private String thisPod;        // DNS name of this machine
@@ -96,11 +82,24 @@ public class Poker extends TimerTask {
         try {
             thisPod = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            thisPod = "*UNKNOWN*";    // not a major problem
+            thisPod = "*UNKNOWN*"; // not a major problem
+            logger.info("UnknownHostException: Setting thisPod to \"*UNKNOWN*\"");
         }
         provString = buildProvisioningString();
 
         rolex.scheduleAtFixedRate(this, 0L, 1000L);    // Run once a second to check the timers
+    }
+
+    /**
+     * Get the singleton Poker object.
+     *
+     * @return the Poker
+     */
+    public static synchronized Poker getPoker() {
+        if (poker == null) {
+            poker = new Poker();
+        }
+        return poker;
     }
 
     /**
@@ -158,7 +157,6 @@ public class Poker extends TimerTask {
             }
         } catch (Exception e) {
             logger.warn("PROV0020: Caught exception in Poker: " + e);
-            e.printStackTrace();
         }
     }
 
@@ -183,7 +181,7 @@ public class Poker extends TimerTask {
 
     private void pokeNode(final String nodename) {
         logger.debug("PROV0012 Poking node " + nodename + " ...");
-        String nodeUrl = String.format(POKE_URL_TEMPLATE, nodename + ":" + DB.HTTP_PORT);
+        String nodeUrl = String.format(POKE_URL_TEMPLATE, nodename + ":" + DB.getHttpPort());
         Runnable r = () -> {
             try {
                 URL url = new URL(nodeUrl);
@@ -193,9 +191,12 @@ public class Poker extends TimerTask {
                 conn.getContentLength();    // Force the GET through
                 conn.disconnect();
             } catch (MalformedURLException e) {
-                logger.warn("PROV0013 MalformedURLException Error poking node at " + nodeUrl + " : " + e.getMessage());
+                logger.warn(
+                        "PROV0013 MalformedURLException Error poking node at " + nodeUrl + " : " + e
+                                .getMessage());
             } catch (IOException e) {
-                logger.warn("PROV0013 IOException Error poking node at " + nodeUrl + " : " + e.getMessage());
+                logger.warn("PROV0013 IOException Error poking node at " + nodeUrl + " : " + e
+                        .getMessage());
             }
         };
         r.run();
