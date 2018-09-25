@@ -27,24 +27,30 @@ package org.onap.dmaap.datarouter.provisioning.utils;
 import java.io.File;
 import java.util.Properties;
 import java.util.TimerTask;
+import org.apache.log4j.Logger;
 
 /**
- * This class provides a {@link TimerTask} that purges old logfiles
- * (older than the number of days specified by the org.onap.dmaap.datarouter.provserver.logretention property).
+ * This class provides a {@link TimerTask} that purges old logfiles (older than the number of days specified by the
+ * org.onap.dmaap.datarouter.provserver.logretention property).
  *
  * @author Robert Eby
  * @version $Id: PurgeLogDirTask.java,v 1.2 2013/07/05 13:48:05 eby Exp $
  */
 public class PurgeLogDirTask extends TimerTask {
+
     private static final long ONEDAY = 86400000L;
 
     private final String logdir;
     private final long interval;
+    private Logger utilsLogger;
 
     public PurgeLogDirTask() {
         Properties p = (new DB()).getProperties();
         logdir = p.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
         String s = p.getProperty("org.onap.dmaap.datarouter.provserver.logretention", "30");
+
+        this.utilsLogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.utils");
+
         long n = 30;
         try {
             n = Long.parseLong(s);
@@ -61,12 +67,13 @@ public class PurgeLogDirTask extends TimerTask {
             if (dir.exists()) {
                 long exptime = System.currentTimeMillis() - interval;
                 for (File logfile : dir.listFiles()) {
-                    if (logfile.lastModified() < exptime)
+                    if (logfile.lastModified() < exptime) {
                         logfile.delete();
+                    }
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            utilsLogger.error("Exception: " + e.getMessage());
         }
     }
 }
