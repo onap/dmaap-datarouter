@@ -214,7 +214,7 @@ public class LogfileLoader extends Thread {
                 }
             } catch (Exception e) {
                 logger.warn("PROV0020: Caught exception in LogfileLoader: " + e);
-                e.printStackTrace();
+                logger.error(e);
             }
         }
     }
@@ -275,7 +275,7 @@ public class LogfileLoader extends Thread {
              }
             } catch (SQLException e) {
                 System.err.println(e);
-                e.printStackTrace();
+                logger.error(e);
             } finally {
                 db.release(conn);
             }
