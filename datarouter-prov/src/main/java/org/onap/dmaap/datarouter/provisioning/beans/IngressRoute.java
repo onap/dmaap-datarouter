@@ -99,7 +99,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             }
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return set;
     }
@@ -137,7 +137,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             }
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return rv;
     }
@@ -172,14 +172,14 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             ps.close();
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
                 if(ps!=null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return v;
@@ -212,7 +212,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             }
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return rv;
     }
@@ -397,7 +397,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             }
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return set;
     }
@@ -425,14 +425,14 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0007 doDelete: " + e.getMessage());
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
                 if(ps!=null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return rv;
@@ -468,14 +468,14 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             rv = true;
         } catch (SQLException e) {
             intlogger.warn("PROV0005 doInsert: " + e.getMessage());
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
                 if(ps!=null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return rv;
