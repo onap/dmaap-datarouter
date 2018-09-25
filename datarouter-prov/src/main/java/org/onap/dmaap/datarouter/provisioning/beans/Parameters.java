@@ -35,13 +35,14 @@ import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 
 /**
- * Methods to provide access to Provisioning parameters in the DB.
- * This class also provides constants of the standard parameters used by the Data Router.
+ * Methods to provide access to Provisioning parameters in the DB. This class also provides constants of the standard
+ * parameters used by the Data Router.
  *
  * @author Robert Eby
  * @version $Id: Parameters.java,v 1.11 2014/03/12 19:45:41 eby Exp $
  */
 public class Parameters extends Syncable {
+
     public static final String PROV_REQUIRE_SECURE = "PROV_REQUIRE_SECURE";
     public static final String PROV_REQUIRE_CERT = "PROV_REQUIRE_CERT";
     public static final String PROV_AUTH_ADDRESSES = "PROV_AUTH_ADDRESSES";
@@ -90,9 +91,9 @@ public class Parameters extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            try(Statement stmt = conn.createStatement()) {
+            try (Statement stmt = conn.createStatement()) {
                 String sql = "select * from PARAMETERS";
-                try(ResultSet rs = stmt.executeQuery(sql)) {
+                try (ResultSet rs = stmt.executeQuery(sql)) {
                     while (rs.next()) {
                         Parameters p = new Parameters(rs);
                         coll.add(p);
@@ -101,7 +102,7 @@ public class Parameters extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return coll;
     }
@@ -118,9 +119,10 @@ public class Parameters extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            try(PreparedStatement stmt = conn.prepareStatement("select KEYNAME, VALUE from PARAMETERS where KEYNAME = ?")) {
+            try (PreparedStatement stmt = conn
+                    .prepareStatement("select KEYNAME, VALUE from PARAMETERS where KEYNAME = ?")) {
                 stmt.setString(1, k);
-                try(ResultSet rs = stmt.executeQuery()) {
+                try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         v = new Parameters(rs);
                     }
@@ -128,7 +130,7 @@ public class Parameters extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return v;
     }
@@ -185,14 +187,13 @@ public class Parameters extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0005 doInsert: " + e.getMessage());
-            e.printStackTrace();
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return rv;
@@ -212,14 +213,13 @@ public class Parameters extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
-            e.printStackTrace();
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return rv;
@@ -238,14 +238,13 @@ public class Parameters extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0007 doDelete: " + e.getMessage());
-            e.printStackTrace();
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return rv;
@@ -258,13 +257,16 @@ public class Parameters extends Syncable {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Parameters))
+        if (!(obj instanceof Parameters)) {
             return false;
+        }
         Parameters of = (Parameters) obj;
-        if (!keyname.equals(of.keyname))
+        if (!keyname.equals(of.keyname)) {
             return false;
-        if (!value.equals(of.value))
+        }
+        if (!value.equals(of.value)) {
             return false;
+        }
         return true;
     }
 
