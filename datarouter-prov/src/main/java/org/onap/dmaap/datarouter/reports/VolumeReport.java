@@ -60,8 +60,8 @@ public class VolumeReport extends ReportBase {
             " from LOG_RECORDS where EVENT_TIME >= ? and EVENT_TIME <= ? LIMIT ?, ?";
     private Logger loggerVolumeReport=Logger.getLogger("org.onap.dmaap.datarouter.reports");
     private class Counters {
-        public int filespublished, filesdelivered, filesexpired;
-        public long bytespublished, bytesdelivered, bytesexpired;
+        int filespublished, filesdelivered, filesexpired;
+        long bytespublished, bytesdelivered, bytesexpired;
 
         @Override
         public String toString() {
@@ -119,7 +119,6 @@ public class VolumeReport extends ReportBase {
                             }
                         }
                     }
-
                 }
                 catch (SQLException sqlException)
                 {
@@ -129,7 +128,7 @@ public class VolumeReport extends ReportBase {
 
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            loggerVolumeReport.error("SQLException: " + e.getMessage());
         }
         logger.debug("Query time: " + (System.currentTimeMillis() - start) + " ms");
         try (PrintWriter os = new PrintWriter(outfile)) {
