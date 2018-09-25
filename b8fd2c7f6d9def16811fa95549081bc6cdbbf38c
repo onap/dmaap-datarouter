@@ -22,6 +22,30 @@
       "revId": "b8fd2c7f6d9def16811fa95549081bc6cdbbf38c",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1a76adc5_72621118",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/beans/EgressRoute.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 4419
+      },
+      "writtenOn": "2018-09-25T10:25:41Z",
+      "side": 1,
+      "message": "As discussed I will email Dom regarding this and other occurrences where there are hard coded stuff.",
+      "parentUuid": "1a76adc5_72c69118",
+      "range": {
+        "startLine": 171,
+        "startChar": 41,
+        "endLine": 171,
+        "endChar": 42
+      },
+      "revId": "b8fd2c7f6d9def16811fa95549081bc6cdbbf38c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
