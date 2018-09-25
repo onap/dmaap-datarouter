@@ -24,11 +24,24 @@
 
 package org.onap.dmaap.datarouter.provisioning.utils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
+import java.util.Properties;
+import java.util.Queue;
+import java.util.Set;
 import org.apache.log4j.Logger;
-
-import java.io.*;
-import java.sql.*;
-import java.util.*;
 
 /**
  * Load the DB JDBC driver, and manage a simple pool of connections to the DB.
@@ -38,7 +51,8 @@ import java.util.*;
  */
 public class DB {
 
-    private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+    private static Logger intlogger = Logger
+            .getLogger("org.onap.dmaap.datarouter.provisioning.internal");
 
     private static String DB_URL;
     private static String DB_LOGIN;
@@ -46,21 +60,22 @@ public class DB {
     private static Properties props;
     private static final Queue<Connection> queue = new LinkedList<>();
 
-    public static String HTTPS_PORT;
-    public static String HTTP_PORT;
+    private static String HTTPS_PORT;
+    private static String HTTP_PORT;
 
     /**
-     * Construct a DB object.  If this is the very first creation of this object, it will load a copy of the properties
-     * for the server, and attempt to load the JDBC driver for the database.  If a fatal error occurs (e.g. either the
-     * properties file or the DB driver is missing), the JVM will exit.
+     * Construct a DB object.  If this is the very first creation of this object, it will load a
+     * copy of the properties for the server, and attempt to load the JDBC driver for the database.
+     * If a fatal error occurs (e.g. either the properties file or the DB driver is missing), the
+     * JVM will exit.
      */
     public DB() {
         if (props == null) {
             props = new Properties();
             try {
                 props.load(new FileInputStream(System.getProperty(
-                    "org.onap.dmaap.datarouter.provserver.properties",
-                    "/opt/app/datartr/etc/provserver.properties")));
+                        "org.onap.dmaap.datarouter.provserver.properties",
+                        "/opt/app/datartr/etc/provserver.properties")));
                 String DB_DRIVER = (String) props.get("org.onap.dmaap.datarouter.db.driver");
                 DB_URL = (String) props.get("org.onap.dmaap.datarouter.db.url");
                 DB_LOGIN = (String) props.get("org.onap.dmaap.datarouter.db.login");
@@ -70,11 +85,9 @@ public class DB {
                 Class.forName(DB_DRIVER);
             } catch (IOException e) {
                 intlogger.fatal("PROV9003 Opening properties: " + e.getMessage());
-                e.printStackTrace();
                 System.exit(1);
             } catch (ClassNotFoundException e) {
                 intlogger.fatal("PROV9004 cannot find the DB driver: " + e);
-                e.printStackTrace();
                 System.exit(1);
             }
         }
@@ -111,8 +124,7 @@ public class DB {
                             if (++n >= 3) {
                                 throw sqlEx;
                             }
-                        }
-                        finally {
+                        } finally {
                             if (connection != null && !connection.isValid(1)) {
                                 connection.close();
                                 connection = null;
@@ -142,8 +154,8 @@ public class DB {
     }
 
     /**
-     * Run all necessary retrofits required to bring the database up to the level required for this version of the
-     * provisioning server.  This should be run before the server itself is started.
+     * Run all necessary retrofits required to bring the database up to the level required for this
+     * version of the provisioning server.  This should be run before the server itself is started.
      *
      * @return true if all retrofits worked, false otherwise
      */
@@ -151,16 +163,26 @@ public class DB {
         return retroFit1();
     }
 
+
+    public static String getHttpsPort() {
+        return HTTPS_PORT;
+    }
+
+    public static String getHttpPort() {
+        return HTTP_PORT;
+    }
+
     /**
-     * Retrofit 1 - Make sure the expected tables are in DB and are initialized. Uses sql_init_01.sql to setup the DB.
+     * Retrofit 1 - Make sure the expected tables are in DB and are initialized. Uses
+     * sql_init_01.sql to setup the DB.
      *
      * @return true if the retrofit worked, false otherwise
      */
     private boolean retroFit1() {
         final String[] expectedTables = {
-            "FEEDS", "FEED_ENDPOINT_ADDRS", "FEED_ENDPOINT_IDS", "PARAMETERS",
-            "SUBSCRIPTIONS", "LOG_RECORDS", "INGRESS_ROUTES", "EGRESS_ROUTES",
-            "NETWORK_ROUTES", "NODESETS", "NODES", "GROUPS"
+                "FEEDS", "FEED_ENDPOINT_ADDRS", "FEED_ENDPOINT_IDS", "PARAMETERS",
+                "SUBSCRIPTIONS", "LOG_RECORDS", "INGRESS_ROUTES", "EGRESS_ROUTES",
+                "NETWORK_ROUTES", "NODESETS", "NODES", "GROUPS"
         };
         Connection connection = null;
         try {
@@ -175,7 +197,8 @@ public class DB {
                 runInitScript(connection, 1);
             }
         } catch (SQLException e) {
-            intlogger.fatal("PROV9000: The database credentials are not working: " + e.getMessage());
+            intlogger
+                    .fatal("PROV9000: The database credentials are not working: " + e.getMessage());
             return false;
         } finally {
             if (connection != null) {
@@ -209,8 +232,10 @@ public class DB {
     }
 
     /**
-     * Initialize the tables by running the initialization scripts located in the directory specified by the property
-     * <i>org.onap.dmaap.datarouter.provserver.dbscripts</i>.  Scripts have names of the form sql_init_NN.sql
+     * Initialize the tables by running the initialization scripts located in the directory
+     * specified by the property
+     * <i>org.onap.dmaap.datarouter.provserver.dbscripts</i>.  Scripts have names of the form
+     * sql_init_NN.sql
      *
      * @param connection a DB connection
      * @param scriptId the number of the sql_init_NN.sql script to run

@@ -118,7 +118,7 @@ public class PublishServlet extends BaseServlet {
                 } else {
                     // Generate new URL
                     String nextnode = getRedirectNode(feedid, req);
-                    nextnode = nextnode + ":" + DB.HTTPS_PORT;
+                    nextnode = nextnode + ":" + DB.getHttpsPort();
                     String newurl = "https://" + nextnode + "/publish" + req.getPathInfo();
                     String qs = req.getQueryString();
                     if (qs != null)
