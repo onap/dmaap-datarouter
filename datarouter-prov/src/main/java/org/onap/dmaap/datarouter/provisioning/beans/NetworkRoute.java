@@ -73,7 +73,7 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
             }
             db.release(conn);
         } catch (SQLException e) {
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         }
         return set;
     }
@@ -127,14 +127,14 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0007 doDelete: " + e.getMessage());
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
                 if(ps!=null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return rv;
@@ -157,14 +157,14 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
                 rv = true;
             } catch (SQLException e) {
                 intlogger.warn("PROV0005 doInsert: " + e.getMessage());
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             } finally {
                 try {
                     if(ps!=null) {
                         ps.close();
                     }
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    intlogger.error("SQLException " + e.getMessage());
                 }
             }
         }
@@ -185,14 +185,14 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
-            e.printStackTrace();
+            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
                 if(ps!=null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                intlogger.error("SQLException " + e.getMessage());
             }
         }
         return rv;
