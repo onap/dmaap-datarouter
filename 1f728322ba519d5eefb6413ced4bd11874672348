@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_4bc63b4b",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/reports/DailyLatencyReport.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2018-09-26T12:05:38Z",
+      "side": 1,
+      "message": "Not part of the vulnerabilities but you can remove this if you wish as automatically inferred.",
+      "range": {
+        "startLine": 75,
+        "startChar": 51,
+        "endLine": 75,
+        "endChar": 55
+      },
+      "revId": "1f728322ba519d5eefb6413ced4bd11874672348",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
