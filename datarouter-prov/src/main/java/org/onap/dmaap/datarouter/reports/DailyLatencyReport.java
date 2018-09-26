@@ -70,11 +70,9 @@ public class DailyLatencyReport extends ReportBase {
             " where EVENT_TIME >= ? and EVENT_TIME <= ?";
 
     private class Job {
-
-        public long pubtime = 0;
-        public long clen = 0;
-        public List<Long> deltime = new ArrayList<Long>();
-
+        private long pubtime = 0;
+        private long clen = 0;
+        private List<Long> deltime = new ArrayList<>();
         public long minLatency() {
             long n = deltime.isEmpty() ? 0 : Long.MAX_VALUE;
             for (Long l : deltime) {
