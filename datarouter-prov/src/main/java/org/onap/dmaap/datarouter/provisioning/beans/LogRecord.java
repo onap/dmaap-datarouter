@@ -30,22 +30,22 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Types;
 import java.text.ParseException;
 import java.util.Iterator;
-
+import org.apache.log4j.Logger;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
 
 /**
- * The representation of a Log Record, as retrieved from the DB.  Since this record format is only used
- * to replicate between provisioning servers, it is very bare-bones; e.g. there are no field setters and only 1 getter.
+ * The representation of a Log Record, as retrieved from the DB.  Since this record format is only used to replicate
+ * between provisioning servers, it is very bare-bones; e.g. there are no field setters and only 1 getter.
  *
  * @author Robert Eby
  * @version $Id: LogRecord.java,v 1.7 2014/03/12 19:45:41 eby Exp $
  */
 public class LogRecord extends BaseLogRecord {
+
     /**
      * Print all log records whose RECORD_IDs are in the bit set provided.
      *
@@ -53,34 +53,29 @@ public class LogRecord extends BaseLogRecord {
      * @param bs the {@link RLEBitSet} listing the record IDs to print
      * @throws IOException
      */
+    private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.beans");
+
     public static void printLogRecords(OutputStream os, RLEBitSet bs) throws IOException {
         final String sql = "select * from LOG_RECORDS where RECORD_ID >= ? AND RECORD_ID <= ?";
         DB db = new DB();
-        Connection conn = null;
-        try {
-            conn = db.getConnection();
-            try(Statement stmt = conn.createStatement()) {
-                Iterator<Long[]> iter = bs.getRangeIterator();
-                try(PreparedStatement ps = conn.prepareStatement(sql)) {
-                    while (iter.hasNext()) {
-                        Long[] n = iter.next();
-                        ps.setLong(1, n[0]);
-                        ps.setLong(2, n[1]);
-                        try(ResultSet rs = ps.executeQuery()) {
-                            while (rs.next()) {
-                                LogRecord lr = new LogRecord(rs);
-                                os.write(lr.toString().getBytes());
-                            }
-                            ps.clearParameters();
+        try (Connection conn = db.getConnection()) {
+            Iterator<Long[]> iter = bs.getRangeIterator();
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                while (iter.hasNext()) {
+                    Long[] n = iter.next();
+                    ps.setLong(1, n[0]);
+                    ps.setLong(2, n[1]);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        while (rs.next()) {
+                            LogRecord lr = new LogRecord(rs);
+                            os.write(lr.toString().getBytes());
                         }
+                        ps.clearParameters();
                     }
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (conn != null)
-                db.release(conn);
+            intlogger.error("SQLException: " + e.getMessage());
         }
     }
 
