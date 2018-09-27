@@ -44,14 +44,15 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  * @version $Id: NetworkRoute.java,v 1.2 2013/12/16 20:30:23 eby Exp $
  */
 public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> {
+
     private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
     private final int fromnode;
     private final int tonode;
     private final int vianode;
 
     /**
-     * Get a set of all Network Routes in the DB.  The set is sorted according to the natural sorting order
-     * of the routes (based on the from and to node names in each route).
+     * Get a set of all Network Routes in the DB.  The set is sorted according to the natural sorting order of the
+     * routes (based on the from and to node names in each route).
      *
      * @return the sorted set
      */
@@ -61,8 +62,8 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            try(Statement stmt = conn.createStatement()) {
-                try(ResultSet rs = stmt.executeQuery("select FROMNODE, TONODE, VIANODE from NETWORK_ROUTES")) {
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("select FROMNODE, TONODE, VIANODE from NETWORK_ROUTES")) {
                     while (rs.next()) {
                         int fromnode = rs.getInt("FROMNODE");
                         int tonode = rs.getInt("TONODE");
@@ -127,10 +128,9 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0007 doDelete: " + e.getMessage());
-            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
@@ -157,10 +157,9 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
                 rv = true;
             } catch (SQLException e) {
                 intlogger.warn("PROV0005 doInsert: " + e.getMessage());
-                intlogger.error("SQLException " + e.getMessage());
             } finally {
                 try {
-                    if(ps!=null) {
+                    if (ps != null) {
                         ps.close();
                     }
                 } catch (SQLException e) {
@@ -185,10 +184,9 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
-            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
@@ -214,8 +212,9 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof NetworkRoute))
+        if (!(obj instanceof NetworkRoute)) {
             return false;
+        }
         NetworkRoute on = (NetworkRoute) obj;
         return (fromnode == on.fromnode) && (tonode == on.tonode) && (vianode == on.vianode);
     }
@@ -228,8 +227,9 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
     @Override
     public int compareTo(NetworkRoute o) {
         if (this.fromnode == o.fromnode) {
-            if (this.tonode == o.tonode)
+            if (this.tonode == o.tonode) {
                 return this.vianode - o.vianode;
+            }
             return this.tonode - o.tonode;
         }
         return this.fromnode - o.fromnode;
