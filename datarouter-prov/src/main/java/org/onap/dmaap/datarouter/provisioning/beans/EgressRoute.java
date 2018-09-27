@@ -44,13 +44,14 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  * @version $Id: EgressRoute.java,v 1.3 2013/12/16 20:30:23 eby Exp $
  */
 public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
+
     private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
     private final int subid;
     private final int nodeid;
 
     /**
-     * Get a set of all Egress Routes in the DB.  The set is sorted according to the natural sorting order
-     * of the routes (based on the subscription ID in each route).
+     * Get a set of all Egress Routes in the DB.  The set is sorted according to the natural sorting order of the routes
+     * (based on the subscription ID in each route).
      *
      * @return the sorted set
      */
@@ -60,15 +61,15 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-           try( Statement stmt = conn.createStatement()) {
-               try(ResultSet rs = stmt.executeQuery("select SUBID, NODEID from EGRESS_ROUTES")) {
-                   while (rs.next()) {
-                       int subid = rs.getInt("SUBID");
-                       int nodeid = rs.getInt("NODEID");
-                       set.add(new EgressRoute(subid, nodeid));
-                   }
-               }
-           }
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("select SUBID, NODEID from EGRESS_ROUTES")) {
+                    while (rs.next()) {
+                        int subid = rs.getInt("SUBID");
+                        int nodeid = rs.getInt("NODEID");
+                        set.add(new EgressRoute(subid, nodeid));
+                    }
+                }
+            }
 
             db.release(conn);
         } catch (SQLException e) {
@@ -93,7 +94,7 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             String sql = "select NODEID from EGRESS_ROUTES where SUBID = ?";
             ps = conn.prepareStatement(sql);
             ps.setInt(1, sub);
-            try(ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     int node = rs.getInt("NODEID");
                     v = new EgressRoute(sub, node);
@@ -105,7 +106,7 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
@@ -143,7 +144,7 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
@@ -168,10 +169,9 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             rv = true;
         } catch (SQLException e) {
             intlogger.warn("PROV0005 doInsert: " + e.getMessage());
-            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
@@ -194,10 +194,9 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
-            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
@@ -221,8 +220,9 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof EgressRoute))
+        if (!(obj instanceof EgressRoute)) {
             return false;
+        }
         EgressRoute on = (EgressRoute) obj;
         return (subid == on.subid) && (nodeid == on.nodeid);
     }

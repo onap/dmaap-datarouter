@@ -683,7 +683,6 @@ public class Feed extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
-            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
                 if (ps != null)
@@ -716,7 +715,6 @@ public class Feed extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
-            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
                 if(ps!=null) {

@@ -52,6 +52,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  * @version $Id: IngressRoute.java,v 1.3 2013/12/16 20:30:23 eby Exp $
  */
 public class IngressRoute extends NodeClass implements Comparable<IngressRoute> {
+
     private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
     private final int seq;
     private final int feedid;
@@ -76,7 +77,8 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
      * @return a set of IngressRoutes
      */
     public static Set<IngressRoute> getIngressRoutesForSeq(int seq) {
-        return getAllIngressRoutesForSQL("select SEQUENCE, FEEDID, USERID, SUBNET, NODESET from INGRESS_ROUTES where SEQUENCE = " + seq);
+        return getAllIngressRoutesForSQL(
+                "select SEQUENCE, FEEDID, USERID, SUBNET, NODESET from INGRESS_ROUTES where SEQUENCE = " + seq);
     }
 
     private static SortedSet<IngressRoute> getAllIngressRoutesForSQL(String sql) {
@@ -85,8 +87,8 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            try(Statement stmt = conn.createStatement()) {
-                try(ResultSet rs = stmt.executeQuery(sql)) {
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery(sql)) {
                     while (rs.next()) {
                         int seq = rs.getInt("SEQUENCE");
                         int feedid = rs.getInt("FEEDID");
@@ -128,12 +130,12 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-            try(Statement stmt = conn.createStatement()) {
-               try(ResultSet rs = stmt.executeQuery(sql)) {
-                   if (rs.next()) {
-                       rv = rs.getInt("MAX");
-                   }
-               }
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery(sql)) {
+                    if (rs.next()) {
+                        rv = rs.getInt("MAX");
+                    }
+                }
             }
             db.release(conn);
         } catch (SQLException e) {
@@ -146,7 +148,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
      * Get an Ingress Route for a particular feed ID, user, and subnet
      *
      * @param feedid the Feed ID to look for
-     * @param user   the user name to look for
+     * @param user the user name to look for
      * @param subnet the subnet to look for
      * @return the Ingress Route, or null of there is none
      */
@@ -162,7 +164,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             ps.setInt(1, feedid);
             ps.setString(2, user);
             ps.setString(3, subnet);
-            try(ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     int seq = rs.getInt("SEQUENCE");
                     int nodeset = rs.getInt("NODESET");
@@ -175,7 +177,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
@@ -198,9 +200,9 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
             String sql = "select FEEDID, USERID, SUBNET, NODESET from INGRESS_ROUTES where SEQUENCE = ?";
-            try(PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, seq);
-                try(ResultSet rs = ps.executeQuery()) {
+                try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         int feedid = rs.getInt("FEEDID");
                         String user = rs.getString("USERID");
@@ -239,12 +241,14 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
         this.subnet = (subnet == null) ? "-" : subnet;
         this.nodelist = -1;
         this.nodes = null;
-        if (Feed.getFeedById(feedid) == null)
+        if (Feed.getFeedById(feedid) == null) {
             throw new IllegalArgumentException("No such feed: " + feedid);
+        }
         if (!this.subnet.equals("-")) {
             SubnetMatcher sm = new SubnetMatcher(subnet);
-            if (!sm.isValid())
+            if (!sm.isValid()) {
                 throw new IllegalArgumentException("Invalid subnet: " + subnet);
+            }
         }
     }
 
@@ -258,37 +262,41 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
         this.nodelist = -1;
         this.nodes = new TreeSet<String>();
         JSONArray ja = jo.getJSONArray("node");
-        for (int i = 0; i < ja.length(); i++)
+        for (int i = 0; i < ja.length(); i++) {
             this.nodes.add(ja.getString(i));
+        }
     }
 
     /**
-     * Does this particular IngressRoute match a request, represented by feedid and req?
-     * To match, <i>feedid</i> must match the feed ID in the route, the user in the route
-     * (if specified) must match the user in the request, and the subnet in the route (if specified)
-     * must match the subnet from the request.
+     * Does this particular IngressRoute match a request, represented by feedid and req? To match, <i>feedid</i> must
+     * match the feed ID in the route, the user in the route (if specified) must match the user in the request, and the
+     * subnet in the route (if specified) must match the subnet from the request.
      *
      * @param feedid the feedid for this request
-     * @param req    the remainder of the request
+     * @param req the remainder of the request
      * @return true if a match, false otherwise
      */
     public boolean matches(int feedid, HttpServletRequest req) {
         // Check feedid
-        if (this.feedid != feedid)
+        if (this.feedid != feedid) {
             return false;
+        }
 
         // Get user from request and compare
         // Note: we don't check the password; the node will do that
         if (userid.length() > 0 && !userid.equals("-")) {
             String credentials = req.getHeader("Authorization");
-            if (credentials == null || !credentials.startsWith("Basic "))
+            if (credentials == null || !credentials.startsWith("Basic ")) {
                 return false;
+            }
             String t = new String(Base64.decodeBase64(credentials.substring(6)));
             int ix = t.indexOf(':');
-            if (ix >= 0)
+            if (ix >= 0) {
                 t = t.substring(0, ix);
-            if (!t.equals(this.userid))
+            }
+            if (!t.equals(this.userid)) {
                 return false;
+            }
         }
 
         // If this route has a subnet, match it against the requester's IP addr
@@ -305,10 +313,11 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
     }
 
     /**
-     * Compare IP addresses as byte arrays to a subnet specified as a CIDR.
-     * Taken from org.onap.dmaap.datarouter.node.SubnetMatcher and modified somewhat.
+     * Compare IP addresses as byte arrays to a subnet specified as a CIDR. Taken from
+     * org.onap.dmaap.datarouter.node.SubnetMatcher and modified somewhat.
      */
     public class SubnetMatcher {
+
         private byte[] sn;
         private int len;
         private int mask;
@@ -386,9 +395,9 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
             String sql = "select NODEID from NODESETS where SETID = ?";
-            try(PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, nodelist);
-                try(ResultSet rs = ps.executeQuery()) {
+                try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         int id = rs.getInt("NODEID");
                         set.add(lookupNodeID(id));
@@ -425,10 +434,9 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0007 doDelete: " + e.getMessage());
-            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
@@ -457,7 +465,8 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             }
 
             // Create the INGRESS_ROUTES row
-            ps = c.prepareStatement("insert into INGRESS_ROUTES (SEQUENCE, FEEDID, USERID, SUBNET, NODESET) values (?, ?, ?, ?, ?)");
+            ps = c.prepareStatement(
+                    "insert into INGRESS_ROUTES (SEQUENCE, FEEDID, USERID, SUBNET, NODESET) values (?, ?, ?, ?, ?)");
             ps.setInt(1, this.seq);
             ps.setInt(2, this.feedid);
             ps.setString(3, this.userid);
@@ -468,10 +477,9 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             rv = true;
         } catch (SQLException e) {
             intlogger.warn("PROV0005 doInsert: " + e.getMessage());
-            intlogger.error("SQLException " + e.getMessage());
         } finally {
             try {
-                if(ps!=null) {
+                if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
@@ -491,10 +499,12 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
         JSONObject jo = new JSONObject();
         jo.put("feedid", feedid);
         // Note: for user and subnet, null, "", and "-" are equivalent
-        if (userid != null && !userid.equals("-") && !userid.equals(""))
+        if (userid != null && !userid.equals("-") && !userid.equals("")) {
             jo.put("user", userid);
-        if (subnet != null && !subnet.equals("-") && !subnet.equals(""))
+        }
+        if (subnet != null && !subnet.equals("-") && !subnet.equals("")) {
             jo.put("subnet", subnet);
+        }
         jo.put("seq", seq);
         jo.put("node", nodes);
         return jo;
@@ -502,7 +512,8 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
 
     @Override
     public String getKey() {
-        return String.format("%d/%s/%s/%d", feedid, (userid == null) ? "" : userid, (subnet == null) ? "" : subnet, seq);
+        return String
+                .format("%d/%s/%s/%d", feedid, (userid == null) ? "" : userid, (subnet == null) ? "" : subnet, seq);
     }
 
     @Override
@@ -513,8 +524,9 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
     @Override
     public boolean equals(Object obj) {
         try {
-            if (!(obj instanceof IngressRoute))
+            if (!(obj instanceof IngressRoute)) {
                 return false;
+            }
             return this.compareTo((IngressRoute) obj) == 0;
         } catch (NullPointerException e) {
             return false;
@@ -523,25 +535,31 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
 
     @Override
     public int compareTo(IngressRoute in) {
-        if (in == null)
+        if (in == null) {
             throw new NullPointerException();
+        }
         int n = this.feedid - in.feedid;
-        if (n != 0)
+        if (n != 0) {
             return n;
+        }
         n = this.seq - in.seq;
-        if (n != 0)
+        if (n != 0) {
             return n;
+        }
         n = this.userid.compareTo(in.userid);
-        if (n != 0)
+        if (n != 0) {
             return n;
+        }
         n = this.subnet.compareTo(in.subnet);
-        if (n != 0)
+        if (n != 0) {
             return n;
+        }
         return this.nodes.equals(in.nodes) ? 0 : 1;
     }
 
     @Override
     public String toString() {
-        return String.format("INGRESS: feed=%d, userid=%s, subnet=%s, seq=%d", feedid, (userid == null) ? "" : userid, (subnet == null) ? "" : subnet, seq);
+        return String.format("INGRESS: feed=%d, userid=%s, subnet=%s, seq=%d", feedid, (userid == null) ? "" : userid,
+                (subnet == null) ? "" : subnet, seq);
     }
 }
