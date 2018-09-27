@@ -22,12 +22,11 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import java.text.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.text.ParseException;
 
 @RunWith(PowerMockRunner.class)
 public class PubFailRecordTest {
@@ -38,8 +37,8 @@ public class PubFailRecordTest {
     @Test
     public void Validate_PubFailRecord_Created_With_Default_Constructor() throws ParseException {
         String[] args = {"2018-08-29-10-10-10-543.", "PBF", "238465493.fileName",
-                "1", "/publish/1/fileName", "PUT", "application/octet-stream", "285", "200",
-                "172.100.0.3", "user1", "403"};
+            "1", "/publish/1/fileName", "PUT", "application/octet-stream", "285", "200",
+            "172.100.0.3", "user1", "403"};
         pubFailRecord = new PubFailRecord(args);
 
         Assert.assertEquals("user1", pubFailRecord.getUser());

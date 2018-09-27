@@ -23,19 +23,19 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import java.text.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
 
-import java.text.ParseException;
-
 public class DeliveryRecordTest {
-    
+
     private DeliveryRecord deliveryRecord;
-    
+
     @Test
     public void Validate_Constructor_Creates_Object_With_Get_Methods() throws ParseException {
-        String[] args = {"2018-08-29-10-10-10-543.", "del", "238465493.fileName", "1","285", "123/file.txt","GET","application/json","2000","example","100"};
+        String[] args = {"2018-08-29-10-10-10-543.", "del", "238465493.fileName", "1", "285", "123/file.txt", "GET",
+            "application/json", "2000", "example", "100"};
         deliveryRecord = new DeliveryRecord(args);
         Assert.assertEquals("238465493.fileName", deliveryRecord.getPublishId());
         Assert.assertEquals(1, deliveryRecord.getFeedid());
@@ -51,7 +51,8 @@ public class DeliveryRecordTest {
 
     @Test
     public void Validate_AsJsonObject_Correct_Json_Object_After_Set_Methods() throws ParseException {
-        String[] args = {"2018-08-29-10-10-10-543.", "del", "238465493.fileName", "1","285", "123/file.txt","GET","application/json","2000","example","100"};
+        String[] args = {"2018-08-29-10-10-10-543.", "del", "238465493.fileName", "1", "285", "123/file.txt", "GET",
+            "application/json", "2000", "example", "100"};
         deliveryRecord = new DeliveryRecord(args);
         deliveryRecord.setContentLength(265);
         deliveryRecord.setEventTime(1535533810543L);

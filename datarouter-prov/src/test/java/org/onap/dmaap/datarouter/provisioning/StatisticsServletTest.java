@@ -29,13 +29,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -45,123 +47,112 @@ import org.mockito.Mock;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 
 @RunWith(PowerMockRunner.class)
 public class StatisticsServletTest {
 
-  private StatisticsServlet statisticsServlet;
+    private static EntityManagerFactory emf;
+    private static EntityManager em;
+    private StatisticsServlet statisticsServlet;
+    @Mock
+    private HttpServletRequest request;
+    @Mock
+    private HttpServletResponse response;
+    private DB db;
 
-  @Mock
-  private HttpServletRequest request;
-
-  @Mock
-  private HttpServletResponse response;
-
-  private DB db;
-
-  private static EntityManagerFactory emf;
-  private static EntityManager em;
-
-  @BeforeClass
-  public static void init() {
-    emf = Persistence.createEntityManagerFactory("dr-unit-tests");
-    em = emf.createEntityManager();
-    System.setProperty(
+    @BeforeClass
+    public static void init() {
+        emf = Persistence.createEntityManagerFactory("dr-unit-tests");
+        em = emf.createEntityManager();
+        System.setProperty(
             "org.onap.dmaap.datarouter.provserver.properties",
             "src/test/resources/h2Database.properties");
-  }
+    }
 
-  @AfterClass
-  public static void tearDownClass() {
-    em.clear();
-    em.close();
-    emf.close();
-  }
+    @AfterClass
+    public static void tearDownClass() {
+        em.clear();
+        em.close();
+        emf.close();
+    }
 
-  @Before
-  public void setUp() throws Exception {
-    statisticsServlet = new StatisticsServlet();
-    db = new DB();
-    buildRequestParameters();
-  }
+    @Before
+    public void setUp() throws Exception {
+        statisticsServlet = new StatisticsServlet();
+        db = new DB();
+        buildRequestParameters();
+    }
 
-  @Test
-  public void Given_Request_Is_HTTP_DELETE_SC_METHOD_NOT_ALLOWED_Response_Is_Generated()
-      throws Exception {
-    statisticsServlet.doDelete(request, response);
-    verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED),
-        argThat(notNullValue(String.class)));
-  }
+    @Test
+    public void Given_Request_Is_HTTP_DELETE_SC_METHOD_NOT_ALLOWED_Response_Is_Generated() throws Exception {
+        statisticsServlet.doDelete(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED),
+            argThat(notNullValue(String.class)));
+    }
 
-  @Test
-  public void Given_Request_Is_HTTP_PUT_SC_METHOD_NOT_ALLOWED_Response_Is_Generated()
-      throws Exception {
-    statisticsServlet.doPut(request, response);
-    verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED),
-        argThat(notNullValue(String.class)));
-  }
+    @Test
+    public void Given_Request_Is_HTTP_PUT_SC_METHOD_NOT_ALLOWED_Response_Is_Generated() throws Exception {
+        statisticsServlet.doPut(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED),
+            argThat(notNullValue(String.class)));
+    }
 
-  @Test
-  public void Given_Request_Is_HTTP_POST_SC_METHOD_NOT_ALLOWED_Response_Is_Generated()
-      throws Exception {
-    statisticsServlet.doPost(request, response);
-    verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED),
-        argThat(notNullValue(String.class)));
-  }
+    @Test
+    public void Given_Request_Is_HTTP_POST_SC_METHOD_NOT_ALLOWED_Response_Is_Generated() throws Exception {
+        statisticsServlet.doPost(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED),
+            argThat(notNullValue(String.class)));
+    }
 
-  @Test
-  public void Given_Request_Is_HTTP_GET_With_Incorrect_Parameters_Then_Bad_Request_Response_Is_Generated()
-      throws Exception {
-    when(request.getParameter("type")).thenReturn("get");
-    statisticsServlet.doGet(request, response);
-    verify(response)
-        .sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
-  }
+    @Test
+    public void Given_Request_Is_HTTP_GET_With_Incorrect_Parameters_Then_Bad_Request_Response_Is_Generated()
+        throws Exception {
+        when(request.getParameter("type")).thenReturn("get");
+        statisticsServlet.doGet(request, response);
+        verify(response)
+            .sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+    }
 
-  @Test
-  public void Given_Request_Is_HTTP_GET_With_GroupId_But_No_FeedId_Parameters_Then_Request_Succeeds()
-      throws Exception {
-    addAliasForSubstringIndex();
-    ServletOutputStream outStream = mock(ServletOutputStream.class);
-    when(response.getOutputStream()).thenReturn(outStream);
-    statisticsServlet.doGet(request, response);
-    verify(response).setStatus(eq(HttpServletResponse.SC_OK));
-  }
+    @Test
+    public void Given_Request_Is_HTTP_GET_With_GroupId_But_No_FeedId_Parameters_Then_Request_Succeeds()
+        throws Exception {
+        addAliasForSubstringIndex();
+        ServletOutputStream outStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outStream);
+        statisticsServlet.doGet(request, response);
+        verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+    }
 
-  @Test
-  public void Given_Request_Is_HTTP_GET_With_GroupId_And_FeedId_Parameters_Then_Request_Succeeds()
-      throws Exception {
-    addAliasForSubstringIndex();
-    when(request.getParameter("feedid")).thenReturn("1");
-    when(request.getParameter("statusCode")).thenReturn("500");
-    ServletOutputStream outStream = mock(ServletOutputStream.class);
-    when(response.getOutputStream()).thenReturn(outStream);
-    statisticsServlet.doGet(request, response);
-    verify(response).setStatus(eq(HttpServletResponse.SC_OK));
-  }
+    @Test
+    public void Given_Request_Is_HTTP_GET_With_GroupId_And_FeedId_Parameters_Then_Request_Succeeds() throws Exception {
+        addAliasForSubstringIndex();
+        when(request.getParameter("feedid")).thenReturn("1");
+        when(request.getParameter("statusCode")).thenReturn("500");
+        ServletOutputStream outStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outStream);
+        statisticsServlet.doGet(request, response);
+        verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+    }
 
-  private void buildRequestParameters() {
-    when(request.getParameter("type")).thenReturn("exp");
-    when(request.getParameter("publishId")).thenReturn("ID");
-    when(request.getParameter("statusCode")).thenReturn("success");
-    when(request.getParameter("expiryReason")).thenReturn("other");
-    when(request.getParameter("start")).thenReturn("0");
-    when(request.getParameter("end")).thenReturn("0");
-    when(request.getParameter("output_type")).thenReturn("csv");
-    when(request.getParameter("start_time")).thenReturn("13");
-    when(request.getParameter("end_time")).thenReturn("15");
-    when(request.getParameter("time")).thenReturn("10");
-    when(request.getParameter("groupid")).thenReturn("1");
-    when(request.getParameter("subid")).thenReturn("1");
-  }
-  private void addAliasForSubstringIndex() throws SQLException {
-    String sql = "CREATE ALIAS IF NOT EXISTS `SUBSTRING_INDEX`AS $$ String Function(String one, String two, String three){ return \"url\"; }$$;";
-    Connection conn = db.getConnection();
-    PreparedStatement pst = conn.prepareStatement(sql);
-    pst.execute();
-  }
+    private void buildRequestParameters() {
+        when(request.getParameter("type")).thenReturn("exp");
+        when(request.getParameter("publishId")).thenReturn("ID");
+        when(request.getParameter("statusCode")).thenReturn("success");
+        when(request.getParameter("expiryReason")).thenReturn("other");
+        when(request.getParameter("start")).thenReturn("0");
+        when(request.getParameter("end")).thenReturn("0");
+        when(request.getParameter("output_type")).thenReturn("csv");
+        when(request.getParameter("start_time")).thenReturn("13");
+        when(request.getParameter("end_time")).thenReturn("15");
+        when(request.getParameter("time")).thenReturn("10");
+        when(request.getParameter("groupid")).thenReturn("1");
+        when(request.getParameter("subid")).thenReturn("1");
+    }
+
+    private void addAliasForSubstringIndex() throws SQLException {
+        String sql = "CREATE ALIAS IF NOT EXISTS `SUBSTRING_INDEX`AS $$ String Function(String one, String two, String three){ return \"url\"; }$$;";
+        Connection conn = db.getConnection();
+        PreparedStatement pst = conn.prepareStatement(sql);
+        pst.execute();
+    }
 }

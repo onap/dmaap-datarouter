@@ -22,83 +22,87 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning.beans;
 
-import org.junit.*;
+import java.util.Collection;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
 @RunWith(PowerMockRunner.class)
 public class GroupTest {
-  private static EntityManagerFactory emf;
-  private static EntityManager em;
-  private Group group;
-  private DB db;
 
-  @BeforeClass
-  public static void init() {
-    emf = Persistence.createEntityManagerFactory("dr-unit-tests");
-    em = emf.createEntityManager();
-    System.setProperty(
-        "org.onap.dmaap.datarouter.provserver.properties",
-        "src/test/resources/h2Database.properties");
-  }
+    private static EntityManagerFactory emf;
+    private static EntityManager em;
+    private Group group;
+    private DB db;
 
-  @AfterClass
-  public static void tearDownClass() {
-    em.clear();
-    em.close();
-    emf.close();
-  }
+    @BeforeClass
+    public static void init() {
+        emf = Persistence.createEntityManagerFactory("dr-unit-tests");
+        em = emf.createEntityManager();
+        System.setProperty(
+            "org.onap.dmaap.datarouter.provserver.properties",
+            "src/test/resources/h2Database.properties");
+    }
 
-  @Before
-  public void setUp() throws Exception {
-    db = new DB();
-    group = new Group("GroupTest", "", "");
-    group.doInsert(db.getConnection());
-  }
+    @AfterClass
+    public static void tearDownClass() {
+        em.clear();
+        em.close();
+        emf.close();
+    }
 
-  @Test
-  public void Given_Group_Exists_In_Db_GetAllGroups_Returns_Correct_Group() {
-    Collection<Group> groups = Group.getAllgroups();
-    Assert.assertEquals("Group1", ((List<Group>) groups).get(0).getName());
-  }
+    @Before
+    public void setUp() throws Exception {
+        db = new DB();
+        group = new Group("GroupTest", "", "");
+        group.doInsert(db.getConnection());
+    }
 
-  @Test
-  public void Given_Group_Inserted_Into_Db_GetGroupMatching_Returns_Created_Group() {
-    Assert.assertEquals(group, Group.getGroupMatching(group));
-  }
+    @Test
+    public void Given_Group_Exists_In_Db_GetAllGroups_Returns_Correct_Group() {
+        Collection<Group> groups = Group.getAllgroups();
+        Assert.assertEquals("Group1", ((List<Group>) groups).get(0).getName());
+    }
 
-  @Test
-  public void Given_Group_Inserted_With_Same_Name_GetGroupMatching_With_Id_Returns_Correct_Group()
-      throws Exception {
-    Group sameGroupName = new Group("GroupTest", "This group has a description", "");
-    sameGroupName.doInsert(db.getConnection());
-    Assert.assertEquals(
-        "This group has a description", Group.getGroupMatching(group, 2).getDescription());
-    sameGroupName.doDelete(db.getConnection());
-  }
+    @Test
+    public void Given_Group_Inserted_Into_Db_GetGroupMatching_Returns_Created_Group() {
+        Assert.assertEquals(group, Group.getGroupMatching(group));
+    }
 
-  @Test
-  public void Given_Group_Inserted_GetGroupById_Returns_Correct_Group() {
-    Assert.assertEquals(group, Group.getGroupById(group.getGroupid()));
-  }
+    @Test
+    public void Given_Group_Inserted_With_Same_Name_GetGroupMatching_With_Id_Returns_Correct_Group()
+        throws Exception {
+        Group sameGroupName = new Group("GroupTest", "This group has a description", "");
+        sameGroupName.doInsert(db.getConnection());
+        Assert.assertEquals(
+            "This group has a description", Group.getGroupMatching(group, 2).getDescription());
+        sameGroupName.doDelete(db.getConnection());
+    }
 
-  @Test
-  public void Given_Group_AuthId_Updated_GetGroupByAuthId_Returns_Correct_Group() throws Exception {
-    group.setAuthid("Basic TmFtZTp6Z04wMFkyS3gybFppbXltNy94ZDhuMkdEYjA9");
-    group.doUpdate(db.getConnection());
-    Assert.assertEquals(group, Group.getGroupByAuthId("Basic TmFtZTp6Z04wMFkyS3gybFppbXltNy94ZDhuMkdEYjA9"));
-  }
+    @Test
+    public void Given_Group_Inserted_GetGroupById_Returns_Correct_Group() {
+        Assert.assertEquals(group, Group.getGroupById(group.getGroupid()));
+    }
 
-  @After
-  public void tearDown() throws Exception {
-    group.doDelete(db.getConnection());
-  }
+    @Test
+    public void Given_Group_AuthId_Updated_GetGroupByAuthId_Returns_Correct_Group() throws Exception {
+        group.setAuthid("Basic TmFtZTp6Z04wMFkyS3gybFppbXltNy94ZDhuMkdEYjA9");
+        group.doUpdate(db.getConnection());
+        Assert.assertEquals(group, Group.getGroupByAuthId("Basic TmFtZTp6Z04wMFkyS3gybFppbXltNy94ZDhuMkdEYjA9"));
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        group.doDelete(db.getConnection());
+    }
 }

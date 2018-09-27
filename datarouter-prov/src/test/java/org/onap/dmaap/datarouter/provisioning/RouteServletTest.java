@@ -23,26 +23,28 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.onap.dmaap.datarouter.provisioning.beans.*;
+import org.onap.dmaap.datarouter.provisioning.beans.Deleteable;
+import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
 import org.powermock.modules.junit4.PowerMockRunner;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
 public class RouteServletTest {
@@ -62,8 +64,8 @@ public class RouteServletTest {
         emf = Persistence.createEntityManagerFactory("dr-unit-tests");
         em = emf.createEntityManager();
         System.setProperty(
-                "org.onap.dmaap.datarouter.provserver.properties",
-                "src/test/resources/h2Database.properties");
+            "org.onap.dmaap.datarouter.provserver.properties",
+            "src/test/resources/h2Database.properties");
     }
 
     @AfterClass
@@ -80,7 +82,7 @@ public class RouteServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated()
-            throws Exception {
+        throws Exception {
         when(request.getRemoteAddr()).thenReturn("stub_addr");
         routeServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
@@ -88,7 +90,7 @@ public class RouteServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Ingress_Route_Does_Not_Exist_In_Path_Then_Route_Does_Not_Exist_Is_Returned()
-            throws Exception {
+        throws Exception {
         when(request.getPathInfo()).thenReturn("/ingress/3/internal/route/");
         routeServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
@@ -96,7 +98,7 @@ public class RouteServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Ingress_Path_Contains_Invalid_FeedID_Then_Feed_Not_Found_Is_Returned()
-            throws Exception {
+        throws Exception {
         when(request.getPathInfo()).thenReturn("/ingress/feedID/internal/route/");
         routeServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
@@ -104,7 +106,7 @@ public class RouteServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Ingress_Path_Contains_Invalid_Sequence_Number_Then_Invalid_Sequence_Is_Returned()
-            throws Exception {
+        throws Exception {
         when(request.getPathInfo()).thenReturn("/ingress/feedID/");
         routeServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
@@ -167,7 +169,7 @@ public class RouteServletTest {
         };
         routeServlet.doDelete(request, response);
         verify(response)
-                .sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+            .sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
     }
 
     @Test
@@ -235,7 +237,7 @@ public class RouteServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Ingress_Path_Starts_With_Ingress_And_Contains_Invalid_Arguments()
-            throws Exception {
+        throws Exception {
         when(request.getPathInfo()).thenReturn("/ingress/");
         when(request.getParameter("feed")).thenReturn("3");
         when(request.getParameter("user")).thenReturn(null);
@@ -248,7 +250,7 @@ public class RouteServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Path_Starts_With_Egress_And_EgressRoute_Already_Exists()
-            throws Exception {
+        throws Exception {
         when(request.getPathInfo()).thenReturn("/egress/");
         when(request.getParameter("sub")).thenReturn("1");
         routeServlet.doPost(request, response);
@@ -257,7 +259,7 @@ public class RouteServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Path_Starts_With_Egress_And_Contains_Invalid_Arguments()
-            throws Exception {
+        throws Exception {
         when(request.getPathInfo()).thenReturn("/egress/");
         when(request.getParameter("sub")).thenReturn("3");
         routeServlet.doPost(request, response);
@@ -310,6 +312,6 @@ public class RouteServletTest {
 
         routeServlet.doPost(request, response);
         verify(response)
-                .sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+            .sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
     }
 }

@@ -22,6 +22,24 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
+
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -39,34 +57,17 @@ import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.*;
-import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
-
 
 @RunWith(PowerMockRunner.class)
 public class FeedServletTest extends DrServletTestBase {
 
     private static FeedServlet feedServlet;
-
+    private static EntityManagerFactory emf;
+    private static EntityManager em;
     @Mock
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
-
-    private static EntityManagerFactory emf;
-    private static EntityManager em;
     private DB db;
 
     @BeforeClass
@@ -74,8 +75,8 @@ public class FeedServletTest extends DrServletTestBase {
         emf = Persistence.createEntityManagerFactory("dr-unit-tests");
         em = emf.createEntityManager();
         System.setProperty(
-                "org.onap.dmaap.datarouter.provserver.properties",
-                "src/test/resources/h2Database.properties");
+            "org.onap.dmaap.datarouter.provserver.properties",
+            "src/test/resources/h2Database.properties");
     }
 
     @AfterClass
@@ -269,7 +270,8 @@ public class FeedServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Request_Contains_Invalid_JSON_Then_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Request_Contains_Invalid_JSON_Then_Bad_Request_Response_Is_Generated()
+        throws Exception {
         FeedServlet feedServlet = new FeedServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
                 return new JSONObject();
@@ -280,7 +282,8 @@ public class FeedServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Feed_Change_Is_Not_Publisher_Who_Requested_Feed_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Feed_Change_Is_Not_Publisher_Who_Requested_Feed_Bad_Request_Response_Is_Generated()
+        throws Exception {
         when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn(null);
         JSONObject JSObject = buildRequestJsonObject();
         FeedServlet feedServlet = new FeedServlet() {
@@ -298,7 +301,8 @@ public class FeedServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Feed_Name_Change_is_Requested_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Feed_Name_Change_is_Requested_Bad_Request_Response_Is_Generated()
+        throws Exception {
         JSONObject JSObject = buildRequestJsonObject();
         FeedServlet feedServlet = new FeedServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -314,7 +318,8 @@ public class FeedServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Feed_Version_Change_is_Requested_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Feed_Version_Change_is_Requested_Bad_Request_Response_Is_Generated()
+        throws Exception {
         JSONObject JSObject = buildRequestJsonObject();
         FeedServlet feedServlet = new FeedServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -330,7 +335,8 @@ public class FeedServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated()
+        throws Exception {
         JSONObject JSObject = buildRequestJsonObject();
         FeedServlet feedServlet = new FeedServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -347,7 +353,8 @@ public class FeedServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Change_On_Feeds_Fails_An_Internal_Server_Error_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Change_On_Feeds_Fails_An_Internal_Server_Error_Response_Is_Generated()
+        throws Exception {
         ServletOutputStream outStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outStream);
 
@@ -367,11 +374,13 @@ public class FeedServletTest extends DrServletTestBase {
             }
         };
         feedServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+        verify(response)
+            .sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Change_On_Feeds_Suceeds_A_STATUS_OK_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Change_On_Feeds_Suceeds_A_STATUS_OK_Response_Is_Generated()
+        throws Exception {
         ServletOutputStream outStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outStream);
         JSONObject JSObject = buildRequestJsonObject();
@@ -415,7 +424,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     private void setUpValidSecurityOnHttpRequest() throws Exception {
         when(request.isSecure()).thenReturn(true);
-        Set<String> authAddressesAndNetworks = new HashSet<String>();
+        Set<String> authAddressesAndNetworks = new HashSet<>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils
             .writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks,
@@ -459,7 +468,7 @@ public class FeedServletTest extends DrServletTestBase {
     }
 
     private void reinsertFeedIntoDb() throws SQLException {
-        Feed feed = new Feed("Feed1","v0.1", "First Feed for testing", "First Feed for testing");
+        Feed feed = new Feed("Feed1", "v0.1", "First Feed for testing", "First Feed for testing");
         feed.setFeedid(1);
         feed.setGroupid(1);
         feed.setDeleted(false);

@@ -23,14 +23,14 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.Properties;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
-import java.util.Properties;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class DrServletTestBase {
 
@@ -49,7 +49,7 @@ public class DrServletTestBase {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
 
     }
 }

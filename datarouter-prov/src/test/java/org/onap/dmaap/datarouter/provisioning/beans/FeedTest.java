@@ -20,23 +20,28 @@
  * * ECOMP is a trademark and service mark of AT&T Intellectual Property.
  * *
  ******************************************************************************/
+
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import java.io.InvalidObjectException;
+import java.sql.SQLException;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import org.json.JSONObject;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import java.io.InvalidObjectException;
-import java.sql.SQLException;
-import java.util.List;
-
 @RunWith(PowerMockRunner.class)
 public class FeedTest {
+
     private static EntityManagerFactory emf;
     private static EntityManager em;
     private Feed feed;
@@ -47,8 +52,8 @@ public class FeedTest {
         emf = Persistence.createEntityManagerFactory("dr-unit-tests");
         em = emf.createEntityManager();
         System.setProperty(
-                "org.onap.dmaap.datarouter.provserver.properties",
-                "src/test/resources/h2Database.properties");
+            "org.onap.dmaap.datarouter.provserver.properties",
+            "src/test/resources/h2Database.properties");
     }
 
     @AfterClass
@@ -61,7 +66,7 @@ public class FeedTest {
     @Before
     public void setUp() throws Exception {
         db = new DB();
-        feed = new Feed("Feed1","v0.1", "First Feed for testing", "First Feed for testing");
+        feed = new Feed("Feed1", "v0.1", "First Feed for testing", "First Feed for testing");
         feed.setFeedid(1);
         feed.setGroupid(1);
         feed.setPublisher("pub");
@@ -69,47 +74,46 @@ public class FeedTest {
     }
 
     @Test
-    public void Given_getFilteredFeedUrlList_With_Name_Then_Method_Returns_Self_Links() {
-        List<String>  list= feed.getFilteredFeedUrlList("name","Feed1");
-        Assert.assertEquals("self_link",list.get(0));
+    public void given_getFilteredFeedUrlList_With_Name_Then_Method_Returns_Self_Links() {
+        List<String> list = Feed.getFilteredFeedUrlList("name", "Feed1");
+        Assert.assertEquals("self_link", list.get(0));
     }
 
     @Test
-    public void Given_getFilteredFeedUrlList_With_Publ_Then_Method_Returns_Self_Links() {
-        List<String>  list= feed.getFilteredFeedUrlList("publ","pub");
-        Assert.assertEquals("self_link",list.get(0));
+    public void given_getFilteredFeedUrlList_With_Publ_Then_Method_Returns_Self_Links() {
+        List<String> list = Feed.getFilteredFeedUrlList("publ", "pub");
+        Assert.assertEquals("self_link", list.get(0));
     }
 
     @Test
-    public void Given_getFilteredFeedUrlList_With_Subs_Then_Method_Returns_Self_Links() {
-        List<String>  list= feed.getFilteredFeedUrlList("subs","sub123");
-        Assert.assertEquals("self_link",list.get(0));
+    public void given_getFilteredFeedUrlList_With_Subs_Then_Method_Returns_Self_Links() {
+        List<String> list = Feed.getFilteredFeedUrlList("subs", "sub123");
+        Assert.assertEquals("self_link", list.get(0));
     }
 
     @Test
-    public void Given_doDelete_Succeeds_Then_doInsert_To_Put_Feed_Back_And_Bool_Is_True() throws SQLException, InvalidObjectException {
+    public void given_doDelete_Succeeds_Then_doInsert_To_Put_Feed_Back_And_Bool_Is_True()
+        throws SQLException, InvalidObjectException {
         Boolean bool = feed.doDelete(db.getConnection());
         Assert.assertEquals(true, bool);
         JSONObject jo = new JSONObject();
-        jo.put("self","self_link");
-        jo.put("publish","publish_link");
-        jo.put("subscribe","subscribe_link");
-        jo.put("log","log_link");
+        jo.put("self", "self_link");
+        jo.put("publish", "publish_link");
+        jo.put("subscribe", "subscribe_link");
+        jo.put("log", "log_link");
         feed.setLinks(new FeedLinks(jo));
         bool = feed.doInsert(db.getConnection());
         Assert.assertEquals(true, bool);
     }
 
     @Test
-    public void Validate_ChaneOwnerShip_Returns_True()
-    {
+    public void validate_ChaneOwnerShip_Returns_True() {
         Boolean bool = feed.changeOwnerShip();
         Assert.assertEquals(true, bool);
     }
 
     @Test
-    public void Given_Feeds_Are_Equal_Then_Equals_Returns_True()
-    {
+    public void given_Feeds_Are_Equal_Then_Equals_Returns_True() {
         Feed feed2 = feed;
         Boolean bool = feed.equals(feed2);
         Assert.assertEquals(true, bool);

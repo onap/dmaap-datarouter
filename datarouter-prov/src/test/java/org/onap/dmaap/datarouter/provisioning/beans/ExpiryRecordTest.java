@@ -23,11 +23,10 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import java.text.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
-
-import java.text.ParseException;
 
 public class ExpiryRecordTest {
 
@@ -36,7 +35,8 @@ public class ExpiryRecordTest {
 
     @Test
     public void Validate_Constructor_Creates_Object_With_Get_Methods() throws ParseException {
-        String[] args = {"2018-08-29-10-10-10-543.", "EXP", "238465493.fileName", "1","285", "123/file.txt","GET","","2000","example","100"};
+        String[] args = {"2018-08-29-10-10-10-543.", "EXP", "238465493.fileName", "1", "285", "123/file.txt", "GET", "",
+            "2000", "example", "100"};
         expiryRecord = new ExpiryRecord(args);
         Assert.assertEquals("238465493.fileName", expiryRecord.getPublishId());
         Assert.assertEquals(1, expiryRecord.getFeedid());
@@ -52,7 +52,8 @@ public class ExpiryRecordTest {
 
     @Test
     public void Validate_AsJsonObject_Correct_Json_Object_After_Set_Methods() throws ParseException {
-        String[] args = {"2018-08-29-10-10-10-543.", "EXP", "238465493.fileName", "1","285", "123/file.txt","GET","","2000","example","100"};
+        String[] args = {"2018-08-29-10-10-10-543.", "EXP", "238465493.fileName", "1", "285", "123/file.txt", "GET", "",
+            "2000", "example", "100"};
         expiryRecord = new ExpiryRecord(args);
         expiryRecord.setContentLength(265);
         expiryRecord.setEventTime(1535533810543L);

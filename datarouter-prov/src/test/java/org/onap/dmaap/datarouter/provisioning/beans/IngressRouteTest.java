@@ -22,6 +22,12 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import static org.mockito.Mockito.mock;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -33,56 +39,49 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.mockito.Mockito.mock;
-
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.onap.dmaap.datarouter.provisioning.beans.Feed")
 public class IngressRouteTest {
 
-  private IngressRoute ingressRoute;
+    private IngressRoute ingressRoute;
 
-  @Before
-  public void setUp() throws IllegalAccessException{
-    PowerMockito.mockStatic(Feed.class);
-    Feed feed = mock(Feed.class);
-    PowerMockito.when(Feed.getFeedById(1)).thenReturn(feed);
-    Map<String, Integer> map = new HashMap<>();
-    FieldUtils.writeDeclaredStaticField(NodeClass.class, "map", map, true);
-  }
+    @Before
+    public void setUp() throws IllegalAccessException {
+        PowerMockito.mockStatic(Feed.class);
+        Feed feed = mock(Feed.class);
+        PowerMockito.when(Feed.getFeedById(1)).thenReturn(feed);
+        Map<String, Integer> map = new HashMap<>();
+        FieldUtils.writeDeclaredStaticField(NodeClass.class, "map", map, true);
+    }
 
-  @Test
-  public void Validate_IngressRoute_Constructors_Create_Same_Object() {
-    List<String> nodes = new ArrayList<>();
-    nodes.add("node.datarouternew.com");
-    ingressRoute = new IngressRoute(1, 1, "user1", "172.100.0.0/25", nodes);
-    JSONObject ingressRouteJson = createIngressRouteJson();
-    Assert.assertEquals(ingressRoute, new IngressRoute(ingressRouteJson));
-  }
+    @Test
+    public void Validate_IngressRoute_Constructors_Create_Same_Object() {
+        List<String> nodes = new ArrayList<>();
+        nodes.add("node.datarouternew.com");
+        ingressRoute = new IngressRoute(1, 1, "user1", "172.100.0.0/25", nodes);
+        JSONObject ingressRouteJson = createIngressRouteJson();
+        Assert.assertEquals(ingressRoute, new IngressRoute(ingressRouteJson));
+    }
 
-  @Test
-  public void Validate_AsJsonObject_Returns_Same_Values() {
-    List<String> nodes = new ArrayList<>();
-    nodes.add("node.datarouternew.com");
-    ingressRoute = new IngressRoute(1, 1, "user1", "172.100.0.0/25", nodes);
-    JSONObject ingressRouteJson = createIngressRouteJson();
-    Assert.assertEquals(ingressRoute.asJSONObject().toString(), ingressRouteJson.toString());
-  }
+    @Test
+    public void Validate_AsJsonObject_Returns_Same_Values() {
+        List<String> nodes = new ArrayList<>();
+        nodes.add("node.datarouternew.com");
+        ingressRoute = new IngressRoute(1, 1, "user1", "172.100.0.0/25", nodes);
+        JSONObject ingressRouteJson = createIngressRouteJson();
+        Assert.assertEquals(ingressRoute.asJSONObject().toString(), ingressRouteJson.toString());
+    }
 
-  private JSONObject createIngressRouteJson() {
-    JSONObject ingressRouteJson = new JSONObject();
-    ingressRouteJson.put("seq", 1);
-    ingressRouteJson.put("feedid", 1);
-    ingressRouteJson.put("user", "user1");
-    ingressRouteJson.put("subnet", "172.100.0.0/25");
-    JSONArray nodes = new JSONArray();
-    nodes.put("node.datarouternew.com");
-    ingressRouteJson.put("node", nodes);
-    return ingressRouteJson;
-  }
+    private JSONObject createIngressRouteJson() {
+        JSONObject ingressRouteJson = new JSONObject();
+        ingressRouteJson.put("seq", 1);
+        ingressRouteJson.put("feedid", 1);
+        ingressRouteJson.put("user", "user1");
+        ingressRouteJson.put("subnet", "172.100.0.0/25");
+        JSONArray nodes = new JSONArray();
+        nodes.put("node.datarouternew.com");
+        ingressRouteJson.put("node", nodes);
+        return ingressRouteJson;
+    }
 
 }

@@ -225,12 +225,10 @@ public class DRFeedsServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_POST_And_Feed_Is_Not_Valid_Object_Bad_Request_Response_Is_Generated()
         throws Exception {
         when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn(null);
-        JSONObject JSObject = buildRequestJsonObject();
 
         DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                return jo;
+                return new JSONObject();
             }
         };
 
@@ -323,7 +321,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
 
     private void setUpValidSecurityOnHttpRequest() throws Exception {
         when(request.isSecure()).thenReturn(true);
-        Set<String> authAddressesAndNetworks = new HashSet<String>();
+        Set<String> authAddressesAndNetworks = new HashSet<>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils
             .writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks,
@@ -356,7 +354,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         when(feed.getName()).thenReturn("stub_name");
         when(feed.getVersion()).thenReturn("1.0");
         when(feed.asLimitedJSONObject()).thenReturn(mock(JSONObject.class));
-        PowerMockito.when(feed.getFeedByNameVersion(anyString(), anyString())).thenReturn(null);
+        PowerMockito.when(Feed.getFeedByNameVersion(anyString(), anyString())).thenReturn(null);
     }
 
     private void setAuthoriserToReturnRequestNotAuthorized() throws IllegalAccessException {

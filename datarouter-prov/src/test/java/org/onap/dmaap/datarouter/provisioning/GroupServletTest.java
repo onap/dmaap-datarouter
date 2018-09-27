@@ -22,6 +22,23 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
+
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.json.JSONObject;
 import org.junit.AfterClass;
@@ -36,24 +53,9 @@ import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
-
 @RunWith(PowerMockRunner.class)
 public class GroupServletTest {
+
     private static EntityManagerFactory emf;
     private static EntityManager em;
     private GroupServlet groupServlet;
@@ -89,21 +91,24 @@ public class GroupServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_GET_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_GET_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated()
+        throws Exception {
         when(request.isSecure()).thenReturn(false);
         groupServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
 
     @Test
-    public void Given_Request_Is_HTTP_GET_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_GET_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated()
+        throws Exception {
         setBehalfHeader(null);
         groupServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
     }
 
     @Test
-    public void Given_Request_Is_HTTP_GET_And_Path_Header_Is_Not_Set_In_Request_With_Valid_Path_Then_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_GET_And_Path_Header_Is_Not_Set_In_Request_With_Valid_Path_Then_Bad_Request_Response_Is_Generated()
+        throws Exception {
         when(request.getPathInfo()).thenReturn(null);
         groupServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
@@ -118,42 +123,49 @@ public class GroupServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated()
+        throws Exception {
         when(request.isSecure()).thenReturn(false);
         groupServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated()
+        throws Exception {
         setBehalfHeader(null);
         groupServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Path_Header_Is_Not_Set_In_Request_With_Valid_Path_Then_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Path_Header_Is_Not_Set_In_Request_With_Valid_Path_Then_Bad_Request_Response_Is_Generated()
+        throws Exception {
         when(request.getPathInfo()).thenReturn(null);
         groupServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Group_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Group_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated()
+        throws Exception {
         when(request.getPathInfo()).thenReturn("/3");
         groupServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Content_Header_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Content_Header_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated()
+        throws Exception {
         when(request.getContentType()).thenReturn("stub_contentType");
         groupServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), argThat(notNullValue(String.class)));
+        verify(response)
+            .sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), argThat(notNullValue(String.class)));
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Request_Contains_Badly_Formed_JSON_Then_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Request_Contains_Badly_Formed_JSON_Then_Bad_Request_Response_Is_Generated()
+        throws Exception {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
         ServletInputStream inStream = mock(ServletInputStream.class);
         when(request.getInputStream()).thenReturn(inStream);
@@ -162,7 +174,8 @@ public class GroupServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Group_Name_Is_Too_Long_Then_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Group_Name_Is_Too_Long_Then_Bad_Request_Response_Is_Generated()
+        throws Exception {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
         GroupServlet groupServlet = overideGetJSONFromInputToReturnAnInvalidGroup(true);
         groupServlet.doPut(request, response);
@@ -170,11 +183,13 @@ public class GroupServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_PUT_Fails_Then_Internal_Server_Error_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_PUT_Fails_Then_Internal_Server_Error_Response_Is_Generated()
+        throws Exception {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
         GroupServlet groupServlet = overideGetJSONFromInputToReturnAValidGroupWithFail();
         groupServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+        verify(response)
+            .sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
     }
 
     @Test
@@ -188,28 +203,33 @@ public class GroupServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_POST_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_POST_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated()
+        throws Exception {
         when(request.isSecure()).thenReturn(false);
         groupServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
 
     @Test
-    public void Given_Request_Is_HTTP_POST_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_POST_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated()
+        throws Exception {
         setBehalfHeader(null);
         groupServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
     }
 
     @Test
-    public void Given_Request_Is_HTTP_POST_And_Content_Header_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_POST_And_Content_Header_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated()
+        throws Exception {
         when(request.getContentType()).thenReturn("stub_contentType");
         groupServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), argThat(notNullValue(String.class)));
+        verify(response)
+            .sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), argThat(notNullValue(String.class)));
     }
 
     @Test
-    public void Given_Request_Is_HTTP_POST_And_Request_Contains_Badly_Formed_JSON_Then_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_POST_And_Request_Contains_Badly_Formed_JSON_Then_Bad_Request_Response_Is_Generated()
+        throws Exception {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
         ServletInputStream inStream = mock(ServletInputStream.class);
         when(request.getInputStream()).thenReturn(inStream);
@@ -218,7 +238,8 @@ public class GroupServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_POST_And_Group_Description_Is_Too_Long_Then_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_POST_And_Group_Description_Is_Too_Long_Then_Bad_Request_Response_Is_Generated()
+        throws Exception {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
         GroupServlet groupServlet = overideGetJSONFromInputToReturnAnInvalidGroup(false);
         groupServlet.doPost(request, response);
@@ -226,7 +247,8 @@ public class GroupServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_POST_And_Group_Name_Already_Exists_Then_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_POST_And_Group_Name_Already_Exists_Then_Bad_Request_Response_Is_Generated()
+        throws Exception {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
         GroupServlet groupServlet = overideGetJSONFromInputToReturnGroupInDb();
         groupServlet.doPost(request, response);
@@ -234,11 +256,13 @@ public class GroupServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_POST_And_POST_Fails_Then_Internal_Server_Error_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_POST_And_POST_Fails_Then_Internal_Server_Error_Response_Is_Generated()
+        throws Exception {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
         GroupServlet groupServlet = overideGetJSONFromInputToReturnAValidGroupWithFail();
         groupServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+        verify(response)
+            .sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
     }
 
     @Test
@@ -278,9 +302,11 @@ public class GroupServletTest {
 
     private void setUpValidSecurityOnHttpRequest() throws Exception {
         when(request.isSecure()).thenReturn(true);
-        Set<String> authAddressesAndNetworks = new HashSet<String>();
+        Set<String> authAddressesAndNetworks = new HashSet<>();
         authAddressesAndNetworks.add(("127.0.0.1"));
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks, true);
+        FieldUtils
+            .writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks,
+                true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", false, true);
     }
 
