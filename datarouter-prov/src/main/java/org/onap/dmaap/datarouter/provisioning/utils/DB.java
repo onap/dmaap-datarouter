@@ -123,16 +123,14 @@ public class DB {
                             if (++n >= 3) {
                                 throw sqlEx;
                             }
-                        } finally {
-                            if (connection != null && !connection.isValid(1)) {
-                                connection.close();
-                                connection = null;
-                            }
                         }
                     } while (connection == null);
                 }
             }
-
+            if (connection != null && !connection.isValid(1)) {
+                connection.close();
+                connection = null;
+            }
         }
         return connection;
     }
