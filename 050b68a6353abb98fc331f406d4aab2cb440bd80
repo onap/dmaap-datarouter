@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_84b3dd09",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-09-27T16:18:23Z",
+      "side": 1,
+      "message": "You might not have the Code Formatter set up properly as these should probably be changed as its part of GoogleStyle to not have wildcard imports",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 17
+      },
+      "revId": "050b68a6353abb98fc331f406d4aab2cb440bd80",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
