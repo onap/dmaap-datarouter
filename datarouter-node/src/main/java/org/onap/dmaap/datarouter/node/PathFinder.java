@@ -24,14 +24,19 @@
 
 package org.onap.dmaap.datarouter.node;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Vector;
 
 /**
- * Given a set of node names and next hops, identify and ignore any cycles and figure out the sequence of next hops to get from this node to any other node
+ * Given a set of node names and next hops, identify and ignore any cycles and figure out the sequence of next hops to
+ * get from this node to any other node
  */
 
 public class PathFinder {
+
     private static class Hop {
+
         boolean mark;
         boolean bad;
         NodeConfig.ProvHop basis;
@@ -90,8 +95,8 @@ public class PathFinder {
      * Find routes from a specified origin to all of the nodes given a set of specified next hops.
      *
      * @param origin where we start
-     * @param nodes  where we can go
-     * @param hops   detours along the way
+     * @param nodes where we can go
+     * @param hops detours along the way
      */
     public PathFinder(String origin, String[] nodes, NodeConfig.ProvHop[] hops) {
         HashSet<String> known = new HashSet<String>();

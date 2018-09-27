@@ -24,22 +24,25 @@
 
 package org.onap.dmaap.datarouter.node;
 
-import java.util.*;
-import java.io.*;
+import java.io.File;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * Processed configuration for this node.
  * <p>
- * The NodeConfig represents a processed configuration from the Data Router
- * provisioning server.  Each time configuration data is received from the
- * provisioning server, a new NodeConfig is created and the previous one
+ * The NodeConfig represents a processed configuration from the Data Router provisioning server.  Each time
+ * configuration data is received from the provisioning server, a new NodeConfig is created and the previous one
  * discarded.
  */
 public class NodeConfig {
+
     /**
      * Raw configuration entry for a data router node
      */
     public static class ProvNode {
+
         private String cname;
 
         /**
@@ -63,14 +66,15 @@ public class NodeConfig {
      * Raw configuration entry for a provisioning parameter
      */
     public static class ProvParam {
+
         private String name;
         private String value;
 
         /**
          * Construct a provisioning parameter configuration entry.
          *
-         * @param    name The name of the parameter.
-         * @param    value The value of the parameter.
+         * @param name The name of the parameter.
+         * @param value The value of the parameter.
          */
         public ProvParam(String name, String value) {
             this.name = name;
@@ -96,6 +100,7 @@ public class NodeConfig {
      * Raw configuration entry for a data feed.
      */
     public static class ProvFeed {
+
         private String id;
         private String logdata;
         private String status;
@@ -103,9 +108,10 @@ public class NodeConfig {
         /**
          * Construct a feed configuration entry.
          *
-         * @param id      The feed ID of the entry.
+         * @param id The feed ID of the entry.
          * @param logdata String for log entries about the entry.
-         * @param status  The reason why this feed cannot be used (Feed has been deleted, Feed has been suspended) or null if it is valid.
+         * @param status The reason why this feed cannot be used (Feed has been deleted, Feed has been suspended) or
+         * null if it is valid.
          */
         public ProvFeed(String id, String logdata, String status) {
             this.id = id;
@@ -139,6 +145,7 @@ public class NodeConfig {
      * Raw configuration entry for a feed user.
      */
     public static class ProvFeedUser {
+
         private String feedid;
         private String user;
         private String credentials;
@@ -146,8 +153,8 @@ public class NodeConfig {
         /**
          * Construct a feed user configuration entry
          *
-         * @param feedid      The feed id.
-         * @param user        The user that will publish to the feed.
+         * @param feedid The feed id.
+         * @param user The user that will publish to the feed.
          * @param credentials The Authorization header the user will use to publish.
          */
         public ProvFeedUser(String feedid, String user, String credentials) {
@@ -182,6 +189,7 @@ public class NodeConfig {
      * Raw configuration entry for a feed subnet
      */
     public static class ProvFeedSubnet {
+
         private String feedid;
         private String cidr;
 
@@ -189,7 +197,7 @@ public class NodeConfig {
          * Construct a feed subnet configuration entry
          *
          * @param feedid The feed ID
-         * @param cidr   The CIDR allowed to publish to the feed.
+         * @param cidr The CIDR allowed to publish to the feed.
          */
         public ProvFeedSubnet(String feedid, String cidr) {
             this.feedid = feedid;
@@ -215,6 +223,7 @@ public class NodeConfig {
      * Raw configuration entry for a subscription
      */
     public static class ProvSubscription {
+
         private String subid;
         private String feedid;
         private String url;
@@ -226,15 +235,17 @@ public class NodeConfig {
         /**
          * Construct a subscription configuration entry
          *
-         * @param subid       The subscription ID
-         * @param feedid      The feed ID
-         * @param url         The base delivery URL (not including the fileid)
-         * @param authuser    The user in the credentials used to deliver
-         * @param credentials The credentials used to authenticate to the delivery URL exactly as they go in the Authorization header.
-         * @param metaonly    Is this a meta data only subscription?
-         * @param use100      Should we send Expect: 100-continue?
+         * @param subid The subscription ID
+         * @param feedid The feed ID
+         * @param url The base delivery URL (not including the fileid)
+         * @param authuser The user in the credentials used to deliver
+         * @param credentials The credentials used to authenticate to the delivery URL exactly as they go in the
+         * Authorization header.
+         * @param metaonly Is this a meta data only subscription?
+         * @param use100 Should we send Expect: 100-continue?
          */
-        public ProvSubscription(String subid, String feedid, String url, String authuser, String credentials, boolean metaonly, boolean use100) {
+        public ProvSubscription(String subid, String feedid, String url, String authuser, String credentials,
+                boolean metaonly, boolean use100) {
             this.subid = subid;
             this.feedid = feedid;
             this.url = url;
@@ -298,6 +309,7 @@ public class NodeConfig {
      * Raw configuration entry for controlled ingress to the data router node
      */
     public static class ProvForceIngress {
+
         private String feedid;
         private String subnet;
         private String user;
@@ -307,9 +319,10 @@ public class NodeConfig {
          * Construct a forced ingress configuration entry
          *
          * @param feedid The feed ID that this entry applies to
-         * @param subnet The CIDR for which publisher IP addresses this entry applies to or "" if it applies to all publisher IP addresses
-         * @param user   The publishing user this entry applies to or "" if it applies to all publishing users.
-         * @param nodes  The array of FQDNs of the data router nodes to redirect publication attempts to.
+         * @param subnet The CIDR for which publisher IP addresses this entry applies to or "" if it applies to all
+         * publisher IP addresses
+         * @param user The publishing user this entry applies to or "" if it applies to all publishing users.
+         * @param nodes The array of FQDNs of the data router nodes to redirect publication attempts to.
          */
         public ProvForceIngress(String feedid, String subnet, String user, String[] nodes) {
             this.feedid = feedid;
@@ -351,6 +364,7 @@ public class NodeConfig {
      * Raw configuration entry for controlled egress from the data router
      */
     public static class ProvForceEgress {
+
         private String subid;
         private String node;
 
@@ -358,7 +372,7 @@ public class NodeConfig {
          * Construct a forced egress configuration entry
          *
          * @param subid The subscription ID the subscription with forced egress
-         * @param node  The node handling deliveries for this subscription
+         * @param node The node handling deliveries for this subscription
          */
         public ProvForceEgress(String subid, String node) {
             this.subid = subid;
@@ -384,6 +398,7 @@ public class NodeConfig {
      * Raw configuration entry for routing within the data router network
      */
     public static class ProvHop {
+
         private String from;
         private String to;
         private String via;
@@ -399,8 +414,8 @@ public class NodeConfig {
          * Construct a hop entry
          *
          * @param from The FQDN of the node with the data to be delivered
-         * @param to   The FQDN of the node that will deliver to the subscriber
-         * @param via  The FQDN of the node where the from node should send the data
+         * @param to The FQDN of the node that will deliver to the subscriber
+         * @param via The FQDN of the node where the from node should send the data
          */
         public ProvHop(String from, String to, String via) {
             this.from = from;
@@ -431,12 +446,14 @@ public class NodeConfig {
     }
 
     private static class Redirection {
+
         SubnetMatcher snm;
         String user;
         String[] nodes;
     }
 
     private static class Feed {
+
         String loginfo;
         String status;
         SubnetMatcher[] subnets;
@@ -458,10 +475,10 @@ public class NodeConfig {
     /**
      * Process the raw provisioning data to configure this node
      *
-     * @param pd          The parsed provisioning data
-     * @param myname      My name as seen by external systems
-     * @param spooldir    The directory where temporary files live
-     * @param port        The port number for URLs
+     * @param pd The parsed provisioning data
+     * @param myname My name as seen by external systems
+     * @param spooldir The directory where temporary files live
+     * @param port The port number for URLs
      * @param nodeauthkey The keying string used to generate node authentication credentials
      */
     public NodeConfig(ProvData pd, String myname, String spooldir, int port, String nodeauthkey) {
@@ -477,7 +494,8 @@ public class NodeConfig {
                 continue;
             }
             String auth = NodeUtils.getNodeAuthHdr(cn, nodeauthkey);
-            DestInfo di = new DestInfo("n:" + cn, spooldir + "/n/" + cn, null, "n2n-" + cn, "https://" + cn + ":" + port + "/internal/publish", cn, myauth, false, true);
+            DestInfo di = new DestInfo("n:" + cn, spooldir + "/n/" + cn, null, "n2n-" + cn,
+                    "https://" + cn + ":" + port + "/internal/publish", cn, myauth, false, true);
             (new File(di.getSpool())).mkdirs();
             div.add(di);
             nodeinfo.put(cn, di);
@@ -547,7 +565,8 @@ public class NodeConfig {
             } catch (Exception e) {
             }
             String siddir = sididx + "/" + sid;
-            DestInfo di = new DestInfo("s:" + sid, spooldir + "/s/" + siddir, sid, fid, ps.getURL(), ps.getAuthUser(), ps.getCredentials(), ps.isMetaDataOnly(), ps.isUsing100());
+            DestInfo di = new DestInfo("s:" + sid, spooldir + "/s/" + siddir, sid, fid, ps.getURL(), ps.getAuthUser(),
+                    ps.getCredentials(), ps.isMetaDataOnly(), ps.isUsing100());
             (new File(di.getSpool())).mkdirs();
             div.add(di);
             subinfo.put(sid, di);
@@ -653,7 +672,7 @@ public class NodeConfig {
      * Check whether this is a valid node-to-node transfer
      *
      * @param credentials Credentials offered by the supposed node
-     * @param ip          IP address the request came from
+     * @param ip IP address the request came from
      */
     public boolean isAnotherNode(String credentials, String ip) {
         IsFrom n = nodes.get(credentials);
@@ -663,9 +682,9 @@ public class NodeConfig {
     /**
      * Check whether publication is allowed.
      *
-     * @param feedid      The ID of the feed being requested.
+     * @param feedid The ID of the feed being requested.
      * @param credentials The offered credentials
-     * @param ip          The requesting IP address
+     * @param ip The requesting IP address
      */
     public String isPublishPermitted(String feedid, String credentials, String ip) {
         Feed f = feeds.get(feedid);
