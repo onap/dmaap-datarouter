@@ -59,7 +59,7 @@ public class PublishServlet extends BaseServlet {
     private List<IngressRoute> irt;
     //Adding EELF Logger Rally:US664892
     private static EELFLogger eelflogger = EELFManager.getInstance()
-        .getLogger("org.onap.dmaap.datarouter.provisioning.PublishServlet");
+            .getLogger("org.onap.dmaap.datarouter.provisioning.PublishServlet");
     private static final Object lock = new Object();
 
 
@@ -106,14 +106,14 @@ public class PublishServlet extends BaseServlet {
             String[] nodes = getNodes();
             if (nodes == null || nodes.length == 0) {
                 resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE,
-                    "There are no nodes defined in the DR network.");
+                        "There are no nodes defined in the DR network.");
             } else {
                 EventLogRecord elr = new EventLogRecord(req);
                 int feedid = checkPath(req);
                 if (feedid < 0) {
                     String message = (feedid == -1)
-                        ? "Invalid request - Missing or bad feed number."
-                        : "Invalid request - Missing file ID.";
+                            ? "Invalid request - Missing or bad feed number."
+                            : "Invalid request - Missing file ID.";
                     elr.setMessage(message);
                     elr.setResult(HttpServletResponse.SC_NOT_FOUND);
                     eventlogger.info(elr);

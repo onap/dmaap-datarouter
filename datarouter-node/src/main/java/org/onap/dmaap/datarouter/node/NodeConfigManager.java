@@ -48,7 +48,7 @@ import com.att.eelf.configuration.EELFManager;
 public class NodeConfigManager implements DeliveryQueueHelper {
 
     private static EELFLogger eelflogger = EELFManager.getInstance()
-        .getLogger("org.onap.dmaap.datarouter.node.NodeConfigManager");
+            .getLogger("org.onap.dmaap.datarouter.node.NodeConfigManager");
     private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeConfigManager");
     private static NodeConfigManager base = new NodeConfigManager();
 
@@ -108,13 +108,14 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         Properties p = new Properties();
         try {
             p.load(new FileInputStream(System
-                .getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties")));
+                    .getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties")));
         } catch (Exception e) {
 
             NodeUtils.setIpAndFqdnForEelf("NodeConfigManager");
             eelflogger.error(EelfMsgs.MESSAGE_PROPERTIES_LOAD_ERROR);
             logger.error("NODE0301 Unable to load local configuration file " + System
-                .getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties"), e);
+                            .getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties"),
+                    e);
         }
         provurl = p.getProperty("ProvisioningURL", "https://feeds-drtr.web.att.com/internal/prov");
         try {
@@ -679,10 +680,10 @@ public class NodeConfigManager implements DeliveryQueueHelper {
             String sdir = config.getSpoolDir(subid);
             if (sdir != null) {
                 logger.info("NODE0310 Received subscription reset request for subscription " + subid
-                    + " from provisioning server " + remoteaddr);
+                        + " from provisioning server " + remoteaddr);
             } else {
                 logger.info("NODE0311 Received subscription reset request for unknown subscription " + subid
-                    + " from provisioning server " + remoteaddr);
+                        + " from provisioning server " + remoteaddr);
             }
             return (sdir);
         } else {
