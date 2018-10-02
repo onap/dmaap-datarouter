@@ -40,12 +40,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.TimeZone;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 import org.slf4j.MDC;
-
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Utility functions for the data router node
@@ -53,7 +52,7 @@ import javax.servlet.http.HttpServletResponse;
 public class NodeUtils {
 
     private static EELFLogger eelfLogger = EELFManager.getInstance()
-        .getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
+            .getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
     private static Logger nodeUtilsLogger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
 
     private NodeUtils() {
@@ -97,7 +96,8 @@ public class NodeUtils {
             return (getAuthHdr(node, base64Encode(md.digest())));
         } catch (Exception exception) {
             nodeUtilsLogger
-                .error("Exception in generating Credentials for given node name:= " + exception.toString(), exception);
+                    .error("Exception in generating Credentials for given node name:= " + exception.toString(),
+                            exception);
             return (null);
         }
     }
@@ -119,7 +119,7 @@ public class NodeUtils {
                 ks.load(fileInputStream, kspass.toCharArray());
             } catch (IOException ioException) {
                 nodeUtilsLogger.error("IOException occurred while opening FileInputStream: " + ioException.getMessage(),
-                    ioException);
+                        ioException);
                 return (null);
             }
         } catch (Exception e) {
@@ -176,7 +176,8 @@ public class NodeUtils {
             return (InetAddress.getByName(ip).getAddress());
         } catch (Exception exception) {
             nodeUtilsLogger
-                .error("Exception in generating byte array for given IP address := " + exception.toString(), exception);
+                    .error("Exception in generating byte array for given IP address := " + exception.toString(),
+                            exception);
         }
         return (null);
     }
@@ -254,7 +255,8 @@ public class NodeUtils {
             MDC.put(MDC_SERVER_IP_ADDRESS, InetAddress.getLocalHost().getHostAddress());
         } catch (Exception exception) {
             nodeUtilsLogger
-                .error("Exception in generating byte array for given IP address := " + exception.toString(), exception);
+                    .error("Exception in generating byte array for given IP address := " + exception.toString(),
+                            exception);
         }
 
     }

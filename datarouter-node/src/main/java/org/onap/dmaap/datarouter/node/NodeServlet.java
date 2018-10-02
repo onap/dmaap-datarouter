@@ -24,6 +24,8 @@
 
 package org.onap.dmaap.datarouter.node;
 
+import static org.onap.dmaap.datarouter.node.NodeUtils.sendResponseError;
+
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.io.File;
@@ -42,11 +44,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
-
-import static org.onap.dmaap.datarouter.node.NodeUtils.sendResponseError;
 
 /**
  * Servlet for handling all http and https requests to the data router node
@@ -60,12 +59,13 @@ import static org.onap.dmaap.datarouter.node.NodeUtils.sendResponseError;
  * PUT/DELETE https://<i>node</i>/publish/<i>feedid</i>/<i>fileid</i> - publsh request
  */
 public class NodeServlet extends HttpServlet {
+
     private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeServlet");
     private static NodeConfigManager config;
     private static Pattern MetaDataPattern;
     //Adding EELF Logger Rally:US664892
     private static EELFLogger eelflogger = EELFManager.getInstance()
-        .getLogger("org.onap.dmaap.datarouter.node.NodeServlet");
+            .getLogger("org.onap.dmaap.datarouter.node.NodeServlet");
 
     static {
         final String ws = "\\s*";
@@ -99,11 +99,11 @@ public class NodeServlet extends HttpServlet {
     /**
      * Handle a GET for /internal/fetchProv
      */
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp){
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         NodeUtils.setIpAndFqdnForEelf("doGet");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader("X-ATT-DR-ON-BEHALF-OF"),
-            getIdFromPath(req) + "");
-        try{
+                getIdFromPath(req) + "");
+        try {
             if (down(resp)) {
                 return;
             }
@@ -140,12 +140,12 @@ public class NodeServlet extends HttpServlet {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
         NodeUtils.setIpAndFqdnForEelf("doPut");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader("X-ATT-DR-ON-BEHALF-OF"),
-            getIdFromPath(req) + "");
+                getIdFromPath(req) + "");
         try {
             common(req, resp, true);
-        } catch(IOException ioe){
+        } catch (IOException ioe) {
             logger.error("IOException" + ioe.getMessage());
-        } catch(ServletException se){
+        } catch (ServletException se) {
             logger.error("ServletException" + se.getMessage());
         }
     }
@@ -156,33 +156,34 @@ public class NodeServlet extends HttpServlet {
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         NodeUtils.setIpAndFqdnForEelf("doDelete");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader("X-ATT-DR-ON-BEHALF-OF"),
-            getIdFromPath(req) + "");
+                getIdFromPath(req) + "");
         try {
             common(req, resp, false);
-        } catch(IOException ioe){
+        } catch (IOException ioe) {
             logger.error("IOException" + ioe.getMessage());
-        } catch(ServletException se){
+        } catch (ServletException se) {
             logger.error("ServletException" + se.getMessage());
         }
     }
 
     private void common(HttpServletRequest req, HttpServletResponse resp, boolean isput)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
         if (down(resp)) {
             return;
         }
         if (!req.isSecure()) {
             logger.info(
-                "NODE0104 Rejecting insecure PUT or DELETE of " + req.getPathInfo() + " from " + req.getRemoteAddr());
+                    "NODE0104 Rejecting insecure PUT or DELETE of " + req.getPathInfo() + " from " + req
+                            .getRemoteAddr());
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "https required on publish requests");
             return;
         }
         String fileid = req.getPathInfo();
         if (fileid == null) {
             logger.info("NODE0105 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + " from " + req
-                .getRemoteAddr());
+                    .getRemoteAddr());
             resp.sendError(HttpServletResponse.SC_NOT_FOUND,
-                "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.");
+                    "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.");
             return;
         }
         String feedid = null;
@@ -190,7 +191,7 @@ public class NodeServlet extends HttpServlet {
         String credentials = req.getHeader("Authorization");
         if (credentials == null) {
             logger.info("NODE0106 Rejecting unauthenticated PUT or DELETE of " + req.getPathInfo() + " from " + req
-                .getRemoteAddr());
+                    .getRemoteAddr());
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Authorization header required");
             return;
         }
@@ -205,9 +206,9 @@ public class NodeServlet extends HttpServlet {
             int i = fileid.indexOf('/');
             if (i == -1 || i == fileid.length() - 1) {
                 logger.info("NODE0105 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + " from " + req
-                    .getRemoteAddr());
+                        .getRemoteAddr());
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND,
-                    "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.  Possible missing fileid.");
+                        "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.  Possible missing fileid.");
                 return;
             }
             feedid = fileid.substring(0, i);
@@ -226,16 +227,16 @@ public class NodeServlet extends HttpServlet {
             targets = config.parseRouting(req.getHeader("X-ATT-DR-ROUTING"));
         } else {
             logger.info("NODE0105 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + " from " + req
-                .getRemoteAddr());
+                    .getRemoteAddr());
             resp.sendError(HttpServletResponse.SC_NOT_FOUND,
-                "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.");
+                    "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.");
             return;
         }
         if (fileid.indexOf('/') != -1) {
             logger.info("NODE0105 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + " from " + req
-                .getRemoteAddr());
+                    .getRemoteAddr());
             resp.sendError(HttpServletResponse.SC_NOT_FOUND,
-                "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.");
+                    "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.");
             return;
         }
         String qs = req.getQueryString();
@@ -253,8 +254,9 @@ public class NodeServlet extends HttpServlet {
             String reason = config.isPublishPermitted(feedid, credentials, ip);
             if (reason != null) {
                 logger.info(
-                    "NODE0111 Rejecting unauthorized publish attempt to feed " + feedid + " fileid " + fileid + " from "
-                        + ip + " reason " + reason);
+                        "NODE0111 Rejecting unauthorized publish attempt to feed " + feedid + " fileid " + fileid
+                                + " from "
+                                + ip + " reason " + reason);
                 resp.sendError(HttpServletResponse.SC_FORBIDDEN, reason);
                 return;
             }
@@ -268,8 +270,9 @@ public class NodeServlet extends HttpServlet {
                 }
                 String redirto = "https://" + newnode + port + "/publish/" + feedid + "/" + fileid;
                 logger.info(
-                    "NODE0108 Redirecting publish attempt for feed " + feedid + " user " + user + " ip " + ip + " to "
-                        + redirto);
+                        "NODE0108 Redirecting publish attempt for feed " + feedid + " user " + user + " ip " + ip
+                                + " to "
+                                + redirto);
                 resp.sendRedirect(redirto);
                 return;
             }
@@ -280,7 +283,7 @@ public class NodeServlet extends HttpServlet {
         File meta = new File(fbase + ".M");
         OutputStream dos = null;
         InputStream is = null;
-        try (Writer mw = new FileWriter(meta)){
+        try (Writer mw = new FileWriter(meta)) {
             StringBuffer mx = new StringBuffer();
             mx.append(req.getMethod()).append('\t').append(fileid).append('\n');
             Enumeration hnames = req.getHeaderNames();
@@ -289,12 +292,12 @@ public class NodeServlet extends HttpServlet {
                 String hn = (String) hnames.nextElement();
                 String hnlc = hn.toLowerCase();
                 if ((isput && ("content-type".equals(hnlc) ||
-                    "content-language".equals(hnlc) ||
-                    "content-md5".equals(hnlc) ||
-                    "content-range".equals(hnlc))) ||
-                    "x-att-dr-meta".equals(hnlc) ||
-                    (feedid == null && "x-att-dr-received".equals(hnlc)) ||
-                    (hnlc.startsWith("x-") && !hnlc.startsWith("x-att-dr-"))) {
+                        "content-language".equals(hnlc) ||
+                        "content-md5".equals(hnlc) ||
+                        "content-range".equals(hnlc))) ||
+                        "x-att-dr-meta".equals(hnlc) ||
+                        (feedid == null && "x-att-dr-received".equals(hnlc)) ||
+                        (hnlc.startsWith("x-") && !hnlc.startsWith("x-att-dr-"))) {
                     Enumeration hvals = req.getHeaders(hn);
                     while (hvals.hasMoreElements()) {
                         String hv = (String) hvals.nextElement();
@@ -304,15 +307,15 @@ public class NodeServlet extends HttpServlet {
                         if ("x-att-dr-meta".equals(hnlc)) {
                             if (hv.length() > 4096) {
                                 logger.info(
-                                    "NODE0109 Rejecting publish attempt with metadata too long for feed " + feedid
-                                        + " user " + user + " ip " + ip);
+                                        "NODE0109 Rejecting publish attempt with metadata too long for feed " + feedid
+                                                + " user " + user + " ip " + ip);
                                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Metadata too long");
                                 return;
                             }
                             if (!MetaDataPattern.matcher(hv.replaceAll("\\\\.", "X")).matches()) {
                                 logger.info(
-                                    "NODE0109 Rejecting publish attempt with malformed metadata for feed " + feedid
-                                        + " user " + user + " ip " + ip);
+                                        "NODE0109 Rejecting publish attempt with malformed metadata for feed " + feedid
+                                                + " user " + user + " ip " + ip);
                                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Malformed metadata");
                                 return;
                             }
@@ -342,7 +345,7 @@ public class NodeServlet extends HttpServlet {
                 } catch (Exception e) {
                 }
                 StatusLog.logPubFail(pubid, feedid, logurl, req.getMethod(), ctype, exlen, data.length(), ip, user,
-                    ioe.getMessage());
+                        ioe.getMessage());
                 throw ioe;
             }
             Path dpath = Paths.get(fbase);
@@ -363,11 +366,11 @@ public class NodeServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
             resp.getOutputStream().close();
             StatusLog.logPub(pubid, feedid, logurl, req.getMethod(), ctype, data.length(), ip, user,
-                HttpServletResponse.SC_NO_CONTENT);
+                    HttpServletResponse.SC_NO_CONTENT);
         } catch (IOException ioe) {
             logger.info(
-                "NODE0110 IO Exception receiving publish attempt for feed " + feedid + " user " + user + " ip " + ip
-                    + " " + ioe.toString(), ioe);
+                    "NODE0110 IO Exception receiving publish attempt for feed " + feedid + " user " + user + " ip " + ip
+                            + " " + ioe.toString(), ioe);
             throw ioe;
         } finally {
             if (is != null) {
