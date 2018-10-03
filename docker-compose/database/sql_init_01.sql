@@ -1,4 +1,4 @@
-use datarouter;
+use dmaap-dr;
 
 CREATE TABLE FEEDS (
     FEEDID         INT UNSIGNED NOT NULL PRIMARY KEY,
