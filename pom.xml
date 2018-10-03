@@ -3,6 +3,7 @@
   * org.onap.dmaap
   * ===========================================================================
   * Copyright © 2017 AT&T Intellectual Property. All rights reserved.
+  * Modifications Copyright (C) 2018 Nokia. All rights reserved.
   * ===========================================================================
   * Licensed under the Apache License, Version 2.0 (the "License");
   * you may not use this file except in compliance with the License.
@@ -58,8 +59,8 @@
         <stagingNexusPath>/content/repositories/staging/</stagingNexusPath>
         <sitePath>/content/sites/site/org/onap/dmaap/datarouter/${project.artifactId}/${project.version}</sitePath>
         <docker.maven.plugin.version>1.0.0</docker.maven.plugin.version>
-        <skip.docker.build>true</skip.docker.build>
-        <skip.docker.tag>true</skip.docker.tag>
+        <skip.docker.build>false</skip.docker.build>
+        <skip.docker.tag>false</skip.docker.tag>
         <skip.docker.push>true</skip.docker.push>
         <commons-codec.version>1.10</commons-codec.version>
     </properties>
@@ -75,7 +76,7 @@
                 <artifactId>docker-maven-plugin</artifactId>
                 <version>${docker.maven.plugin.version}</version>
                 <configuration>
-                    <skipDockerBuild>true</skipDockerBuild>
+                    <skipDockerBuild>false</skipDockerBuild>
                 </configuration>
             </plugin>
             <plugin>

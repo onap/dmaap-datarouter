@@ -124,10 +124,10 @@ CREATE TABLE GROUPS (
 );
 
 INSERT INTO PARAMETERS VALUES
-    ('ACTIVE_POD',  'dmaap-dr-prov'),
-    ('PROV_ACTIVE_NAME',  'dmaap-dr-prov'),
+    ('ACTIVE_POD',  'datarouter-prov'),
+    ('PROV_ACTIVE_NAME',  'datarouter-prov'),
     ('STANDBY_POD', ''),
-    ('PROV_NAME',   'dmaap-dr-prov'),
+    ('PROV_NAME',   'datarouter-prov'),
     ('NODES',       'dmaap-dr-node'),
     ('PROV_DOMAIN', ''),
     ('DELIVERY_INIT_RETRY_INTERVAL', '10'),
@@ -135,7 +135,7 @@ INSERT INTO PARAMETERS VALUES
     ('DELIVERY_MAX_RETRY_INTERVAL', '3600'),
     ('DELIVERY_RETRY_RATIO', '2'),
     ('LOGROLL_INTERVAL', '300'),
-    ('PROV_AUTH_ADDRESSES', 'dmaap-dr-prov|dmaap-dr-node'),
+    ('PROV_AUTH_ADDRESSES', 'datarouter-prov|dmaap-dr-node'),
     ('PROV_AUTH_SUBJECTS', ''),
     ('PROV_MAXFEED_COUNT',  '10000'),
     ('PROV_MAXSUB_COUNT',   '100000'),
