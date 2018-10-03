@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bada0100_0b204e48",
+        "filename": "docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 3541
+      },
+      "writtenOn": "2018-10-03T15:20:18Z",
+      "side": 1,
+      "message": "remove/uncomment",
+      "revId": "167ace7d2c0ff232457a87a5a06e46ec30ba4f92",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bada0100_cb19e623",
+        "filename": "docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 3541
+      },
+      "writtenOn": "2018-10-03T15:20:18Z",
+      "side": 1,
+      "message": "is this network needed?\nI see you need to contact between containers. If that\u0027s only case then they should be discoverable by container name.\nhttps://docs.docker.com/compose/networking/",
+      "revId": "167ace7d2c0ff232457a87a5a06e46ec30ba4f92",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
