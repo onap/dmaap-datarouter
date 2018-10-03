@@ -3,6 +3,7 @@
   * org.onap.dmaap
   * ===========================================================================
   * Copyright © 2017 AT&T Intellectual Property. All rights reserved.
+  * Modifications Copyright (C) 2018 Nokia. All rights reserved.
   * ===========================================================================
   * Licensed under the Apache License, Version 2.0 (the "License");
   * you may not use this file except in compliance with the License.
@@ -25,7 +26,7 @@
     <parent>
         <groupId>org.onap.dmaap.datarouter</groupId>
         <artifactId>parent</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>datarouter-node</artifactId>
@@ -234,10 +235,10 @@
                     <plugin>
                         <groupId>com.spotify</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
-                        <version>1.0.0</version>
+                        <version>${docker.maven.plugin.version}</version>
                         <configuration>
                             <imageName>${onap.nexus.dockerregistry.daily}/${datarouter.node.image.name}</imageName>
-                            <dockerDirectory>${docker.location}</dockerDirectory>
+                            <baseImage>java:8</baseImage>
                             <serverId>${onap.nexus.dockerregistry.daily}</serverId>
                             <skipDockerBuild>false</skipDockerBuild>
                             <imageTags>
@@ -245,22 +246,25 @@
                                 <imageTag>latest</imageTag>
                             </imageTags>
                             <forceTags>true</forceTags>
+                            <entryPoint>["/startup.sh", "start"]</entryPoint>
                             <resources>
                                 <resource>
-                                    <targetPath>/</targetPath>
-                                    <directory>${project.basedir}</directory>
-                                    <excludes>
-                                        <exclude>target/**/*</exclude>
-                                        <exclude>pom.xml</exclude>
-                                    </excludes>
+                                    <targetPath>/opt</targetPath>
+                                    <directory>${project.build.directory}/opt</directory>
                                 </resource>
-
                                 <resource>
                                     <targetPath>/</targetPath>
-                                    <directory>${project.build.directory}</directory>
-                                    <include>**/**</include>
+                                    <directory>${docker.location}</directory>
+                                    <include>startup.sh</include>
                                 </resource>
                             </resources>
+                            <runs>
+                                <run>chmod 0700 /startup.sh</run>
+                            </runs>
+                            <exposes>
+                                <expose>8080</expose>
+                                <expose>8443</expose>
+                            </exposes>
                         </configuration>
                     </plugin>
                 </plugins>
