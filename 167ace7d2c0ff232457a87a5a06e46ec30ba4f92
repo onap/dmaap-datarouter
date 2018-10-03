@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "bada0100_8bbafedf",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-10-03T15:32:25Z",
+      "side": 1,
+      "message": "Removal of the \"docker\" profile will require additional updates to the CSIT jenkins JJB templates to reflect the new maven goals.\nhttps://jenkins.onap.org/view/dmaap/job/dmaap-datarouter-master-docker-java-shell-daily/configure\n\n\nThis refactoring should be done in Dublin release at the earliest.",
+      "range": {
+        "startLine": 224,
+        "startChar": 4,
+        "endLine": 224,
+        "endChar": 19
+      },
+      "revId": "167ace7d2c0ff232457a87a5a06e46ec30ba4f92",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bada0100_d07d11b3",
+        "filename": "docker-compose/database/sql_init_01.sql",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-10-03T15:32:25Z",
+      "side": 1,
+      "message": "This naming convention has been defined for OOM deployment so should remain as \"dmaap-dr-___\"",
+      "range": {
+        "startLine": 127,
+        "startChar": 21,
+        "endLine": 127,
+        "endChar": 31
+      },
+      "revId": "167ace7d2c0ff232457a87a5a06e46ec30ba4f92",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bada0100_0b204e48",
         "filename": "docker-compose/docker-compose.yml",
         "patchSetId": 1
@@ -13,6 +59,29 @@
       "writtenOn": "2018-10-03T15:20:18Z",
       "side": 1,
       "message": "remove/uncomment",
+      "revId": "167ace7d2c0ff232457a87a5a06e46ec30ba4f92",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bada0100_0bce0e84",
+        "filename": "docker-compose/docker-compose.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-10-03T15:32:25Z",
+      "side": 1,
+      "message": "These are required for local testing framework.",
+      "range": {
+        "startLine": 100,
+        "startChar": 4,
+        "endLine": 102,
+        "endChar": 28
+      },
       "revId": "167ace7d2c0ff232457a87a5a06e46ec30ba4f92",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
