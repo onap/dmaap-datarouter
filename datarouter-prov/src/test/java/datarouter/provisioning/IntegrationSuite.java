@@ -45,6 +45,6 @@ import org.junit.runners.Suite.SuiteClasses;
     IntegrationTestRleBitSet.class
 })
 
-public class AllTests {
+public class IntegrationSuite {
 
 }
