@@ -282,8 +282,9 @@ public class NodeServlet extends HttpServlet {
         File data = new File(fbase);
         File meta = new File(fbase + ".M");
         OutputStream dos = null;
+        Writer mw = null;
         InputStream is = null;
-        try (Writer mw = new FileWriter(meta)) {
+        try {
             StringBuffer mx = new StringBuffer();
             mx.append(req.getMethod()).append('\t').append(fileid).append('\n');
             Enumeration hnames = req.getHeaderNames();
@@ -357,10 +358,12 @@ public class NodeServlet extends HttpServlet {
                 }
                 String dbase = di.getSpool() + "/" + pubid;
                 Files.createLink(Paths.get(dbase), dpath);
+                mw = new FileWriter(meta);
                 mw.write(metadata);
                 if (di.getSubId() == null) {
                     mw.write("X-ATT-DR-ROUTING\t" + t.getRouting() + "\n");
                 }
+                mw.close();
                 meta.renameTo(new File(dbase + ".M"));
             }
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -382,6 +385,12 @@ public class NodeServlet extends HttpServlet {
             if (dos != null) {
                 try {
                     dos.close();
+                } catch (Exception e) {
+                }
+            }
+            if (mw != null) {
+                try {
+                    mw.close();
                 } catch (Exception e) {
                 }
             }
