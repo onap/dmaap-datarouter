@@ -68,6 +68,7 @@
         <module>datarouter-prov</module>
         <module>datarouter-node</module>
         <module>datarouter-subscriber</module>
+        <module>datarouter-docker-compose</module>
     </modules>
     <build>
         <plugins>
