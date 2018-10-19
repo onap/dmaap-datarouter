@@ -1,0 +1,12 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Wojciech Sliwka <wojciech.sliwka@nokia.com>
+Code-Review+1: Piotr Krysiak <piotr.krysiak@nokia.com>
+Code-Review+1: Marcin Migdal <marcin.migdal@nokia.com>
+Code-Review+1: Conor Ward <conor.ward@ericsson.com>
+Code-Review+1: Dominic Lunanuova <dgl@research.att.com>
+Code-Review+2: varun gudisena <vg411h@att.com>
+Submitted-by: varun gudisena <vg411h@att.com>
+Submitted-at: Fri, 19 Oct 2018 10:48:16 +0000
+Reviewed-on: https://gerrit.onap.org/r/70239
+Project: dmaap/datarouter
+Branch: refs/heads/master
