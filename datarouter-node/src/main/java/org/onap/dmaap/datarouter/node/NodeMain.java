@@ -99,6 +99,7 @@ public class NodeMain {
         nodeMainLogger.info("NODE0002 I am " + nodeConfigManager.getMyName());
         (new WaitForConfig(nodeConfigManager)).waitForConfig();
         delivery = new Delivery(nodeConfigManager);
+        new LogManager(nodeConfigManager);
         Server server = new Server();
         // HTTP configuration
         HttpConfiguration httpConfiguration = new HttpConfiguration();
