@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_d1cbae70",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-11-15T13:29:19Z",
+      "side": 1,
+      "message": "as discussed, its weird but thats what they have it marked as in documentation. I\u0027ll look into it further.",
+      "parentUuid": "9adffdf1_915206dc",
+      "range": {
+        "startLine": 444,
+        "startChar": 97,
+        "endLine": 444,
+        "endChar": 98
+      },
+      "revId": "9552f747d659562871567743c5d71a77bdc16545",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_315f9ae7",
         "filename": "docs/data-router/data-router.rst",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2018-11-15T12:52:34Z",
       "side": 1,
       "message": "Is this neccesary on strings without the \"--\" entry?",
+      "range": {
+        "startLine": 1012,
+        "startChar": 0,
+        "endLine": 1012,
+        "endChar": 2
+      },
+      "revId": "9552f747d659562871567743c5d71a77bdc16545",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_11ba96de",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 1012,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-11-15T13:29:19Z",
+      "side": 1,
+      "message": "The `` formats the line into a code block  and parses it as written. If I leave it out here it\u0027ll break convention over the rest of the doc.",
+      "parentUuid": "9adffdf1_315f9ae7",
       "range": {
         "startLine": 1012,
         "startChar": 0,
