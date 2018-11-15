@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_915206dc",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-11-15T12:52:34Z",
+      "side": 1,
+      "message": "Is this accurate? Surely the userId can be more than 8 chars?",
+      "range": {
+        "startLine": 444,
+        "startChar": 97,
+        "endLine": 444,
+        "endChar": 98
+      },
+      "revId": "9552f747d659562871567743c5d71a77bdc16545",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_315f9ae7",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 1012,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-11-15T12:52:34Z",
+      "side": 1,
+      "message": "Is this neccesary on strings without the \"--\" entry?",
+      "range": {
+        "startLine": 1012,
+        "startChar": 0,
+        "endLine": 1012,
+        "endChar": 2
+      },
+      "revId": "9552f747d659562871567743c5d71a77bdc16545",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
