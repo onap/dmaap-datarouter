@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_10bda768",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 782,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-11-19T13:39:24Z",
+      "side": 1,
+      "message": "Accepts only non nested json objects of the following type:\n-Numbers\n-Strings\n-Lowercase boolean\n-null",
+      "range": {
+        "startLine": 782,
+        "startChar": 50,
+        "endLine": 782,
+        "endChar": 57
+      },
+      "revId": "fb6fc403d6491449e02510b85ec54712c490152a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_908997cc",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 782,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-11-19T13:39:24Z",
+      "side": 1,
+      "message": "Format column isn\u0027t used anywhere.\nIs it necessary?\nCan we dictate a specific json format here?",
+      "range": {
+        "startLine": 782,
+        "startChar": 124,
+        "endLine": 782,
+        "endChar": 133
+      },
+      "revId": "fb6fc403d6491449e02510b85ec54712c490152a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_f0a4a358",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 783,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-11-19T13:39:24Z",
+      "side": 1,
+      "message": "4096",
+      "range": {
+        "startLine": 783,
+        "startChar": 96,
+        "endLine": 783,
+        "endChar": 100
+      },
+      "revId": "fb6fc403d6491449e02510b85ec54712c490152a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
