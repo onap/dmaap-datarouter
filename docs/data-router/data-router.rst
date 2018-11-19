@@ -54,7 +54,7 @@ Create a Feed
 Sample Request
 ==============
 
-curl -v -X POST -H "Content-Type: application/vnd.att-dr.feed" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @/opt/app/datartr/addFeed3.txt --post301 --location-trusted -k https:/{host}:{port}
+``curl -v -X POST -H "Content-Type: application/vnd.att-dr.feed" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @/opt/app/datartr/addFeed3.txt --post301 --location-trusted -k https:/{host}:{port}``
 
 Request Parameters:
 ===================
@@ -79,10 +79,10 @@ Request Parameters:
 | group-id               |                                 |     Body         |   Integer  |              |     Y       |                     |                                      |
 |                        |                                 |                  |            |              |             |                     |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
-| content-type           | To specify type of message      |     Header       |   String   |     20       |     N       |                     | application/vnd.att-dr.feed          |
+| content-type           | To specify type of message      |     Header       |   String   |              |     Y       |                     | application/vnd.att-dr.feed          |
 |                        | (feed,subscriber,publisher)     |                  |            |              |             |                     |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
-| X-ATT-DR-ON-BEHALF-OF  | User id of owner of feed        |     Header       |   String   |     1        |     N       |                     |  username                            |
+| X-ATT-DR-ON-BEHALF-OF  | User id of owner of feed        |     Header       |   String   |     8        |     Y       |                     |  username                            |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
 
 Response/Error Codes
@@ -161,7 +161,7 @@ Sample Body
           ]
      },
 
-}
+ }
 
 Updating a Feed
 ---------------
@@ -171,7 +171,7 @@ Updating a Feed
 Sample Request
 ==============
 
-curl -v -X PUT -H "Content-Type: application/vnd.att-dr.feed" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @/opt/app/datartr/addFeed3.txt --location-trusted -k https:/{host}:{port}
+``curl -v -X PUT -H "Content-Type: application/vnd.att-dr.feed" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @/opt/app/datartr/addFeed3.txt --location-trusted -k https:/{host}:{port}``
 
 Request Parameters:
 ===================
@@ -192,10 +192,10 @@ Request Parameters:
 | group-id               |                                 |     Body         |   Integer  |              |     Y       |                     |                                      |
 |                        |                                 |                  |            |              |             |                     |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
-| content-type           | To specify type of message      |     Header       |   String   |     20       |     N       |                     | application/vnd.att-dr.feed          |
+| content-type           | To specify type of message      |     Header       |   String   |              |     Y       |                     | application/vnd.att-dr.feed          |
 |                        | (feed,subscriber,publisher)     |                  |            |              |             |                     |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
-| X-ATT-DR-ON-BEHALF-OF  | User id of owner of feed        |     Header       |   String   |     1        |     N       |                     |  username                            |
+| X-ATT-DR-ON-BEHALF-OF  | User id of owner of feed        |     Header       |   String   |     8        |     Y       |                     |  username                            |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
 
 Response/Error Codes
@@ -274,7 +274,7 @@ Sample Body
           ]
      },
 
-}
+ }
 
 Get a Feed
 ----------
@@ -291,7 +291,7 @@ http[s]://{host}:{port}/feed/{feedId}
 Sample Request
 ==============
 
-curl -v -X GET -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/feed/{feedId}
+``curl -v -X GET -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/feed/{feedId}``
 
 Response/Error Codes
 ====================
@@ -352,7 +352,7 @@ http[s]://{host}:{port}/feed/{feedId}
 Sample Request
 ==============
 
-curl -v -X DELETE -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/feed/{feedId}
+``curl -v -X DELETE -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/feed/{feedId}``
 
 Response/Error Codes
 ====================
@@ -412,7 +412,7 @@ http[s]://{host}:{port}/subscribe/{feedId}
 Sample Request
 ==============
 
-curl -v -X POST -H "Content-Type: application/vnd.att-dr.subscription" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @/opt/app/datartr/addSubscriber.txt --post301 --location-trusted -k https://{host}:{port}/subscribe/{feedId}
+``curl -v -X POST -H "Content-Type: application/vnd.att-dr.subscription" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @/opt/app/datartr/addSubscriber.txt --post301 --location-trusted -k https://{host}:{port}/subscribe/{feedId}``
 
 Request Parameters:
 ===================
@@ -438,10 +438,10 @@ Request Parameters:
 | group-id               |                                 |     Body         |   Integer  |              |     Y       |                     |                                      |
 |                        |                                 |                  |            |              |             |                     |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
-| content-type           | To specify type of message      |     Header       |   String   |     20       |     N       |                     | application/vnd.att-dr.subscription  |
+| content-type           | To specify type of message      |     Header       |   String   |              |     Y       |                     | application/vnd.att-dr.subscription  |
 |                        | (feed,subscriber,publisher)     |                  |            |              |             |                     |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
-| X-ATT-DR-ON-BEHALF-OF  | User id of subscriber           |     Header       |   String   |     1        |     N       |                     |  username                            |
+| X-ATT-DR-ON-BEHALF-OF  | User id of subscriber           |     Header       |   String   |     8        |     Y       |                     |  username                            |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
 
 Response/Error Codes
@@ -511,7 +511,7 @@ Sample Body
     "groupid" : 29,
     "subscriber" : "subscriber123"
 
-}
+ }
 
 Update subscription
 -------------------
@@ -526,7 +526,7 @@ http[s]://{host}:{port}/subscribe/{feedId}
 Sample Request
 ==============
 
-curl -v -X PUT -H "Content-Type: application/vnd.att-dr.subscription" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @/opt/app/datartr/addSubscriber.txt --location-trusted -k https://{host}:{port}/subscribe/{feedId}
+``curl -v -X PUT -H "Content-Type: application/vnd.att-dr.subscription" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @/opt/app/datartr/addSubscriber.txt --location-trusted -k https://{host}:{port}/subscribe/{feedId}``
 
 Request Parameters:
 ===================
@@ -552,10 +552,10 @@ Request Parameters:
 | group-id               |                                 |     Body         |   Integer  |              |     Y       |                     |                                      |
 |                        |                                 |                  |            |              |             |                     |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
-| content-type           | To specify type of message      |     Header       |   String   |     20       |     N       |                     | application/vnd.att-dr.subscription  |
+| content-type           | To specify type of message      |     Header       |   String   |              |     Y       |                     | application/vnd.att-dr.subscription  |
 |                        | (feed,subscriber,publisher)     |                  |            |              |             |                     |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
-| X-ATT-DR-ON-BEHALF-OF  | User id of subscriber           |     Header       |   String   |     1        |     N       |                     |  username                            |
+| X-ATT-DR-ON-BEHALF-OF  | User id of subscriber           |     Header       |   String   |     8        |     Y       |                     |  username                            |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
 
 Response/Error Codes
@@ -625,7 +625,7 @@ Sample Body
     "groupid" : 29,
     "subscriber" : "subscriber123"
 
-}
+ }
 
 
 Get a Subscription
@@ -643,7 +643,7 @@ http[s]://{host}:{port}/subscribe/{subId}
 Sample Request
 ==============
 
-curl -v -X GET -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/subscribe/{subId}
+``curl -v -X GET -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/subscribe/{subId}``
 
 Response/Error Codes
 ====================
@@ -704,7 +704,7 @@ http[s]://{host}:{port}/feed/{feedId}
 Sample Request
 ==============
 
-curl -v -X DELETE -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/subscribe/{feedId}
+``curl -v -X DELETE -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/subscribe/{feedId}``
 
 Response/Error Codes
 ====================
@@ -776,8 +776,15 @@ Request parameters
 | fileId                 | Name of the file when it  is    |     Path         |   String   |              |     Y       |                     |                                      |
 |                        | published to subscribers        |                  |            |              |             |                     |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
-| content-type           | To specify type of message      |     Header       |   String   |     20       |     N       |                     | application/octet-stream             |
+| content-type           | To specify type of message      |     Header       |   String   |              |     Y       |                     | application/octet-stream             |
 |                        | format                          |                  |            |              |             |                     |                                      |
++------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
+| X-ATT-DR-META          | Metadata for the file. Accepts  |     Header       |   String   |              |     N       |                     | '{"filetype":"zip"}'                 |
+|                        | only JSON objects, not arrays.  |                  |            |              |             |                     |                                      |
+|                        | Does not accept nested objects  |                  |            |              |             |                     |                                      |
+|                        | or nested arrays. Will accept   |                  |            |              |             |                     |                                      |
+|                        | Numbers, Strings, true/false    |                  |            |              |             |                     |                                      |
+|                        | or null values.                 |                  |            |              |             |                     |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+---------------------+--------------------------------------+
 
 Response/Error Codes
@@ -812,7 +819,7 @@ Response/Error Codes
 Sample Request
 ==============
 
-curl -v -X PUT --user {user}:{password} -H "Content-Type: application/octet-stream" --data-binary @/opt/app/datartr/sampleFile.txt --post301 --location-trusted -k https://{host}:{port}/publish/{feedId}/sampleFile.txt
+``curl -v -X PUT --user {user}:{password} -H "Content-Type: application/octet-stream"  -H X-ATT-DR-META:'{"filetype":"zip"}' --data-binary @/opt/app/datartr/sampleFile.txt --post301 --location-trusted -k https://{host}:{port}/publish/{feedId}/sampleFile.txt``
 
 Delete a Published file
 -----------------------
@@ -830,7 +837,7 @@ http[s]://{host}:{port}/publish/{feedId}/{fileId}
 Sample Request
 ==============
 
-curl -v -X DELETE -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/publish/{feedId}/{fileId}
+``curl -v -X DELETE -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/publish/{feedId}/{fileId}``
 
 Response/Error Codes
 ====================
@@ -1009,7 +1016,7 @@ Response/Error Codes
 Sample Request
 ==============
 
-curl -v -k https://{host}:{port}/feedlog/{feedId}?statusCode=204
+``curl -v -k https://{host}:{port}/feedlog/{feedId}?statusCode=204``
 
 Subscriber logging
 ------------------
@@ -1161,4 +1168,4 @@ Response/Error Codes
 Sample Request
 ==============
 
-curl -v -k https://{host}:{port}/sublog/{subscriberId}?statusCode=204
+``curl -v -k https://{host}:{port}/sublog/{subscriberId}?statusCode=204``
