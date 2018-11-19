@@ -96,6 +96,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_87139eb7",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 782,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-11-19T18:02:15Z",
+      "side": 1,
+      "message": "Something like this would prob suffice:\n\n{\"compressionType\":\"gzip\",\"id\":123456,\"transferred\":true,\"size\":null}\n\nJust so it covers the 4 types.",
+      "parentUuid": "9adffdf1_879cfec1",
+      "range": {
+        "startLine": 782,
+        "startChar": 124,
+        "endLine": 782,
+        "endChar": 133
+      },
+      "revId": "fb6fc403d6491449e02510b85ec54712c490152a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_f0a4a358",
         "filename": "docs/data-router/data-router.rst",
         "patchSetId": 1
