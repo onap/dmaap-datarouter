@@ -22,6 +22,30 @@
       "revId": "08d5698e0c16c31072f90f7286184ba2a9ce7a00",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_d0671524",
+        "filename": "version.properties",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2018-11-21T11:50:12Z",
+      "side": 1,
+      "message": "we\u0027re going to update the pom again after this gets merged and released and then we\u0027ll change it to 1.1.0, and casablanca branch to 1.0.7",
+      "parentUuid": "9adffdf1_d0cb951c",
+      "range": {
+        "startLine": 28,
+        "startChar": 3,
+        "endLine": 30,
+        "endChar": 7
+      },
+      "revId": "08d5698e0c16c31072f90f7286184ba2a9ce7a00",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
