@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_d0cb951c",
+        "filename": "version.properties",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-11-21T11:17:44Z",
+      "side": 1,
+      "message": "Was there not talk of doing a \"minor\" release update to 1.1.0",
+      "range": {
+        "startLine": 28,
+        "startChar": 3,
+        "endLine": 30,
+        "endChar": 7
+      },
+      "revId": "08d5698e0c16c31072f90f7286184ba2a9ce7a00",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
