@@ -25,8 +25,8 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.onap.dmaap.datarouter</groupId>
-        <artifactId>parent</artifactId>
-        <version>1.0.6-SNAPSHOT</version>
+        <artifactId>parent</artifactId
+        <version>1.0.7-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>datarouter-prov</artifactId>
