@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_680e473d",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-12-11T21:06:16Z",
+      "side": 1,
+      "message": "Could reduce it a bit:\n\nString provData \u003d Poker.getPoker().getProvisioningString();\nJSONArray feeds \u003d new JSONObject(provData).getJSONArray(\"feeds\");\nfor (int n \u003d 0; n \u003c feeds.length(); ++n) {\n    if (feeds.getJSONObject(n).getInt(\"feedid\") \u003d\u003d feedid) {\n          return feedid;\n     }\n}",
+      "range": {
+        "startLine": 200,
+        "startChar": 12,
+        "endLine": 200,
+        "endChar": 15
+      },
+      "revId": "445aab7cc368e3217a5fdb17cf9653d04a49db9f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_93671ce9",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-12-11T21:06:16Z",
+      "side": 1,
+      "message": "Is there risk here that this is only useful for existing active feeds?\nIf any create or updates happen they still fail no?",
+      "range": {
+        "startLine": 202,
+        "startChar": 12,
+        "endLine": 202,
+        "endChar": 17
+      },
+      "revId": "445aab7cc368e3217a5fdb17cf9653d04a49db9f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_9312bc55",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-12-11T21:06:16Z",
+      "side": 1,
+      "message": "Is it too much to add a unit test for this?",
+      "range": {
+        "startLine": 206,
+        "startChar": 16,
+        "endLine": 206,
+        "endChar": 25
+      },
+      "revId": "445aab7cc368e3217a5fdb17cf9653d04a49db9f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_b307c017",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2018-12-11T21:06:16Z",
+      "side": 1,
+      "message": "May need to catch JSONException also",
+      "range": {
+        "startLine": 211,
+        "startChar": 18,
+        "endLine": 211,
+        "endChar": 26
+      },
+      "revId": "445aab7cc368e3217a5fdb17cf9653d04a49db9f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
