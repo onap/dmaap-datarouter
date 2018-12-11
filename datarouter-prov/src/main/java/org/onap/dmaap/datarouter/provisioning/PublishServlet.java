@@ -35,10 +35,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;
-import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.beans.IngressRoute;
 import org.onap.dmaap.datarouter.provisioning.eelf.EelfMsgs;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
@@ -54,7 +54,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
 @SuppressWarnings("serial")
 public class PublishServlet extends BaseServlet {
 
-    private int next_node;
+    private int nextNode;
     private String provstring;
     private List<IngressRoute> irt;
     //Adding EELF Logger Rally:US664892
@@ -66,35 +66,35 @@ public class PublishServlet extends BaseServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        next_node = 0;
+        nextNode = 0;
         provstring = "";
-        irt = new ArrayList<IngressRoute>();
+        irt = new ArrayList<>();
 
     }
 
     @Override
-    public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         setIpAndFqdnForEelf("doDelete");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         redirect(req, resp);
     }
 
     @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         setIpAndFqdnForEelf("doGet");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         redirect(req, resp);
     }
 
     @Override
-    public void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPut(HttpServletRequest req, HttpServletResponse resp) {
         setIpAndFqdnForEelf("doPut");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         redirect(req, resp);
     }
 
     @Override
-    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) {
         setIpAndFqdnForEelf("doPost");
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
         redirect(req, resp);
@@ -155,7 +155,7 @@ public class PublishServlet extends BaseServlet {
                 provstring = s;
                 JSONObject jo = new JSONObject(new JSONTokener(provstring));
                 JSONArray ja = jo.getJSONArray("ingress");
-                List<IngressRoute> newlist = new ArrayList<IngressRoute>();
+                List<IngressRoute> newlist = new ArrayList<>();
                 for (int i = 0; i < ja.length(); i++) {
                     IngressRoute iroute = new IngressRoute(ja.getJSONObject(i));
                     newlist.add(iroute);
@@ -179,11 +179,11 @@ public class PublishServlet extends BaseServlet {
 
         // No IRT rule matches, do round robin of all active nodes
         String[] nodes = getNodes();
-        if (next_node >= nodes.length)    // The list of nodes may have grown/shrunk
+        if (nextNode >= nodes.length)    // The list of nodes may have grown/shrunk
         {
-            next_node = 0;
+            nextNode = 0;
         }
-        return nodes[next_node++];
+        return nodes[nextNode++];
     }
 
     private int checkPath(HttpServletRequest req) {
@@ -198,11 +198,15 @@ public class PublishServlet extends BaseServlet {
         }
         try {
             int feedid = Integer.parseInt(path.substring(0, ix));
-            if (!Feed.isFeedValid(feedid)) {
-                return -1;
+            String provData = Poker.getPoker().getProvisioningString();
+            JSONArray feeds = new JSONObject(provData).getJSONArray("feeds");
+            for (int n = 0; n < feeds.length(); ++n) {
+                if (feeds.getJSONObject(n).getInt("feedid") == feedid) {
+                    return feedid;
+                }
             }
-            return feedid;
-        } catch (NumberFormatException e) {
+            return -1;
+        } catch (NumberFormatException | JSONException e) {
             return -1;
         }
     }
