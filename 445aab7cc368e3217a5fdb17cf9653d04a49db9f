@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_4e2fcb88",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-12-12T09:41:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_680e473d",
+      "range": {
+        "startLine": 200,
+        "startChar": 12,
+        "endLine": 200,
+        "endChar": 15
+      },
+      "revId": "445aab7cc368e3217a5fdb17cf9653d04a49db9f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_93671ce9",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2018-12-11T21:06:16Z",
       "side": 1,
       "message": "Is there risk here that this is only useful for existing active feeds?\nIf any create or updates happen they still fail no?",
+      "range": {
+        "startLine": 202,
+        "startChar": 12,
+        "endLine": 202,
+        "endChar": 17
+      },
+      "revId": "445aab7cc368e3217a5fdb17cf9653d04a49db9f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_2e3287f2",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-12-12T09:41:34Z",
+      "side": 1,
+      "message": "The provstring is updated after every provisioning change by calling provisioningDataChanged so this shouldn\u0027t be an issue.",
+      "parentUuid": "9adffdf1_93671ce9",
       "range": {
         "startLine": 202,
         "startChar": 12,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_6e3c0fc9",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-12-12T09:41:34Z",
+      "side": 1,
+      "message": "Tested in existing tests as functionality didn\u0027t change",
+      "parentUuid": "9adffdf1_9312bc55",
+      "range": {
+        "startLine": 206,
+        "startChar": 16,
+        "endLine": 206,
+        "endChar": 25
+      },
+      "revId": "445aab7cc368e3217a5fdb17cf9653d04a49db9f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_b307c017",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
         "patchSetId": 1
@@ -82,6 +154,30 @@
       "writtenOn": "2018-12-11T21:06:16Z",
       "side": 1,
       "message": "May need to catch JSONException also",
+      "range": {
+        "startLine": 211,
+        "startChar": 18,
+        "endLine": 211,
+        "endChar": 26
+      },
+      "revId": "445aab7cc368e3217a5fdb17cf9653d04a49db9f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_ae6c37d1",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2018-12-12T09:41:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_b307c017",
       "range": {
         "startLine": 211,
         "startChar": 18,
