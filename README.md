@@ -75,24 +75,14 @@ What the Data Router is NOT:
     Per-file metadata can be used for ordering
 
 
-
-
 ## BUILD
 
-Datarouter can be cloned and repository and builb using Maven
-In the repository
+Datarouter can be cloned and images can be built using Maven
+In the repository run
 
-Go to datarouter-prov in the root
-
-	mvn clean install
-
-Go to datarouter-node in the root
-
-	mvn clean install
+    mvn clean install -P docker docker:build
 
 Project Build will be Successful
-
-
 
 
 ## RUN
