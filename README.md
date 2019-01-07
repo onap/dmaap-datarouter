@@ -45,9 +45,6 @@ Data Router and Sensitive Data Handling
     It is the responsibility of the subscribers to work with the publisher to determine how to decrypt that data
 
 
-
-
-
 What the Data Router is NOT:
 
     Does not support streaming data
@@ -75,11 +72,9 @@ What the Data Router is NOT:
     Per-file metadata can be used for ordering
 
 
-
-
 ## BUILD
 
-Datarouter can be cloned and repository and builb using Maven
+Datarouter can be cloned and repository built using Maven
 In the repository
 
 Go to datarouter-prov in the root
