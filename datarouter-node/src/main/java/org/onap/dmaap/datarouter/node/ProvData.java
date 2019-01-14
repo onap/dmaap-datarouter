@@ -41,7 +41,7 @@ import com.att.eelf.configuration.EELFManager;
  * provisioning server to construct arrays of raw configuration entries.
  */
 public class ProvData {
-    private static EELFLogger eelflogger = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.node.ProvData");
+    private static EELFLogger eelflogger = EELFManager.getInstance().getLogger(ProvData.class);
     private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.ProvData");
     private NodeConfig.ProvNode[] pn;
     private NodeConfig.ProvParam[] pp;

@@ -50,7 +50,7 @@ import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 public class NodeConfigManager implements DeliveryQueueHelper {
 
     private static EELFLogger eelflogger = EELFManager.getInstance()
-            .getLogger("org.onap.dmaap.datarouter.node.NodeConfigManager");
+            .getLogger(NodeConfigManager.class);
     private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeConfigManager");
     private static NodeConfigManager base = new NodeConfigManager();
 

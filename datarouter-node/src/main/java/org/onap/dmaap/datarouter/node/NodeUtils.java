@@ -24,10 +24,6 @@
 
 package org.onap.dmaap.datarouter.node;
 
-import static com.att.eelf.configuration.Configuration.MDC_SERVER_FQDN;
-import static com.att.eelf.configuration.Configuration.MDC_SERVER_IP_ADDRESS;
-import static com.att.eelf.configuration.Configuration.MDC_SERVICE_NAME;
-
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.io.FileInputStream;
@@ -40,11 +36,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.TimeZone;
+import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 import org.slf4j.MDC;
+
+import static com.att.eelf.configuration.Configuration.*;
 
 /**
  * Utility functions for the data router node
@@ -52,7 +53,7 @@ import org.slf4j.MDC;
 public class NodeUtils {
 
     private static EELFLogger eelfLogger = EELFManager.getInstance()
-            .getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
+            .getLogger(NodeUtils.class);
     private static Logger nodeUtilsLogger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
 
     private NodeUtils() {
@@ -259,6 +260,23 @@ public class NodeUtils {
                             exception);
         }
 
+    }
+
+    /* Method sets RequestIs and InvocationId for se in EELF logs
+     * @Method - setIpAndFqdnForEelf
+     * @Params - Req, Request used to get RequestId and InvocationId
+     */
+    public static void setRequestIdAndInvocationId(HttpServletRequest req) {
+        String reqId = req.getHeader("X-ONAP-RequestID");
+        if (StringUtils.isBlank(reqId)) {
+            reqId = UUID.randomUUID().toString();
+        }
+        MDC.put(MDC_KEY_REQUEST_ID, reqId);
+        String invId = req.getHeader("X-InvocationID");
+        if (StringUtils.isBlank(invId)) {
+            invId = UUID.randomUUID().toString();
+        }
+        MDC.put("InvocationId", invId);
     }
 
     public static void sendResponseError(HttpServletResponse response, int errorCode, Logger intlogger) {

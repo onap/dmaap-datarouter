@@ -22,13 +22,13 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
@@ -39,6 +39,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -47,17 +48,21 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 
 @RunWith(PowerMockRunner.class)
-public class SubscriptionServletTest {
+public class SubscriptionServletTest extends DrServletTestBase {
     private static EntityManagerFactory emf;
     private static EntityManager em;
     private SubscriptionServlet subscriptionServlet;
@@ -66,10 +71,13 @@ public class SubscriptionServletTest {
     private final String USER = "user1";
     private final String PASSWORD="password1";
 
+
     @Mock
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
+
+    ListAppender<ILoggingEvent> listAppender;
 
     @BeforeClass
     public static void init() {
@@ -81,7 +89,7 @@ public class SubscriptionServletTest {
     }
 
     @AfterClass
-    public static void tearDownClass() {
+    public static void tearDownClass() throws FileNotFoundException {
         em.clear();
         em.close();
         emf.close();
@@ -89,6 +97,7 @@ public class SubscriptionServletTest {
 
     @Before
     public void setUp() throws Exception {
+        listAppender = setTestLogger(SubscriptionServlet.class);
         subscriptionServlet = new SubscriptionServlet();
         db = new DB();
         setAuthoriserToReturnRequestIsAuthorized();
@@ -102,6 +111,7 @@ public class SubscriptionServletTest {
         when(request.isSecure()).thenReturn(false);
         subscriptionServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -147,6 +157,7 @@ public class SubscriptionServletTest {
     public void Given_Request_Is_HTTP_DELETE_And_Delete_On_Database_Succeeds_A_NO_CONTENT_Response_Is_Generated() throws Exception {
         subscriptionServlet.doDelete(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_NO_CONTENT));
+        verifyEnteringExitCalled(listAppender);
         insertSubscriptionIntoDb();
     }
 
@@ -155,6 +166,7 @@ public class SubscriptionServletTest {
         when(request.isSecure()).thenReturn(false);
         subscriptionServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -191,6 +203,7 @@ public class SubscriptionServletTest {
         when(response.getOutputStream()).thenReturn(outStream);
         subscriptionServlet.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -198,6 +211,7 @@ public class SubscriptionServletTest {
         when(request.isSecure()).thenReturn(false);
         subscriptionServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -328,6 +342,7 @@ public class SubscriptionServletTest {
         subscriptionServlet.doPut(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
         changeSubscriptionBackToNormal();
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -335,6 +350,7 @@ public class SubscriptionServletTest {
         when(request.isSecure()).thenReturn(false);
         subscriptionServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -423,6 +439,7 @@ public class SubscriptionServletTest {
         };
         subscriptionServlet.doPost(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_ACCEPTED));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @NotNull

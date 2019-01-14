@@ -41,6 +41,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,6 +72,8 @@ public class InternalServletTest extends DrServletTestBase {
   @Mock
   private HttpServletResponse response;
 
+  ListAppender<ILoggingEvent> listAppender;
+
   @BeforeClass
   public static void init() {
     emf = Persistence.createEntityManagerFactory("dr-unit-tests");
@@ -88,8 +92,9 @@ public class InternalServletTest extends DrServletTestBase {
 
   @Before
   public void setUp() throws Exception {
-    internalServlet = new InternalServlet();
-    setUpValidAuthorisedRequest();
+      listAppender = setTestLogger(InternalServlet.class);
+      internalServlet = new InternalServlet();
+      setUpValidAuthorisedRequest();
   }
 
   @Test
@@ -99,6 +104,7 @@ public class InternalServletTest extends DrServletTestBase {
     internalServlet.doGet(request, response);
     verify(response)
         .sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+    verifyEnteringExitCalled(listAppender);
   }
 
   @Test
@@ -127,6 +133,7 @@ public class InternalServletTest extends DrServletTestBase {
     when(request.isSecure()).thenReturn(false);
     internalServlet.doGet(request, response);
     verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+      verifyEnteringExitCalled(listAppender);
   }
 
   @Test
@@ -207,6 +214,7 @@ public class InternalServletTest extends DrServletTestBase {
     internalServlet.doPut(request, response);
     verify(response)
         .sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+    verifyEnteringExitCalled(listAppender);
   }
 
   @Test
@@ -218,6 +226,7 @@ public class InternalServletTest extends DrServletTestBase {
     setPokerToNotCreateTimers();
     internalServlet.doPut(request, response);
     verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+    verifyEnteringExitCalled(listAppender);
   }
 
   @Test
@@ -249,6 +258,7 @@ public class InternalServletTest extends DrServletTestBase {
     internalServlet.doDelete(request, response);
     verify(response)
         .sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+    verifyEnteringExitCalled(listAppender);
   }
 
   @Test
@@ -261,6 +271,7 @@ public class InternalServletTest extends DrServletTestBase {
     setPokerToNotCreateTimers();
     internalServlet.doDelete(request, response);
     verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+    verifyEnteringExitCalled(listAppender);
   }
 
   @Test
@@ -291,6 +302,7 @@ public class InternalServletTest extends DrServletTestBase {
     internalServlet.doPost(request, response);
     verify(response)
         .sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+    verifyEnteringExitCalled(listAppender);
   }
 
   @Test
@@ -302,6 +314,7 @@ public class InternalServletTest extends DrServletTestBase {
     setPokerToNotCreateTimers();
     internalServlet.doPost(request, response);
     verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+    verifyEnteringExitCalled(listAppender);
   }
 
   @Test
