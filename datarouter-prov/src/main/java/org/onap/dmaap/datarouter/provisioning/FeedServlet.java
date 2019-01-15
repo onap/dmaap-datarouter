@@ -63,73 +63,78 @@ public class FeedServlet extends ProxyServlet {
      */
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) {
-        setIpAndFqdnForEelf("doDelete");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
-        EventLogRecord elr = new EventLogRecord(req);
-        String message = isAuthorizedForProvisioning(req);
-        if (message != null) {
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-            return;
-        }
-        if (isProxyServer()) {
-            super.doDelete(req, resp);
-            return;
-        }
-        String bhdr = req.getHeader(BEHALF_HEADER);
-        if (bhdr == null) {
-            message = "Missing "+BEHALF_HEADER+" header.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        int feedid = getIdFromPath(req);
-        if (feedid < 0) {
-            message = "Missing or bad feed number.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        Feed feed = Feed.getFeedById(feedid);
-        if (feed == null || feed.isDeleted()) {
-            message = "Missing or bad feed number.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
-            return;
-        }
-        // Check with the Authorizer
-        AuthorizationResponse aresp = authz.decide(req);
-        if (! aresp.isAuthorized()) {
-            message = "Policy Engine disallows access.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-            return;
-        }
+        setIpFqdnRequestIDandInvocationIDForEelf("doDelete", req);
+        eelflogger.info(EelfMsgs.ENTRY);
+        try {
+            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
+            EventLogRecord elr = new EventLogRecord(req);
+            String message = isAuthorizedForProvisioning(req);
+            if (message != null) {
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                return;
+            }
+            if (isProxyServer()) {
+                super.doDelete(req, resp);
+                return;
+            }
+            String bhdr = req.getHeader(BEHALF_HEADER);
+            if (bhdr == null) {
+                message = "Missing "+BEHALF_HEADER+" header.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            int feedid = getIdFromPath(req);
+            if (feedid < 0) {
+                message = "Missing or bad feed number.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            Feed feed = Feed.getFeedById(feedid);
+            if (feed == null || feed.isDeleted()) {
+                message = "Missing or bad feed number.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_NOT_FOUND);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
+                return;
+            }
+            // Check with the Authorizer
+            AuthorizationResponse aresp = authz.decide(req);
+            if (! aresp.isAuthorized()) {
+                message = "Policy Engine disallows access.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                return;
+            }
 
-        // Delete FEED table entry (set DELETED flag)
-        feed.setDeleted(true);
-        if (doUpdate(feed)) {
-            activeFeeds--;
-            // send response
-            elr.setResult(HttpServletResponse.SC_NO_CONTENT);
-            eventlogger.info(elr);
-            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            provisioningDataChanged();
-        } else {
-            // Something went wrong with the UPDATE
-            elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
+            // Delete FEED table entry (set DELETED flag)
+            feed.setDeleted(true);
+            if (doUpdate(feed)) {
+                activeFeeds--;
+                // send response
+                elr.setResult(HttpServletResponse.SC_NO_CONTENT);
+                eventlogger.info(elr);
+                resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                provisioningDataChanged();
+            } else {
+                // Something went wrong with the UPDATE
+                elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
+            }
+        }finally{
+            eelflogger.info(EelfMsgs.EXIT);
         }
     }
     /**
@@ -139,68 +144,73 @@ public class FeedServlet extends ProxyServlet {
      */
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        setIpAndFqdnForEelf("doGet");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
-        EventLogRecord elr = new EventLogRecord(req);
-        String message = isAuthorizedForProvisioning(req);
-        if (message != null) {
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-            return;
-        }
-        if (isProxyServer()) {
-            super.doGet(req, resp);
-            return;
-        }
-        String bhdr = req.getHeader(BEHALF_HEADER);
-        if (bhdr == null) {
-            message = "Missing "+BEHALF_HEADER+" header.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        int feedid = getIdFromPath(req);
-        if (feedid < 0) {
-            message = "Missing or bad feed number.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        Feed feed = Feed.getFeedById(feedid);
-        if (feed == null || feed.isDeleted()) {
-            message = "Missing or bad feed number.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
-            return;
-        }
-        // Check with the Authorizer
-        AuthorizationResponse aresp = authz.decide(req);
-        if (! aresp.isAuthorized()) {
-            message = "Policy Engine disallows access.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-            return;
-        }
-
-        // send response
-        elr.setResult(HttpServletResponse.SC_OK);
-        eventlogger.info(elr);
-        resp.setStatus(HttpServletResponse.SC_OK);
-        resp.setContentType(FEEDFULL_CONTENT_TYPE);
+        setIpFqdnRequestIDandInvocationIDForEelf("doGet", req);
+        eelflogger.info(EelfMsgs.ENTRY);
         try {
-            resp.getOutputStream().print(feed.asJSONObject(true).toString());
-        } catch (IOException ioe) {
-            eventlogger.error("IOException" + ioe.getMessage());
+            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
+            EventLogRecord elr = new EventLogRecord(req);
+            String message = isAuthorizedForProvisioning(req);
+            if (message != null) {
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                return;
+            }
+            if (isProxyServer()) {
+                super.doGet(req, resp);
+                return;
+            }
+            String bhdr = req.getHeader(BEHALF_HEADER);
+            if (bhdr == null) {
+                message = "Missing "+BEHALF_HEADER+" header.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            int feedid = getIdFromPath(req);
+            if (feedid < 0) {
+                message = "Missing or bad feed number.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            Feed feed = Feed.getFeedById(feedid);
+            if (feed == null || feed.isDeleted()) {
+                message = "Missing or bad feed number.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_NOT_FOUND);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
+                return;
+            }
+            // Check with the Authorizer
+            AuthorizationResponse aresp = authz.decide(req);
+            if (! aresp.isAuthorized()) {
+                message = "Policy Engine disallows access.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                return;
+            }
+
+            // send response
+            elr.setResult(HttpServletResponse.SC_OK);
+            eventlogger.info(elr);
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setContentType(FEEDFULL_CONTENT_TYPE);
+            try {
+                resp.getOutputStream().print(feed.asJSONObject(true).toString());
+            } catch (IOException ioe) {
+                eventlogger.error("IOException" + ioe.getMessage());
+            }
+        }finally{
+            eelflogger.info(EelfMsgs.EXIT);
         }
     }
     /**
@@ -210,154 +220,159 @@ public class FeedServlet extends ProxyServlet {
      */
     @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) {
-        setIpAndFqdnForEelf("doPut");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
-        EventLogRecord elr = new EventLogRecord(req);
-        String message = isAuthorizedForProvisioning(req);
-        if (message != null) {
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-            return;
-        }
-        if (isProxyServer()) {
-            super.doPut(req, resp);
-            return;
-        }
-        String bhdr = req.getHeader(BEHALF_HEADER);
-        if (bhdr == null) {
-            message = "Missing "+BEHALF_HEADER+" header.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        int feedid = getIdFromPath(req);
-        if (feedid < 0) {
-            message = "Missing or bad feed number.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        Feed oldFeed = Feed.getFeedById(feedid);
-        if (oldFeed == null || oldFeed.isDeleted()) {
-            message = "Missing or bad feed number.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
-            return;
-        }
-        // check content type is FEED_CONTENT_TYPE, version 1.0
-        ContentHeader ch = getContentHeader(req);
-        String ver = ch.getAttribute("version");
-        if (!ch.getType().equals(FEED_BASECONTENT_TYPE) || !(ver.equals("1.0") || ver.equals("2.0"))) {
-            message = "Incorrect content-type";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message, eventlogger);
-            return;
-        }
-        JSONObject jo = getJSONfromInput(req);
-        if (jo == null) {
-            message = "Badly formed JSON";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        if (intlogger.isDebugEnabled())
-            intlogger.debug(jo.toString());
-        Feed feed = null;
+        setIpFqdnRequestIDandInvocationIDForEelf("doPut", req);
+        eelflogger.info(EelfMsgs.ENTRY);
         try {
-            feed = new Feed(jo);
-        } catch (InvalidObjectException e) {
-            message = e.getMessage();
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        feed.setFeedid(feedid);
-        feed.setPublisher(bhdr);    // set from X-ATT-DR-ON-BEHALF-OF header
-
-        String subjectgroup = (req.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP"));  //Adding for group feature:Rally US708115
-        if (!oldFeed.getPublisher().equals(feed.getPublisher()) && subjectgroup == null) {
-            message = "This feed must be modified by the same publisher that created it.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        if (!oldFeed.getName().equals(feed.getName())) {
-            message = "The name of the feed may not be updated.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        if (!oldFeed.getVersion().equals(feed.getVersion())) {
-            message = "The version of the feed may not be updated.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        // Check with the Authorizer
-        AuthorizationResponse aresp = authz.decide(req);
-        if (! aresp.isAuthorized()) {
-            message = "Policy Engine disallows access.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-            return;
-        }
-
-        // Update FEEDS table entries
-        if (doUpdate(feed)) {
-            // send response
-            elr.setResult(HttpServletResponse.SC_OK);
-            eventlogger.info(elr);
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.setContentType(FEEDFULL_CONTENT_TYPE);
+            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
+            EventLogRecord elr = new EventLogRecord(req);
+            String message = isAuthorizedForProvisioning(req);
+            if (message != null) {
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                return;
+            }
+            if (isProxyServer()) {
+                super.doPut(req, resp);
+                return;
+            }
+            String bhdr = req.getHeader(BEHALF_HEADER);
+            if (bhdr == null) {
+                message = "Missing "+BEHALF_HEADER+" header.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            int feedid = getIdFromPath(req);
+            if (feedid < 0) {
+                message = "Missing or bad feed number.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            Feed oldFeed = Feed.getFeedById(feedid);
+            if (oldFeed == null || oldFeed.isDeleted()) {
+                message = "Missing or bad feed number.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_NOT_FOUND);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
+                return;
+            }
+            // check content type is FEED_CONTENT_TYPE, version 1.0
+            ContentHeader ch = getContentHeader(req);
+            String ver = ch.getAttribute("version");
+            if (!ch.getType().equals(FEED_BASECONTENT_TYPE) || !(ver.equals("1.0") || ver.equals("2.0"))) {
+                message = "Incorrect content-type";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message, eventlogger);
+                return;
+            }
+            JSONObject jo = getJSONfromInput(req);
+            if (jo == null) {
+                message = "Badly formed JSON";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            if (intlogger.isDebugEnabled())
+                intlogger.debug(jo.toString());
+            Feed feed = null;
             try {
-                resp.getOutputStream().print(feed.asLimitedJSONObject().toString());
-            } catch (IOException ioe) {
-                eventlogger.error("IOException" + ioe.getMessage());
+                feed = new Feed(jo);
+            } catch (InvalidObjectException e) {
+                message = e.getMessage();
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            feed.setFeedid(feedid);
+            feed.setPublisher(bhdr);    // set from X-ATT-DR-ON-BEHALF-OF header
+
+            String subjectgroup = (req.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP"));  //Adding for group feature:Rally US708115
+            if (!oldFeed.getPublisher().equals(feed.getPublisher()) && subjectgroup == null) {
+                message = "This feed must be modified by the same publisher that created it.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            if (!oldFeed.getName().equals(feed.getName())) {
+                message = "The name of the feed may not be updated.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            if (!oldFeed.getVersion().equals(feed.getVersion())) {
+                message = "The version of the feed may not be updated.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            // Check with the Authorizer
+            AuthorizationResponse aresp = authz.decide(req);
+            if (! aresp.isAuthorized()) {
+                message = "Policy Engine disallows access.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                return;
             }
 
-
-            /**Change Owner ship of Feed //Adding for group feature:Rally US708115*/
-            if (jo.has("changeowner") && subjectgroup != null) {
+            // Update FEEDS table entries
+            if (doUpdate(feed)) {
+                // send response
+                elr.setResult(HttpServletResponse.SC_OK);
+                eventlogger.info(elr);
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.setContentType(FEEDFULL_CONTENT_TYPE);
                 try {
-                    Boolean changeowner = (Boolean) jo.get("changeowner");
-                    if (changeowner != null && changeowner.equals(true)) {
-                        feed.setPublisher(req.getHeader(BEHALF_HEADER));
-                        feed.changeOwnerShip();
-                    }
-                } catch (JSONException je) {
-                    eventlogger.error("JSONException" + je.getMessage());
+                    resp.getOutputStream().print(feed.asLimitedJSONObject().toString());
+                } catch (IOException ioe) {
+                    eventlogger.error("IOException" + ioe.getMessage());
                 }
-            }
-            /***End of change ownership*/
 
-            provisioningDataChanged();
-        } else {
-            // Something went wrong with the UPDATE
-            elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
+
+                /**Change Owner ship of Feed //Adding for group feature:Rally US708115*/
+                if (jo.has("changeowner") && subjectgroup != null) {
+                    try {
+                        Boolean changeowner = (Boolean) jo.get("changeowner");
+                        if (changeowner != null && changeowner.equals(true)) {
+                            feed.setPublisher(req.getHeader(BEHALF_HEADER));
+                            feed.changeOwnerShip();
+                        }
+                    } catch (JSONException je) {
+                        eventlogger.error("JSONException" + je.getMessage());
+                    }
+                }
+                /***End of change ownership*/
+
+                provisioningDataChanged();
+            } else {
+                // Something went wrong with the UPDATE
+                elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
+            }
+        }finally{
+            eelflogger.info(EelfMsgs.EXIT);
         }
     }
     /**
@@ -365,13 +380,18 @@ public class FeedServlet extends ProxyServlet {
      */
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) {
-        setIpAndFqdnForEelf("doPost");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
-        String message = "POST not allowed for the feedURL.";
-        EventLogRecord elr = new EventLogRecord(req);
-        elr.setMessage(message);
-        elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-        eventlogger.info(elr);
-        sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
+        setIpFqdnRequestIDandInvocationIDForEelf("doPost", req);
+        eelflogger.info(EelfMsgs.ENTRY);
+        try {
+            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
+            String message = "POST not allowed for the feedURL.";
+            EventLogRecord elr = new EventLogRecord(req);
+            elr.setMessage(message);
+            elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            eventlogger.info(elr);
+            sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
+        }finally{
+        eelflogger.info(EelfMsgs.EXIT);
+    }
     }
 }

@@ -32,11 +32,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -65,9 +69,12 @@ public class DRFeedsServletTest extends DrServletTestBase {
     @Mock
     private HttpServletResponse response;
 
+    ListAppender<ILoggingEvent> listAppender;
+
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        listAppender = set_Test_Logger(DRFeedsServlet.class);
         drfeedsServlet = new DRFeedsServlet();
         setAuthoriserToReturnRequestIsAuthorized();
         setPokerToNotCreateTimersWhenDeleteFeedIsCalled();
@@ -80,6 +87,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_DELETE_SC_METHOD_NOT_ALLOWED_Response_Is_Generated() throws Exception {
         drfeedsServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), argThat(notNullValue(String.class)));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -89,6 +97,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         drfeedsServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -137,6 +146,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         when(feed.asJSONObject(true)).thenReturn(mock(JSONObject.class));
         drfeedsServlet.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+        verify_Entering_Exit_Called(listAppender);
     }
 
 
@@ -153,6 +163,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_PUT_SC_METHOD_NOT_ALLOWED_Response_Is_Generated() throws Exception {
         drfeedsServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), argThat(notNullValue(String.class)));
+        verify_Entering_Exit_Called(listAppender);
     }
 
 
@@ -163,6 +174,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         drfeedsServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -301,6 +313,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         };
         drfeedsServlet.doPost(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_CREATED));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @NotNull

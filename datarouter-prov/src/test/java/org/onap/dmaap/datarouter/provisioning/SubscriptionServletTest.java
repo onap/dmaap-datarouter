@@ -22,13 +22,13 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
@@ -39,6 +39,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -47,11 +48,16 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
@@ -66,10 +72,15 @@ public class SubscriptionServletTest {
     private final String USER = "user1";
     private final String PASSWORD="password1";
 
+    static File file = new File("logs/EELF/application.log");
+
+
     @Mock
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
+
+    ListAppender<ILoggingEvent> listAppender;
 
     @BeforeClass
     public static void init() {
@@ -81,14 +92,17 @@ public class SubscriptionServletTest {
     }
 
     @AfterClass
-    public static void tearDownClass() {
+    public static void tearDownClass() throws FileNotFoundException {
         em.clear();
         em.close();
         emf.close();
+        PrintWriter pw = new PrintWriter(file);
+        pw.close();
     }
 
     @Before
     public void setUp() throws Exception {
+        listAppender = set_Test_Logger(SubscriptionServlet.class);
         subscriptionServlet = new SubscriptionServlet();
         db = new DB();
         setAuthoriserToReturnRequestIsAuthorized();
@@ -102,6 +116,7 @@ public class SubscriptionServletTest {
         when(request.isSecure()).thenReturn(false);
         subscriptionServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -147,6 +162,7 @@ public class SubscriptionServletTest {
     public void Given_Request_Is_HTTP_DELETE_And_Delete_On_Database_Succeeds_A_NO_CONTENT_Response_Is_Generated() throws Exception {
         subscriptionServlet.doDelete(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_NO_CONTENT));
+        verify_Entering_Exit_Called(listAppender);
         insertSubscriptionIntoDb();
     }
 
@@ -155,6 +171,7 @@ public class SubscriptionServletTest {
         when(request.isSecure()).thenReturn(false);
         subscriptionServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -191,6 +208,7 @@ public class SubscriptionServletTest {
         when(response.getOutputStream()).thenReturn(outStream);
         subscriptionServlet.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -198,6 +216,7 @@ public class SubscriptionServletTest {
         when(request.isSecure()).thenReturn(false);
         subscriptionServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -328,6 +347,7 @@ public class SubscriptionServletTest {
         subscriptionServlet.doPut(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
         changeSubscriptionBackToNormal();
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -335,6 +355,7 @@ public class SubscriptionServletTest {
         when(request.isSecure()).thenReturn(false);
         subscriptionServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -423,6 +444,7 @@ public class SubscriptionServletTest {
         };
         subscriptionServlet.doPost(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_ACCEPTED));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @NotNull
@@ -435,6 +457,19 @@ public class SubscriptionServletTest {
         return JSObject;
     }
 
+    public ListAppender<ILoggingEvent> set_Test_Logger(Class c) {
+        Logger fooLogger = (Logger) LoggerFactory.getLogger(c);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        fooLogger.addAppender(listAppender);
+        return listAppender;
+    }
+
+    public void verify_Entering_Exit_Called(ListAppender<ILoggingEvent> listAppender) {
+        assertEquals("EELF0004I  Entering", listAppender.list.get(0).getMessage());
+        assertEquals("EELF0005I  Exiting", listAppender.list.get(2).getMessage());
+        assertEquals(3, listAppender.list.size());
+    }
     private void setUpValidSecurityOnHttpRequest() throws Exception {
         when(request.isSecure()).thenReturn(true);
         Set<String> authAddressesAndNetworks = new HashSet<String>();
