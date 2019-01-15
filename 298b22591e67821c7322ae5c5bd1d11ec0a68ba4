@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_4c71e074",
+        "filename": "datarouter-subscriber/src/main/java/org/onap/dmaap/datarouter/subscriber/SampleSubscriberServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 4593
+      },
+      "writtenOn": "2019-01-15T11:38:18Z",
+      "side": 1,
+      "message": "Need to deleteIfExists for the metadata file here",
+      "revId": "298b22591e67821c7322ae5c5bd1d11ec0a68ba4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_0c6758b8",
+        "filename": "datarouter-subscriber/src/main/java/org/onap/dmaap/datarouter/subscriber/SampleSubscriberServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 4593
+      },
+      "writtenOn": "2019-01-15T11:38:18Z",
+      "side": 1,
+      "message": "Need to deleteIfExists on the tmp metadata file here too",
+      "revId": "298b22591e67821c7322ae5c5bd1d11ec0a68ba4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_6c0dc4e7",
+        "filename": "datarouter-subscriber/src/test/java/org/onap/dmaap/datarouter/subscriber/SampleSubscriberServletTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 4593
+      },
+      "writtenOn": "2019-01-15T11:38:18Z",
+      "side": 1,
+      "message": "Should return value be valid JSON?\ne.g.: `thenReturn(\"{\\\"Key\\\": \\\"Value\\\"}\");`",
+      "revId": "298b22591e67821c7322ae5c5bd1d11ec0a68ba4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
