@@ -45,9 +45,6 @@ Data Router and Sensitive Data Handling
     It is the responsibility of the subscribers to work with the publisher to determine how to decrypt that data
 
 
-
-
-
 What the Data Router is NOT:
 
     Does not support streaming data
@@ -75,11 +72,9 @@ What the Data Router is NOT:
     Per-file metadata can be used for ordering
 
 
-
-
 ## BUILD
 
-Datarouter can be cloned and repository and builb using Maven
+Datarouter can be cloned and repository built using Maven
 In the repository
 
 Go to datarouter-prov in the root
@@ -126,7 +121,6 @@ curl -v -X POST -H "Content-Type: application/vnd.att-dr.subscription" -H "X-ATT
 Publish to feed:
 
 curl -v -X PUT --user rs873m:rs873m -H "Content-Type: application/octet-stream" --data-binary @/opt/app/datartr/addFeed3.txt  --post301 --location-trusted -k https://dmaap-dr-prov:8443/publish/1/test1
-
 
 
 
