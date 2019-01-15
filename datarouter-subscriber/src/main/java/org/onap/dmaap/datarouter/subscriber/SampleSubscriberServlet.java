@@ -140,9 +140,12 @@ public class SampleSubscriberServlet extends HttpServlet {
         URLEncoder.encode(fileid, "UTF-8").replaceAll("^\\.", "%2E").replaceAll("\\*", "%2A");
     String fullPath = outputDirectory + "/" + filename;
     String tmpPath = outputDirectory + "/." + filename;
+    String fullMetaDataPath = outputDirectory + "/" + filename + ".M";
+    String tmpMetaDataPath = outputDirectory + "/." + filename + ".M";
     try {
       if (isdelete) {
         Files.deleteIfExists(Paths.get(fullPath));
+        Files.deleteIfExists(Paths.get(fullMetaDataPath));
         logger.info(
             "SampleSubServlet: Received delete for file id "
                 + fileid
@@ -154,6 +157,7 @@ public class SampleSubscriberServlet extends HttpServlet {
                 + fullPath);
       } else {
         new File(tmpPath).createNewFile();
+        new File(tmpMetaDataPath).createNewFile();
         try (InputStream is = req.getInputStream();
             OutputStream os = new FileOutputStream(tmpPath)) {
           byte[] buf = new byte[65536];
@@ -163,6 +167,11 @@ public class SampleSubscriberServlet extends HttpServlet {
           }
         }
         Files.move(Paths.get(tmpPath), Paths.get(fullPath), StandardCopyOption.REPLACE_EXISTING);
+        try (PrintWriter writer = new PrintWriter(new FileOutputStream(tmpMetaDataPath))) {
+          String metaData = req.getHeader("X-ATT-DR-META");
+          writer.print(metaData);
+        }
+        Files.move(Paths.get(tmpMetaDataPath), Paths.get(fullMetaDataPath), StandardCopyOption.REPLACE_EXISTING);
         logger.info(
             "SampleSubServlet: Received file id "
                 + fileid
@@ -177,6 +186,7 @@ public class SampleSubscriberServlet extends HttpServlet {
       resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     } catch (IOException ioe) {
       Files.deleteIfExists(Paths.get(tmpPath));
+      Files.deleteIfExists(Paths.get(tmpMetaDataPath));
       logger.info(
           "SampleSubServlet: Failed to process file "
               + fullPath
