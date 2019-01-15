@@ -23,15 +23,18 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -40,16 +43,26 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.util.Scanner;
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 /**
  * Created by ezcoxem on 21/08/2018.
  */
 
 @RunWith(PowerMockRunner.class)
+@PrepareForTest({InetAddress.class })
 public class PublishServletTest {
     private PublishServlet publishServlet;
 
@@ -63,6 +76,10 @@ public class PublishServletTest {
     private static EntityManager em;
     private DB db;
 
+    static File file = new File("logs/EELF/application.log");
+
+    ListAppender<ILoggingEvent> listAppender;
+
     @BeforeClass
     public static void init() {
         emf = Persistence.createEntityManagerFactory("dr-unit-tests");
@@ -73,15 +90,18 @@ public class PublishServletTest {
     }
 
     @AfterClass
-    public static void tearDownClass() {
+    public static void tearDownClass() throws FileNotFoundException {
         em.clear();
         em.close();
         emf.close();
+        PrintWriter pw = new PrintWriter(file);
+        pw.close();
     }
 
 
     @Before
     public void setUp() throws Exception {
+        listAppender = set_Test_Logger(PublishServlet.class);
         publishServlet = new PublishServlet();
         db = new DB();
     }
@@ -93,6 +113,7 @@ public class PublishServletTest {
         publishServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_SERVICE_UNAVAILABLE), argThat(notNullValue(String.class)));
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "nodes", new String[1], true);
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -135,6 +156,7 @@ public class PublishServletTest {
         setConditionsForPositiveSuccessFlow();
         publishServlet.doDelete(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_MOVED_PERMANENTLY));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -144,6 +166,7 @@ public class PublishServletTest {
 
         publishServlet.doPut(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_MOVED_PERMANENTLY));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -153,20 +176,51 @@ public class PublishServletTest {
 
         publishServlet.doPost(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_MOVED_PERMANENTLY));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
-    public void Given_Request_Is_HTTP_GET_And_Request_succeeds()
+    public void Given_Request_Is_HTTP_GET_And_Request_succeeds_And_RequestId_Header_is_empty()
             throws Exception {
         setConditionsForPositiveSuccessFlow();
-
+        mockStatic(InetAddress.class);
         publishServlet.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_MOVED_PERMANENTLY));
+        verify_Entering_Exit_Called(listAppender);
+        assertEquals(null, listAppender.list.get(0).getMDCPropertyMap().get("RequestId"));
+        assertEquals(null, listAppender.list.get(0).getMDCPropertyMap().get("InvocationId"));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_GET_And_Request_succeeds_And_RequestId_Header_Is_Not_Empty()
+            throws Exception {
+        setConditionsForPositiveSuccessFlow();
+        when(request.getHeader("X-ONAP-RequestID")).thenReturn("123");
+        when(request.getHeader("X-InvocationID")).thenReturn("456");
+        publishServlet.doGet(request, response);
+        verify(response).setStatus(eq(HttpServletResponse.SC_MOVED_PERMANENTLY));
+        verify_Entering_Exit_Called(listAppender);
+        assertEquals("123", listAppender.list.get(0).getMDCPropertyMap().get("RequestId"));
+        assertEquals("456", listAppender.list.get(0).getMDCPropertyMap().get("InvocationId"));
     }
 
     private void setConditionsForPositiveSuccessFlow() throws Exception {
         FieldUtils.writeDeclaredField(publishServlet, "provstring", "", true);
         when(request.getPathInfo()).thenReturn("/1/fileName.txt");
+    }
+
+    public ListAppender<ILoggingEvent> set_Test_Logger(Class c) {
+        Logger fooLogger = (Logger) LoggerFactory.getLogger(c);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        fooLogger.addAppender(listAppender);
+        return listAppender;
+    }
+
+    public void verify_Entering_Exit_Called(ListAppender<ILoggingEvent> listAppender) {
+        assertEquals("EELF0004I  Entering", listAppender.list.get(0).getMessage());
+        assertEquals("EELF0005I  Exiting", listAppender.list.get(2).getMessage());
+        assertEquals(3, listAppender.list.size());
     }
 
 

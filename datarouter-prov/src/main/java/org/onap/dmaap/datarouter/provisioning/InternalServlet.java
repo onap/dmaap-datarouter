@@ -168,44 +168,50 @@ public class InternalServlet extends ProxyServlet {
      */
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) {
-        setIpAndFqdnForEelf("doDelete");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
-        EventLogRecord elr = new EventLogRecord(req);
-        if (!isAuthorizedForInternal(req)) {
-            elr.setMessage("Unauthorized.");
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
-            return;
-        }
-
-        String path = req.getPathInfo();
-        if (path.startsWith("/api/")) {
-            if (isProxyOK(req) && isProxyServer()) {
-                super.doDelete(req, resp);
+        setIpFqdnRequestIDandInvocationIDForEelf("doDelete", req);
+        eelflogger.info(EelfMsgs.ENTRY);
+        try {
+            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            EventLogRecord elr = new EventLogRecord(req);
+            if (!isAuthorizedForInternal(req)) {
+                elr.setMessage("Unauthorized.");
+                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
                 return;
             }
-            String key = path.substring(5);
-            if (key.length() > 0) {
-                Parameters param = Parameters.getParameter(key);
-                if (param != null) {
-                    if (doDelete(param)) {
-                        elr.setResult(HttpServletResponse.SC_OK);
-                        eventlogger.info(elr);
-                        resp.setStatus(HttpServletResponse.SC_OK);
-                        provisioningDataChanged();
-                        provisioningParametersChanged();
-                    } else {
-                        // Something went wrong with the DELETE
-                        elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                        eventlogger.info(elr);
-                        sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
-                    }
+
+            String path = req.getPathInfo();
+            if (path.startsWith("/api/")) {
+                if (isProxyOK(req) && isProxyServer()) {
+                    super.doDelete(req, resp);
                     return;
                 }
+                String key = path.substring(5);
+                if (key.length() > 0) {
+                    Parameters param = Parameters.getParameter(key);
+                    if (param != null) {
+                        if (doDelete(param)) {
+                            elr.setResult(HttpServletResponse.SC_OK);
+                            eventlogger.info(elr);
+                            resp.setStatus(HttpServletResponse.SC_OK);
+                            provisioningDataChanged();
+                            provisioningParametersChanged();
+                        } else {
+                            // Something went wrong with the DELETE
+                            elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                            eventlogger.info(elr);
+                            sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
+                        }
+                        return;
+                    }
+                }
             }
+            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", eventlogger);
+        }finally
+        {
+            eelflogger.info(EelfMsgs.EXIT);
         }
-        sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", eventlogger);
     }
 
     /**
@@ -214,120 +220,126 @@ public class InternalServlet extends ProxyServlet {
      */
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        setIpAndFqdnForEelf("doGet");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
-        String path = req.getPathInfo();
-        Properties props = (new DB()).getProperties();
-        if (path.equals("/halt") && !req.isSecure()) {
-            // request to halt the server - can ONLY come from localhost
-            String remote = req.getRemoteAddr();
-            if (remote.equals(props.getProperty("org.onap.dmaap.datarouter.provserver.localhost"))) {
-                intlogger.info("PROV0009 Request to HALT received.");
-                resp.setStatus(HttpServletResponse.SC_OK);
-                Main.shutdown();
-            } else {
-                intlogger.info("PROV0010 Disallowed request to HALT received from " + remote);
-                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            }
-            return;
-        }
-
-        EventLogRecord elr = new EventLogRecord(req);
-        if (!isAuthorizedForInternal(req)) {
-            elr.setMessage("Unauthorized.");
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
-            return;
-        }
-        if (path.equals("/fetchProv") && !req.isSecure()) {
-            // if request came from active_pod or standby_pod and it is not us, reload prov data
-            SynchronizerTask s = SynchronizerTask.getSynchronizer();
-            s.doFetch();
-            resp.setStatus(HttpServletResponse.SC_OK);
-            return;
-        }
-        if (path.equals("/prov")) {
-            if (isProxyOK(req) && isProxyServer()) {
-                if (super.doGetWithFallback(req, resp)) {
-                    return;
-                }
-                // fall back to returning the local data if the remote is unreachable
-                intlogger.info("Active server unavailable; falling back to local copy.");
-            }
-            Poker p = Poker.getPoker();
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.setContentType(PROVFULL_CONTENT_TYPE2);
-            try {
-                resp.getOutputStream().print(p.getProvisioningString());
-            } catch (IOException ioe) {
-                intlogger.error("IOException" + ioe.getMessage());
-            }
-            return;
-        }
-        if (path.equals("/logs") || path.equals("/logs/")) {
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.setContentType("application/json");
-            try {
-                resp.getOutputStream().print(generateLogfileList().toString());
-            } catch (IOException ioe) {
-                intlogger.error("IOException" + ioe.getMessage());
-            }
-            return;
-        }
-        if (path.startsWith("/logs/")) {
-            String logdir = props.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
-            String logfile = path.substring(6);
-            if (logdir != null && logfile != null && logfile.indexOf('/') < 0) {
-                File log = new File(logdir + "/" + logfile);
-                if (log.exists() && log.isFile()) {
+        setIpFqdnRequestIDandInvocationIDForEelf("doGet",req);
+        eelflogger.info(EelfMsgs.ENTRY);
+        try {
+            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            String path = req.getPathInfo();
+            Properties props = (new DB()).getProperties();
+            if (path.equals("/halt") && !req.isSecure()) {
+                // request to halt the server - can ONLY come from localhost
+                String remote = req.getRemoteAddr();
+                if (remote.equals(props.getProperty("org.onap.dmaap.datarouter.provserver.localhost"))) {
+                    intlogger.info("PROV0009 Request to HALT received.");
                     resp.setStatus(HttpServletResponse.SC_OK);
-                    resp.setContentType("text/plain");
-                    Path logpath = Paths.get(log.getAbsolutePath());
-                    try {
-                        Files.copy(logpath, resp.getOutputStream());
-                    } catch (IOException ioe) {
-                        intlogger.error("IOException" + ioe.getMessage());
-                    }
-                    return;
+                    Main.shutdown();
+                } else {
+                    intlogger.info("PROV0010 Disallowed request to HALT received from " + remote);
+                    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 }
-            }
-            sendResponseError(resp, HttpServletResponse.SC_NO_CONTENT, "No file.", eventlogger);
-            return;
-        }
-        if (path.startsWith("/api/")) {
-            if (isProxyOK(req) && isProxyServer()) {
-                super.doGet(req, resp);
                 return;
             }
-            String key = path.substring(5);
-            if (key.length() > 0) {
-                Parameters param = Parameters.getParameter(key);
-                if (param != null) {
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                    resp.setContentType("text/plain");
-                    try {
-                        resp.getOutputStream().print(param.getValue() + "\n");
-                    } catch (IOException ioe) {
-                        intlogger.error("IOException" + ioe.getMessage());
+
+            EventLogRecord elr = new EventLogRecord(req);
+            if (!isAuthorizedForInternal(req)) {
+                elr.setMessage("Unauthorized.");
+                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
+                return;
+            }
+            if (path.equals("/fetchProv") && !req.isSecure()) {
+                // if request came from active_pod or standby_pod and it is not us, reload prov data
+                SynchronizerTask s = SynchronizerTask.getSynchronizer();
+                s.doFetch();
+                resp.setStatus(HttpServletResponse.SC_OK);
+                return;
+            }
+            if (path.equals("/prov")) {
+                if (isProxyOK(req) && isProxyServer()) {
+                    if (super.doGetWithFallback(req, resp)) {
+                        return;
                     }
+                    // fall back to returning the local data if the remote is unreachable
+                    intlogger.info("Active server unavailable; falling back to local copy.");
+                }
+                Poker p = Poker.getPoker();
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.setContentType(PROVFULL_CONTENT_TYPE2);
+                try {
+                    resp.getOutputStream().print(p.getProvisioningString());
+                } catch (IOException ioe) {
+                    intlogger.error("IOException" + ioe.getMessage());
+                }
+                return;
+            }
+            if (path.equals("/logs") || path.equals("/logs/")) {
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.setContentType("application/json");
+                try {
+                    resp.getOutputStream().print(generateLogfileList().toString());
+                } catch (IOException ioe) {
+                    intlogger.error("IOException" + ioe.getMessage());
+                }
+                return;
+            }
+            if (path.startsWith("/logs/")) {
+                String logdir = props.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
+                String logfile = path.substring(6);
+                if (logdir != null && logfile != null && logfile.indexOf('/') < 0) {
+                    File log = new File(logdir + "/" + logfile);
+                    if (log.exists() && log.isFile()) {
+                        resp.setStatus(HttpServletResponse.SC_OK);
+                        resp.setContentType("text/plain");
+                        Path logpath = Paths.get(log.getAbsolutePath());
+                        try {
+                            Files.copy(logpath, resp.getOutputStream());
+                        } catch (IOException ioe) {
+                            intlogger.error("IOException" + ioe.getMessage());
+                        }
+                        return;
+                    }
+                }
+                sendResponseError(resp, HttpServletResponse.SC_NO_CONTENT, "No file.", eventlogger);
+                return;
+            }
+            if (path.startsWith("/api/")) {
+                if (isProxyOK(req) && isProxyServer()) {
+                    super.doGet(req, resp);
                     return;
                 }
+                String key = path.substring(5);
+                if (key.length() > 0) {
+                    Parameters param = Parameters.getParameter(key);
+                    if (param != null) {
+                        resp.setStatus(HttpServletResponse.SC_OK);
+                        resp.setContentType("text/plain");
+                        try {
+                            resp.getOutputStream().print(param.getValue() + "\n");
+                        } catch (IOException ioe) {
+                            intlogger.error("IOException" + ioe.getMessage());
+                        }
+                        return;
+                    }
+                }
             }
-        }
-        if (path.equals("/drlogs") || path.equals("/drlogs/")) {
-            // Special POD <=> POD API to determine what log file records are loaded here
-            LogfileLoader lfl = LogfileLoader.getLoader();
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.setContentType("text/plain");
-            try {
-                resp.getOutputStream().print(lfl.getBitSet().toString());
-            } catch (IOException ioe) {
-                intlogger.error("IOException" + ioe.getMessage());
+            if (path.equals("/drlogs") || path.equals("/drlogs/")) {
+                // Special POD <=> POD API to determine what log file records are loaded here
+                LogfileLoader lfl = LogfileLoader.getLoader();
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.setContentType("text/plain");
+                try {
+                    resp.getOutputStream().print(lfl.getBitSet().toString());
+                } catch (IOException ioe) {
+                    intlogger.error("IOException" + ioe.getMessage());
+                }
+                return;
             }
-            return;
+            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", eventlogger);
+        }finally
+        {
+            eelflogger.info(EelfMsgs.EXIT);
         }
-        sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", eventlogger);
     }
 
     /**
@@ -336,45 +348,51 @@ public class InternalServlet extends ProxyServlet {
      */
     @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) {
-        setIpAndFqdnForEelf("doPut");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
-        EventLogRecord elr = new EventLogRecord(req);
-        if (!isAuthorizedForInternal(req)) {
-            elr.setMessage("Unauthorized.");
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
-            return;
-        }
-        String path = req.getPathInfo();
-        if (path.startsWith("/api/")) {
-            if (isProxyOK(req) && isProxyServer()) {
-                super.doPut(req, resp);
+        setIpFqdnRequestIDandInvocationIDForEelf("doPut", req);
+        eelflogger.info(EelfMsgs.ENTRY);
+        try {
+            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            EventLogRecord elr = new EventLogRecord(req);
+            if (!isAuthorizedForInternal(req)) {
+                elr.setMessage("Unauthorized.");
+                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
                 return;
             }
-            String key = path.substring(5);
-            if (key.length() > 0) {
-                Parameters param = Parameters.getParameter(key);
-                if (param != null) {
-                    String t = catValues(req.getParameterValues("val"));
-                    param.setValue(t);
-                    if (doUpdate(param)) {
-                        elr.setResult(HttpServletResponse.SC_OK);
-                        eventlogger.info(elr);
-                        resp.setStatus(HttpServletResponse.SC_OK);
-                        provisioningDataChanged();
-                        provisioningParametersChanged();
-                    } else {
-                        // Something went wrong with the UPDATE
-                        elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                        eventlogger.info(elr);
-                        sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
-                    }
+            String path = req.getPathInfo();
+            if (path.startsWith("/api/")) {
+                if (isProxyOK(req) && isProxyServer()) {
+                    super.doPut(req, resp);
                     return;
                 }
+                String key = path.substring(5);
+                if (key.length() > 0) {
+                    Parameters param = Parameters.getParameter(key);
+                    if (param != null) {
+                        String t = catValues(req.getParameterValues("val"));
+                        param.setValue(t);
+                        if (doUpdate(param)) {
+                            elr.setResult(HttpServletResponse.SC_OK);
+                            eventlogger.info(elr);
+                            resp.setStatus(HttpServletResponse.SC_OK);
+                            provisioningDataChanged();
+                            provisioningParametersChanged();
+                        } else {
+                            // Something went wrong with the UPDATE
+                            elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                            eventlogger.info(elr);
+                            sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
+                        }
+                        return;
+                    }
+                }
             }
+            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", eventlogger);
+        }finally
+        {
+            eelflogger.info(EelfMsgs.EXIT);
         }
-        sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", eventlogger);
     }
 
     /**
@@ -384,142 +402,148 @@ public class InternalServlet extends ProxyServlet {
     @SuppressWarnings("resource")
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) {
-        setIpAndFqdnForEelf("doPost");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
-        EventLogRecord elr = new EventLogRecord(req);
-        if (!isAuthorizedForInternal(req)) {
-            elr.setMessage("Unauthorized.");
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
-            return;
-        }
-
-        String path = req.getPathInfo();
-        if (path.startsWith("/api/")) {
-            if (isProxyOK(req) && isProxyServer()) {
-                super.doPost(req, resp);
+        setIpFqdnRequestIDandInvocationIDForEelf("doPost", req);
+        eelflogger.info(EelfMsgs.ENTRY);
+        try {
+            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
+            EventLogRecord elr = new EventLogRecord(req);
+            if (!isAuthorizedForInternal(req)) {
+                elr.setMessage("Unauthorized.");
+                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
                 return;
             }
-            String key = path.substring(5);
-            if (key.length() > 0) {
-                Parameters param = Parameters.getParameter(key);
-                if (param == null) {
-                    String t = catValues(req.getParameterValues("val"));
-                    param = new Parameters(key, t);
-                    if (doInsert(param)) {
-                        elr.setResult(HttpServletResponse.SC_OK);
-                        eventlogger.info(elr);
-                        resp.setStatus(HttpServletResponse.SC_OK);
-                        provisioningDataChanged();
-                        provisioningParametersChanged();
-                    } else {
-                        // Something went wrong with the INSERT
-                        elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                        eventlogger.info(elr);
-                        sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
-                    }
+
+            String path = req.getPathInfo();
+            if (path.startsWith("/api/")) {
+                if (isProxyOK(req) && isProxyServer()) {
+                    super.doPost(req, resp);
                     return;
                 }
+                String key = path.substring(5);
+                if (key.length() > 0) {
+                    Parameters param = Parameters.getParameter(key);
+                    if (param == null) {
+                        String t = catValues(req.getParameterValues("val"));
+                        param = new Parameters(key, t);
+                        if (doInsert(param)) {
+                            elr.setResult(HttpServletResponse.SC_OK);
+                            eventlogger.info(elr);
+                            resp.setStatus(HttpServletResponse.SC_OK);
+                            provisioningDataChanged();
+                            provisioningParametersChanged();
+                        } else {
+                            // Something went wrong with the INSERT
+                            elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                            eventlogger.info(elr);
+                            sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
+                        }
+                        return;
+                    }
+                }
             }
-        }
 
-        if (path.equals("/logs") || path.equals("/logs/")) {
-            String ctype = req.getHeader("Content-Type");
-            if (ctype == null || !ctype.equals("text/plain")) {
-                elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-                elr.setMessage("Bad media type: " + ctype);
-                resp.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-                eventlogger.info(elr);
-                return;
-            }
-            String spooldir = (new DB()).getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
-            String spoolname = String.format("%d-%d-", System.currentTimeMillis(), Thread.currentThread().getId());
-            synchronized (lock) {
-                // perhaps unnecessary, but it helps make the name unique
-                spoolname += logseq.toString();
-                logseq++;
-            }
-            String encoding = req.getHeader("Content-Encoding");
-            if (encoding != null) {
-                if (encoding.trim().equals("gzip")) {
-                    spoolname += ".gz";
-                } else {
+            if (path.equals("/logs") || path.equals("/logs/")) {
+                String ctype = req.getHeader("Content-Type");
+                if (ctype == null || !ctype.equals("text/plain")) {
                     elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+                    elr.setMessage("Bad media type: " + ctype);
                     resp.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
                     eventlogger.info(elr);
                     return;
                 }
-            }
-            // Determine space available -- available space must be at least 5%
-            FileSystem fs = (Paths.get(spooldir)).getFileSystem();
-            long total = 0;
-            long avail = 0;
-            for (FileStore store : fs.getFileStores()) {
+                String spooldir = (new DB()).getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
+                String spoolname = String.format("%d-%d-", System.currentTimeMillis(), Thread.currentThread().getId());
+                synchronized (lock) {
+                    // perhaps unnecessary, but it helps make the name unique
+                    spoolname += logseq.toString();
+                    logseq++;
+                }
+                String encoding = req.getHeader("Content-Encoding");
+                if (encoding != null) {
+                    if (encoding.trim().equals("gzip")) {
+                        spoolname += ".gz";
+                    } else {
+                        elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+                        resp.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+                        eventlogger.info(elr);
+                        return;
+                    }
+                }
+                // Determine space available -- available space must be at least 5%
+                FileSystem fs = (Paths.get(spooldir)).getFileSystem();
+                long total = 0;
+                long avail = 0;
+                for (FileStore store : fs.getFileStores()) {
+                    try {
+                        total += store.getTotalSpace();
+                        avail += store.getUsableSpace();
+                    } catch (IOException ioe) {
+                        intlogger.error("IOException" + ioe.getMessage());
+                    }
+                }
                 try {
-                    total += store.getTotalSpace();
-                    avail += store.getUsableSpace();
+                    fs.close();
+                } catch (Exception e) {
+                }
+                if (((avail * 100) / total) < 5) {
+                    elr.setResult(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                    resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+                    eventlogger.info(elr);
+                    return;
+                }
+                Path tmppath = Paths.get(spooldir, spoolname);
+                Path donepath = Paths.get(spooldir, "IN." + spoolname);
+                try {
+                    Files.copy(req.getInputStream(), Paths.get(spooldir, spoolname), StandardCopyOption.REPLACE_EXISTING);
+                    Files.move(tmppath, donepath, StandardCopyOption.REPLACE_EXISTING);
+                    elr.setResult(HttpServletResponse.SC_CREATED);
+                    resp.setStatus(HttpServletResponse.SC_CREATED);
+                    eventlogger.info(elr);
+                    LogfileLoader.getLoader();    // This starts the logfile loader "task"
                 } catch (IOException ioe) {
                     intlogger.error("IOException" + ioe.getMessage());
                 }
-            }
-            try {
-                fs.close();
-            } catch (Exception e) {
-            }
-            if (((avail * 100) / total) < 5) {
-                elr.setResult(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-                resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-                eventlogger.info(elr);
                 return;
             }
-            Path tmppath = Paths.get(spooldir, spoolname);
-            Path donepath = Paths.get(spooldir, "IN." + spoolname);
-            try {
-                Files.copy(req.getInputStream(), Paths.get(spooldir, spoolname), StandardCopyOption.REPLACE_EXISTING);
-                Files.move(tmppath, donepath, StandardCopyOption.REPLACE_EXISTING);
-                elr.setResult(HttpServletResponse.SC_CREATED);
-                resp.setStatus(HttpServletResponse.SC_CREATED);
-                eventlogger.info(elr);
-                LogfileLoader.getLoader();    // This starts the logfile loader "task"
-            } catch (IOException ioe) {
-                intlogger.error("IOException" + ioe.getMessage());
-            }
-            return;
-        }
 
-        if (path.equals("/drlogs") || path.equals("/drlogs/")) {
-            // Receive post request and generate log entries
-            String ctype = req.getHeader("Content-Type");
-            if (ctype == null || !ctype.equals("text/plain")) {
-                elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-                elr.setMessage("Bad media type: " + ctype);
-                resp.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-                eventlogger.info(elr);
-                return;
-            }
-            try {
-                InputStream is = req.getInputStream();
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                int ch;
-                while ((ch = is.read()) >= 0) {
-                    bos.write(ch);
+            if (path.equals("/drlogs") || path.equals("/drlogs/")) {
+                // Receive post request and generate log entries
+                String ctype = req.getHeader("Content-Type");
+                if (ctype == null || !ctype.equals("text/plain")) {
+                    elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+                    elr.setMessage("Bad media type: " + ctype);
+                    resp.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+                    eventlogger.info(elr);
+                    return;
                 }
-                RLEBitSet bs = new RLEBitSet(bos.toString());    // The set of records to retrieve
-                elr.setResult(HttpServletResponse.SC_OK);
-                resp.setStatus(HttpServletResponse.SC_OK);
-                resp.setContentType("text/plain");
-                LogRecord.printLogRecords(resp.getOutputStream(), bs);
-                eventlogger.info(elr);
-            } catch (IOException ioe) {
-                intlogger.error("IOException" + ioe.getMessage());
+                try {
+                    InputStream is = req.getInputStream();
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    int ch;
+                    while ((ch = is.read()) >= 0) {
+                        bos.write(ch);
+                    }
+                    RLEBitSet bs = new RLEBitSet(bos.toString());    // The set of records to retrieve
+                    elr.setResult(HttpServletResponse.SC_OK);
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                    resp.setContentType("text/plain");
+                    LogRecord.printLogRecords(resp.getOutputStream(), bs);
+                    eventlogger.info(elr);
+                } catch (IOException ioe) {
+                    intlogger.error("IOException" + ioe.getMessage());
+                }
+                return;
             }
-            return;
-        }
 
-        elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-        sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", eventlogger);
-        eventlogger.info(elr);
+            elr.setResult(HttpServletResponse.SC_NOT_FOUND);
+            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", eventlogger);
+            eventlogger.info(elr);
+        }finally
+        {
+            eelflogger.info(EelfMsgs.EXIT);
+        }
     }
 
     private String catValues(String[] v) {

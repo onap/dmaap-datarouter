@@ -24,6 +24,7 @@
 package org.onap.dmaap.datarouter.provisioning;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,11 +34,16 @@ import org.onap.dmaap.datarouter.provisioning.beans.FeedAuthorization;
 import org.onap.dmaap.datarouter.provisioning.beans.Group;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.MDC;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertNull;
@@ -45,11 +51,14 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.provisioning.beans.Feed",
         "org.onap.dmaap.datarouter.provisioning.beans.Subscription",
-        "org.onap.dmaap.datarouter.provisioning.beans.Group"})
+        "org.onap.dmaap.datarouter.provisioning.beans.Group",
+        "org.onap.dmaap.datarouter.provisioning.BaseServlet"})
+@PrepareForTest({ UUID.class})
 public class BaseServletTest extends DrServletTestBase {
 
     private BaseServlet baseServlet;
@@ -193,4 +202,26 @@ public class BaseServletTest extends DrServletTestBase {
         when(group.getAuthid()).thenReturn("stub_authID");
         assertThat(baseServlet.getGroupBySubGroupId("stub_user", "3"), is(nullValue()));
     }
+
+    @Test
+    public void Given_Request_Has_Empty_RequestId_And_InvocationId_Headers_Generate_MDC_Values() {
+        when(request.getHeader("X-ONAP-RequestID")).thenReturn("");
+        when(request.getHeader("X-InvocationID")).thenReturn("");
+        mockStatic(UUID.class);
+        when(UUID.randomUUID().toString()).thenReturn("123", "456");
+        baseServlet.setIpFqdnRequestIDandInvocationIDForEelf("doDelete", request);
+        Assert.assertEquals("123", MDC.get("RequestId"));
+        Assert.assertEquals("456", MDC.get("InvocationId"));
+    }
+
+    @Test
+    public void Given_Request_Has_RequestId_And_InvocationId_Headers_set_MDC_Values() {
+        when(request.getHeader("X-ONAP-RequestID")).thenReturn("123");
+        when(request.getHeader("X-InvocationID")).thenReturn("456");
+        baseServlet.setIpFqdnRequestIDandInvocationIDForEelf("doDelete", request);
+        Assert.assertEquals("123", MDC.get("RequestId"));
+        Assert.assertEquals("456", MDC.get("InvocationId"));
+    }
+
+
 }

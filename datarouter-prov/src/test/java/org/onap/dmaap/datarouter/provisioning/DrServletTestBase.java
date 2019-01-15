@@ -23,16 +23,31 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
-import java.util.Properties;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Properties;
+import java.util.Scanner;
+
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class DrServletTestBase {
+
+    static File file = new File("logs/EELF/application.log");
+
 
     @Before
     public void setUp() throws Exception {
@@ -48,8 +63,27 @@ public class DrServletTestBase {
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "synctask", synchronizerTask, true);
     }
 
+    public ListAppender<ILoggingEvent> set_Test_Logger(Class c) {
+        Logger fooLogger = (Logger) LoggerFactory.getLogger(c);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        fooLogger.addAppender(listAppender);
+        return listAppender;
+    }
+
+    public void verify_Entering_Exit_Called(ListAppender<ILoggingEvent> listAppender) {
+        assertEquals("EELF0004I  Entering", listAppender.list.get(0).getMessage());
+        assertEquals("EELF0005I  Exiting", listAppender.list.get(2).getMessage());
+        assertEquals(3, listAppender.list.size());
+    }
+
     @After
     public void tearDown() throws Exception {
+    }
 
+    @AfterClass
+    public static void clearFile() throws FileNotFoundException {
+        PrintWriter pw = new PrintWriter(file);
+        pw.close();
     }
 }

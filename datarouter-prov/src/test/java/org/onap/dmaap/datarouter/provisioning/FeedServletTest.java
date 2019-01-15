@@ -22,6 +22,9 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -38,6 +41,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -69,6 +73,8 @@ public class FeedServletTest extends DrServletTestBase {
     private static EntityManager em;
     private DB db;
 
+    ListAppender<ILoggingEvent> listAppender;
+
     @BeforeClass
     public static void init() {
         emf = Persistence.createEntityManagerFactory("dr-unit-tests");
@@ -87,6 +93,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Before
     public void setUp() throws Exception {
+        listAppender = set_Test_Logger(FeedServlet.class);
         feedServlet = new FeedServlet();
         db = new DB();
         setAuthoriserToReturnRequestIsAuthorized();
@@ -101,6 +108,7 @@ public class FeedServletTest extends DrServletTestBase {
         when(request.isSecure()).thenReturn(false);
         feedServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify_Entering_Exit_Called(listAppender);
     }
 
 
@@ -160,6 +168,7 @@ public class FeedServletTest extends DrServletTestBase {
         feedServlet.doDelete(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_NO_CONTENT));
         reinsertFeedIntoDb();
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -168,6 +177,7 @@ public class FeedServletTest extends DrServletTestBase {
         when(request.isSecure()).thenReturn(false);
         feedServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -212,6 +222,7 @@ public class FeedServletTest extends DrServletTestBase {
         when(response.getOutputStream()).thenReturn(outStream);
         feedServlet.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+        verify_Entering_Exit_Called(listAppender);
     }
 
 
@@ -221,6 +232,7 @@ public class FeedServletTest extends DrServletTestBase {
         when(request.isSecure()).thenReturn(false);
         feedServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -387,12 +399,14 @@ public class FeedServletTest extends DrServletTestBase {
         };
         feedServlet.doPut(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
     public void Given_Request_Is_HTTP_POST_SC_METHOD_NOT_ALLOWED_Response_Is_Generated() throws Exception {
         feedServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), argThat(notNullValue(String.class)));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @NotNull

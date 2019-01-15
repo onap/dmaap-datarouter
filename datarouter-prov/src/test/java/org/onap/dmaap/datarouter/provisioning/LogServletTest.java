@@ -23,6 +23,8 @@
 package org.onap.dmaap.datarouter.provisioning;
 
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.AfterClass;
@@ -58,6 +60,8 @@ public class LogServletTest extends DrServletTestBase {
     @Mock
     private HttpServletResponse response;
 
+    ListAppender<ILoggingEvent> listAppender;
+
     @BeforeClass
     public static void init() {
         emf = Persistence.createEntityManagerFactory("dr-unit-tests");
@@ -76,6 +80,7 @@ public class LogServletTest extends DrServletTestBase {
 
     @Before
     public void setUp() throws Exception {
+        listAppender = set_Test_Logger(LogServlet.class);
         logServlet = new LogServlet(true);
         setUpValidParameterValuesForMap();
     }
@@ -85,6 +90,7 @@ public class LogServletTest extends DrServletTestBase {
             throws Exception {
         logServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), argThat(notNullValue(String.class)));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -93,6 +99,7 @@ public class LogServletTest extends DrServletTestBase {
         when(request.getPathInfo()).thenReturn(null);
         logServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -148,6 +155,7 @@ public class LogServletTest extends DrServletTestBase {
             throws Exception {
         logServlet.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -155,6 +163,7 @@ public class LogServletTest extends DrServletTestBase {
             throws Exception {
         logServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), argThat(notNullValue(String.class)));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test
@@ -162,6 +171,7 @@ public class LogServletTest extends DrServletTestBase {
             throws Exception {
         logServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), argThat(notNullValue(String.class)));
+        verify_Entering_Exit_Called(listAppender);
     }
 
     @Test

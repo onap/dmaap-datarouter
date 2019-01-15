@@ -49,7 +49,7 @@ services:
         - dmaap-dr-prov
 
   datarouter-node:
-    image: nexus3.onap.org:10001/onap/dmaap/datarouter-node
+    image: nexus3.onap.org:10001/onap/dmaap/datarouter-NODE
     container_name: datarouter-node
     hostname: dmaap-dr-node
     ports:

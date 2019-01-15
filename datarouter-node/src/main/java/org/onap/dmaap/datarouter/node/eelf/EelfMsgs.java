@@ -38,6 +38,10 @@ public enum EelfMsgs implements EELFResolvableErrorEnum {
 
     MESSAGE_WITH_BEHALF_AND_FEEDID,
 
+    ENTRY,
+
+    EXIT,
+
     /**
      * Application message prints keystore file error in EELF errors log
      */

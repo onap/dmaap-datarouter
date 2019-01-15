@@ -28,7 +28,13 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.apache.log4j.Logger;
+import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
+import org.slf4j.MDC;
+
+import static com.att.eelf.configuration.Configuration.*;
 
 /**
  * A file to be delivered to a destination.
@@ -39,6 +45,8 @@ import org.apache.log4j.Logger;
  */
 public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     private static Logger loggerDeliveryTask = Logger.getLogger("org.onap.dmaap.datarouter.node.DeliveryTask");
+    private static EELFLogger eelflogger = EELFManager.getInstance()
+            .getLogger("org.onap.dmaap.datarouter.node.NodeServlet");
     private DeliveryTaskHelper dth;
     private String pubid;
     private DestInfo di;
@@ -84,6 +92,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
             String s = br.readLine();
             int i = s.indexOf('\t');
             method = s.substring(0, i);
+            NodeUtils.setIpAndFqdnForEelf(method);
             if (!"DELETE".equals(method) && !monly) {
                 length = datafile.length();
             }
@@ -101,6 +110,12 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 }
                 if (h.equalsIgnoreCase("content-type")) {
                     ctype = v;
+                }
+                if (h.equalsIgnoreCase("x-onap-requestid")) {
+                    MDC.put(MDC_KEY_REQUEST_ID, v);
+                }
+                if (h.equalsIgnoreCase("x-invocationid")) {
+                    MDC.put("InvocationId", v);
                 }
                 hdrv.add(new String[]{h, v});
             }
@@ -252,6 +267,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     public void clean() {
         datafile.delete();
         metafile.delete();
+        eelflogger.info(EelfMsgs.EXIT);
         hdrs = null;
     }
 
