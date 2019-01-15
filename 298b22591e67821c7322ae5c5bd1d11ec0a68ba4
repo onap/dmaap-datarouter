@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_6f6cd6d0",
+        "filename": "datarouter-subscriber/src/main/java/org/onap/dmaap/datarouter/subscriber/SampleSubscriberServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 4593
+      },
+      "writtenOn": "2019-01-15T16:03:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_4c71e074",
+      "revId": "298b22591e67821c7322ae5c5bd1d11ec0a68ba4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_0c6758b8",
         "filename": "datarouter-subscriber/src/main/java/org/onap/dmaap/datarouter/subscriber/SampleSubscriberServlet.java",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_8f71faa9",
+        "filename": "datarouter-subscriber/src/main/java/org/onap/dmaap/datarouter/subscriber/SampleSubscriberServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 4593
+      },
+      "writtenOn": "2019-01-15T16:03:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_0c6758b8",
+      "revId": "298b22591e67821c7322ae5c5bd1d11ec0a68ba4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_6c0dc4e7",
         "filename": "datarouter-subscriber/src/test/java/org/onap/dmaap/datarouter/subscriber/SampleSubscriberServletTest.java",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2019-01-15T11:38:18Z",
       "side": 1,
       "message": "Should return value be valid JSON?\ne.g.: `thenReturn(\"{\\\"Key\\\": \\\"Value\\\"}\");`",
+      "revId": "298b22591e67821c7322ae5c5bd1d11ec0a68ba4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_2f6a4eb3",
+        "filename": "datarouter-subscriber/src/test/java/org/onap/dmaap/datarouter/subscriber/SampleSubscriberServletTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 4593
+      },
+      "writtenOn": "2019-01-15T16:03:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_6c0dc4e7",
       "revId": "298b22591e67821c7322ae5c5bd1d11ec0a68ba4",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
