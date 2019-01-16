@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_005dd914",
+        "filename": "datarouter-node/src/test/java/org/onap/dmaap/datarouter/node/NodeUtilsTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-01-16T17:34:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_601e2561",
+      "range": {
+        "startLine": 81,
+        "startChar": 69,
+        "endLine": 81,
+        "endChar": 70
+      },
+      "revId": "fe6c65a3e9f2ce9a28395f469c1ba679eb039699",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_802309a6",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2019-01-16T16:52:25Z",
       "side": 1,
       "message": "EXIT?",
+      "range": {
+        "startLine": 111,
+        "startChar": 63,
+        "endLine": 111,
+        "endChar": 68
+      },
+      "revId": "fe6c65a3e9f2ce9a28395f469c1ba679eb039699",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_607aa578",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-01-16T17:34:13Z",
+      "side": 1,
+      "message": "added code without needing it, I got rid of it.",
+      "parentUuid": "9adffdf1_802309a6",
       "range": {
         "startLine": 111,
         "startChar": 63,
@@ -94,6 +142,54 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_807f8965",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 988,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-01-16T17:34:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_a04f2d6a",
+      "range": {
+        "startLine": 988,
+        "startChar": 9,
+        "endLine": 988,
+        "endChar": 35
+      },
+      "revId": "fe6c65a3e9f2ce9a28395f469c1ba679eb039699",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_20981dbf",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 988,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-01-16T17:34:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_c054b100",
+      "range": {
+        "startLine": 988,
+        "startChar": 86,
+        "endLine": 988,
+        "endChar": 93
+      },
+      "revId": "fe6c65a3e9f2ce9a28395f469c1ba679eb039699",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_606ce5d0",
         "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/PublishServletTest.java",
         "patchSetId": 3
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_e08d357d",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/PublishServletTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-01-16T17:34:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_606ce5d0",
+      "range": {
+        "startLine": 209,
+        "startChar": 0,
+        "endLine": 221,
+        "endChar": 7
+      },
+      "revId": "fe6c65a3e9f2ce9a28395f469c1ba679eb039699",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_8071c9a9",
         "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/SubscriptionServletTest.java",
         "patchSetId": 3
@@ -128,6 +248,30 @@
       "writtenOn": "2019-01-16T16:52:25Z",
       "side": 1,
       "message": "Can be deleted too",
+      "range": {
+        "startLine": 459,
+        "startChar": 0,
+        "endLine": 471,
+        "endChar": 7
+      },
+      "revId": "fe6c65a3e9f2ce9a28395f469c1ba679eb039699",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_a0ebad11",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/SubscriptionServletTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-01-16T17:34:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9adffdf1_8071c9a9",
       "range": {
         "startLine": 459,
         "startChar": 0,
