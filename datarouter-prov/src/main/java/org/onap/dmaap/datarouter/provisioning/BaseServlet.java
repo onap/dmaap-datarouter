@@ -28,6 +28,9 @@ import static com.att.eelf.configuration.Configuration.MDC_SERVER_FQDN;
 
 import static com.att.eelf.configuration.Configuration.MDC_SERVER_IP_ADDRESS;
 import static com.att.eelf.configuration.Configuration.MDC_SERVICE_NAME;
+import static com.att.eelf.configuration.Configuration.MDC_KEY_REQUEST_ID;
+
+
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,18 +39,13 @@ import java.net.UnknownHostException;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -66,8 +64,17 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.ThrottleFilter;
 import org.json.JSONException;
 import org.slf4j.MDC;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -103,9 +110,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
 
     //Adding groups functionality, ...1610
     static final String GROUP_BASECONTENT_TYPE = "application/vnd.att-dr.group";
-    public static final String GROUP_CONTENT_TYPE = "application/vnd.att-dr.group; version=2.0";
     static final String GROUPFULL_CONTENT_TYPE = "application/vnd.att-dr.group-full; version=2.0";
-    public static final String GROUPLIST_CONTENT_TYPE = "application/vnd.att-dr.fegrouped-list; version=1.0";
 
 
     public static final String LOGLIST_CONTENT_TYPE = "application/vnd.att-dr.log-list; version=1.0";
@@ -966,10 +971,31 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     }
 
     /*
-     * @Method - setIpAndFqdnForEelf - Rally:US664892
+     * @Method - setIpFqdnRequestIDandInvocationIDForEelf
+     * @Params - method, prints method name in EELF log.
+     * @Params- Req, Request used to get RequestId and InvocationId
+     */
+    void setIpFqdnRequestIDandInvocationIDForEelf(String method, HttpServletRequest req) {
+        setIpFqdnForEelf(method);
+        setMDC(req, "X-ONAP-RequestID", MDC_KEY_REQUEST_ID);
+        setMDC(req, "X-InvocationID", "InvocationId");
+
+    }
+
+    void setMDC(HttpServletRequest req, String headerName, String keyName)
+    {
+        String mdcId = req.getHeader(headerName);
+        if (StringUtils.isBlank(mdcId)) {
+            mdcId = UUID.randomUUID().toString();
+        }
+        MDC.put(keyName, mdcId);
+    }
+
+    /*
+     * @Method - setIpFqdnRequestIdForEelf - Rally:US664892
      * @Params - method, prints method name in EELF log.
      */
-    void setIpAndFqdnForEelf(String method) {
+    void setIpFqdnForEelf(String method) {
         MDC.clear();
         MDC.put(MDC_SERVICE_NAME, method);
         try {

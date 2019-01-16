@@ -45,10 +45,10 @@
   <!-- name="auditLogName" value="audit" -->
   <!-- name="debugLogName" value="debug" -->
   <property name="jettyAndNodeLogName" value="node"></property>
-  <property name="defaultPattern"    value="%d{MM/dd-HH:mm:ss.SSS}|%logger|%X{RequestId}|%X{ServiceInstanceId}|%thread|%X{ServiceName}|%X{InstanceUUID}|%.-5level|%X{AlertSeverity}|%X{ServerIPAddress}|%X{ServerFQDN}|%X{RemoteHost}|%X{Timer}|%msg%n" />
+  <property name="defaultPattern"    value="%d{MM/dd-HH:mm:ss.SSS}|%logger|%X{RequestId}|%X{InvocationId}|%X{ServiceInstanceId}|%thread|%X{ServiceName}|%X{InstanceUUID}|%.-5level|%X{AlertSeverity}|%X{ServerIPAddress}|%X{ServerFQDN}|%X{RemoteHost}|%X{Timer}|%msg%n" />
   <property name="jettyAndNodeLoggerPattern" value="%d{MM/dd-HH:mm:ss.SSS}|%logger|%thread|%.-5level|%msg%n" />
 
-  <property name="debugLoggerPattern" value="%d{MM/dd-HH:mm:ss.SSS}|%X{RequestId}|%X{ServiceInstanceId}|%thread|%X{ServiceName}|%X{InstanceUUID}|%.-5level|%X{AlertSeverity}|%X{ServerIPAddress}|%X{ServerFQDN}|%X{RemoteHost}|%X{Timer}|[%caller{3}]|%msg%n" />
+  <property name="debugLoggerPattern" value="%d{MM/dd-HH:mm:ss.SSS}|%X{RequestId}|%X{InvocationId}|%X{ServiceInstanceId}|%thread|%X{ServiceName}|%X{InstanceUUID}|%.-5level|%X{AlertSeverity}|%X{ServerIPAddress}|%X{ServerFQDN}|%X{RemoteHost}|%X{Timer}|[%caller{3}]|%msg%n" />
 
   <property name="logDirectory" value="${logDir}" />
   <!-- property name="debugLogDirectory" value="${debugDir}/${componentName}" /-->

@@ -42,7 +42,11 @@ public enum EelfMsgs implements EELFResolvableErrorEnum {
      * Application message prints user and SUBID (accepts two arguments)
      */
 
-    MESSAGE_WITH_BEHALF_AND_SUBID;
+    MESSAGE_WITH_BEHALF_AND_SUBID,
+
+    ENTRY,
+
+    EXIT;
 
 
     /**
