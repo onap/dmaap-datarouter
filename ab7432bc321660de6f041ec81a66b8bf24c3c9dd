@@ -1,0 +1,274 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_cac370eb",
+        "filename": "datarouter-node/src/test/java/org/onap/dmaap/datarouter/node/NodeServletTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-16T11:44:32Z",
+      "side": 1,
+      "message": "Underline only used on test methods, so should be setTestLogger, same below.\n\nBoth methods can also be private",
+      "range": {
+        "startLine": 221,
+        "startChar": 39,
+        "endLine": 221,
+        "endChar": 54
+      },
+      "revId": "ab7432bc321660de6f041ec81a66b8bf24c3c9dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_aabe2c63",
+        "filename": "datarouter-node/src/test/java/org/onap/dmaap/datarouter/node/NodeServletTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-16T11:44:32Z",
+      "side": 1,
+      "message": "logger probably fine here.",
+      "range": {
+        "startLine": 222,
+        "startChar": 15,
+        "endLine": 222,
+        "endChar": 24
+      },
+      "revId": "ab7432bc321660de6f041ec81a66b8bf24c3c9dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_8ab9e87a",
+        "filename": "datarouter-node/src/test/java/org/onap/dmaap/datarouter/node/NodeUtilsTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-16T11:44:32Z",
+      "side": 1,
+      "message": "Maybe Then_MDC_Values_Are_Set",
+      "range": {
+        "startLine": 81,
+        "startChar": 69,
+        "endLine": 81,
+        "endChar": 83
+      },
+      "revId": "ab7432bc321660de6f041ec81a66b8bf24c3c9dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_2ab23c94",
+        "filename": "datarouter-node/src/test/java/org/onap/dmaap/datarouter/node/NodeUtilsTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-16T11:44:32Z",
+      "side": 1,
+      "message": "Maybe Called_Then_MDC_Values_Are_Set",
+      "range": {
+        "startLine": 90,
+        "startChar": 42,
+        "endLine": 90,
+        "endChar": 63
+      },
+      "revId": "ab7432bc321660de6f041ec81a66b8bf24c3c9dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_eaa7544e",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 965,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-16T11:44:32Z",
+      "side": 1,
+      "message": "setIpFqdnRequestIDandInvocationIDForEelf",
+      "range": {
+        "startLine": 965,
+        "startChar": 17,
+        "endLine": 965,
+        "endChar": 42
+      },
+      "revId": "ab7432bc321660de6f041ec81a66b8bf24c3c9dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_0aa5f845",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 966,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-16T11:44:32Z",
+      "side": 1,
+      "message": "Add param for HttpServletRequest",
+      "revId": "ab7432bc321660de6f041ec81a66b8bf24c3c9dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_6a6b64f1",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/DRFeedsServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-16T11:44:32Z",
+      "side": 1,
+      "message": "If you have the code formatting set up you could run that on each of the files, think it should be \ntry {\n//code\n\n} finally {\n//code\n}\nNoticed it in other files as well",
+      "range": {
+        "startLine": 67,
+        "startChar": 11,
+        "endLine": 67,
+        "endChar": 12
+      },
+      "revId": "ab7432bc321660de6f041ec81a66b8bf24c3c9dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_2a79dcc7",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-16T11:44:32Z",
+      "side": 1,
+      "message": "Could be extracted to private method\nprivate void setUpEelfForPublishServlet(String method)",
+      "range": {
+        "startLine": 129,
+        "startChar": 0,
+        "endLine": 134,
+        "endChar": 9
+      },
+      "revId": "ab7432bc321660de6f041ec81a66b8bf24c3c9dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_4a76a0d8",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/BaseServletTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-16T11:44:32Z",
+      "side": 1,
+      "message": "Set",
+      "range": {
+        "startLine": 218,
+        "startChar": 69,
+        "endLine": 218,
+        "endChar": 72
+      },
+      "revId": "ab7432bc321660de6f041ec81a66b8bf24c3c9dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_ea7e74ae",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/DrServletTestBase.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-16T11:44:32Z",
+      "side": 1,
+      "message": "No need for underlines and you can remove public I think",
+      "range": {
+        "startLine": 64,
+        "startChar": 39,
+        "endLine": 64,
+        "endChar": 54
+      },
+      "revId": "ab7432bc321660de6f041ec81a66b8bf24c3c9dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_0a7c18b4",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/DrServletTestBase.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-16T11:44:32Z",
+      "side": 1,
+      "message": "logger",
+      "range": {
+        "startLine": 65,
+        "startChar": 15,
+        "endLine": 65,
+        "endChar": 24
+      },
+      "revId": "ab7432bc321660de6f041ec81a66b8bf24c3c9dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_aa4cec9e",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/PublishServletTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-16T11:44:32Z",
+      "side": 1,
+      "message": "Same comment and method can be private, or do you know if theres a reason why the class can\u0027t extend DrServletTestBase",
+      "range": {
+        "startLine": 212,
+        "startChar": 39,
+        "endLine": 212,
+        "endChar": 54
+      },
+      "revId": "ab7432bc321660de6f041ec81a66b8bf24c3c9dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
