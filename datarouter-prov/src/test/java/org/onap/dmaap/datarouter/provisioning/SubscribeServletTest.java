@@ -22,6 +22,8 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -61,9 +63,12 @@ public class SubscribeServletTest extends DrServletTestBase {
     @Mock
     private HttpServletResponse response;
 
+    ListAppender<ILoggingEvent> listAppender;
+
     @Before
     public void setUp() throws Exception {
         super.setUp();
+        listAppender = setTestLogger(SubscribeServlet.class);
         subscribeServlet = new SubscribeServlet();
         setAuthoriserToReturnRequestIsAuthorized();
         setPokerToNotCreateTimersWhenDeleteFeedIsCalled();
@@ -76,6 +81,7 @@ public class SubscribeServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_DELETE_SC_METHOD_NOT_ALLOWED_Response_Is_Generated() throws Exception {
         subscribeServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -84,6 +90,7 @@ public class SubscribeServletTest extends DrServletTestBase {
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         subscribeServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -127,6 +134,7 @@ public class SubscribeServletTest extends DrServletTestBase {
         PowerMockito.when(Subscription.getSubscriptionUrlList(anyInt())).thenReturn(list);
         subscribeServlet.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+        verifyEnteringExitCalled(listAppender);
     }
 
 
@@ -134,6 +142,7 @@ public class SubscribeServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_PUT_SC_METHOD_NOT_ALLOWED_Response_Is_Generated() throws Exception {
         subscribeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
     @Test
     public void Given_Request_Is_HTTP_POST_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated() throws Exception {
@@ -141,6 +150,7 @@ public class SubscribeServletTest extends DrServletTestBase {
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         subscribeServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -253,6 +263,7 @@ public class SubscribeServletTest extends DrServletTestBase {
         };
         subscribeServlet.doPost(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_CREATED));
+        verifyEnteringExitCalled(listAppender);
     }
 
 
