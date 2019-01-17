@@ -1,0 +1,42 @@
+---
+project: 'dmaap-datarouter'
+project_creation_date: '2017-06-30'
+lifecycle_state: 'Incubation'
+project_lead: &onap_releng_ptl
+    name: 'Ram Koya'
+    email: 'rk541m@att.com'
+    id: 'rampi_k'
+    company: 'ATT'
+    timezone: 'America/Dallas'
+primary_contact: *onap_releng_ptl
+issue_tracking:
+    type: 'jira'
+    url: 'https://jira.onap.org/projects/DMAAP'
+    key: 'DMAAP'
+meetings:
+    - type: 'zoom'
+        agenda: ''
+        url: 'https://wiki.onap.org/pages/viewpage.action?pageId=13599275'
+        server: 'n/a'
+        channel: 'n/a'
+        repeats: 'weekly'
+        time: '13:00 UTC'
+committers:
+    - <<: *onap_releng_ptl
+    - name: 'Ramdas Sawant'
+        email: 'rs873m@att.com'
+        company: 'ATT'
+        id: 'rs873m'
+        timezone: 'America/Dallas'
+    - name: 'Varun Gudisena'
+        email: 'vg411h@att.com'
+        company: 'ATT'
+        id: 'vg411h'
+        timezone: 'America/Dallas'
+tsc:
+    approval: 'https://lists.onap.org/pipermail/onap-tsc'
+    changes:
+        - type: 'Removal'
+          name: 'Habib Madani'
+          name: 'Xinhui Li'
+          name: 'Jing Wang'
