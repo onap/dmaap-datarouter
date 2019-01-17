@@ -63,14 +63,19 @@ public class SubscribeServlet extends ProxyServlet {
      */
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) {
-        setIpAndFqdnForEelf("doDelete");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
-        String message = "DELETE not allowed for the subscribeURL.";
-        EventLogRecord elr = new EventLogRecord(req);
-        elr.setMessage(message);
-        elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-        eventlogger.info(elr);
-        sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
+        setIpFqdnRequestIDandInvocationIDForEelf("doDelete", req);
+        eelflogger.info(EelfMsgs.ENTRY);
+        try {
+            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            String message = "DELETE not allowed for the subscribeURL.";
+            EventLogRecord elr = new EventLogRecord(req);
+            elr.setMessage(message);
+            elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            eventlogger.info(elr);
+            sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
+        } finally {
+            eelflogger.info(EelfMsgs.EXIT);
+        }
     }
 
     /**
@@ -79,72 +84,77 @@ public class SubscribeServlet extends ProxyServlet {
      */
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        setIpAndFqdnForEelf("doGet");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
-        EventLogRecord elr = new EventLogRecord(req);
-        String message = isAuthorizedForProvisioning(req);
-        if (message != null) {
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-            return;
-        }
-        if (isProxyServer()) {
-            super.doGet(req, resp);
-            return;
-        }
-        String bhdr = req.getHeader(BEHALF_HEADER);
-        if (bhdr == null) {
-            message = "Missing " + BEHALF_HEADER + " header.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        int feedid = getIdFromPath(req);
-        if (feedid < 0) {
-            message = "Missing or bad feed number.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        Feed feed = Feed.getFeedById(feedid);
-        if (feed == null || feed.isDeleted()) {
-            message = "Missing or bad feed number.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
-            return;
-        }
-        // Check with the Authorizer
-        AuthorizationResponse aresp = authz.decide(req);
-        if (!aresp.isAuthorized()) {
-            message = "Policy Engine disallows access.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-            return;
-        }
-
-        // Display a list of URLs
-        Collection<String> list = Subscription.getSubscriptionUrlList(feedid);
-        String t = JSONUtilities.createJSONArray(list);
-
-        // send response
-        elr.setResult(HttpServletResponse.SC_OK);
-        eventlogger.info(elr);
-        resp.setStatus(HttpServletResponse.SC_OK);
-        resp.setContentType(SUBLIST_CONTENT_TYPE);
+        setIpFqdnRequestIDandInvocationIDForEelf("doGet", req);
+        eelflogger.info(EelfMsgs.ENTRY);
         try {
-            resp.getOutputStream().print(t);
-        } catch (IOException ioe) {
-            eventlogger.error("IOException: " + ioe.getMessage());
+            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            EventLogRecord elr = new EventLogRecord(req);
+            String message = isAuthorizedForProvisioning(req);
+            if (message != null) {
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                return;
+            }
+            if (isProxyServer()) {
+                super.doGet(req, resp);
+                return;
+            }
+            String bhdr = req.getHeader(BEHALF_HEADER);
+            if (bhdr == null) {
+                message = "Missing " + BEHALF_HEADER + " header.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            int feedid = getIdFromPath(req);
+            if (feedid < 0) {
+                message = "Missing or bad feed number.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            Feed feed = Feed.getFeedById(feedid);
+            if (feed == null || feed.isDeleted()) {
+                message = "Missing or bad feed number.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_NOT_FOUND);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
+                return;
+            }
+            // Check with the Authorizer
+            AuthorizationResponse aresp = authz.decide(req);
+            if (!aresp.isAuthorized()) {
+                message = "Policy Engine disallows access.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                return;
+            }
+
+            // Display a list of URLs
+            Collection<String> list = Subscription.getSubscriptionUrlList(feedid);
+            String t = JSONUtilities.createJSONArray(list);
+
+            // send response
+            elr.setResult(HttpServletResponse.SC_OK);
+            eventlogger.info(elr);
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setContentType(SUBLIST_CONTENT_TYPE);
+            try {
+                resp.getOutputStream().print(t);
+            } catch (IOException ioe) {
+                eventlogger.error("IOException: " + ioe.getMessage());
+            }
+        } finally {
+            eelflogger.info(EelfMsgs.EXIT);
         }
     }
 
@@ -153,14 +163,19 @@ public class SubscribeServlet extends ProxyServlet {
      */
     @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) {
-        setIpAndFqdnForEelf("doPut");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
-        String message = "PUT not allowed for the subscribeURL.";
-        EventLogRecord elr = new EventLogRecord(req);
-        elr.setMessage(message);
-        elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-        eventlogger.info(elr);
-        sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
+        setIpFqdnRequestIDandInvocationIDForEelf("doPut", req);
+        eelflogger.info(EelfMsgs.ENTRY);
+        try {
+            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            String message = "PUT not allowed for the subscribeURL.";
+            EventLogRecord elr = new EventLogRecord(req);
+            elr.setMessage(message);
+            elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            eventlogger.info(elr);
+            sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
+        } finally {
+            eelflogger.info(EelfMsgs.EXIT);
+        }
     }
 
     /**
@@ -169,136 +184,141 @@ public class SubscribeServlet extends ProxyServlet {
      */
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) {
-        setIpAndFqdnForEelf("doPost");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
-        EventLogRecord elr = new EventLogRecord(req);
-        String message = isAuthorizedForProvisioning(req);
-        if (message != null) {
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-            return;
-        }
-        if (isProxyServer()) {
-            super.doPost(req, resp);
-            return;
-        }
-        String bhdr = req.getHeader(BEHALF_HEADER);
-        if (bhdr == null) {
-            message = "Missing " + BEHALF_HEADER + " header.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        int feedid = getIdFromPath(req);
-        if (feedid < 0) {
-            message = "Missing or bad feed number.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        Feed feed = Feed.getFeedById(feedid);
-        if (feed == null || feed.isDeleted()) {
-            message = "Missing or bad feed number.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
-            return;
-        }
-        // Check with the Authorizer
-        AuthorizationResponse aresp = authz.decide(req);
-        if (!aresp.isAuthorized()) {
-            message = "Policy Engine disallows access.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-            return;
-        }
-
-        // check content type is SUB_CONTENT_TYPE, version 1.0
-        ContentHeader ch = getContentHeader(req);
-        String ver = ch.getAttribute("version");
-        if (!ch.getType().equals(SUB_BASECONTENT_TYPE) || !(ver.equals("1.0") || ver.equals("2.0"))) {
-            intlogger.debug("Content-type is: " + req.getHeader("Content-Type"));
-            message = "Incorrect content-type";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message, eventlogger);
-            return;
-        }
-        JSONObject jo = getJSONfromInput(req);
-        if (jo == null) {
-            message = "Badly formed JSON";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        if (intlogger.isDebugEnabled()) {
-            intlogger.debug(jo.toString());
-        }
-        if (++activeSubs > maxSubs) {
-            activeSubs--;
-            message = "Cannot create subscription; the maximum number of subscriptions has been configured.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_CONFLICT);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_CONFLICT, message, eventlogger);
-            return;
-        }
-        Subscription sub = null;
+        setIpFqdnRequestIDandInvocationIDForEelf("doPost", req);
+        eelflogger.info(EelfMsgs.ENTRY);
         try {
-            sub = new Subscription(jo);
-        } catch (InvalidObjectException e) {
-            activeSubs--;
-            message = e.getMessage();
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-            return;
-        }
-        sub.setFeedid(feedid);
-        sub.setSubscriber(bhdr);    // set from X-ATT-DR-ON-BEHALF-OF header
-
-        // Check if this subscription already exists; not an error (yet), just warn
-        Subscription sub2 = Subscription.getSubscriptionMatching(sub);
-        if (sub2 != null) {
-            intlogger.warn(
-                "PROV0011 Creating a duplicate subscription: new subid=" + sub.getSubid() + ", old subid=" + sub2
-                    .getSubid());
-        }
-
-        // Create SUBSCRIPTIONS table entries
-        if (doInsert(sub)) {
-            // send response
-            elr.setResult(HttpServletResponse.SC_CREATED);
-            eventlogger.info(elr);
-            resp.setStatus(HttpServletResponse.SC_CREATED);
-            resp.setContentType(SUBFULL_CONTENT_TYPE);
-            resp.setHeader("Location", sub.getLinks().getSelf());
-            try {
-                resp.getOutputStream().print(sub.asLimitedJSONObject().toString());
-            } catch (IOException ioe) {
-                eventlogger.error("IOException: " + ioe.getMessage());
+            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
+            EventLogRecord elr = new EventLogRecord(req);
+            String message = isAuthorizedForProvisioning(req);
+            if (message != null) {
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                return;
+            }
+            if (isProxyServer()) {
+                super.doPost(req, resp);
+                return;
+            }
+            String bhdr = req.getHeader(BEHALF_HEADER);
+            if (bhdr == null) {
+                message = "Missing " + BEHALF_HEADER + " header.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            int feedid = getIdFromPath(req);
+            if (feedid < 0) {
+                message = "Missing or bad feed number.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            Feed feed = Feed.getFeedById(feedid);
+            if (feed == null || feed.isDeleted()) {
+                message = "Missing or bad feed number.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_NOT_FOUND);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
+                return;
+            }
+            // Check with the Authorizer
+            AuthorizationResponse aresp = authz.decide(req);
+            if (!aresp.isAuthorized()) {
+                message = "Policy Engine disallows access.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                return;
             }
 
-            provisioningDataChanged();
-        } else {
-            // Something went wrong with the INSERT
-            activeSubs--;
-            elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            eventlogger.info(elr);
-            sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
+            // check content type is SUB_CONTENT_TYPE, version 1.0
+            ContentHeader ch = getContentHeader(req);
+            String ver = ch.getAttribute("version");
+            if (!ch.getType().equals(SUB_BASECONTENT_TYPE) || !(ver.equals("1.0") || ver.equals("2.0"))) {
+                intlogger.debug("Content-type is: " + req.getHeader("Content-Type"));
+                message = "Incorrect content-type";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message, eventlogger);
+                return;
+            }
+            JSONObject jo = getJSONfromInput(req);
+            if (jo == null) {
+                message = "Badly formed JSON";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            if (intlogger.isDebugEnabled()) {
+                intlogger.debug(jo.toString());
+            }
+            if (++activeSubs > maxSubs) {
+                activeSubs--;
+                message = "Cannot create subscription; the maximum number of subscriptions has been configured.";
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_CONFLICT);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_CONFLICT, message, eventlogger);
+                return;
+            }
+            Subscription sub = null;
+            try {
+                sub = new Subscription(jo);
+            } catch (InvalidObjectException e) {
+                activeSubs--;
+                message = e.getMessage();
+                elr.setMessage(message);
+                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                return;
+            }
+            sub.setFeedid(feedid);
+            sub.setSubscriber(bhdr);    // set from X-ATT-DR-ON-BEHALF-OF header
+
+            // Check if this subscription already exists; not an error (yet), just warn
+            Subscription sub2 = Subscription.getSubscriptionMatching(sub);
+            if (sub2 != null) {
+                intlogger.warn(
+                    "PROV0011 Creating a duplicate subscription: new subid=" + sub.getSubid() + ", old subid=" + sub2
+                        .getSubid());
+            }
+
+            // Create SUBSCRIPTIONS table entries
+            if (doInsert(sub)) {
+                // send response
+                elr.setResult(HttpServletResponse.SC_CREATED);
+                eventlogger.info(elr);
+                resp.setStatus(HttpServletResponse.SC_CREATED);
+                resp.setContentType(SUBFULL_CONTENT_TYPE);
+                resp.setHeader("Location", sub.getLinks().getSelf());
+                try {
+                    resp.getOutputStream().print(sub.asLimitedJSONObject().toString());
+                } catch (IOException ioe) {
+                    eventlogger.error("IOException: " + ioe.getMessage());
+                }
+
+                provisioningDataChanged();
+            } else {
+                // Something went wrong with the INSERT
+                activeSubs--;
+                elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                eventlogger.info(elr);
+                sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
+            }
+        } finally {
+            eelflogger.info(EelfMsgs.EXIT);
         }
     }
 }

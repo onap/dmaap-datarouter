@@ -147,14 +147,19 @@ public class LogServlet extends BaseServlet {
      */
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) {
-        setIpAndFqdnForEelf("doDelete");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
-        String message = "DELETE not allowed for the logURL.";
-        EventLogRecord elr = new EventLogRecord(req);
-        elr.setMessage(message);
-        elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-        eventlogger.info(elr);
-        sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
+        setIpFqdnRequestIDandInvocationIDForEelf("doDelete", req);
+        eelflogger.info(EelfMsgs.ENTRY);
+        try {
+            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            String message = "DELETE not allowed for the logURL.";
+            EventLogRecord elr = new EventLogRecord(req);
+            elr.setMessage(message);
+            elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            eventlogger.info(elr);
+            sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
+        } finally {
+        eelflogger.info(EelfMsgs.EXIT);
+    }
     }
     /**
      * GET a logging URL -- retrieve logging data for a feed or subscription.
@@ -162,64 +167,69 @@ public class LogServlet extends BaseServlet {
      */
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        setIpAndFqdnForEelf("doGet");
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
-        int id = getIdFromPath(req);
-        if (id < 0) {
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Missing or bad feed/subscription number.", eventlogger);
-            return;
-        }
-        Map<String, String> map = buildMapFromRequest(req);
-        if (map.get("err") != null) {
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments: "+map.get("err"), eventlogger);
-            return;
-        }
-        // check Accept: header??
-
-        resp.setStatus(HttpServletResponse.SC_OK);
-        resp.setContentType(LOGLIST_CONTENT_TYPE);
-
-        try (ServletOutputStream out = resp.getOutputStream()) {
-            final String fields = req.getParameter("fields");
-
-            out.print("[");
-            if (isfeedlog) {
-                // Handle /feedlog/feedid request
-                boolean firstrow = true;
-
-                // 1. Collect publish records for this feed
-                RowHandler rh = new PublishRecordRowHandler(out, fields, firstrow);
-                getPublishRecordsForFeed(id, rh, map);
-                firstrow = rh.firstrow;
-
-                // 2. Collect delivery records for subscriptions to this feed
-                rh = new DeliveryRecordRowHandler(out, fields, firstrow);
-                getDeliveryRecordsForFeed(id, rh, map);
-                firstrow = rh.firstrow;
-
-                // 3. Collect expiry records for subscriptions to this feed
-                rh = new ExpiryRecordRowHandler(out, fields, firstrow);
-                getExpiryRecordsForFeed(id, rh, map);
-            } else {
-                // Handle /sublog/subid request
-                Subscription sub = Subscription.getSubscriptionById(id);
-                if (sub != null) {
-                    // 1. Collect publish records for the feed this subscription feeds
-                    RowHandler rh = new PublishRecordRowHandler(out, fields, true);
-                    getPublishRecordsForFeed(sub.getFeedid(), rh, map);
-
-                    // 2. Collect delivery records for this subscription
-                    rh = new DeliveryRecordRowHandler(out, fields, rh.firstrow);
-                    getDeliveryRecordsForSubscription(id, rh, map);
-
-                    // 3. Collect expiry records for this subscription
-                    rh = new ExpiryRecordRowHandler(out, fields, rh.firstrow);
-                    getExpiryRecordsForSubscription(id, rh, map);
-                }
+        setIpFqdnRequestIDandInvocationIDForEelf("doGet", req);
+        eelflogger.info(EelfMsgs.ENTRY);
+        try {
+            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            int id = getIdFromPath(req);
+            if (id < 0) {
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Missing or bad feed/subscription number.", eventlogger);
+                return;
             }
-            out.print("]");
-        } catch (IOException ioe) {
-            eventlogger.error("IOException: " + ioe.getMessage());
+            Map<String, String> map = buildMapFromRequest(req);
+            if (map.get("err") != null) {
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments: " + map.get("err"), eventlogger);
+                return;
+            }
+            // check Accept: header??
+
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.setContentType(LOGLIST_CONTENT_TYPE);
+
+            try (ServletOutputStream out = resp.getOutputStream()) {
+                final String fields = req.getParameter("fields");
+
+                out.print("[");
+                if (isfeedlog) {
+                    // Handle /feedlog/feedid request
+                    boolean firstrow = true;
+
+                    // 1. Collect publish records for this feed
+                    RowHandler rh = new PublishRecordRowHandler(out, fields, firstrow);
+                    getPublishRecordsForFeed(id, rh, map);
+                    firstrow = rh.firstrow;
+
+                    // 2. Collect delivery records for subscriptions to this feed
+                    rh = new DeliveryRecordRowHandler(out, fields, firstrow);
+                    getDeliveryRecordsForFeed(id, rh, map);
+                    firstrow = rh.firstrow;
+
+                    // 3. Collect expiry records for subscriptions to this feed
+                    rh = new ExpiryRecordRowHandler(out, fields, firstrow);
+                    getExpiryRecordsForFeed(id, rh, map);
+                } else {
+                    // Handle /sublog/subid request
+                    Subscription sub = Subscription.getSubscriptionById(id);
+                    if (sub != null) {
+                        // 1. Collect publish records for the feed this subscription feeds
+                        RowHandler rh = new PublishRecordRowHandler(out, fields, true);
+                        getPublishRecordsForFeed(sub.getFeedid(), rh, map);
+
+                        // 2. Collect delivery records for this subscription
+                        rh = new DeliveryRecordRowHandler(out, fields, rh.firstrow);
+                        getDeliveryRecordsForSubscription(id, rh, map);
+
+                        // 3. Collect expiry records for this subscription
+                        rh = new ExpiryRecordRowHandler(out, fields, rh.firstrow);
+                        getExpiryRecordsForSubscription(id, rh, map);
+                    }
+                }
+                out.print("]");
+            } catch (IOException ioe) {
+                eventlogger.error("IOException: " + ioe.getMessage());
+            }
+        } finally {
+            eelflogger.info(EelfMsgs.EXIT);
         }
     }
     /**
@@ -227,7 +237,9 @@ public class LogServlet extends BaseServlet {
      */
     @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) {
-        setIpAndFqdnForEelf("doPut");
+        setIpFqdnRequestIDandInvocationIDForEelf("doPut", req);
+        eelflogger.info(EelfMsgs.ENTRY);
+        try {
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
         String message = "PUT not allowed for the logURL.";
         EventLogRecord elr = new EventLogRecord(req);
@@ -235,13 +247,18 @@ public class LogServlet extends BaseServlet {
         elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         eventlogger.info(elr);
         sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
+        } finally {
+            eelflogger.info(EelfMsgs.EXIT);
+        }
     }
     /**
      * POST a logging URL -- not supported.
      */
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) {
-        setIpAndFqdnForEelf("doPost");
+        setIpFqdnRequestIDandInvocationIDForEelf("doPost", req);
+        eelflogger.info(EelfMsgs.ENTRY);
+        try {
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
         String message = "POST not allowed for the logURL.";
         EventLogRecord elr = new EventLogRecord(req);
@@ -249,6 +266,9 @@ public class LogServlet extends BaseServlet {
         elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         eventlogger.info(elr);
         sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
+        } finally {
+            eelflogger.info(EelfMsgs.EXIT);
+        }
     }
 
     private Map<String, String> buildMapFromRequest(HttpServletRequest req) {

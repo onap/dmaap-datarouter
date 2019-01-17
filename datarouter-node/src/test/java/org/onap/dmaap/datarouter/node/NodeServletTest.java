@@ -22,22 +22,25 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.node;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import ch.qos.logback.classic.Logger;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.util.*;
 
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -53,8 +56,11 @@ public class NodeServletTest {
     @Mock
     private HttpServletResponse response;
 
+    ListAppender<ILoggingEvent> listAppender;
+
     @Before
     public void setUp() throws Exception{
+        listAppender = setTestLogger();
         nodeServlet = new NodeServlet();
         setBehalfHeader("Stub_Value");
         when(request.getPathInfo()).thenReturn("2");
@@ -70,6 +76,7 @@ public class NodeServletTest {
         setNodeConfigManagerIsConfiguredToReturnFalse();
         nodeServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_SERVICE_UNAVAILABLE));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -77,6 +84,7 @@ public class NodeServletTest {
         when(request.getPathInfo()).thenReturn("/internal/fetchProv");
         nodeServlet.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_NO_CONTENT));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -84,6 +92,7 @@ public class NodeServletTest {
         when(request.getPathInfo()).thenReturn("/internal/resetSubscription/1");
         nodeServlet.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_NO_CONTENT));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -91,6 +100,7 @@ public class NodeServletTest {
         when(request.getPathInfo()).thenReturn("/incorrect");
         nodeServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -98,6 +108,7 @@ public class NodeServletTest {
         setNodeConfigManagerIsConfiguredToReturnFalse();
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_SERVICE_UNAVAILABLE));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -105,6 +116,7 @@ public class NodeServletTest {
         when(request.getPathInfo()).thenReturn("/incorrect/");
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -112,6 +124,7 @@ public class NodeServletTest {
         when(request.isSecure()).thenReturn(false);
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -119,6 +132,7 @@ public class NodeServletTest {
         when(request.getPathInfo()).thenReturn(null);
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -126,6 +140,7 @@ public class NodeServletTest {
         when(request.getHeader("Authorization")).thenReturn(null);
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -133,6 +148,7 @@ public class NodeServletTest {
         when(request.getPathInfo()).thenReturn("/publish/");
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -141,6 +157,7 @@ public class NodeServletTest {
         setNodeConfigManagerIsPublishPermittedToReturnAReason();
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -149,6 +166,7 @@ public class NodeServletTest {
         setNodeConfigManagerIsPublishPermittedToReturnAReason();
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -156,6 +174,7 @@ public class NodeServletTest {
         when(request.getPathInfo()).thenReturn("/internal/publish/1/");
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -164,6 +183,7 @@ public class NodeServletTest {
         setNodeConfigManagerToAllowRedirectOnIngressNode();
         nodeServlet.doPut(request, response);
         verify(response).sendRedirect(anyString());
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -172,6 +192,7 @@ public class NodeServletTest {
         setHeadersForValidRequest(true);
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -180,6 +201,7 @@ public class NodeServletTest {
         setHeadersForValidRequest(false);
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -188,11 +210,26 @@ public class NodeServletTest {
         setHeadersForValidRequest(false);
         nodeServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
     }
 
 
     private void setBehalfHeader(String headerValue) {
         when(request.getHeader("X-ATT-DR-ON-BEHALF-OF")).thenReturn(headerValue);
+    }
+
+    private ListAppender<ILoggingEvent> setTestLogger() {
+        Logger Logger = (Logger) LoggerFactory.getLogger(NodeServlet.class);
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        Logger.addAppender(listAppender);
+        return listAppender;
+    }
+
+    private void verifyEnteringExitCalled(ListAppender<ILoggingEvent> listAppender) {
+        assertEquals("EELF0004I  Entering data router node component with RequestId and InvocationId", listAppender.list.get(0).getMessage());
+        assertEquals("EELF0005I  Exiting data router node component with RequestId and InvocationId", listAppender.list.get(2).getMessage());
+        assertEquals(3, listAppender.list.size());
     }
 
     private void setUpConfig() throws IllegalAccessException{
