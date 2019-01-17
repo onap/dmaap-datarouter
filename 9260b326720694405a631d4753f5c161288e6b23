@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_77b3484d",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryTask.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-17T08:52:05Z",
+      "side": 1,
+      "message": "Just seeing this now, DeliveryTask",
+      "range": {
+        "startLine": 50,
+        "startChar": 55,
+        "endLine": 50,
+        "endChar": 66
+      },
+      "revId": "9260b326720694405a631d4753f5c161288e6b23",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_17ed1c26",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeUtils.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-17T08:52:05Z",
+      "side": 1,
+      "message": "Empty line",
+      "range": {
+        "startLine": 280,
+        "startChar": 0,
+        "endLine": 280,
+        "endChar": 0
+      },
+      "revId": "9260b326720694405a631d4753f5c161288e6b23",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_b794508b",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 981,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-17T08:52:05Z",
+      "side": 1,
+      "message": "Empty Line",
+      "range": {
+        "startLine": 981,
+        "startChar": 54,
+        "endLine": 981,
+        "endChar": 54
+      },
+      "revId": "9260b326720694405a631d4753f5c161288e6b23",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_578f2475",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 986,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-17T08:52:05Z",
+      "side": 1,
+      "message": "Move bracket up",
+      "range": {
+        "startLine": 985,
+        "startChar": 74,
+        "endLine": 986,
+        "endChar": 5
+      },
+      "revId": "9260b326720694405a631d4753f5c161288e6b23",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
