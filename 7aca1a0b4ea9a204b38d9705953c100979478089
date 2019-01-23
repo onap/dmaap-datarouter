@@ -39,6 +39,52 @@
       "revId": "7aca1a0b4ea9a204b38d9705953c100979478089",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_aa5cda19",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 833,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-23T13:14:47Z",
+      "side": 1,
+      "message": "-k twice and --location-trusted here and in command above as well",
+      "range": {
+        "startLine": 833,
+        "startChar": 45,
+        "endLine": 833,
+        "endChar": 67
+      },
+      "revId": "7aca1a0b4ea9a204b38d9705953c100979478089",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_4ad44e47",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 1015,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-23T13:14:47Z",
+      "side": 1,
+      "message": "Could probably be Subscription",
+      "range": {
+        "startLine": 1015,
+        "startChar": 0,
+        "endLine": 1015,
+        "endChar": 10
+      },
+      "revId": "7aca1a0b4ea9a204b38d9705953c100979478089",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
