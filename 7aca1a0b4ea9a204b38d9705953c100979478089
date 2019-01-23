@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_aa17fa43",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2019-01-23T12:03:04Z",
+      "side": 1,
+      "message": "oops.. :)",
+      "range": {
+        "startLine": 10,
+        "startChar": 27,
+        "endLine": 10,
+        "endChar": 28
+      },
+      "revId": "7aca1a0b4ea9a204b38d9705953c100979478089",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_8a3316f5",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 518,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2019-01-23T12:03:04Z",
+      "side": 1,
+      "message": "feedId was listed in the table above...should subId be also?",
+      "revId": "7aca1a0b4ea9a204b38d9705953c100979478089",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
