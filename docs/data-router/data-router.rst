@@ -7,7 +7,7 @@ Introduction
 ------------
 
 The DataRouter(DR) provisioning API is an HTTPS-based, REST-like API for creating and managing DR feeds
-and subscriptions. The Data Routing System project is intended to provide a common framework by which
+and subscriptions. The DMaaP Data Router System project is intended to provide a common framework by which
 data producers can make data available to data consumers and a way for potential consumers to find feeds
 with the data they require.
 
@@ -16,15 +16,13 @@ HTTP Service APIs
 -----------------
 
 DMaaP Data Router utilizes an HTTP REST API to service all transactions. HTTP and REST standards are followed so
-clients as varied as CURL, Java applications and even Web Browsers will
-work to interact with the Data Router.
+clients as varied as CURL, Java applications and even Web Browsers will work to interact with the Data Router.
 
 General HTTP Requirements
 =========================
 
-A DMaaP Data Router transactions consists of 4 distinct segments,
-HTTP URL, HTTP Header, HTTP Body (POST/PUT) and HTTP Response. The general
-considerations for each segment are as follows and are required for each
+A DMaaP Data Router transactions consists of 4 distinct segments, HTTP URL, HTTP Header, HTTP Body (POST/PUT)
+and HTTP Response. The general considerations for each segment are as follows and are required for each
 of the specific transactions described in this section.
 
 HTTP URL
@@ -32,8 +30,8 @@ HTTP URL
 
 http[s]://{serverBaseURL}/{resourcePath}
 
-* The serverBaseURL points to DMaaP Data Router host/port that will service the request.
-* The resourcePath specifies the specific service that the client is attempting to reach.
+* The serverBaseURL points to DMaaP Data Router host:port that will service the request.
+* The resourcePath specifies the service that the client is attempting to reach.
 
 
 HTTP Header
@@ -49,12 +47,12 @@ The HTTP Body contains the feed content when creating a feed.
 Create a Feed
 -------------
 
-**Description**: Creates a unique set of URL's to service the publisher/subscriber model.
+**Description**: Creates a unique feed URL to service the publisher/subscriber model.
 
 Sample Request
 ==============
 
-``curl -v -X POST -H "Content-Type: application/vnd.att-dr.feed" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @/opt/app/datartr/addFeed3.txt --post301 --location-trusted -k https:/{host}:{port}``
+``curl -k -X POST -H "Content-Type:application/vnd.att-dr.feed" -H "X-ATT-DR-ON-BEHALF-OF:{user}" --data-ascii @createFeed.json https://{host}:{port}``
 
 Request Parameters:
 ===================
@@ -82,7 +80,7 @@ Request Parameters:
 | content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.att-dr.feed          |
 |                        | (feed,subscriber,publisher)     |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| X-ATT-DR-ON-BEHALF-OF  | User id of owner of feed        |     Header       |   String   |     8        |     Y       |  username                            |
+| X-ATT-DR-ON-BEHALF-OF  | User id of owner of feed        |     Header       |   String   |     <=8      |     Y       |  username                            |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 
 Response/Error Codes
@@ -142,26 +140,23 @@ Sample Body
 
  {
      "name": "Jettydemo",
-     "version": "m1.0",
+     "version": "v1.0.0",
      "description": "Jettydemo",
      "business_description": "Jettydemo",
      "suspend": false,
-     "deleted": false,
      "changeowner": true,
      "authorization": {
           "classification": "unclassified",
-          "endpoint_addrs": [
-               "172.18.0.3",
-            ],
+          "endpoint_addrs": ["172.18.0.3","192.167.3.42"],
           "endpoint_ids": [
                {
                     "password": "password",
                     "id": "user"
                }
           ]
-     },
-
+     }
  }
+
 
 Updating a Feed
 ---------------
@@ -171,7 +166,7 @@ Updating a Feed
 Sample Request
 ==============
 
-``curl -v -X PUT -H "Content-Type: application/vnd.att-dr.feed" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @/opt/app/datartr/addFeed3.txt --location-trusted -k https:/{host}:{port}``
+``curl -k -X PUT -H "Content-Type: application/vnd.att-dr.feed" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @updateFeed.json --location-trusted https://{host}:{port}/feed/{feedId}``
 
 Request Parameters:
 ===================
@@ -195,7 +190,7 @@ Request Parameters:
 | content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.att-dr.feed          |
 |                        | (feed,subscriber,publisher)     |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| X-ATT-DR-ON-BEHALF-OF  | User id of owner of feed        |     Header       |   String   |     8        |     Y       |  username                            |
+| X-ATT-DR-ON-BEHALF-OF  | User id of owner of feed        |     Header       |   String   |     <=8      |     Y       |  username                            |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 
 Response/Error Codes
@@ -255,26 +250,23 @@ Sample Body
 
  {
      "name": "Jettydemo",
-     "version": "m1.0",
-     "description": "Jettydemo",
-     "business_description": "Jettydemo",
+     "version": "v1.0.0",
+     "description": "Updated decription",
+     "business_description": "Updated business description",
      "suspend": false,
-     "deleted": false,
      "changeowner": true,
      "authorization": {
           "classification": "unclassified",
-          "endpoint_addrs": [
-               "172.18.0.3",
-            ],
+          "endpoint_addrs": ["172.18.0.3","192.167.3.42"],
           "endpoint_ids": [
                {
                     "password": "password",
                     "id": "user"
                }
           ]
-     },
-
+     }
  }
+
 
 Get a Feed
 ----------
@@ -291,7 +283,7 @@ http[s]://{host}:{port}/feed/{feedId}
 Sample Request
 ==============
 
-``curl -v -X GET -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/feed/{feedId}``
+``curl -k -H "X-ATT-DR-ON-BEHALF-OF: {user}" https://{host}:{port}/feed/{feedId}``
 
 Response/Error Codes
 ====================
@@ -352,7 +344,7 @@ http[s]://{host}:{port}/feed/{feedId}
 Sample Request
 ==============
 
-``curl -v -X DELETE -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/feed/{feedId}``
+``curl -k -X DELETE -H "X-ATT-DR-ON-BEHALF-OF: {user}" https://{host}:{port}/feed/{feedId}``
 
 Response/Error Codes
 ====================
@@ -409,10 +401,12 @@ Request URL
 
 http[s]://{host}:{port}/subscribe/{feedId}
 
+* {feedId}: Id of the feed to subscribe to
+
 Sample Request
 ==============
 
-``curl -v -X POST -H "Content-Type: application/vnd.att-dr.subscription" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @/opt/app/datartr/addSubscriber.txt --post301 --location-trusted -k https://{host}:{port}/subscribe/{feedId}``
+``curl -k -X POST -H "Content-Type:application/vnd.att-dr.subscription" -H "X-ATT-DR-ON-BEHALF-OF:{user}" --data-ascii @addSubscriber.json https://{host}:{port}/subscribe/{feedId}``
 
 Request Parameters:
 ===================
@@ -441,7 +435,7 @@ Request Parameters:
 | content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.att-dr.subscription  |
 |                        | (feed,subscriber,publisher)     |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| X-ATT-DR-ON-BEHALF-OF  | User id of subscriber           |     Header       |   String   |     8        |     Y       |  username                            |
+| X-ATT-DR-ON-BEHALF-OF  | User id of subscriber           |     Header       |   String   |     <=8      |     Y       |  username                            |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 
 Response/Error Codes
@@ -507,10 +501,8 @@ Sample Body
         "use100" : true
     },
     "metadataOnly" : false,
-    "suspend" : false,
-    "groupid" : 29,
-    "subscriber" : "subscriber123"
-
+    "groupid" : 1,
+    "subscriber" : "subuser"
  }
 
 Update subscription
@@ -521,12 +513,14 @@ Update subscription
 Request URL
 ===========
 
-http[s]://{host}:{port}/subscribe/{feedId}
+http[s]://{host}:{port}/subs/{subId}
+
+* {subId}: Id of the subscription to be updated
 
 Sample Request
 ==============
 
-``curl -v -X PUT -H "Content-Type: application/vnd.att-dr.subscription" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @/opt/app/datartr/addSubscriber.txt --location-trusted -k https://{host}:{port}/subscribe/{feedId}``
+``curl -k -X PUT -H "Content-Type:application/vnd.att-dr.subscription" -H "X-ATT-DR-ON-BEHALF-OF:{user}" --data-ascii @updateSubscriber.json https://{host}:{port}/subs/{subId}``
 
 Request Parameters:
 ===================
@@ -534,7 +528,7 @@ Request Parameters:
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 | Name                   | Description                     |  Param Type      |  Data Type |   MaxLen     |  Required   |  Valid/Example Values                |
 +========================+=================================+==================+============+==============+=============+======================================+
-| feedId                 | ID for the subscription you are |     Path         |   String   |              |     Y       |                                      |
+| subId                  | ID for the subscription you are |     Path         |   String   |              |     Y       |                                      |
 |                        | updating                        |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 | delivery               | Address and credentials for     |     Body         |   Object   |              |     Y       |                                      |
@@ -615,16 +609,14 @@ Sample Body
 
  {
     "delivery" :{
-        "url" : "http://172.18.0.3:7070/",
-        "user" : "LOGIN",
-        "password" : "PASSWORD",
+        "url" : "http://192.0.0.1:7070/",
+        "user" : "NEW_LOGIN",
+        "password" : "NEW_PASSWORD",
         "use100" : true
     },
     "metadataOnly" : false,
-    "suspend" : false,
-    "groupid" : 29,
-    "subscriber" : "subscriber123"
-
+    "groupid" : 2,
+    "subscriber" : "subuser"
  }
 
 
@@ -636,14 +628,14 @@ Get a Subscription
 Request URL
 ===========
 
-http[s]://{host}:{port}/subscribe/{subId}
+http[s]://{host}:{port}/subs/{subId}
 
 * {subId}: Id of the subscription you want to see a representation of
 
 Sample Request
 ==============
 
-``curl -v -X GET -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/subscribe/{subId}``
+``curl -k -H "X-ATT-DR-ON-BEHALF-OF:{user}" https://{host}:{port}/subs/{subId}``
 
 Response/Error Codes
 ====================
@@ -697,14 +689,14 @@ Delete a subscription
 Request URL
 ===========
 
-http[s]://{host}:{port}/feed/{feedId}
+http[s]://{host}:{port}/subs/{subId}
 
-* {feedId}: Id of the subscription you want to delete
+* {subId}: Id of the subscription you want to delete
 
 Sample Request
 ==============
 
-``curl -v -X DELETE -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/subscribe/{feedId}``
+``curl -k -X DELETE -H "X-ATT-DR-ON-BEHALF-OF:{user}" https://{host}:{port}/subs/{subId}``
 
 Response/Error Codes
 ====================
@@ -753,16 +745,20 @@ Response/Error Codes
 Publish to Feed
 ---------------
 
-**Description**: Publish a file to a created feed so that it can be shared to any subscribers of that feed
+**Description**: Publish data to a given feed
 
 Request URL
 ===========
 
 http[s]://{host}:{port}/publish/{feedId}/{fileName}
 
-* {feedId} is the id of the feed you are publishing to.
-* {fileId} is the id of the file you are publishing onto the feed.
+* {feedId} The id of the feed you are publishing to.
+* {fileId} The name of the file you are publishing to the feed.
 
+Sample Request
+==============
+
+``curl -k -X PUT --user {user}:{password} -H "Content-Type:application/octet-stream"  -H "X-ATT-DR-META:{\"filetype\":\"txt\"}" --data-binary @sampleFile.txt --post301 --location-trusted https://{host}:{port}/publish/{feedId}/sampleFile``
 
 Request parameters
 ==================
@@ -817,10 +813,6 @@ Response/Error Codes
 |                        | available                       |
 +------------------------+---------------------------------+
 
-Sample Request
-==============
-
-``curl -v -X PUT --user {user}:{password} -H "Content-Type: application/octet-stream"  -H X-ATT-DR-META:'{"filetype":"zip"}' --data-binary @/opt/app/datartr/sampleFile.txt --post301 --location-trusted -k https://{host}:{port}/publish/{feedId}/sampleFile.txt``
 
 Delete a Published file
 -----------------------
@@ -838,7 +830,7 @@ http[s]://{host}:{port}/publish/{feedId}/{fileId}
 Sample Request
 ==============
 
-``curl -v -X DELETE -H "X-ATT-DR-ON-BEHALF-OF: {user}" --location-trusted -k https:/{host}:{port}/publish/{feedId}/{fileId}``
+``curl -k -X DELETE --user {user}:{password} --location-trusted https://{host}:{port}/publish/{feedId}/{fileId}``
 
 Response/Error Codes
 ====================
@@ -877,11 +869,16 @@ Feed logging
 Request URL
 ===========
 
-
 http[s]://{host}:{port}/feedlog/{feedId}?{queryParameter}
 
-* {feedId} : The id of the feed you want to get logs from
-* {queryParameter}: A parameter passed through to narrow the returned logs. multiple parameters can be passed
+* {feedId} : The id of the feed you want to get logs for
+* {queryParameter}: A parameter passed through to narrow the returned logs. Multiple parameters can be passed.
+
+
+Sample Request
+==============
+
+``curl -k https://{host}:{port}/feedlog/{feedId}?statusCode=204``
 
 Request parameters
 ==================
@@ -890,7 +887,7 @@ Request parameters
 | Name                   | Description                     |  Param Type      |  Data Type |   MaxLen     |  Required   |  Valid/Example Values                |
 +========================+=================================+==================+============+==============+=============+======================================+
 | feedId                 | Id of the feed you want         |     Path         |   String   |              |     N       | 1                                    |
-|                        | logs from                       |                  |            |              |             |                                      |
+|                        | logs for                        |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 | type                   | Select records of the           |     Path         |   String   |              |     N       | * pub: Publish attempt               |
 |                        | specified type                  |                  |            |              |             | * del: Delivery attempt              |
@@ -1014,12 +1011,8 @@ Response/Error Codes
 |                        | is currently unavailable                  |
 +------------------------+-------------------------------------------+
 
-Sample Request
-==============
 
-``curl -v -k https://{host}:{port}/feedlog/{feedId}?statusCode=204``
-
-Subscriber logging
+Subscription logging
 ------------------
 
 **Description**: View logging information for specified subscriptions, which can be narrowed down with further parameters
@@ -1027,11 +1020,16 @@ Subscriber logging
 Request URL
 ===========
 
-
 http[s]://{host}:{port}/sublog/{subId}?{queryParameter}
 
 * {subId}: The id of the feed you want to get logs from
-* {queryParameter}: A parameter passed through to narrow the returned logs. multiple parameters can be passed
+* {queryParameter}: A parameter passed through to narrow the returned logs. Multiple parameters can be passed.
+
+
+Sample Request
+==============
+
+``curl -k https://{host}:{port}/sublog/{subId}?statusCode=204``
 
 Request parameters
 ==================
@@ -1039,8 +1037,8 @@ Request parameters
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 | Name                   | Description                     |  Param Type      |  Data Type |   MaxLen     |  Required   |  Valid/Example Values                |
 +========================+=================================+==================+============+==============+=============+======================================+
-| subId                  | Id of the feed you want         |     Path         |   String   |              |     N       | 1                                    |
-|                        | logs from                       |                  |            |              |             |                                      |
+| subId                  | Id of the subscription you want |     Path         |   String   |              |     N       | 1                                    |
+|                        | logs for                        |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 | type                   | Select records of the           |     Path         |   String   |              |     N       | * pub: Publish attempt               |
 |                        | specified type                  |                  |            |              |             | * del: Delivery attempt              |
@@ -1087,7 +1085,7 @@ Response Parameters
 +------------------------+-------------------------------------------+
 | publishId              | The unique identifier assigned by the DR  |
 |                        | at the time of the initial publication    |
-|                        | request (carried in the X-ATT-DRPUBLISH-ID|
+|                        | request(carried in the X-ATT-DR-PUBLISH-ID|
 |                        | header in the response to the original    |
 |                        | publish request) to a feed log URL or     |
 |                        | subscription log URL known to the system  |
@@ -1165,8 +1163,3 @@ Response/Error Codes
 | 503                    | Service Unavailable - The DR API service  |
 |                        | is currently unavailable                  |
 +------------------------+-------------------------------------------+
-
-Sample Request
-==============
-
-``curl -v -k https://{host}:{port}/sublog/{subscriberId}?statusCode=204``
