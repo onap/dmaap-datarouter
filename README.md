@@ -79,7 +79,7 @@ What the Data Router is NOT:
 
 ## BUILD
 
-Datarouter can be cloned and repository and builb using Maven
+After Datarouter repository is cloned it can be built using Maven
 In the repository
 
 Go to datarouter-prov in the root
