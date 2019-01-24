@@ -90,27 +90,27 @@ import javax.mail.internet.MimeMultipart;
 @SuppressWarnings("serial")
 public class BaseServlet extends HttpServlet implements ProvDataProvider {
 
-    public static final String BEHALF_HEADER = "X-ATT-DR-ON-BEHALF-OF";
-    static final String FEED_BASECONTENT_TYPE = "application/vnd.att-dr.feed";
-    public static final String FEED_CONTENT_TYPE = "application/vnd.att-dr.feed; version=2.0";
-    public static final String FEEDFULL_CONTENT_TYPE = "application/vnd.att-dr.feed-full; version=2.0";
-    public static final String FEEDLIST_CONTENT_TYPE = "application/vnd.att-dr.feed-list; version=1.0";
-    static final String SUB_BASECONTENT_TYPE = "application/vnd.att-dr.subscription";
-    public static final String SUB_CONTENT_TYPE = "application/vnd.att-dr.subscription; version=2.0";
-    public static final String SUBFULL_CONTENT_TYPE = "application/vnd.att-dr.subscription-full; version=2.0";
-    static final String SUBLIST_CONTENT_TYPE = "application/vnd.att-dr.subscription-list; version=1.0";
+    public static final String BEHALF_HEADER = "X-DR-ON-BEHALF-OF";
+    static final String FEED_BASECONTENT_TYPE = "application/vnd.dr.feed";
+    public static final String FEED_CONTENT_TYPE = "application/vnd.dr.feed; version=2.0";
+    public static final String FEEDFULL_CONTENT_TYPE = "application/vnd.dr.feed-full; version=2.0";
+    public static final String FEEDLIST_CONTENT_TYPE = "application/vnd.dr.feed-list; version=1.0";
+    static final String SUB_BASECONTENT_TYPE = "application/vnd.dr.subscription";
+    public static final String SUB_CONTENT_TYPE = "application/vnd.dr.subscription; version=2.0";
+    public static final String SUBFULL_CONTENT_TYPE = "application/vnd.dr.subscription-full; version=2.0";
+    static final String SUBLIST_CONTENT_TYPE = "application/vnd.dr.subscription-list; version=1.0";
 
 
     //Adding groups functionality, ...1610
-    static final String GROUP_BASECONTENT_TYPE = "application/vnd.att-dr.group";
-    public static final String GROUP_CONTENT_TYPE = "application/vnd.att-dr.group; version=2.0";
-    static final String GROUPFULL_CONTENT_TYPE = "application/vnd.att-dr.group-full; version=2.0";
-    public static final String GROUPLIST_CONTENT_TYPE = "application/vnd.att-dr.fegrouped-list; version=1.0";
+    static final String GROUP_BASECONTENT_TYPE = "application/vnd.dr.group";
+    public static final String GROUP_CONTENT_TYPE = "application/vnd.dr.group; version=2.0";
+    static final String GROUPFULL_CONTENT_TYPE = "application/vnd.dr.group-full; version=2.0";
+    public static final String GROUPLIST_CONTENT_TYPE = "application/vnd.dr.fegrouped-list; version=1.0";
 
 
-    public static final String LOGLIST_CONTENT_TYPE = "application/vnd.att-dr.log-list; version=1.0";
-    public static final String PROVFULL_CONTENT_TYPE1 = "application/vnd.att-dr.provfeed-full; version=1.0";
-    public static final String PROVFULL_CONTENT_TYPE2 = "application/vnd.att-dr.provfeed-full; version=2.0";
+    public static final String LOGLIST_CONTENT_TYPE = "application/vnd.dr.log-list; version=1.0";
+    public static final String PROVFULL_CONTENT_TYPE1 = "application/vnd.dr.provfeed-full; version=1.0";
+    public static final String PROVFULL_CONTENT_TYPE2 = "application/vnd.dr.provfeed-full; version=2.0";
     public static final String CERT_ATTRIBUTE = "javax.servlet.request.X509Certificate";
 
     static final String DB_PROBLEM_MSG = "There has been a problem with the DB.  It is suggested you try the operation again.";
@@ -234,7 +234,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
 
     //DMAAP-597 (Tech Dept) REST request source IP auth relaxation to accommodate OOM kubernetes deploy
     private static String isAddressAuthEnabled = (new DB()).getProperties()
-        .getProperty("org.onap.dmaap.datarouter.provserver.isaddressauthenabled", "false");
+            .getProperty("org.onap.dmaap.datarouter.provserver.isaddressauthenabled", "false");
 
     /**
      * Initialize data common to all the provisioning server servlets.
@@ -411,8 +411,8 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             }
             if (mlen > 0) {
                 byte[] masks = {
-                    (byte) 0x00, (byte) 0x80, (byte) 0xC0, (byte) 0xE0,
-                    (byte) 0xF0, (byte) 0xF8, (byte) 0xFC, (byte) 0xFE
+                        (byte) 0x00, (byte) 0x80, (byte) 0xC0, (byte) 0xE0,
+                        (byte) 0xF0, (byte) 0xF8, (byte) 0xFC, (byte) 0xFE
                 };
                 byte mask = masks[mlen % 8];
                 for (n = mlen / 8; n < b1.length; n++) {
@@ -460,11 +460,11 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         provName = getString(map, Parameters.PROV_NAME, DEFAULT_PROVSRVR_NAME);
         activeProvName = getString(map, Parameters.PROV_ACTIVE_NAME, provName);
         staticRoutingNodes = getString(map, Parameters.STATIC_ROUTING_NODES,
-            ""); //Adding new param for static Routing - Rally:US664862-1610
+                ""); //Adding new param for static Routing - Rally:US664862-1610
         initialActivePod = getString(map, Parameters.ACTIVE_POD, "");
         initialStandbyPod = getString(map, Parameters.STANDBY_POD, "");
         staticRoutingNodes = getString(map, Parameters.STATIC_ROUTING_NODES,
-            ""); //Adding new param for static Routing - Rally:US664862-1610
+                ""); //Adding new param for static Routing - Rally:US664862-1610
         activeFeeds = Feed.countActiveFeeds();
         activeSubs = Subscription.countActiveSubscriptions();
         try {
@@ -597,12 +597,12 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             msg.addRecipients(Message.RecipientType.TO, addressTo);
             msg.setSubject(mailprops.get("com.att.dmaap.datarouter.mail.subject").toString());
             htmlPart.setContent(mailprops.get("com.att.dmaap.datarouter.mail.body").toString()
-                .replace("[SERVER]", InetAddress.getLocalHost().getHostName()), "text/html");
+                    .replace("[SERVER]", InetAddress.getLocalHost().getHostName()), "text/html");
             mp.addBodyPart(htmlPart);
             msg.setContent(mp);
 
             System.out.println(mailprops.get("com.att.dmaap.datarouter.mail.body").toString()
-                .replace("[SERVER]", InetAddress.getLocalHost().getHostName()));
+                    .replace("[SERVER]", InetAddress.getLocalHost().getHostName()));
 
             Transport.send(msg);
             intlogger.info("HTTPS relaxation mail is sent to - : " + email);

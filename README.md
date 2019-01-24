@@ -117,11 +117,11 @@ Curl Commands to test:
 
 create a feed:
 
-curl -v -X POST -H "Content-Type : application/vnd.att-dr.feed" -H "X-ATT-DR-ON-BEHALF-OF: rs873m" --data-ascii @/opt/app/datartr/addFeed3.txt --post301 --location-trusted  -k https://dmaap-dr-prov:8443
+curl -v -X POST -H "Content-Type : application/vnd.dr.feed" -H "X-DR-ON-BEHALF-OF: rs873m" --data-ascii @/opt/app/datartr/addFeed3.txt --post301 --location-trusted  -k https://dmaap-dr-prov:8443
 
 Subscribe to feed:
 
-curl -v -X POST -H "Content-Type: application/vnd.att-dr.subscription" -H "X-ATT-DR-ON-BEHALF-OF: rs873m" --data-ascii @/opt/app/datartr/addSubscriber.txt --post301 --location-trusted -k https://dmaap-dr-prov:8443/subscribe/1
+curl -v -X POST -H "Content-Type: application/vnd.dr.subscription" -H "X-DR-ON-BEHALF-OF: rs873m" --data-ascii @/opt/app/datartr/addSubscriber.txt --post301 --location-trusted -k https://dmaap-dr-prov:8443/subscribe/1
 
 Publish to feed:
 
