@@ -78,11 +78,7 @@ public class Delivery {
     private DeliveryQueue[] queues = new DeliveryQueue[0];
     private int qpos = 0;
     private long nextcheck;
-    private Runnable cmon = new Runnable() {
-        public void run() {
-            checkconfig();
-        }
-    };
+    private Runnable cmon = this::checkconfig;
 
     /**
      * Constructs a new Delivery system using the specified configuration manager.

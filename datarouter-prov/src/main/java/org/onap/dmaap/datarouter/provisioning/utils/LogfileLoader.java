@@ -176,12 +176,7 @@ public class LogfileLoader extends Thread {
                 File dirfile = new File(spooldir);
                 while (true) {
                     // process IN files
-                    File[] infiles = dirfile.listFiles(new FilenameFilter() {
-                        @Override
-                        public boolean accept(File dir, String name) {
-                            return name.startsWith("IN.");
-                        }
-                    });
+                    File[] infiles = dirfile.listFiles((dir, name) -> name.startsWith("IN."));
 
                     if (infiles.length == 0) {
                         idle = true;
