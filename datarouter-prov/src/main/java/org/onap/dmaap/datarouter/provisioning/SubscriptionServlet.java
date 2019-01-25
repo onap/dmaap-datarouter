@@ -58,10 +58,10 @@ import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.send
 @SuppressWarnings("serial")
 public class SubscriptionServlet extends ProxyServlet {
 
-    public static final String SUBCNTRL_CONTENT_TYPE = "application/vnd.att-dr.subscription-control";
+    public static final String SUBCNTRL_CONTENT_TYPE = "application/vnd.dr.subscription-control";
     //Adding EELF Logger Rally:US664892
     private static EELFLogger eelflogger = EELFManager.getInstance()
-        .getLogger("org.onap.dmaap.datarouter.provisioning.SubscriptionServlet");
+            .getLogger("org.onap.dmaap.datarouter.provisioning.SubscriptionServlet");
 
     /**
      * DELETE on the &lt;subscriptionUrl&gt; -- delete a subscription. See the <i>Deleting a Subscription</i> section in
@@ -304,9 +304,9 @@ public class SubscriptionServlet extends ProxyServlet {
         }
         sub.setSubid(oldsub.getSubid());
         sub.setFeedid(oldsub.getFeedid());
-        sub.setSubscriber(bhdr);    // set from X-ATT-DR-ON-BEHALF-OF header
+        sub.setSubscriber(bhdr);    // set from X-DR-ON-BEHALF-OF header
 
-        String subjectgroup = (req.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")); //Adding for group feature:Rally US708115
+        String subjectgroup = (req.getHeader("X-DR-ON-BEHALF-OF-GROUP")); //Adding for group feature:Rally US708115
         if (!oldsub.getSubscriber().equals(sub.getSubscriber()) && subjectgroup == null) {
             message = "This subscriber must be modified by the same subscriber that created it.";
             elr.setMessage(message);

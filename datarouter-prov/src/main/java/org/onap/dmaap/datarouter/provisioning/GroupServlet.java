@@ -357,7 +357,7 @@ public class GroupServlet extends ProxyServlet {
             return;
         }
         //gup.setFeedid(feedid);
-        //sub.setSubscriber(bhdr);    // set from X-ATT-DR-ON-BEHALF-OF header
+        //sub.setSubscriber(bhdr);    // set from X-DR-ON-BEHALF-OF header
 
         // Check if this group already exists; not an error (yet), just warn
         Group gb2 = Group.getGroupMatching(gup);

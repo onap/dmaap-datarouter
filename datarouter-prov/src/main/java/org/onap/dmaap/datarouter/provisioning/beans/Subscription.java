@@ -219,7 +219,7 @@ public class Subscription extends Syncable {
     public Subscription(JSONObject jo) throws InvalidObjectException {
         this("", "", "");
         try {
-            // The JSONObject is assumed to contain a vnd.att-dr.subscription representation
+            // The JSONObject is assumed to contain a vnd.dr.subscription representation
             this.subid = jo.optInt(SUBID_KEY, -1);
             this.feedid = jo.optInt(FEEDID_KEY, -1);
             this.groupid = jo.optInt(GROUPID_KEY, -1); //New field is added - Groups feature Rally:US708115 - 1610

@@ -97,7 +97,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         when(request.isSecure()).thenReturn(false);
         feedServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
@@ -106,7 +106,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         setBehalfHeader(null);
         feedServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
@@ -115,7 +115,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Path_Header_Is_Not_Set_In_Request_With_Valid_Path_Then_Bad_Request_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         when(request.getPathInfo()).thenReturn(null);
         feedServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
@@ -124,7 +124,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Feed_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         when(request.getPathInfo()).thenReturn("/123");
         feedServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
@@ -133,7 +133,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         setAuthoriserToReturnRequestNotAuthorized();
         feedServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
@@ -142,7 +142,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Delete_On_Database_Fails_An_Internal_Server_Error_Is_Reported()
-        throws Exception {
+            throws Exception {
         FeedServlet feedServlet = new FeedServlet() {
             protected boolean doUpdate(Updateable bean) {
                 return false;
@@ -150,13 +150,13 @@ public class FeedServletTest extends DrServletTestBase {
         };
         feedServlet.doDelete(request, response);
         verify(response)
-            .sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+                .sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
     }
 
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Delete_On_Database_Succeeds_A_NO_CONTENT_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         feedServlet.doDelete(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_NO_CONTENT));
         reinsertFeedIntoDb();
@@ -164,7 +164,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         when(request.isSecure()).thenReturn(false);
         feedServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
@@ -172,7 +172,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         setBehalfHeader(null);
         feedServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
@@ -181,7 +181,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_Path_Header_Is_Not_Set_In_Request_With_Valid_Path_Then_Bad_Request_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         when(request.getPathInfo()).thenReturn(null);
         feedServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
@@ -190,7 +190,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_Feed_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         when(request.getPathInfo()).thenReturn("/123");
         feedServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
@@ -199,7 +199,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         setAuthoriserToReturnRequestNotAuthorized();
         feedServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
@@ -217,7 +217,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         when(request.isSecure()).thenReturn(false);
         feedServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
@@ -225,7 +225,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         setBehalfHeader(null);
         feedServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
@@ -234,7 +234,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Path_Header_Is_Not_Set_In_Request_With_Valid_Path_Then_Bad_Request_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         when(request.getPathInfo()).thenReturn(null);
         feedServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
@@ -243,7 +243,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Feed_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         when(request.getPathInfo()).thenReturn("/123");
         feedServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
@@ -251,17 +251,17 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Content_Header_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated()
-        throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.feed-fail; version=2.0");
+            throws Exception {
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dr.feed-fail; version=2.0");
         when(request.getContentType()).thenReturn("stub_contentType");
         feedServlet.doPut(request, response);
         verify(response)
-            .sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), argThat(notNullValue(String.class)));
+                .sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), argThat(notNullValue(String.class)));
     }
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Request_Contains_Badly_Formed_JSON_Then_Bad_Request_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         ServletInputStream inStream = mock(ServletInputStream.class);
         when(request.getInputStream()).thenReturn(inStream);
         feedServlet.doPut(request, response);
@@ -281,7 +281,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Feed_Change_Is_Not_Publisher_Who_Requested_Feed_Bad_Request_Response_Is_Generated() throws Exception {
-        when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn(null);
+        when(request.getHeader("X-DR-ON-BEHALF-OF-GROUP")).thenReturn(null);
         JSONObject JSObject = buildRequestJsonObject();
         FeedServlet feedServlet = new FeedServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -418,8 +418,8 @@ public class FeedServletTest extends DrServletTestBase {
         Set<String> authAddressesAndNetworks = new HashSet<String>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils
-            .writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks,
-                true);
+                .writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks,
+                        true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", false, true);
     }
 
@@ -454,8 +454,8 @@ public class FeedServletTest extends DrServletTestBase {
     }
 
     private void setUpValidContentHeadersAndJSONOnHttpRequest() {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.feed; version=1.0");
-        when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dr.feed; version=1.0");
+        when(request.getHeader("X-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
     }
 
     private void reinsertFeedIntoDb() throws SQLException {

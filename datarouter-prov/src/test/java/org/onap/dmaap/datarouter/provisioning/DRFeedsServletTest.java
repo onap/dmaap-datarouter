@@ -84,7 +84,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         when(request.isSecure()).thenReturn(false);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         drfeedsServlet.doGet(request, response);
@@ -93,7 +93,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         setBehalfHeader(null);
         drfeedsServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
@@ -102,7 +102,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_URL_Path_Not_Valid_Then_Bad_Request_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         when(request.getRequestURI()).thenReturn("/123");
         drfeedsServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
@@ -111,7 +111,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         setAuthoriserToReturnRequestNotAuthorized();
         drfeedsServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
@@ -158,7 +158,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         when(request.isSecure()).thenReturn(false);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         drfeedsServlet.doPost(request, response);
@@ -167,7 +167,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         setBehalfHeader(null);
         drfeedsServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
@@ -176,7 +176,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_URL_Path_Not_Valid_Then_Bad_Request_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         when(request.getRequestURI()).thenReturn("/123");
         drfeedsServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
@@ -185,17 +185,17 @@ public class DRFeedsServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Content_Header_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated()
-        throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.feed; version=1.1");
+            throws Exception {
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dr.feed; version=1.1");
         when(request.getContentType()).thenReturn("stub_contentType");
         drfeedsServlet.doPost(request, response);
         verify(response)
-            .sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), argThat(notNullValue(String.class)));
+                .sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), argThat(notNullValue(String.class)));
     }
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         setAuthoriserToReturnRequestNotAuthorized();
         drfeedsServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
@@ -203,14 +203,14 @@ public class DRFeedsServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Request_Contains_Badly_Formed_JSON_Then_Bad_Request_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         drfeedsServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
     }
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Active_Feeds_Equals_Max_Feeds_Then_Bad_Request_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "maxFeeds", 0, true);
         DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -223,8 +223,8 @@ public class DRFeedsServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Feed_Is_Not_Valid_Object_Bad_Request_Response_Is_Generated()
-        throws Exception {
-        when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn(null);
+            throws Exception {
+        when(request.getHeader("X-DR-ON-BEHALF-OF-GROUP")).thenReturn(null);
         JSONObject JSObject = buildRequestJsonObject();
 
         DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
@@ -240,7 +240,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Feed_Already_Exists_Bad_Request_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         setFeedToReturnInvalidFeedIdSupplied();
         JSONObject JSObject = buildRequestJsonObject();
         DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
@@ -275,13 +275,13 @@ public class DRFeedsServletTest extends DrServletTestBase {
         };
         drfeedsServlet.doPost(request, response);
         verify(response)
-            .sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+                .sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
     }
 
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Change_On_Feeds_Succeeds_A_STATUS_OK_Response_Is_Generated()
-        throws Exception {
+            throws Exception {
         ServletOutputStream outStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outStream);
         JSONObject JSObject = buildRequestJsonObject();
@@ -326,8 +326,8 @@ public class DRFeedsServletTest extends DrServletTestBase {
         Set<String> authAddressesAndNetworks = new HashSet<String>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils
-            .writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks,
-                true);
+                .writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks,
+                        true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", false, true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "maxFeeds", 100, true);
     }
@@ -388,8 +388,8 @@ public class DRFeedsServletTest extends DrServletTestBase {
     }
 
     private void setUpValidContentHeadersAndJSONOnHttpRequest() {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.feed; version=1.0");
-        when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dr.feed; version=1.0");
+        when(request.getHeader("X-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
 
     }
 }

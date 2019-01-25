@@ -52,7 +52,7 @@ Create a Feed
 Sample Request
 ==============
 
-``curl -k -X POST -H "Content-Type:application/vnd.att-dr.feed" -H "X-ATT-DR-ON-BEHALF-OF:{user}" --data-ascii @createFeed.json https://{host}:{port}``
+``curl -k -X POST -H "Content-Type:application/vnd.dr.feed" -H "X-DR-ON-BEHALF-OF:{user}" --data-ascii @createFeed.json https://{host}:{port}``
 
 Request Parameters:
 ===================
@@ -77,10 +77,10 @@ Request Parameters:
 | group-id               |                                 |     Body         |   Integer  |              |     Y       |                                      |
 |                        |                                 |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.att-dr.feed          |
+| content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.dr.feed              |
 |                        | (feed,subscriber,publisher)     |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| X-ATT-DR-ON-BEHALF-OF  | User id of owner of feed        |     Header       |   String   |     <=8      |     Y       |  username                            |
+| X-DR-ON-BEHALF-OF      | User id of owner of feed        |     Header       |   String   |     <=8      |     Y       |  username                            |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 
 Response/Error Codes
@@ -110,7 +110,7 @@ Response/Error Codes
 |                        |   IP address                              |
 |                        | * Client certificate subject is not on    |
 |                        |   the API’s authorized list.              |
-|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        | * X-DR-ON-BEHALF-OF identity is not       |
 |                        |   authorized to perform                   |
 +------------------------+-------------------------------------------+
 | 404                    | Not Found - The Request-URI does not point|
@@ -166,7 +166,7 @@ Updating a Feed
 Sample Request
 ==============
 
-``curl -k -X PUT -H "Content-Type: application/vnd.att-dr.feed" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @updateFeed.json --location-trusted https://{host}:{port}/feed/{feedId}``
+``curl -k -X PUT -H "Content-Type: application/vnd.dr.feed" -H "X-DR-ON-BEHALF-OF: {user}" --data-ascii @updateFeed.json --location-trusted https://{host}:{port}/feed/{feedId}``
 
 Request Parameters:
 ===================
@@ -187,10 +187,10 @@ Request Parameters:
 | group-id               |                                 |     Body         |   Integer  |              |     Y       |                                      |
 |                        |                                 |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.att-dr.feed          |
+| content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.dr.feed              |
 |                        | (feed,subscriber,publisher)     |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| X-ATT-DR-ON-BEHALF-OF  | User id of owner of feed        |     Header       |   String   |     <=8      |     Y       |  username                            |
+| X-DR-ON-BEHALF-OF      | User id of owner of feed        |     Header       |   String   |     <=8      |     Y       |  username                            |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 
 Response/Error Codes
@@ -220,7 +220,7 @@ Response/Error Codes
 |                        |   IP address                              |
 |                        | * Client certificate subject is not on    |
 |                        |   the API’s authorized list.              |
-|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        | * X-DR-ON-BEHALF-OF identity is not       |
 |                        |   authorized to perform                   |
 +------------------------+-------------------------------------------+
 | 404                    | Not Found - The Request-URI does not point|
@@ -283,7 +283,7 @@ http[s]://{host}:{port}/feed/{feedId}
 Sample Request
 ==============
 
-``curl -k -H "X-ATT-DR-ON-BEHALF-OF: {user}" https://{host}:{port}/feed/{feedId}``
+``curl -k -H "X-DR-ON-BEHALF-OF: {user}" https://{host}:{port}/feed/{feedId}``
 
 Response/Error Codes
 ====================
@@ -305,7 +305,7 @@ Response/Error Codes
 |                        |   IP address                              |
 |                        | * Client certificate subject is not on    |
 |                        |   the API’s authorized list.              |
-|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        | * X-DR-ON-BEHALF-OF identity is not       |
 |                        |   authorized to perform                   |
 +------------------------+-------------------------------------------+
 | 404                    | Not Found - The Request-URI does not point|
@@ -344,7 +344,7 @@ http[s]://{host}:{port}/feed/{feedId}
 Sample Request
 ==============
 
-``curl -k -X DELETE -H "X-ATT-DR-ON-BEHALF-OF: {user}" https://{host}:{port}/feed/{feedId}``
+``curl -k -X DELETE -H "X-DR-ON-BEHALF-OF: {user}" https://{host}:{port}/feed/{feedId}``
 
 Response/Error Codes
 ====================
@@ -366,7 +366,7 @@ Response/Error Codes
 |                        |   IP address                              |
 |                        | * Client certificate subject is not on    |
 |                        |   the API’s authorized list.              |
-|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        | * X-DR-ON-BEHALF-OF identity is not       |
 |                        |   authorized to perform                   |
 +------------------------+-------------------------------------------+
 | 404                    | Not Found - The Request-URI does not point|
@@ -406,7 +406,7 @@ http[s]://{host}:{port}/subscribe/{feedId}
 Sample Request
 ==============
 
-``curl -k -X POST -H "Content-Type:application/vnd.att-dr.subscription" -H "X-ATT-DR-ON-BEHALF-OF:{user}" --data-ascii @addSubscriber.json https://{host}:{port}/subscribe/{feedId}``
+``curl -k -X POST -H "Content-Type:application/vnd.dr.subscription" -H "X-DR-ON-BEHALF-OF:{user}" --data-ascii @addSubscriber.json https://{host}:{port}/subscribe/{feedId}``
 
 Request Parameters:
 ===================
@@ -432,10 +432,10 @@ Request Parameters:
 | group-id               |                                 |     Body         |   Integer  |              |     Y       |                                      |
 |                        |                                 |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.att-dr.subscription  |
+| content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.dr.subscription      |
 |                        | (feed,subscriber,publisher)     |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| X-ATT-DR-ON-BEHALF-OF  | User id of subscriber           |     Header       |   String   |     <=8      |     Y       |  username                            |
+| X-DR-ON-BEHALF-OF      | User id of subscriber           |     Header       |   String   |     <=8      |     Y       |  username                            |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 
 Response/Error Codes
@@ -465,7 +465,7 @@ Response/Error Codes
 |                        |   IP address                              |
 |                        | * Client certificate subject is not on    |
 |                        |   the API’s authorized list.              |
-|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        | * X-DR-ON-BEHALF-OF identity is not       |
 |                        |   authorized to perform                   |
 +------------------------+-------------------------------------------+
 | 404                    | Not Found - The Request-URI does not point|
@@ -520,7 +520,7 @@ http[s]://{host}:{port}/subs/{subId}
 Sample Request
 ==============
 
-``curl -k -X PUT -H "Content-Type:application/vnd.att-dr.subscription" -H "X-ATT-DR-ON-BEHALF-OF:{user}" --data-ascii @updateSubscriber.json https://{host}:{port}/subs/{subId}``
+``curl -k -X PUT -H "Content-Type:application/vnd.dr.subscription" -H "X-DR-ON-BEHALF-OF:{user}" --data-ascii @updateSubscriber.json https://{host}:{port}/subs/{subId}``
 
 Request Parameters:
 ===================
@@ -546,10 +546,10 @@ Request Parameters:
 | group-id               |                                 |     Body         |   Integer  |              |     Y       |                                      |
 |                        |                                 |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.att-dr.subscription  |
+| content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.dr.subscription      |
 |                        | (feed,subscriber,publisher)     |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| X-ATT-DR-ON-BEHALF-OF  | User id of subscriber           |     Header       |   String   |     8        |     Y       |  username                            |
+| X-DR-ON-BEHALF-OF      | User id of subscriber           |     Header       |   String   |     8        |     Y       |  username                            |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 
 Response/Error Codes
@@ -579,7 +579,7 @@ Response/Error Codes
 |                        |   IP address                              |
 |                        | * Client certificate subject is not on    |
 |                        |   the API’s authorized list.              |
-|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        | * X-DR-ON-BEHALF-OF identity is not       |
 |                        |   authorized to perform                   |
 +------------------------+-------------------------------------------+
 | 404                    | Not Found - The Request-URI does not point|
@@ -635,7 +635,7 @@ http[s]://{host}:{port}/subs/{subId}
 Sample Request
 ==============
 
-``curl -k -H "X-ATT-DR-ON-BEHALF-OF:{user}" https://{host}:{port}/subs/{subId}``
+``curl -k -H "X-DR-ON-BEHALF-OF:{user}" https://{host}:{port}/subs/{subId}``
 
 Response/Error Codes
 ====================
@@ -657,7 +657,7 @@ Response/Error Codes
 |                        |   IP address                              |
 |                        | * Client certificate subject is not on    |
 |                        |   the API’s authorized list.              |
-|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        | * X-DR-ON-BEHALF-OF identity is not       |
 |                        |   authorized to perform                   |
 +------------------------+-------------------------------------------+
 | 404                    | Not Found - The Request-URI does not point|
@@ -696,7 +696,7 @@ http[s]://{host}:{port}/subs/{subId}
 Sample Request
 ==============
 
-``curl -k -X DELETE -H "X-ATT-DR-ON-BEHALF-OF:{user}" https://{host}:{port}/subs/{subId}``
+``curl -k -X DELETE -H "X-DR-ON-BEHALF-OF:{user}" https://{host}:{port}/subs/{subId}``
 
 Response/Error Codes
 ====================
@@ -718,7 +718,7 @@ Response/Error Codes
 |                        |   IP address                              |
 |                        | * Client certificate subject is not on    |
 |                        |   the API’s authorized list.              |
-|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        | * X-DR-ON-BEHALF-OF identity is not       |
 |                        |   authorized to perform                   |
 +------------------------+-------------------------------------------+
 | 404                    | Not Found - The Request-URI does not point|
@@ -758,7 +758,7 @@ http[s]://{host}:{port}/publish/{feedId}/{fileName}
 Sample Request
 ==============
 
-``curl -k -X PUT --user {user}:{password} -H "Content-Type:application/octet-stream"  -H "X-ATT-DR-META:{\"filetype\":\"txt\"}" --data-binary @sampleFile.txt --post301 --location-trusted https://{host}:{port}/publish/{feedId}/sampleFile``
+``curl -k -X PUT --user {user}:{password} -H "Content-Type:application/octet-stream"  -H "X-DR-META:{\"filetype\":\"txt\"}" --data-binary @sampleFile.txt --post301 --location-trusted https://{host}:{port}/publish/{feedId}/sampleFile``
 
 Request parameters
 ==================
@@ -775,7 +775,7 @@ Request parameters
 | content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/octet-stream                                                 |
 |                        | format                          |                  |            |              |             |                                                                          |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------------------------------------------+
-| X-ATT-DR-META          | Metadata for the file. Accepts  |     Header       |   String   |     4096     |     N       | '{"compressionType":"gzip","id": 1234, "transferred":true, "size":null}' |
+| X-DR-META              | Metadata for the file. Accepts  |     Header       |   String   |     4096     |     N       | '{"compressionType":"gzip","id": 1234, "transferred":true, "size":null}' |
 |                        | only non nested json objects    |                  |            |              |             |                                                                          |
 |                        | of the following type :         |                  |            |              |             |                                                                          |
 |                        | -Numbers                        |                  |            |              |             |                                                                          |
@@ -895,7 +895,7 @@ Request parameters
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 | publishId              | Select records with specified   |     Path         |   String   |              |     N       |                                      |
 |                        | publish id, carried in the      |                  |            |              |             |                                      |
-|                        | X-ATT-DR-PUBLISH-ID header from |                  |            |              |             |                                      |
+|                        | X-DR-PUBLISH-ID header from     |                  |            |              |             |                                      |
 |                        | original publish request        |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 | start                  | Select records created at or    |     Path         |   String   |              |     N       | A date-time expressed in the format  |
@@ -933,7 +933,7 @@ Response Parameters
 +------------------------+-------------------------------------------+
 | publishId              | The unique identifier assigned by the DR  |
 |                        | at the time of the initial publication    |
-|                        | request (carried in the X-ATT-DRPUBLISH-ID|
+|                        | request (carried in the X-DR-PUBLISH-ID   |
 |                        | header in the response to the original    |
 |                        | publish request)                          |
 +------------------------+-------------------------------------------+
@@ -1001,7 +1001,7 @@ Response/Error Codes
 | 406                    | Not Acceptable - The request has an Accept|
 |                        | header indicating that the requester will |
 |                        | not accept a response with                |
-|                        | application/vnd.att-dr.log-list content.  |
+|                        | application/vnd.dr.log-list content.      |
 +------------------------+-------------------------------------------+
 | 500                    | Internal Server Error - The DR API server |
 |                        | encountered an internal error and could   |
@@ -1046,7 +1046,7 @@ Request parameters
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 | publishId              | Select records with specified   |     Path         |   String   |              |     N       |                                      |
 |                        | publish id, carried in the      |                  |            |              |             |                                      |
-|                        | X-ATT-DR-PUBLISH-ID header from |                  |            |              |             |                                      |
+|                        | X-DR-PUBLISH-ID header from     |                  |            |              |             |                                      |
 |                        | original publish request        |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 | start                  | Select records created at or    |     Path         |   String   |              |     N       | A date-time expressed in the format  |
@@ -1085,7 +1085,7 @@ Response Parameters
 +------------------------+-------------------------------------------+
 | publishId              | The unique identifier assigned by the DR  |
 |                        | at the time of the initial publication    |
-|                        | request(carried in the X-ATT-DR-PUBLISH-ID|
+|                        | request(carried in the X-DR-PUBLISH-ID    |
 |                        | header in the response to the original    |
 |                        | publish request) to a feed log URL or     |
 |                        | subscription log URL known to the system  |
@@ -1154,7 +1154,7 @@ Response/Error Codes
 | 406                    | Not Acceptable - The request has an Accept|
 |                        | header indicating that the requester will |
 |                        | not accept a response with                |
-|                        | application/vnd.att-dr.log-list content.  |
+|                        | application/vnd.dr.log-list content.      |
 +------------------------+-------------------------------------------+
 | 500                    | Internal Server Error - The DR API server |
 |                        | encountered an internal error and could   |

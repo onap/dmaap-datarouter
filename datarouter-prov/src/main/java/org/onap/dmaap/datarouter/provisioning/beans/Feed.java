@@ -320,7 +320,7 @@ public class Feed extends Syncable {
     public Feed(JSONObject jo) throws InvalidObjectException {
         this("", "", "", "");
         try {
-            // The JSONObject is assumed to contain a vnd.att-dr.feed representation
+            // The JSONObject is assumed to contain a vnd.dr.feed representation
             this.feedid = jo.optInt("feedid", -1);
             this.groupid = jo.optInt("groupid"); //New field is added - Groups feature Rally:US708115 - 1610
             this.name = jo.getString("name");
