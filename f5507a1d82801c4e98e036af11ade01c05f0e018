@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_d9efa71c",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-01-29T23:58:56Z",
+      "side": 1,
+      "message": "Minor comment but would it be better to have \"vnd.dmaap-dr.***\"",
+      "range": {
+        "startLine": 97,
+        "startChar": 72,
+        "endLine": 97,
+        "endChar": 74
+      },
+      "revId": "f5507a1d82801c4e98e036af11ade01c05f0e018",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
