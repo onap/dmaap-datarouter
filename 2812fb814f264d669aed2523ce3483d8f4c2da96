@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_5c708571",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/DRFeedsServlet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-30T10:54:20Z",
+      "side": 1,
+      "message": "-DMAAP-",
+      "range": {
+        "startLine": 285,
+        "startChar": 49,
+        "endLine": 285,
+        "endChar": 50
+      },
+      "revId": "2812fb814f264d669aed2523ce3483d8f4c2da96",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_dc6475ba",
+        "filename": "datarouter-prov/src/test/java/datarouter/provisioning/IntegrationTestDrFeedsPost.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-01-30T10:54:20Z",
+      "side": 1,
+      "message": "dmaap-",
+      "revId": "2812fb814f264d669aed2523ce3483d8f4c2da96",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
