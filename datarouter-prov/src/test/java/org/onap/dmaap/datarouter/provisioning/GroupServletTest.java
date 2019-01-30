@@ -69,8 +69,8 @@ public class GroupServletTest {
         emf = Persistence.createEntityManagerFactory("dr-unit-tests");
         em = emf.createEntityManager();
         System.setProperty(
-            "org.onap.dmaap.datarouter.provserver.properties",
-            "src/test/resources/h2Database.properties");
+                "org.onap.dmaap.datarouter.provserver.properties",
+                "src/test/resources/h2Database.properties");
     }
 
     @AfterClass
@@ -154,7 +154,7 @@ public class GroupServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Request_Contains_Badly_Formed_JSON_Then_Bad_Request_Response_Is_Generated() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.group; version=1.0");
         ServletInputStream inStream = mock(ServletInputStream.class);
         when(request.getInputStream()).thenReturn(inStream);
         groupServlet.doPut(request, response);
@@ -163,7 +163,7 @@ public class GroupServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Group_Name_Is_Too_Long_Then_Bad_Request_Response_Is_Generated() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.group; version=1.0");
         GroupServlet groupServlet = overideGetJSONFromInputToReturnAnInvalidGroup(true);
         groupServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
@@ -171,7 +171,7 @@ public class GroupServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_PUT_Fails_Then_Internal_Server_Error_Response_Is_Generated() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.group; version=1.0");
         GroupServlet groupServlet = overideGetJSONFromInputToReturnAValidGroupWithFail();
         groupServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
@@ -179,7 +179,7 @@ public class GroupServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Request_Succeeds() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.group; version=1.0");
         GroupServlet groupServlet = overideGetJSONFromInputToReturnGroupInDb();
         ServletOutputStream outStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outStream);
@@ -210,7 +210,7 @@ public class GroupServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Request_Contains_Badly_Formed_JSON_Then_Bad_Request_Response_Is_Generated() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.group; version=1.0");
         ServletInputStream inStream = mock(ServletInputStream.class);
         when(request.getInputStream()).thenReturn(inStream);
         groupServlet.doPost(request, response);
@@ -219,7 +219,7 @@ public class GroupServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Group_Description_Is_Too_Long_Then_Bad_Request_Response_Is_Generated() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.group; version=1.0");
         GroupServlet groupServlet = overideGetJSONFromInputToReturnAnInvalidGroup(false);
         groupServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
@@ -227,7 +227,7 @@ public class GroupServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Group_Name_Already_Exists_Then_Bad_Request_Response_Is_Generated() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.group; version=1.0");
         GroupServlet groupServlet = overideGetJSONFromInputToReturnGroupInDb();
         groupServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
@@ -235,7 +235,7 @@ public class GroupServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_POST_Fails_Then_Internal_Server_Error_Response_Is_Generated() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.group; version=1.0");
         GroupServlet groupServlet = overideGetJSONFromInputToReturnAValidGroupWithFail();
         groupServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
@@ -243,7 +243,7 @@ public class GroupServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Request_Succeeds() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.group; version=1.0");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.group; version=1.0");
         GroupServlet groupServlet = overideGetJSONFromInputToReturnNewGroupToInsert();
         ServletOutputStream outStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outStream);
@@ -353,6 +353,7 @@ public class GroupServletTest {
             }
         };
         return groupServlet;
+
     }
 
     private GroupServlet overideGetJSONFromInputToReturnNewGroupToInsert() {

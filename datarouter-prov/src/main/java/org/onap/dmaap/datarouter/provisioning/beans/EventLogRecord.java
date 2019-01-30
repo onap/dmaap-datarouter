@@ -32,7 +32,7 @@ import org.onap.dmaap.datarouter.provisioning.BaseServlet;
 
 /**
  * This class is used to log provisioning server events.  Each event consists of a who
- * (who made the provisioning request including the IP address, the X-ATT-DR-ON-BEHALF-OF
+ * (who made the provisioning request including the IP address, the X-DMAAP-DR-ON-BEHALF-OF
  * header value, and the client certificate), a what (what request was made; the method
  * and servlet involved), and a how (how the request was handled; the result code and
  * message returned to the client).  EventLogRecords are logged using log4j at the INFO level.
