@@ -55,7 +55,7 @@ public class DRFeedsServlet extends ProxyServlet {
 
     //Adding EELF Logger Rally:US664892
     private static EELFLogger eelflogger = EELFManager.getInstance()
-        .getLogger("org.onap.dmaap.datarouter.provisioning.DRFeedsServlet");
+            .getLogger("org.onap.dmaap.datarouter.provisioning.DRFeedsServlet");
 
     /**
      * DELETE on the &lt;drFeedsURL&gt; -- not supported.
@@ -103,7 +103,7 @@ public class DRFeedsServlet extends ProxyServlet {
             return;
         }
         String path = req
-            .getRequestURI(); // Note: I think this should be getPathInfo(), but that doesn't work (Jetty bug?)
+                .getRequestURI(); // Note: I think this should be getPathInfo(), but that doesn't work (Jetty bug?)
         if (path != null && !path.equals("/")) {
             message = "Bad URL.";
             elr.setMessage(message);
@@ -220,7 +220,7 @@ public class DRFeedsServlet extends ProxyServlet {
             return;
         }
         String path = req
-            .getRequestURI(); // Note: I think this should be getPathInfo(), but that doesn't work (Jetty bug?)
+                .getRequestURI(); // Note: I think this should be getPathInfo(), but that doesn't work (Jetty bug?)
         if (path != null && !path.equals("/")) {
             message = "Bad URL.";
             elr.setMessage(message);
@@ -282,7 +282,7 @@ public class DRFeedsServlet extends ProxyServlet {
             sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
             return;
         }
-        feed.setPublisher(bhdr);    // set from X-ATT-DR-ON-BEHALF-OF header
+        feed.setPublisher(bhdr);    // set from X-DR-ON-BEHALF-OF header
 
         // Check if this feed already exists
         Feed feed2 = Feed.getFeedByNameVersion(feed.getName(), feed.getVersion());
