@@ -56,7 +56,7 @@ public class SubscribeServlet extends ProxyServlet {
 
     //Adding EELF Logger Rally:US664892
     private static EELFLogger eelflogger = EELFManager.getInstance()
-        .getLogger("org.onap.dmaap.datarouter.provisioning.SubscribeServlet");
+            .getLogger("org.onap.dmaap.datarouter.provisioning.SubscribeServlet");
 
     /**
      * DELETE on the &lt;subscribeUrl&gt; -- not supported.
@@ -268,14 +268,14 @@ public class SubscribeServlet extends ProxyServlet {
             return;
         }
         sub.setFeedid(feedid);
-        sub.setSubscriber(bhdr);    // set from X-ATT-DR-ON-BEHALF-OF header
+        sub.setSubscriber(bhdr);    // set from X-DMAAP-DR-ON-BEHALF-OF header
 
         // Check if this subscription already exists; not an error (yet), just warn
         Subscription sub2 = Subscription.getSubscriptionMatching(sub);
         if (sub2 != null) {
             intlogger.warn(
-                "PROV0011 Creating a duplicate subscription: new subid=" + sub.getSubid() + ", old subid=" + sub2
-                    .getSubid());
+                    "PROV0011 Creating a duplicate subscription: new subid=" + sub.getSubid() + ", old subid=" + sub2
+                            .getSubid());
         }
 
         // Create SUBSCRIPTIONS table entries

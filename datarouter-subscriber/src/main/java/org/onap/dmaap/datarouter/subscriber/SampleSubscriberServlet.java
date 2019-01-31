@@ -135,7 +135,7 @@ public class SampleSubscriberServlet extends HttpServlet {
     if (queryString != null) {
       fileid = fileid + "?" + queryString;
     }
-    String publishid = req.getHeader("X-ATT-DR-PUBLISH-ID");
+    String publishid = req.getHeader("X-DMAAP-DR-PUBLISH-ID");
     String filename =
         URLEncoder.encode(fileid, "UTF-8").replaceAll("^\\.", "%2E").replaceAll("\\*", "%2A");
     String fullPath = outputDirectory + "/" + filename;
@@ -168,7 +168,7 @@ public class SampleSubscriberServlet extends HttpServlet {
         }
         Files.move(Paths.get(tmpPath), Paths.get(fullPath), StandardCopyOption.REPLACE_EXISTING);
         try (PrintWriter writer = new PrintWriter(new FileOutputStream(tmpMetaDataPath))) {
-          String metaData = req.getHeader("X-ATT-DR-META");
+          String metaData = req.getHeader("X-DMAAP-DR-META");
           writer.print(metaData);
         }
         Files.move(Paths.get(tmpMetaDataPath), Paths.get(fullMetaDataPath), StandardCopyOption.REPLACE_EXISTING);

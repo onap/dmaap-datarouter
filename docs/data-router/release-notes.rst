@@ -4,6 +4,27 @@
 Release-notes
 ==============
 
+Version: 2.0.0
+--------------
+
+:Release Date:
+
+
+New Features:
+
+ - Replacing ATT Headers with generic alternatives <https://jira.onap.org/browse/DMAAP-1000>
+
+
+
+Bug Fixes
+NA
+
+Known Issues
+NA
+
+Other
+NA
+
 Version: 1.0.1
 --------------
 
