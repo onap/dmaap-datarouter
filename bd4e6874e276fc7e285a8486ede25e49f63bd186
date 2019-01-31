@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_dc6a3080",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryTask.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-01-31T16:28:31Z",
+      "side": 1,
+      "message": "I agree thats its a much cleaner way to write the code, however I\u0027m unable to use getClass() in a static context, like in the case of the logger. \n\nHowever I used DeliveryTask.class to replace the string path. is this acceptable? its not generic, but at least we don\u0027t have problems with restructuring the package, and its possible to use ide tools to copy/paste relatively easily.\n\nAlso, I presume these changes should be done across all of dr?",
+      "parentUuid": "9adffdf1_e86973f9",
+      "revId": "bd4e6874e276fc7e285a8486ede25e49f63bd186",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_a885abcf",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryTask.java",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2019-01-31T14:19:13Z",
       "side": 1,
       "message": "consider making this a String set from a property which defaults to \"x-onap-requestid\".   Useful for some deployment where a diff header is used.",
+      "revId": "bd4e6874e276fc7e285a8486ede25e49f63bd186",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_7c28e432",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryTask.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-01-31T16:28:31Z",
+      "side": 1,
+      "message": "It\u0027s actually not neccessary: part of the logging api\u0027s specifies that the header should always be called X-ONAP-RequestID. Any other Header names have been depreciated.\n\nyou can have a look here: \n\nhttps://wiki.onap.org/pages/viewpage.action?pageId\u003d28378955#ONAPApplicationLoggingSpecificationv1.2(Casablanca)-MDC-RequestID\n\ntheres no need to make it a property since it should always be the same value.",
+      "parentUuid": "9adffdf1_a885abcf",
       "revId": "bd4e6874e276fc7e285a8486ede25e49f63bd186",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_fc1374fe",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryTask.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-01-31T16:28:31Z",
+      "side": 1,
+      "message": "same as my comment on requestId above, InvocationId will always retain the same header name.",
+      "parentUuid": "9adffdf1_4870bf0a",
+      "revId": "bd4e6874e276fc7e285a8486ede25e49f63bd186",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_c8634f40",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
         "patchSetId": 6
@@ -64,6 +118,24 @@
       "writtenOn": "2019-01-31T14:19:13Z",
       "side": 1,
       "message": "Is this a missed \"X-ATT...\" header reference?",
+      "revId": "bd4e6874e276fc7e285a8486ede25e49f63bd186",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_bcd96c58",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-01-31T16:28:31Z",
+      "side": 1,
+      "message": "The changes for the att headers haven\u0027t been merged yet. if they\u0027re merged first I can rebase, and vice-versa.",
+      "parentUuid": "9adffdf1_c8634f40",
       "revId": "bd4e6874e276fc7e285a8486ede25e49f63bd186",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "9adffdf1_5cdc0046",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-01-31T16:28:31Z",
+      "side": 1,
+      "message": "check my response to 108.",
+      "parentUuid": "9adffdf1_2848dbb1",
+      "revId": "bd4e6874e276fc7e285a8486ede25e49f63bd186",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9adffdf1_c8ca6f1a",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
         "patchSetId": 6
@@ -98,6 +188,24 @@
       "writtenOn": "2019-01-31T14:19:13Z",
       "side": 1,
       "message": "repeat line 108 comment",
+      "revId": "bd4e6874e276fc7e285a8486ede25e49f63bd186",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_7cdf843a",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-01-31T16:28:31Z",
+      "side": 1,
+      "message": "check my response to 108.",
+      "parentUuid": "9adffdf1_c8ca6f1a",
       "revId": "bd4e6874e276fc7e285a8486ede25e49f63bd186",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
