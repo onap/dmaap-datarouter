@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_e86973f9",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryTask.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1111
+      },
+      "writtenOn": "2019-01-31T14:19:13Z",
+      "side": 1,
+      "message": "can you use getClass() instead of hardcoding full Class name?  (to minimize imapct of any future restructuring of package and to easily copy/paste this line into usage in other Classes)",
+      "revId": "bd4e6874e276fc7e285a8486ede25e49f63bd186",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_a885abcf",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryTask.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1111
+      },
+      "writtenOn": "2019-01-31T14:19:13Z",
+      "side": 1,
+      "message": "consider making this a String set from a property which defaults to \"x-onap-requestid\".   Useful for some deployment where a diff header is used.",
+      "revId": "bd4e6874e276fc7e285a8486ede25e49f63bd186",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_4870bf0a",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryTask.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1111
+      },
+      "writtenOn": "2019-01-31T14:19:13Z",
+      "side": 1,
+      "message": "repeat comment from line 115, but for \"x-invocationid\"",
+      "revId": "bd4e6874e276fc7e285a8486ede25e49f63bd186",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_c8634f40",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1111
+      },
+      "writtenOn": "2019-01-31T14:19:13Z",
+      "side": 1,
+      "message": "Is this a missed \"X-ATT...\" header reference?",
+      "revId": "bd4e6874e276fc7e285a8486ede25e49f63bd186",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_2848dbb1",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1111
+      },
+      "writtenOn": "2019-01-31T14:19:13Z",
+      "side": 1,
+      "message": "same comment as line 108",
+      "revId": "bd4e6874e276fc7e285a8486ede25e49f63bd186",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9adffdf1_c8ca6f1a",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1111
+      },
+      "writtenOn": "2019-01-31T14:19:13Z",
+      "side": 1,
+      "message": "repeat line 108 comment",
+      "revId": "bd4e6874e276fc7e285a8486ede25e49f63bd186",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
