@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9adffdf1_6d87d5b5",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2019-01-31T10:56:04Z",
+      "side": 1,
+      "message": "Should this be \"DMAAP-DR\"?",
+      "range": {
+        "startLine": 193,
+        "startChar": 4,
+        "endLine": 193,
+        "endChar": 11
+      },
+      "revId": "17e7fd8005f71cec40b820a11db3c3858d531f54",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
