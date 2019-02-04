@@ -185,7 +185,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
 
     private void localconfig() {
         followredirects = Boolean.parseBoolean(getProvParam("FOLLOW_REDIRECTS", "false"));
-        eventloginterval = getProvParam("LOGROLL_INTERVAL", "5m");
+        eventloginterval = getProvParam("LOGROLL_INTERVAL", "30s");
         initfailuretimer = 10000;
         maxfailuretimer = 3600000;
         expirationtimer = 86400000;
@@ -365,13 +365,13 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * Get a provisioned configuration parameter (from the provisioning server configuration)
      *
      * @param name The name of the parameter
-     * @param deflt The value to use if the parameter is not defined
+     * @param default_value The value to use if the parameter is not defined
      * @return The value of the parameter or deflt if it is not defined.
      */
-    public String getProvParam(String name, String deflt) {
+    public String getProvParam(String name, String default_value) {
         name = config.getProvParam(name);
         if (name == null) {
-            name = deflt;
+            name = default_value;
         }
         return (name);
     }
