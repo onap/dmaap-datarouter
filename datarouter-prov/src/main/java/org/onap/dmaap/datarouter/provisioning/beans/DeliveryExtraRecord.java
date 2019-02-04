@@ -64,5 +64,6 @@ public class DeliveryExtraRecord extends BaseLogRecord {
         ps.setNull(16, Types.INTEGER);
         ps.setNull(17, Types.VARCHAR);
         ps.setLong(19, contentLength2);
+        ps.setNull(20, Types.VARCHAR);
     }
 }

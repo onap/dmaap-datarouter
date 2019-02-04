@@ -91,6 +91,7 @@ public class LogRecord extends BaseLogRecord {
     private final String reason;
     private final long record_id;
     private final long clength2;
+    private final String fileName;
 
     public LogRecord(ResultSet rs) throws SQLException {
         super(rs);
@@ -109,6 +110,7 @@ public class LogRecord extends BaseLogRecord {
 
         this.record_id = rs.getLong("RECORD_ID");
         this.clength2 = rs.getLong("CONTENT_LENGTH_2");
+        this.fileName = rs.getString("FILENAME");
     }
 
     public LogRecord(String[] pp) throws ParseException {
@@ -127,7 +129,8 @@ public class LogRecord extends BaseLogRecord {
         this.reason = pp[17];
 
         this.record_id = Long.parseLong(pp[18]);
-        this.clength2 = (pp.length == 20) ? Long.parseLong(pp[19]) : 0;
+        this.clength2 = (pp.length == 21) ? Long.parseLong(pp[19]) : 0;
+        this.fileName = pp[20];
     }
 
     public long getRecordId() {
@@ -176,6 +179,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setNull(17, Types.VARCHAR);
             ps.setLong(18, record_id);
             ps.setNull(19, Types.BIGINT);
+            ps.setString(20, fileName);
         } else if (type.equals("del")) {
             ps.setNull(9, Types.VARCHAR);
             ps.setNull(10, Types.VARCHAR);
@@ -188,6 +192,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setNull(17, Types.VARCHAR);
             ps.setLong(18, record_id);
             ps.setNull(19, Types.BIGINT);
+            ps.setString(20, fileName);
         } else if (type.equals("exp")) {
             ps.setNull(9, Types.VARCHAR);
             ps.setNull(10, Types.VARCHAR);
@@ -200,6 +205,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setString(17, reason);
             ps.setLong(18, record_id);
             ps.setNull(19, Types.BIGINT);
+            ps.setString(20, fileName);
         } else if (type.equals("pbf")) {
             ps.setString(9, feedFileid);
             ps.setString(10, remoteAddr);
@@ -212,6 +218,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setNull(17, Types.VARCHAR);
             ps.setLong(18, record_id);
             ps.setLong(19, clength2);
+            ps.setString(20, fileName);
         } else if (type.equals("dlx")) {
             ps.setNull(9, Types.VARCHAR);
             ps.setNull(10, Types.VARCHAR);
@@ -224,6 +231,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setNull(17, Types.VARCHAR);
             ps.setLong(18, record_id);
             ps.setLong(19, clength2);
+            ps.setString(20, fileName);
         }
     }
 

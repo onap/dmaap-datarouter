@@ -88,5 +88,6 @@ public class PubFailRecord extends BaseLogRecord {
         ps.setNull(16, Types.INTEGER);
         ps.setNull(17, Types.VARCHAR);
         ps.setLong(19, getContentLengthReceived());
+        ps.setNull(20, Types.VARCHAR);
     }
 }
