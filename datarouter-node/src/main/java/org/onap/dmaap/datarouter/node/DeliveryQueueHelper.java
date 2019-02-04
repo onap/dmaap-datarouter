@@ -37,6 +37,11 @@ public interface DeliveryQueueHelper {
     public long getInitFailureTimer();
 
     /**
+     * Get the timeout before retrying after delivery and wait for file processing
+     */
+    long getWaitForFileProcessFailureTimer();
+
+    /**
      * Get the ratio between timeouts on consecutive delivery attempts
      */
     public double getFailureBackoff();

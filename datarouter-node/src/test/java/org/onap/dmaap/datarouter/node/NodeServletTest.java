@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import static org.hamcrest.Matchers.notNullValue;
@@ -213,6 +215,34 @@ public class NodeServletTest {
         verifyEnteringExitCalled(listAppender);
     }
 
+    @Test
+    public void Given_Request_Is_HTTP_DELETE_File_With_Invalid_Endpoint_Then_Not_Found_Response_Is_Generated() throws Exception {
+        when(request.getPathInfo()).thenReturn("/delete/1");
+        setHeadersForValidRequest(false);
+        nodeServlet.doDelete(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_DELETE_File_Then_Request_Succeeds() throws IOException {
+        when(request.getPathInfo()).thenReturn("/delete/1/dmaap-dr-node.1234567");
+        setHeadersForValidRequest(false);
+        createFilesToDelete();
+        nodeServlet.doDelete(request, response);
+        verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+        verifyEnteringExitCalled(listAppender);
+        deleteCreatedDirectories();
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_DELETE_File_And_File_Does_Not_Exist_Then_Not_Found_Response_Is_Generated() throws IOException {
+        when(request.getPathInfo()).thenReturn("/delete/1/nonExistingFile");
+        setHeadersForValidRequest(false);
+        nodeServlet.doDelete(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
+    }
 
     private void setBehalfHeader(String headerValue) {
         when(request.getHeader("X-ATT-DR-ON-BEHALF-OF")).thenReturn(headerValue);
@@ -237,7 +267,8 @@ public class NodeServletTest {
         PowerMockito.mockStatic(NodeConfigManager.class);
         when(config.isShutdown()).thenReturn(false);
         when(config.isConfigured()).thenReturn(true);
-        when(config.getSpoolDir()).thenReturn("spool/dir");
+        when(config.getSpoolDir()).thenReturn("spool/f");
+        when(config.getSpoolBase()).thenReturn("spool");
         when(config.getLogDir()).thenReturn("log/dir");
         when(config.getPublishId()).thenReturn("User1");
         when(config.isAnotherNode(anyString(), anyString())).thenReturn(true);
@@ -312,5 +343,30 @@ public class NodeServletTest {
         when(request.getHeaders("Content-Type")).thenReturn(contentTypeHeader);
         when(request.getHeaders("X-ATT-DR-ON-BEHALF-OF")).thenReturn(behalfHeader);
         when(request.getHeaders("X-ATT-DR-META")).thenReturn(metaDataHeader);
+    }
+
+    private void createFilesToDelete() throws IOException {
+        File spoolDir = new File("spool/s/0/1");
+        File dataFile = new File("spool/s/0/1/dmaap-dr-node.1234567");
+        File metaDataFile = new File("spool/s/0/1/dmaap-dr-node.1234567.M");
+        spoolDir.mkdirs();
+        dataFile.createNewFile();
+        metaDataFile.createNewFile();
+    }
+
+    private void deleteCreatedDirectories() {
+        File spoolDir = new File("spool");
+        delete(spoolDir);
+    }
+
+    private void delete(File file) {
+        if (file.isDirectory()) {
+            for (File f: file.listFiles()) {
+                delete(f);
+            }
+        }
+        if (!file.delete()) {
+            System.out.println("Failed to delete: " + file);
+        }
     }
 }

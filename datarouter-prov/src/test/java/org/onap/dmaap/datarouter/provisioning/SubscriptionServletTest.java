@@ -283,6 +283,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("version", "2.0");
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
+                jo.put("waitForFileProcessed", true);
                 jo.put("delivery", JSObject);
                 jo.put("subscriber", "differentSubscriber");
                 jo.put("sync", true);
@@ -305,6 +306,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("version", "2.0");
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
+                jo.put("waitForFileProcessed", true);
                 jo.put("delivery", JSObject);
                 jo.put("sync", true);
                 return jo;
@@ -333,6 +335,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("version", "2.0");
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
+                jo.put("waitForFileProcessed", true);
                 jo.put("delivery", JSObject);
                 jo.put("sync", true);
                 jo.put("changeowner", true);
@@ -505,6 +508,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setGroupid(1);
         subscription.setMetadataOnly(false);
         subscription.setSuspended(false);
+        subscription.setWaitForFileProcessed(false);
         subscription.doInsert(db.getConnection());
     }
 
@@ -518,6 +522,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setGroupid(1);
         subscription.setMetadataOnly(false);
         subscription.setSuspended(false);
+        subscription.setWaitForFileProcessed(false);
         subscription.changeOwnerShip();
         subscription.doUpdate(db.getConnection());
     }

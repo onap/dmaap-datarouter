@@ -63,6 +63,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     private String subid;
     private int attempts;
     private String[][] hdrs;
+    private boolean waitForFileProcessed;
     private String newInvocationId;
 
 
@@ -87,7 +88,8 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
         metafile = new File(mfn);
         boolean monly = di.isMetaDataOnly();
         date = Long.parseLong(pubid.substring(0, pubid.indexOf('.')));
-        Vector<String[]> hdrv = new Vector<String[]>();
+        Vector<String[]> hdrv = new Vector<>();
+        waitForFileProcessed = di.getWaitForFileProcessed();
 
         try (BufferedReader br = new BufferedReader(new FileReader(metafile))) {
             String s = br.readLine();
@@ -343,5 +345,12 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
      */
     public String getFeedId() {
         return (feedid);
+    }
+
+    /**
+     * Should we wait to receive a file processed acknowledgement before deleting file
+     */
+    public boolean getWaitForFileProcessed() {
+        return (waitForFileProcessed);
     }
 }

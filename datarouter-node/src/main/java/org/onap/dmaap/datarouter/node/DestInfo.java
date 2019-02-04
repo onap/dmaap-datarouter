@@ -37,6 +37,7 @@ public class DestInfo {
     private String authentication;
     private boolean metaonly;
     private boolean use100;
+    private boolean waitForFileProcessed;
 
     /**
      * Create a destination information object.
@@ -61,6 +62,27 @@ public class DestInfo {
         this.authentication = authentication;
         this.metaonly = metaonly;
         this.use100 = use100;
+        this.waitForFileProcessed = false;
+    }
+
+    /**
+     * Create a destination information object.
+     *
+     * @param    name    n:fqdn or s:subid
+     * @param    spool    The directory where files are spooled.
+     * @param    subscription    The subscription.
+     */
+    public DestInfo(String name, String spool, NodeConfig.ProvSubscription subscription) {
+        this.name = name;
+        this.spool = spool;
+        this.subid = subscription.getSubId();
+        this.logdata = subscription.getFeedId();
+        this.url = subscription.getURL();
+        this.authuser = subscription.getAuthUser();
+        this.authentication = subscription.getCredentials();
+        this.metaonly = subscription.isMetaDataOnly();
+        this.use100 = subscription.isUsing100();
+        this.waitForFileProcessed = subscription.getWaitForFileProcessed();
     }
 
     public boolean equals(Object o) {
@@ -149,5 +171,12 @@ public class DestInfo {
      */
     public boolean isUsing100() {
         return (use100);
+    }
+
+    /**
+     * Should we wait to receive a file processed acknowledgement before deleting file
+     */
+    public boolean getWaitForFileProcessed() {
+        return (waitForFileProcessed);
     }
 }

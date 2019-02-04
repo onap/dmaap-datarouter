@@ -139,7 +139,11 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
         if (!failed) {
             failed = true;
             if (failduration == 0) {
-                failduration = dqh.getInitFailureTimer();
+                if (di.getWaitForFileProcessed()) {
+                    failduration = dqh.getWaitForFileProcessFailureTimer();
+                } else{
+                    failduration = dqh.getInitFailureTimer();
+                }
             }
             resumetime = System.currentTimeMillis() + failduration;
             long maxdur = dqh.getMaxFailureTimer();
@@ -294,8 +298,13 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
      */
     public void reportStatus(DeliveryTask task, int status, String xpubid, String location) {
         if (status < 300) {
-            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), di.getAuthUser(), status, xpubid);
-            markSuccess(task);
+            if (task.getWaitForFileProcessed()) {
+                StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), di.getAuthUser(), status, xpubid);
+                markFailWithRetry(task);
+            } else {
+                StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), di.getAuthUser(), status, xpubid);
+                markSuccess(task);
+            }
         } else if (status < 400 && dqh.isFollowRedirects()) {
             StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), di.getAuthUser(), status, location);
             if (dqh.handleRedirection(di, location, task.getFileId())) {
@@ -304,7 +313,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
                 StatusLog.logExp(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), "notRetryable", task.getAttempts());
                 markFailNoRetry(task);
             }
-        } else if (status < 500) {
+        } else if (status < 500 && status != 429) {
             StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), di.getAuthUser(), status, location);
             StatusLog.logExp(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), "notRetryable", task.getAttempts());
             markFailNoRetry(task);
