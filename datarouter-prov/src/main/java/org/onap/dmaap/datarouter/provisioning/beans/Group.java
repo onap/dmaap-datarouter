@@ -209,7 +209,7 @@ public class Group extends Syncable {
     public Group(JSONObject jo) throws InvalidObjectException {
         this("", "", "");
         try {
-            // The JSONObject is assumed to contain a vnd.att-dr.group representation
+            // The JSONObject is assumed to contain a vnd.dmaap-dr.group representation
             this.groupid = jo.optInt("groupid", -1);
             String gname = jo.getString("name");
             String gdescription = jo.getString("description");

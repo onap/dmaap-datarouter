@@ -298,9 +298,9 @@ public class FeedServlet extends ProxyServlet {
                 return;
             }
             feed.setFeedid(feedid);
-            feed.setPublisher(bhdr);    // set from X-ATT-DR-ON-BEHALF-OF header
+            feed.setPublisher(bhdr);    // set from X-DMAAP-DR-ON-BEHALF-OF header
 
-            String subjectgroup = (req.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP"));  //Adding for group feature:Rally US708115
+            String subjectgroup = (req.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP"));  //Adding for group feature:Rally US708115
             if (!oldFeed.getPublisher().equals(feed.getPublisher()) && subjectgroup == null) {
                 message = "This feed must be modified by the same publisher that created it.";
                 elr.setMessage(message);

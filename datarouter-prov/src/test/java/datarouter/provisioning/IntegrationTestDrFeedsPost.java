@@ -63,7 +63,7 @@ public class IntegrationTestDrFeedsPost extends IntegrationTestBase {
     @Test
     public void testNormalNoCtVersion() {
         JSONObject jo = buildFeedRequest();
-        testCommon(jo, HttpServletResponse.SC_CREATED, "application/vnd.att-dr.feed", "JUnit");
+        testCommon(jo, HttpServletResponse.SC_CREATED, "application/vnd.dmaap-dr.feed", "JUnit");
     }
 
     @Test
@@ -302,7 +302,7 @@ public class IntegrationTestDrFeedsPost extends IntegrationTestBase {
     }
 }
 /*
-curl -v -X POST -H 'X-ATT-DR-ON-BEHALF-OF: tester' -H 'Content-type: application/vnd.att-dr.feed' \
+curl -v -X POST -H 'X-DMAAP-DR-ON-BEHALF-OF: tester' -H 'Content-type: application/vnd.dmaap-dr.feed' \
     --user publisher:tomcat \
     --data "$data" http://127.0.0.1:8080/prov/feed/
 */

@@ -251,7 +251,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Request_Contains_Badly_Formed_JSON_Then_Bad_Request_Response_Is_Generated() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.subscription; version=1.0");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
         ServletInputStream inStream = mock(ServletInputStream.class);
         when(request.getInputStream()).thenReturn(inStream);
         subscriptionServlet.doPut(request, response);
@@ -260,7 +260,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Subscription_Object_Is_Invalid_Bad_Request_Response_Is_Generated() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.subscription; version=1.0");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
@@ -273,8 +273,8 @@ public class SubscriptionServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Subscriber_Modified_By_Different_Creator_Then_Bad_Request_Is_Generated() throws Exception {
-        when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn(null);
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.subscription; version=1.0");
+        when(request.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP")).thenReturn(null);
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
         JSONObject JSObject = buildRequestJsonObject();
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -295,8 +295,8 @@ public class SubscriptionServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Update_Fails() throws Exception {
-        when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.subscription; version=1.0");
+        when(request.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
         JSONObject JSObject = buildRequestJsonObject();
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -323,8 +323,8 @@ public class SubscriptionServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_PUT_And_Update_Succeeds() throws Exception {
         ServletOutputStream outStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outStream);
-        when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.subscription; version=1.0");
+        when(request.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
         JSONObject JSObject = buildRequestJsonObject();
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -383,7 +383,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated() throws Exception {
-        when(request.getHeader(anyString())).thenReturn("application/vnd.att-dr.subscription-control");
+        when(request.getHeader(anyString())).thenReturn("application/vnd.dmaap-dr.subscription-control");
         setAuthoriserToReturnRequestNotAuthorized();
         subscriptionServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
@@ -391,7 +391,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Request_Contains_Badly_Formed_JSON_Then_Bad_Request_Response_Is_Generated() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.subscription-control; version=1.0");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription-control; version=1.0");
         ServletInputStream inStream = mock(ServletInputStream.class);
         when(request.getInputStream()).thenReturn(inStream);
         subscriptionServlet.doPost(request, response);
@@ -400,8 +400,8 @@ public class SubscriptionServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Post_Fails() throws Exception {
-        when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.subscription-control; version=1.0");
+        when(request.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription-control; version=1.0");
         JSONObject JSObject = buildRequestJsonObject();
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -422,8 +422,8 @@ public class SubscriptionServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_POST_And_Post_Succeeds() throws Exception {
         ServletOutputStream outStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outStream);
-        when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.subscription-control; version=1.0");
+        when(request.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription-control; version=1.0");
         JSONObject JSObject = buildRequestJsonObject();
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {

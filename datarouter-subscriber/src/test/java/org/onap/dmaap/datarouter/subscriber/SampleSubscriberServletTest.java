@@ -99,8 +99,8 @@ public class SampleSubscriberServletTest {
   private void setUpSuccessfulFlow() throws IOException {
     when(request.getHeader("Authorization")).thenReturn("Basic TE9HSU46UEFTU1dPUkQ=");
     when(request.getPathInfo()).thenReturn("/publish/1/testfile");
-    when(request.getHeader("X-ATT-DR-PUBLISH-ID")).thenReturn("1");
-    when(request.getHeader("X-ATT-DR-META")).thenReturn("{\"Key\":\"Value\"}");
+    when(request.getHeader("X-DMAAP-DR-PUBLISH-ID")).thenReturn("1");
+    when(request.getHeader("X-DMAAP-DR-META")).thenReturn("{\"Key\":\"Value\"}");
     when(request.getQueryString()).thenReturn(null);
     ServletInputStream inStream = mock(ServletInputStream.class);
     when(request.getInputStream()).thenReturn(inStream);

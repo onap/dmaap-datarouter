@@ -42,8 +42,8 @@ public class ProvAuthorizer implements Authorizer {
     private Logger log;
     private ProvDataProvider provData;
 
-    private static final String SUBJECT_HEADER = "X-ATT-DR-ON-BEHALF-OF";  // HTTP header carrying requester identity
-    private static final String SUBJECT_HEADER_GROUP = "X-ATT-DR-ON-BEHALF-OF-GROUP";  // HTTP header carrying requester identity  by group Rally : US708115
+    private static final String SUBJECT_HEADER = "X-DMAAP-DR-ON-BEHALF-OF";  // HTTP header carrying requester identity
+    private static final String SUBJECT_HEADER_GROUP = "X-DMAAP-DR-ON-BEHALF-OF-GROUP";  // HTTP header carrying requester identity  by group Rally : US708115
     /** Constructor. For the moment, do nothing special.  Make it a singleton?
      *
      */

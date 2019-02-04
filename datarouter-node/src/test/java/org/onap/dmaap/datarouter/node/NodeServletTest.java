@@ -68,7 +68,7 @@ public class NodeServletTest {
         setUpConfig();
         setUpNodeMainDelivery();
         when(request.getHeader("Authorization")).thenReturn("User1");
-        when(request.getHeader("X-ATT-DR-PUBLISH-ID")).thenReturn("User1");
+        when(request.getHeader("X-DMAAP-DR-PUBLISH-ID")).thenReturn("User1");
     }
 
     @Test
@@ -215,7 +215,7 @@ public class NodeServletTest {
 
 
     private void setBehalfHeader(String headerValue) {
-        when(request.getHeader("X-ATT-DR-ON-BEHALF-OF")).thenReturn(headerValue);
+        when(request.getHeader("X-DMAAP-DR-ON-BEHALF-OF")).thenReturn(headerValue);
     }
 
     private ListAppender<ILoggingEvent> setTestLogger() {
@@ -302,15 +302,15 @@ public class NodeServletTest {
         }
         List<String> headers = new ArrayList<>();
         headers.add("Content-Type");
-        headers.add("X-ATT-DR-ON-BEHALF-OF");
-        headers.add("X-ATT-DR-META");
+        headers.add("X-DMAAP-DR-ON-BEHALF-OF");
+        headers.add("X-DMAAP-DR-META");
         Enumeration<String> headerNames = Collections.enumeration(headers);
         when(request.getHeaderNames()).thenReturn(headerNames);
         Enumeration<String> contentTypeHeader = Collections.enumeration(Arrays.asList("text/plain"));
         Enumeration<String> behalfHeader = Collections.enumeration(Arrays.asList("User1"));
         Enumeration<String> metaDataHeader = Collections.enumeration(Arrays.asList(metaDataString));
         when(request.getHeaders("Content-Type")).thenReturn(contentTypeHeader);
-        when(request.getHeaders("X-ATT-DR-ON-BEHALF-OF")).thenReturn(behalfHeader);
-        when(request.getHeaders("X-ATT-DR-META")).thenReturn(metaDataHeader);
+        when(request.getHeaders("X-DMAAP-DR-ON-BEHALF-OF")).thenReturn(behalfHeader);
+        when(request.getHeaders("X-DMAAP-DR-META")).thenReturn(metaDataHeader);
     }
 }
