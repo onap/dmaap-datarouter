@@ -262,7 +262,7 @@ public class FeedServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Content_Header_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated()
         throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.feed-fail; version=2.0");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.feed-fail; version=2.0");
         when(request.getContentType()).thenReturn("stub_contentType");
         feedServlet.doPut(request, response);
         verify(response)
@@ -291,7 +291,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Feed_Change_Is_Not_Publisher_Who_Requested_Feed_Bad_Request_Response_Is_Generated() throws Exception {
-        when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn(null);
+        when(request.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP")).thenReturn(null);
         JSONObject JSObject = buildRequestJsonObject();
         FeedServlet feedServlet = new FeedServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -466,8 +466,8 @@ public class FeedServletTest extends DrServletTestBase {
     }
 
     private void setUpValidContentHeadersAndJSONOnHttpRequest() {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.feed; version=1.0");
-        when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.feed; version=1.0");
+        when(request.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
     }
 
     private void reinsertFeedIntoDb() throws SQLException {

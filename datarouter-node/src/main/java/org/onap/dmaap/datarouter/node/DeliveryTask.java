@@ -102,7 +102,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 i = s.indexOf('\t');
                 String h = s.substring(0, i);
                 String v = s.substring(i + 1);
-                if ("x-att-dr-routing".equalsIgnoreCase(h)) {
+                if ("x-dmaap-dr-routing".equalsIgnoreCase(h)) {
                     subid = v.replaceAll("[^ ]*/", "");
                     feedid = dth.getFeedId(subid.replaceAll(" .*", ""));
                 }
@@ -187,7 +187,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
             uc.setRequestMethod(method);
             uc.setRequestProperty("Content-Length", Long.toString(length));
             uc.setRequestProperty("Authorization", di.getAuth());
-            uc.setRequestProperty("X-ATT-DR-PUBLISH-ID", pubid);
+            uc.setRequestProperty("X-DMAAP-DR-PUBLISH-ID", pubid);
             for (String[] nv : hdrs) {
                 uc.addRequestProperty(nv[0], nv[1]);
             }
@@ -244,7 +244,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
             InputStream is;
             if (rc >= 200 && rc <= 299) {
                 is = uc.getInputStream();
-                xpubid = uc.getHeaderField("X-ATT-DR-PUBLISH-ID");
+                xpubid = uc.getHeaderField("X-DMAAP-DR-PUBLISH-ID");
             } else {
                 if (rc >= 300 && rc <= 399) {
                     rmsg = uc.getHeaderField("Location");

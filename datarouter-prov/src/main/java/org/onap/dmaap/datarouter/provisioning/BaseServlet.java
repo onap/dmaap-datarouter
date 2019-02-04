@@ -97,25 +97,25 @@ import javax.mail.internet.MimeMultipart;
 @SuppressWarnings("serial")
 public class BaseServlet extends HttpServlet implements ProvDataProvider {
 
-    public static final String BEHALF_HEADER = "X-ATT-DR-ON-BEHALF-OF";
-    static final String FEED_BASECONTENT_TYPE = "application/vnd.att-dr.feed";
-    public static final String FEED_CONTENT_TYPE = "application/vnd.att-dr.feed; version=2.0";
-    public static final String FEEDFULL_CONTENT_TYPE = "application/vnd.att-dr.feed-full; version=2.0";
-    public static final String FEEDLIST_CONTENT_TYPE = "application/vnd.att-dr.feed-list; version=1.0";
-    static final String SUB_BASECONTENT_TYPE = "application/vnd.att-dr.subscription";
-    public static final String SUB_CONTENT_TYPE = "application/vnd.att-dr.subscription; version=2.0";
-    public static final String SUBFULL_CONTENT_TYPE = "application/vnd.att-dr.subscription-full; version=2.0";
-    static final String SUBLIST_CONTENT_TYPE = "application/vnd.att-dr.subscription-list; version=1.0";
+    public static final String BEHALF_HEADER = "X-DMAAP-DR-ON-BEHALF-OF";
+    static final String FEED_BASECONTENT_TYPE = "application/vnd.dmaap-dr.feed";
+    public static final String FEED_CONTENT_TYPE = "application/vnd.dmaap-dr.feed; version=2.0";
+    public static final String FEEDFULL_CONTENT_TYPE = "application/vnd.dmaap-dr.feed-full; version=2.0";
+    public static final String FEEDLIST_CONTENT_TYPE = "application/vnd.dmaap-dr.feed-list; version=1.0";
+    static final String SUB_BASECONTENT_TYPE = "application/vnd.dmaap-dr.subscription";
+    public static final String SUB_CONTENT_TYPE = "application/vnd.dmaap-dr.subscription; version=2.0";
+    public static final String SUBFULL_CONTENT_TYPE = "application/vnd.dmaap-dr.subscription-full; version=2.0";
+    static final String SUBLIST_CONTENT_TYPE = "application/vnd.dmaap-dr.subscription-list; version=1.0";
 
 
     //Adding groups functionality, ...1610
-    static final String GROUP_BASECONTENT_TYPE = "application/vnd.att-dr.group";
-    static final String GROUPFULL_CONTENT_TYPE = "application/vnd.att-dr.group-full; version=2.0";
+    static final String GROUP_BASECONTENT_TYPE = "application/vnd.dmaap-dr.group";
+    static final String GROUPFULL_CONTENT_TYPE = "application/vnd.dmaap-dr.group-full; version=2.0";
 
 
-    public static final String LOGLIST_CONTENT_TYPE = "application/vnd.att-dr.log-list; version=1.0";
-    public static final String PROVFULL_CONTENT_TYPE1 = "application/vnd.att-dr.provfeed-full; version=1.0";
-    public static final String PROVFULL_CONTENT_TYPE2 = "application/vnd.att-dr.provfeed-full; version=2.0";
+    public static final String LOGLIST_CONTENT_TYPE = "application/vnd.dmaap-dr.log-list; version=1.0";
+    public static final String PROVFULL_CONTENT_TYPE1 = "application/vnd.dmaap-dr.provfeed-full; version=1.0";
+    public static final String PROVFULL_CONTENT_TYPE2 = "application/vnd.dmaap-dr.provfeed-full; version=2.0";
     public static final String CERT_ATTRIBUTE = "javax.servlet.request.X509Certificate";
 
     static final String DB_PROBLEM_MSG = "There has been a problem with the DB.  It is suggested you try the operation again.";

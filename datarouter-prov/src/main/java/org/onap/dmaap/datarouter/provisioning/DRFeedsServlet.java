@@ -299,7 +299,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
-            feed.setPublisher(bhdr);    // set from X-ATT-DR-ON-BEHALF-OF header
+            feed.setPublisher(bhdr);    // set from X-DMAAP-DR-ON-BEHALF-OF header
 
             // Check if this feed already exists
             Feed feed2 = Feed.getFeedByNameVersion(feed.getName(), feed.getVersion());

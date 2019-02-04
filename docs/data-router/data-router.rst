@@ -52,7 +52,7 @@ Create a Feed
 Sample Request
 ==============
 
-``curl -k -X POST -H "Content-Type:application/vnd.att-dr.feed" -H "X-ATT-DR-ON-BEHALF-OF:{user}" --data-ascii @createFeed.json https://{host}:{port}``
+``curl -k -X POST -H "Content-Type:application/vnd.dmaap-dr.feed" -H "X-DMAAP-DR-ON-BEHALF-OF:{user}" --data-ascii @createFeed.json https://{host}:{port}``
 
 Request Parameters:
 ===================
@@ -77,10 +77,10 @@ Request Parameters:
 | group-id               |                                 |     Body         |   Integer  |              |     Y       |                                      |
 |                        |                                 |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.att-dr.feed          |
+| content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.dmaap-dr.feed        |
 |                        | (feed,subscriber,publisher)     |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| X-ATT-DR-ON-BEHALF-OF  | User id of owner of feed        |     Header       |   String   |     <=8      |     Y       |  username                            |
+| X-DMAAP-DR-ON-BEHALF-OF| User id of owner of feed        |     Header       |   String   |     <=8      |     Y       |  username                            |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 
 Response/Error Codes
@@ -110,7 +110,7 @@ Response/Error Codes
 |                        |   IP address                              |
 |                        | * Client certificate subject is not on    |
 |                        |   the API’s authorized list.              |
-|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        | * X-DMAAP-DR-ON-BEHALF-OF identity is not |
 |                        |   authorized to perform                   |
 +------------------------+-------------------------------------------+
 | 404                    | Not Found - The Request-URI does not point|
@@ -166,7 +166,7 @@ Updating a Feed
 Sample Request
 ==============
 
-``curl -k -X PUT -H "Content-Type: application/vnd.att-dr.feed" -H "X-ATT-DR-ON-BEHALF-OF: {user}" --data-ascii @updateFeed.json --location-trusted https://{host}:{port}/feed/{feedId}``
+``curl -k -X PUT -H "Content-Type: application/vnd.dmaap-dr.feed" -H "X-DMAAP-DR-ON-BEHALF-OF: {user}" --data-ascii @updateFeed.json --location-trusted https://{host}:{port}/feed/{feedId}``
 
 Request Parameters:
 ===================
@@ -187,10 +187,10 @@ Request Parameters:
 | group-id               |                                 |     Body         |   Integer  |              |     Y       |                                      |
 |                        |                                 |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.att-dr.feed          |
+| content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.dmaap-dr.feed        |
 |                        | (feed,subscriber,publisher)     |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| X-ATT-DR-ON-BEHALF-OF  | User id of owner of feed        |     Header       |   String   |     <=8      |     Y       |  username                            |
+| X-DMAAP-DR-ON-BEHALF-OF| User id of owner of feed        |     Header       |   String   |     <=8      |     Y       |  username                            |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 
 Response/Error Codes
@@ -220,7 +220,7 @@ Response/Error Codes
 |                        |   IP address                              |
 |                        | * Client certificate subject is not on    |
 |                        |   the API’s authorized list.              |
-|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        | * X-DMAAP-DR-ON-BEHALF-OF identity is not |
 |                        |   authorized to perform                   |
 +------------------------+-------------------------------------------+
 | 404                    | Not Found - The Request-URI does not point|
@@ -283,7 +283,7 @@ http[s]://{host}:{port}/feed/{feedId}
 Sample Request
 ==============
 
-``curl -k -H "X-ATT-DR-ON-BEHALF-OF: {user}" https://{host}:{port}/feed/{feedId}``
+``curl -k -H "X-DMAAP-DR-ON-BEHALF-OF: {user}" https://{host}:{port}/feed/{feedId}``
 
 Response/Error Codes
 ====================
@@ -305,7 +305,7 @@ Response/Error Codes
 |                        |   IP address                              |
 |                        | * Client certificate subject is not on    |
 |                        |   the API’s authorized list.              |
-|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        | * X-DMAAP-DR-ON-BEHALF-OF identity is not |
 |                        |   authorized to perform                   |
 +------------------------+-------------------------------------------+
 | 404                    | Not Found - The Request-URI does not point|
@@ -344,7 +344,7 @@ http[s]://{host}:{port}/feed/{feedId}
 Sample Request
 ==============
 
-``curl -k -X DELETE -H "X-ATT-DR-ON-BEHALF-OF: {user}" https://{host}:{port}/feed/{feedId}``
+``curl -k -X DELETE -H "X-DMAAP-DR-ON-BEHALF-OF: {user}" https://{host}:{port}/feed/{feedId}``
 
 Response/Error Codes
 ====================
@@ -366,7 +366,7 @@ Response/Error Codes
 |                        |   IP address                              |
 |                        | * Client certificate subject is not on    |
 |                        |   the API’s authorized list.              |
-|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        | * X-DMAAP-DR-ON-BEHALF-OF identity is not |
 |                        |   authorized to perform                   |
 +------------------------+-------------------------------------------+
 | 404                    | Not Found - The Request-URI does not point|
@@ -406,7 +406,7 @@ http[s]://{host}:{port}/subscribe/{feedId}
 Sample Request
 ==============
 
-``curl -k -X POST -H "Content-Type:application/vnd.att-dr.subscription" -H "X-ATT-DR-ON-BEHALF-OF:{user}" --data-ascii @addSubscriber.json https://{host}:{port}/subscribe/{feedId}``
+``curl -k -X POST -H "Content-Type:application/vnd.dmaap-dr.subscription" -H "X-DMAAP-DR-ON-BEHALF-OF:{user}" --data-ascii @addSubscriber.json https://{host}:{port}/subscribe/{feedId}``
 
 Request Parameters:
 ===================
@@ -432,10 +432,10 @@ Request Parameters:
 | group-id               |                                 |     Body         |   Integer  |              |     Y       |                                      |
 |                        |                                 |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.att-dr.subscription  |
+| content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.dmaap-dr.subscription|
 |                        | (feed,subscriber,publisher)     |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| X-ATT-DR-ON-BEHALF-OF  | User id of subscriber           |     Header       |   String   |     <=8      |     Y       |  username                            |
+| X-DMAAP-DR-ON-BEHALF-OF| User id of subscriber           |     Header       |   String   |     <=8      |     Y       |  username                            |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 
 Response/Error Codes
@@ -465,7 +465,7 @@ Response/Error Codes
 |                        |   IP address                              |
 |                        | * Client certificate subject is not on    |
 |                        |   the API’s authorized list.              |
-|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        | * X-DMAAP-DR-ON-BEHALF-OF identity is not |
 |                        |   authorized to perform                   |
 +------------------------+-------------------------------------------+
 | 404                    | Not Found - The Request-URI does not point|
@@ -520,7 +520,7 @@ http[s]://{host}:{port}/subs/{subId}
 Sample Request
 ==============
 
-``curl -k -X PUT -H "Content-Type:application/vnd.att-dr.subscription" -H "X-ATT-DR-ON-BEHALF-OF:{user}" --data-ascii @updateSubscriber.json https://{host}:{port}/subs/{subId}``
+``curl -k -X PUT -H "Content-Type:application/vnd.dmaap-dr.subscription" -H "X-DMAAP-DR-ON-BEHALF-OF:{user}" --data-ascii @updateSubscriber.json https://{host}:{port}/subs/{subId}``
 
 Request Parameters:
 ===================
@@ -546,10 +546,10 @@ Request Parameters:
 | group-id               |                                 |     Body         |   Integer  |              |     Y       |                                      |
 |                        |                                 |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.att-dr.subscription  |
+| content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/vnd.dmaap-dr.subscription|
 |                        | (feed,subscriber,publisher)     |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| X-ATT-DR-ON-BEHALF-OF  | User id of subscriber           |     Header       |   String   |     8        |     Y       |  username                            |
+| X-DMAAP-DR-ON-BEHALF-OF| User id of subscriber           |     Header       |   String   |     8        |     Y       |  username                            |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 
 Response/Error Codes
@@ -579,7 +579,7 @@ Response/Error Codes
 |                        |   IP address                              |
 |                        | * Client certificate subject is not on    |
 |                        |   the API’s authorized list.              |
-|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        | * X-DMAAP-DR-ON-BEHALF-OF identity is not |
 |                        |   authorized to perform                   |
 +------------------------+-------------------------------------------+
 | 404                    | Not Found - The Request-URI does not point|
@@ -635,7 +635,7 @@ http[s]://{host}:{port}/subs/{subId}
 Sample Request
 ==============
 
-``curl -k -H "X-ATT-DR-ON-BEHALF-OF:{user}" https://{host}:{port}/subs/{subId}``
+``curl -k -H "X-DMAAP-DR-ON-BEHALF-OF:{user}" https://{host}:{port}/subs/{subId}``
 
 Response/Error Codes
 ====================
@@ -657,7 +657,7 @@ Response/Error Codes
 |                        |   IP address                              |
 |                        | * Client certificate subject is not on    |
 |                        |   the API’s authorized list.              |
-|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        | * X-DMAAP-DR-ON-BEHALF-OF identity is not |
 |                        |   authorized to perform                   |
 +------------------------+-------------------------------------------+
 | 404                    | Not Found - The Request-URI does not point|
@@ -696,7 +696,7 @@ http[s]://{host}:{port}/subs/{subId}
 Sample Request
 ==============
 
-``curl -k -X DELETE -H "X-ATT-DR-ON-BEHALF-OF:{user}" https://{host}:{port}/subs/{subId}``
+``curl -k -X DELETE -H "X-DMAAP-DR-ON-BEHALF-OF:{user}" https://{host}:{port}/subs/{subId}``
 
 Response/Error Codes
 ====================
@@ -718,7 +718,7 @@ Response/Error Codes
 |                        |   IP address                              |
 |                        | * Client certificate subject is not on    |
 |                        |   the API’s authorized list.              |
-|                        | * X-ATT-DR-ON-BEHALF-OF identity is not   |
+|                        | * X-DMAAP-DR-ON-BEHALF-OF identity is not |
 |                        |   authorized to perform                   |
 +------------------------+-------------------------------------------+
 | 404                    | Not Found - The Request-URI does not point|
@@ -758,7 +758,7 @@ http[s]://{host}:{port}/publish/{feedId}/{fileName}
 Sample Request
 ==============
 
-``curl -k -X PUT --user {user}:{password} -H "Content-Type:application/octet-stream"  -H "X-ATT-DR-META:{\"filetype\":\"txt\"}" --data-binary @sampleFile.txt --post301 --location-trusted https://{host}:{port}/publish/{feedId}/sampleFile``
+``curl -k -X PUT --user {user}:{password} -H "Content-Type:application/octet-stream"  -H "X-DMAAP-DR-META:{\"filetype\":\"txt\"}" --data-binary @sampleFile.txt --post301 --location-trusted https://{host}:{port}/publish/{feedId}/sampleFile``
 
 Request parameters
 ==================
@@ -775,7 +775,7 @@ Request parameters
 | content-type           | To specify type of message      |     Header       |   String   |              |     Y       | application/octet-stream                                                 |
 |                        | format                          |                  |            |              |             |                                                                          |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------------------------------------------+
-| X-ATT-DR-META          | Metadata for the file. Accepts  |     Header       |   String   |     4096     |     N       | '{"compressionType":"gzip","id": 1234, "transferred":true, "size":null}' |
+| X-DMAAP-DR-META        | Metadata for the file. Accepts  |     Header       |   String   |     4096     |     N       | '{"compressionType":"gzip","id": 1234, "transferred":true, "size":null}' |
 |                        | only non nested json objects    |                  |            |              |             |                                                                          |
 |                        | of the following type :         |                  |            |              |             |                                                                          |
 |                        | -Numbers                        |                  |            |              |             |                                                                          |
@@ -895,8 +895,8 @@ Request parameters
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 | publishId              | Select records with specified   |     Path         |   String   |              |     N       |                                      |
 |                        | publish id, carried in the      |                  |            |              |             |                                      |
-|                        | X-ATT-DR-PUBLISH-ID header from |                  |            |              |             |                                      |
-|                        | original publish request        |                  |            |              |             |                                      |
+|                        | X-DMAAP-DR-PUBLISH-ID header    |                  |            |              |             |                                      |
+|                        | from original publish request   |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 | start                  | Select records created at or    |     Path         |   String   |              |     N       | A date-time expressed in the format  |
 |                        | after specified date            |                  |            |              |             | specified by RFC 3339                |
@@ -918,63 +918,63 @@ Request parameters
 Response Parameters
 ===================
 
-+------------------------+-------------------------------------------+
-| Name                   | Description                               |
-+========================+===========================================+
-| type                   | Record type:                              |
-|                        |                                           |
-|                        | * pub: publication attempt                |
-|                        | * del: delivery attempt                   |
-|                        | * exp: delivery expiry                    |
-+------------------------+-------------------------------------------+
-| date                   | The UTC date and time at which the record |
-|                        | was generated, with millisecond resolution|
-|                        | in the format specified by RFC 3339       |
-+------------------------+-------------------------------------------+
-| publishId              | The unique identifier assigned by the DR  |
-|                        | at the time of the initial publication    |
-|                        | request (carried in the X-ATT-DRPUBLISH-ID|
-|                        | header in the response to the original    |
-|                        | publish request)                          |
-+------------------------+-------------------------------------------+
-| requestURI             | The Request-URI associated with the       |
-|                        | request                                   |
-+------------------------+-------------------------------------------+
-| method                 | The HTTP method (PUT or DELETE) for the   |
-|                        | request                                   |
-+------------------------+-------------------------------------------+
-| contentType            | The media type of the payload of the      |
-|                        | request                                   |
-+------------------------+-------------------------------------------+
-| contentLength          | The size (in bytes) of the payload of     |
-|                        | the request                               |
-+------------------------+-------------------------------------------+
-| sourceIp               | The IP address from which the request     |
-|                        | originated                                |
-+------------------------+-------------------------------------------+
-| endpointId             | The identity used to submit a publish     |
-|                        | request to the DR                         |
-+------------------------+-------------------------------------------+
-| deliveryId             | The identity used to submit a delivery    |
-|                        | request to a subscriber endpoint          |
-+------------------------+-------------------------------------------+
-| statusCode             | The HTTP status code in the response to   |
-|                        | the request. A value of -1 indicates that |
-|                        | the DR was not able to obtain an HTTP     |
-|                        | status code                               |
-+------------------------+-------------------------------------------+
-| expiryReason           | The reason that delivery attempts were    |
-|                        | discontinued:                             |
-|                        |                                           |
-|                        | * notRetryable: The last delivery attempt |
-|                        |   encountered an error condition for which|
-|                        |   the DR does not make retries.           |
-|                        | * retriesExhausted: The DR reached its    |
-|                        |   limit for making further retry attempts |
-+------------------------+-------------------------------------------+
-| attempts               | Total number of attempts made before      |
-|                        | delivery attempts were discontinued       |
-+------------------------+-------------------------------------------+
++------------------------+----------------------------------------------+
+| Name                   | Description                                  |
++========================+==============================================+
+| type                   | Record type:                                 |
+|                        |                                              |
+|                        | * pub: publication attempt                   |
+|                        | * del: delivery attempt                      |
+|                        | * exp: delivery expiry                       |
++------------------------+----------------------------------------------+
+| date                   | The UTC date and time at which the record    |
+|                        | was generated, with millisecond resolution   |
+|                        | in the format specified by RFC 3339          |
++------------------------+----------------------------------------------+
+| publishId              | The unique identifier assigned by the DR     |
+|                        | at the time of the initial publication       |
+|                        | request (carried in the X-DMAAP-DR-PUBLISH-ID|
+|                        | header in the response to the original       |
+|                        | publish request)                             |
++------------------------+----------------------------------------------+
+| requestURI             | The Request-URI associated with the          |
+|                        | request                                      |
++------------------------+----------------------------------------------+
+| method                 | The HTTP method (PUT or DELETE) for the      |
+|                        | request                                      |
++------------------------+----------------------------------------------+
+| contentType            | The media type of the payload of the         |
+|                        | request                                      |
++------------------------+----------------------------------------------+
+| contentLength          | The size (in bytes) of the payload of        |
+|                        | the request                                  |
++------------------------+----------------------------------------------+
+| sourceIp               | The IP address from which the request        |
+|                        | originated                                   |
++------------------------+----------------------------------------------+
+| endpointId             | The identity used to submit a publish        |
+|                        | request to the DR                            |
++------------------------+----------------------------------------------+
+| deliveryId             | The identity used to submit a delivery       |
+|                        | request to a subscriber endpoint             |
++------------------------+----------------------------------------------+
+| statusCode             | The HTTP status code in the response to      |
+|                        | the request. A value of -1 indicates that    |
+|                        | the DR was not able to obtain an HTTP        |
+|                        | status code                                  |
++------------------------+----------------------------------------------+
+| expiryReason           | The reason that delivery attempts were       |
+|                        | discontinued:                                |
+|                        |                                              |
+|                        | * notRetryable: The last delivery attempt    |
+|                        |   encountered an error condition for which   |
+|                        |   the DR does not make retries.              |
+|                        | * retriesExhausted: The DR reached its       |
+|                        |   limit for making further retry attempts    |
++------------------------+----------------------------------------------+
+| attempts               | Total number of attempts made before         |
+|                        | delivery attempts were discontinued          |
++------------------------+----------------------------------------------+
 
 Response/Error Codes
 ====================
@@ -1001,7 +1001,7 @@ Response/Error Codes
 | 406                    | Not Acceptable - The request has an Accept|
 |                        | header indicating that the requester will |
 |                        | not accept a response with                |
-|                        | application/vnd.att-dr.log-list content.  |
+|                        | application/vnd.dmaap-dr.log-list content.|
 +------------------------+-------------------------------------------+
 | 500                    | Internal Server Error - The DR API server |
 |                        | encountered an internal error and could   |
@@ -1046,8 +1046,8 @@ Request parameters
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 | publishId              | Select records with specified   |     Path         |   String   |              |     N       |                                      |
 |                        | publish id, carried in the      |                  |            |              |             |                                      |
-|                        | X-ATT-DR-PUBLISH-ID header from |                  |            |              |             |                                      |
-|                        | original publish request        |                  |            |              |             |                                      |
+|                        | X-DMAAP-DR-PUBLISH-ID header    |                  |            |              |             |                                      |
+|                        | from original publish request   |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 | start                  | Select records created at or    |     Path         |   String   |              |     N       | A date-time expressed in the format  |
 |                        | after specified date            |                  |            |              |             | specified by RFC 3339                |
@@ -1070,64 +1070,64 @@ Request parameters
 Response Parameters
 ===================
 
-+------------------------+-------------------------------------------+
-| Name                   | Description                               |
-+========================+===========================================+
-| type                   | Record type:                              |
-|                        |                                           |
-|                        | * pub: publication attempt                |
-|                        | * del: delivery attempt                   |
-|                        | * exp: delivery expiry                    |
-+------------------------+-------------------------------------------+
-| date                   | The UTC date and time at which the record |
-|                        | was generated, with millisecond resolution|
-|                        | in the format specified by RFC 3339       |
-+------------------------+-------------------------------------------+
-| publishId              | The unique identifier assigned by the DR  |
-|                        | at the time of the initial publication    |
-|                        | request(carried in the X-ATT-DR-PUBLISH-ID|
-|                        | header in the response to the original    |
-|                        | publish request) to a feed log URL or     |
-|                        | subscription log URL known to the system  |
-+------------------------+-------------------------------------------+
-| requestURI             | The Request-URI associated with the       |
-|                        | request                                   |
-+------------------------+-------------------------------------------+
-| method                 | The HTTP method (PUT or DELETE) for the   |
-|                        | request                                   |
-+------------------------+-------------------------------------------+
-| contentType            | The media type of the payload of the      |
-|                        | request                                   |
-+------------------------+-------------------------------------------+
-| contentLength          | The size (in bytes) of the payload of     |
-|                        | the request                               |
-+------------------------+-------------------------------------------+
-| sourceIp               | The IP address from which the request     |
-|                        | originated                                |
-+------------------------+-------------------------------------------+
-| endpointId             | The identity used to submit a publish     |
-|                        | request to the DR                         |
-+------------------------+-------------------------------------------+
-| deliveryId             | The identity used to submit a delivery    |
-|                        | request to a subscriber endpoint          |
-+------------------------+-------------------------------------------+
-| statusCode             | The HTTP status code in the response to   |
-|                        | the request. A value of -1 indicates that |
-|                        | the DR was not able to obtain an HTTP     |
-|                        | status code                               |
-+------------------------+-------------------------------------------+
-| expiryReason           | The reason that delivery attempts were    |
-|                        | discontinued:                             |
-|                        |                                           |
-|                        | * notRetryable: The last delivery attempt |
-|                        |   encountered an error condition for which|
-|                        |   the DR does not make retries.           |
-|                        | * retriesExhausted: The DR reached its    |
-|                        |   limit for making further retry attempts |
-+------------------------+-------------------------------------------+
-| attempts               | Total number of attempts made before      |
-|                        | delivery attempts were discontinued       |
-+------------------------+-------------------------------------------+
++------------------------+---------------------------------------------+
+| Name                   | Description                                 |
++========================+=============================================+
+| type                   | Record type:                                |
+|                        |                                             |
+|                        | * pub: publication attempt                  |
+|                        | * del: delivery attempt                     |
+|                        | * exp: delivery expiry                      |
++------------------------+---------------------------------------------+
+| date                   | The UTC date and time at which the record   |
+|                        | was generated, with millisecond resolution  |
+|                        | in the format specified by RFC 3339         |
++------------------------+---------------------------------------------+
+| publishId              | The unique identifier assigned by the DR    |
+|                        | at the time of the initial publication      |
+|                        | request(carried in the X-DMAAP-DR-PUBLISH-ID|
+|                        | header in the response to the original      |
+|                        | publish request) to a feed log URL or       |
+|                        | subscription log URL known to the system    |
++------------------------+---------------------------------------------+
+| requestURI             | The Request-URI associated with the         |
+|                        | request                                     |
++------------------------+---------------------------------------------+
+| method                 | The HTTP method (PUT or DELETE) for the     |
+|                        | request                                     |
++------------------------+---------------------------------------------+
+| contentType            | The media type of the payload of the        |
+|                        | request                                     |
++------------------------+---------------------------------------------+
+| contentLength          | The size (in bytes) of the payload of       |
+|                        | the request                                 |
++------------------------+---------------------------------------------+
+| sourceIp               | The IP address from which the request       |
+|                        | originated                                  |
++------------------------+---------------------------------------------+
+| endpointId             | The identity used to submit a publish       |
+|                        | request to the DR                           |
++------------------------+---------------------------------------------+
+| deliveryId             | The identity used to submit a delivery      |
+|                        | request to a subscriber endpoint            |
++------------------------+---------------------------------------------+
+| statusCode             | The HTTP status code in the response to     |
+|                        | the request. A value of -1 indicates that   |
+|                        | the DR was not able to obtain an HTTP       |
+|                        | status code                                 |
++------------------------+---------------------------------------------+
+| expiryReason           | The reason that delivery attempts were      |
+|                        | discontinued:                               |
+|                        |                                             |
+|                        | * notRetryable: The last delivery attempt   |
+|                        |   encountered an error condition for which  |
+|                        |   the DR does not make retries.             |
+|                        | * retriesExhausted: The DR reached its      |
+|                        |   limit for making further retry attempts   |
++------------------------+---------------------------------------------+
+| attempts               | Total number of attempts made before        |
+|                        | delivery attempts were discontinued         |
++------------------------+---------------------------------------------+
 
 Response/Error Codes
 ====================
@@ -1154,7 +1154,7 @@ Response/Error Codes
 | 406                    | Not Acceptable - The request has an Accept|
 |                        | header indicating that the requester will |
 |                        | not accept a response with                |
-|                        | application/vnd.att-dr.log-list content.  |
+|                        | application/vnd.dmaap-dr.log-list content.|
 +------------------------+-------------------------------------------+
 | 500                    | Internal Server Error - The DR API server |
 |                        | encountered an internal error and could   |

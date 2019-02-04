@@ -285,7 +285,7 @@ public class SubscribeServlet extends ProxyServlet {
                 return;
             }
             sub.setFeedid(feedid);
-            sub.setSubscriber(bhdr);    // set from X-ATT-DR-ON-BEHALF-OF header
+            sub.setSubscriber(bhdr);    // set from X-DMAAP-DR-ON-BEHALF-OF header
 
             // Check if this subscription already exists; not an error (yet), just warn
             Subscription sub2 = Subscription.getSubscriptionMatching(sub);

@@ -105,7 +105,7 @@ public class NodeServlet extends HttpServlet {
         NodeUtils.setRequestIdAndInvocationId(req);
         eelflogger.info(EelfMsgs.ENTRY);
         try {
-            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader("X-ATT-DR-ON-BEHALF-OF"),
+            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader("X-DMAAP-DR-ON-BEHALF-OF"),
                     getIdFromPath(req) + "");
             try {
                 if (down(resp)) {
@@ -148,7 +148,7 @@ public class NodeServlet extends HttpServlet {
         NodeUtils.setIpAndFqdnForEelf("doPut");
         NodeUtils.setRequestIdAndInvocationId(req);
         eelflogger.info(EelfMsgs.ENTRY);
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader("X-ATT-DR-ON-BEHALF-OF"),
+        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader("X-DMAAP-DR-ON-BEHALF-OF"),
                     getIdFromPath(req) + "");
         try {
             common(req, resp, true);
@@ -168,7 +168,7 @@ public class NodeServlet extends HttpServlet {
         NodeUtils.setIpAndFqdnForEelf("doDelete");
         NodeUtils.setRequestIdAndInvocationId(req);
         eelflogger.info(EelfMsgs.ENTRY);
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader("X-ATT-DR-ON-BEHALF-OF"),
+        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader("X-DMAAP-DR-ON-BEHALF-OF"),
                 getIdFromPath(req) + "");
         try {
             common(req, resp, false);
@@ -235,7 +235,7 @@ public class NodeServlet extends HttpServlet {
             feedid = fileid.substring(0, i);
             fileid = fileid.substring(i + 1);
             pubid = config.getPublishId();
-            xpubid = req.getHeader("X-ATT-DR-PUBLISH-ID");
+            xpubid = req.getHeader("X-DMAAP-DR-PUBLISH-ID");
             targets = config.getTargets(feedid);
         } else if (fileid.startsWith("/internal/publish/")) {
             if (!config.isAnotherNode(credentials, ip)) {
@@ -245,8 +245,8 @@ public class NodeServlet extends HttpServlet {
                 return;
             }
             fileid = fileid.substring(18);
-            pubid = req.getHeader("X-ATT-DR-PUBLISH-ID");
-            targets = config.parseRouting(req.getHeader("X-ATT-DR-ROUTING"));
+            pubid = req.getHeader("X-DMAAP-DR-PUBLISH-ID");
+            targets = config.parseRouting(req.getHeader("X-DMAAP-DR-ROUTING"));
         } else {
             logger.info("NODE0105 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + " from " + req
                     .getRemoteAddr());
@@ -302,7 +302,7 @@ public class NodeServlet extends HttpServlet {
                 eelflogger.info(EelfMsgs.EXIT);
                 return;
             }
-            resp.setHeader("X-ATT-DR-PUBLISH-ID", pubid);
+            resp.setHeader("X-DMAAP-DR-PUBLISH-ID", pubid);
         }
         String fbase = config.getSpoolDir() + "/" + pubid;
         File data = new File(fbase);
@@ -324,9 +324,9 @@ public class NodeServlet extends HttpServlet {
                         "content-language".equals(hnlc) ||
                         "content-md5".equals(hnlc) ||
                         "content-range".equals(hnlc))) ||
-                        "x-att-dr-meta".equals(hnlc) ||
-                        (feedid == null && "x-att-dr-received".equals(hnlc)) ||
-                        (hnlc.startsWith("x-") && !hnlc.startsWith("x-att-dr-"))) {
+                        "x-dmaap-dr-meta".equals(hnlc) ||
+                        (feedid == null && "x-dmaap-dr-received".equals(hnlc)) ||
+                        (hnlc.startsWith("x-") && !hnlc.startsWith("x-dmaap-dr-"))) {
                     Enumeration hvals = req.getHeaders(hn);
                     while (hvals.hasMoreElements()) {
                         String hv = (String) hvals.nextElement();
@@ -339,7 +339,7 @@ public class NodeServlet extends HttpServlet {
                         if ("x-invocationid".equals(hnlc)) {
                             hasInvocationIdHeader = true;
                         }
-                        if ("x-att-dr-meta".equals(hnlc)) {
+                        if ("x-dmaap-dr-meta".equals(hnlc)) {
                             if (hv.length() > 4096) {
                                 logger.info(
                                         "NODE0109 Rejecting publish attempt with metadata too long for feed " + feedid
@@ -367,7 +367,7 @@ public class NodeServlet extends HttpServlet {
             if(!hasInvocationIdHeader){
                 mx.append("X-InvocationID\t").append(MDC.get("InvocationId")).append('\n');
             }
-            mx.append("X-ATT-DR-RECEIVED\t").append(rcvd).append('\n');
+            mx.append("X-DMAAP-DR-RECEIVED\t").append(rcvd).append('\n');
             String metadata = mx.toString();
             byte[] buf = new byte[1024 * 1024];
             int i;
@@ -404,7 +404,7 @@ public class NodeServlet extends HttpServlet {
                 mw = new FileWriter(meta);
                 mw.write(metadata);
                 if (di.getSubId() == null) {
-                    mw.write("X-ATT-DR-ROUTING\t" + t.getRouting() + "\n");
+                    mw.write("X-DMAAP-DR-ROUTING\t" + t.getRouting() + "\n");
                 }
                 mw.close();
                 meta.renameTo(new File(dbase + ".M"));

@@ -185,7 +185,7 @@ public class SubscribeServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Content_Header_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.feed; version=1.1");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.feed; version=1.1");
         when(request.getContentType()).thenReturn("stub_contentType");
         subscribeServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), argThat(notNullValue(String.class)));
@@ -340,8 +340,8 @@ public class SubscribeServletTest extends DrServletTestBase {
     }
 
     private void setUpValidContentHeadersAndJSONOnHttpRequest() {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.att-dr.subscription; version=1.0");
-        when(request.getHeader("X-ATT-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
+        when(request.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
 
     }
 }
