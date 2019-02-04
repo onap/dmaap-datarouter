@@ -72,6 +72,7 @@ public class PublishRecordTest {
     publishRecordMap.put("type", "pub");
     publishRecordMap.put("date", "2018-08-29T10:10:10.543Z");
     publishRecordMap.put("contentLength", 285);
+    publishRecordMap.put("fileName", "fileName");
     return  new LOGJSONObject(publishRecordMap);
   }
 }

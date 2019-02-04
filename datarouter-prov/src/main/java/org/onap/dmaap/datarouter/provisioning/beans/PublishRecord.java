@@ -44,6 +44,7 @@ public class PublishRecord extends BaseLogRecord {
     private String remoteAddr;
     private String user;
     private int status;
+    private String fileName;
 
     public PublishRecord(String[] pp) throws ParseException {
         super(pp);
@@ -62,6 +63,8 @@ public class PublishRecord extends BaseLogRecord {
         this.remoteAddr = pp[8];
         this.user = pp[9];
         this.status = Integer.parseInt(pp[10]);
+        String[] reqUriSplit = this.getRequestUri().split("/");
+        this.fileName = reqUriSplit[reqUriSplit.length -1];
     }
 
     public PublishRecord(ResultSet rs) throws SQLException {
@@ -70,6 +73,8 @@ public class PublishRecord extends BaseLogRecord {
         this.remoteAddr = rs.getString("REMOTE_ADDR");
         this.user = rs.getString("USER");
         this.status = rs.getInt("STATUS");
+        String[] reqUriSplit = this.getRequestUri().split("/");
+        this.fileName = reqUriSplit[reqUriSplit.length -1];
     }
 
     public String getFeedFileid() {
@@ -104,6 +109,10 @@ public class PublishRecord extends BaseLogRecord {
         this.status = status;
     }
 
+    public String getFileName() { return fileName;}
+
+    public void setFileName(String fileName) { this.fileName = fileName; }
+
 
     public LOGJSONObject reOrderObject(LOGJSONObject jo) {
         LinkedHashMap<String, Object> logrecordObj = new LinkedHashMap<String, Object>();
@@ -119,6 +128,7 @@ public class PublishRecord extends BaseLogRecord {
         logrecordObj.put("type", jo.get("type"));
         logrecordObj.put("date", jo.get("date"));
         logrecordObj.put("contentLength", jo.get("contentLength"));
+        logrecordObj.put("fileName", jo.get("fileName"));
 
         LOGJSONObject newjo = new LOGJSONObject(logrecordObj);
         return newjo;
@@ -134,6 +144,7 @@ public class PublishRecord extends BaseLogRecord {
         jo.put("sourceIP", remoteAddr);
         jo.put("endpointId", user);
         jo.put("statusCode", status);
+        jo.put("fileName", fileName);
 
         LOGJSONObject newjo = this.reOrderObject(jo);
 
@@ -154,5 +165,6 @@ public class PublishRecord extends BaseLogRecord {
         ps.setNull(16, Types.INTEGER);
         ps.setNull(17, Types.VARCHAR);
         ps.setNull(19, Types.BIGINT);
+        ps.setString(20, getFileName());
     }
 }
