@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2956f8de_8b270e46",
+        "filename": "docs/data-router/release-notes.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-05T14:48:19Z",
+      "side": 1,
+      "message": "Not sure if it needs to be fixed but we actually only have 1.0.3 in oom",
+      "range": {
+        "startLine": 6,
+        "startChar": 9,
+        "endLine": 6,
+        "endChar": 14
+      },
+      "revId": "6aefa4a771ad1a8827e3256a7e45e455470da848",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
