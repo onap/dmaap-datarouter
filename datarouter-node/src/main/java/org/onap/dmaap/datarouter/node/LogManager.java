@@ -188,7 +188,7 @@ public class LogManager extends TimerTask {
         uploaddir = logdir + "/.spool";
         (new File(uploaddir)).mkdirs();
         long now = System.currentTimeMillis();
-        long intvl = StatusLog.parseInterval(config.getEventLogInterval(), 300000);
+        long intvl = StatusLog.parseInterval(config.getEventLogInterval(), 30000);
         long when = now - now % intvl + intvl + 20000L;
         config.getTimer().scheduleAtFixedRate(this, when - now, intvl);
         worker = new Uploader();

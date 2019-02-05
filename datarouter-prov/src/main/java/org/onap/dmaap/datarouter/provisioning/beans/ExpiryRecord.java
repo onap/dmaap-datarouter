@@ -141,5 +141,6 @@ public class ExpiryRecord extends BaseLogRecord {
         ps.setInt(16, getAttempts());
         ps.setString(17, getReason());
         ps.setNull(19, Types.BIGINT);
+        ps.setNull(20, Types.VARCHAR);
     }
 }
