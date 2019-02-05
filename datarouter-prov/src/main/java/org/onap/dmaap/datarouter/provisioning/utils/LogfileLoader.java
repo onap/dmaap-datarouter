@@ -100,7 +100,7 @@ public class LogfileLoader extends Thread {
     /**
      * The PreparedStatement which is loaded by a <i>Loadable</i>.
      */
-    public static final String INSERT_SQL = "insert into LOG_RECORDS values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    public static final String INSERT_SQL = "insert into LOG_RECORDS values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     /**
      * Each server can assign this many IDs
      */

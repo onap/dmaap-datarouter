@@ -77,6 +77,7 @@ CREATE TABLE LOG_RECORDS (
 
     RECORD_ID      BIGINT UNSIGNED NOT NULL PRIMARY KEY, /* unique ID for this record */
     CONTENT_LENGTH_2 BIGINT,
+    FILENAME       VARCHAR(256),        /* Name of the file being published on DR */
 
     INDEX (FEEDID) USING BTREE,
     INDEX (DELIVERY_SUBID) USING BTREE,
@@ -134,7 +135,7 @@ INSERT INTO PARAMETERS VALUES
     ('DELIVERY_MAX_AGE', '86400'),
     ('DELIVERY_MAX_RETRY_INTERVAL', '3600'),
     ('DELIVERY_RETRY_RATIO', '2'),
-    ('LOGROLL_INTERVAL', '300'),
+    ('LOGROLL_INTERVAL', '30'),
     ('PROV_AUTH_ADDRESSES', 'dmaap-dr-prov|dmaap-dr-node'),
     ('PROV_AUTH_SUBJECTS', ''),
     ('PROV_MAXFEED_COUNT',  '10000'),
