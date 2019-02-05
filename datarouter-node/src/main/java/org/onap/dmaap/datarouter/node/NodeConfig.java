@@ -231,6 +231,7 @@ public class NodeConfig {
         private String credentials;
         private boolean metaonly;
         private boolean use100;
+        private boolean waitForFileProcessed;
 
         /**
          * Construct a subscription configuration entry
@@ -243,9 +244,10 @@ public class NodeConfig {
          * Authorization header.
          * @param metaonly Is this a meta data only subscription?
          * @param use100 Should we send Expect: 100-continue?
+         * @param waitForFileProcessed Should we wait to receive a file processed acknowledgement before deleting file
          */
         public ProvSubscription(String subid, String feedid, String url, String authuser, String credentials,
-                boolean metaonly, boolean use100) {
+                boolean metaonly, boolean use100, boolean waitForFileProcessed) {
             this.subid = subid;
             this.feedid = feedid;
             this.url = url;
@@ -253,6 +255,7 @@ public class NodeConfig {
             this.credentials = credentials;
             this.metaonly = metaonly;
             this.use100 = use100;
+            this.waitForFileProcessed = waitForFileProcessed;
         }
 
         /**
@@ -302,6 +305,13 @@ public class NodeConfig {
          */
         public boolean isUsing100() {
             return (use100);
+        }
+
+        /**
+         * Should we wait to receive a file processed acknowledgement before deleting file
+         */
+        public boolean getWaitForFileProcessed() {
+            return (waitForFileProcessed);
         }
     }
 
@@ -565,8 +575,7 @@ public class NodeConfig {
             } catch (Exception e) {
             }
             String siddir = sididx + "/" + sid;
-            DestInfo di = new DestInfo("s:" + sid, spooldir + "/s/" + siddir, sid, fid, ps.getURL(), ps.getAuthUser(),
-                    ps.getCredentials(), ps.isMetaDataOnly(), ps.isUsing100());
+            DestInfo di = new DestInfo("s:" + sid, spooldir + "/s/" + siddir, ps);
             (new File(di.getSpool())).mkdirs();
             div.add(di);
             subinfo.put(sid, di);

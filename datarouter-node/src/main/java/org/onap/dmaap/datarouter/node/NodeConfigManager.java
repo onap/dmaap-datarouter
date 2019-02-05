@@ -57,6 +57,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private Timer timer = new Timer("Node Configuration Timer", true);
     private long maxfailuretimer;
     private long initfailuretimer;
+    private long waitForFileProcessFailureTimer;
     private long expirationtimer;
     private double failurebackoff;
     private long fairtimelimit;
@@ -187,6 +188,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         followredirects = Boolean.parseBoolean(getProvParam("FOLLOW_REDIRECTS", "false"));
         eventloginterval = getProvParam("LOGROLL_INTERVAL", "5m");
         initfailuretimer = 10000;
+        waitForFileProcessFailureTimer = 600000;
         maxfailuretimer = 3600000;
         expirationtimer = 86400000;
         failurebackoff = 2.0;
@@ -197,6 +199,10 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         fdpstop = 0.2;
         try {
             initfailuretimer = (long) (Double.parseDouble(getProvParam("DELIVERY_INIT_RETRY_INTERVAL")) * 1000);
+        } catch (Exception e) {
+        }
+        try {
+            waitForFileProcessFailureTimer = (long) (Double.parseDouble(getProvParam("DELIVERY_FILE_PROCESS_INTERVAL")) * 1000);
         } catch (Exception e) {
         }
         try {
@@ -459,6 +465,13 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      */
     public long getInitFailureTimer() {
         return (initfailuretimer);
+    }
+
+    /**
+     * Get the timeout before retrying after delivery and wait for file processing
+     */
+    public long getWaitForFileProcessFailureTimer() {
+        return (waitForFileProcessFailureTimer);
     }
 
     /**

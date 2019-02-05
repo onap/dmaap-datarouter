@@ -57,6 +57,10 @@ public class LogManager extends TimerTask {
             return (10000L);
         }
 
+        public long getWaitForFileProcessFailureTimer() {
+            return (600000L);
+        }
+
         public double getFailureBackoff() {
             return (2.0);
         }

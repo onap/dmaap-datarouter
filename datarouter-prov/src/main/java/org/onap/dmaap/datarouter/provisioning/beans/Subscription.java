@@ -68,6 +68,7 @@ public class Subscription extends Syncable {
     private boolean suspended;
     private Date lastMod;
     private Date createdDate;
+    private boolean waitForFileProcessed;
 
     public static Subscription getSubscriptionMatching(Subscription sub) {
         SubDelivery deli = sub.getDelivery();
@@ -200,6 +201,7 @@ public class Subscription extends Syncable {
         this.suspended = false;
         this.lastMod = new Date();
         this.createdDate = new Date();
+        this.waitForFileProcessed = false;
     }
 
     public Subscription(ResultSet rs) throws SQLException {
@@ -214,6 +216,7 @@ public class Subscription extends Syncable {
         this.suspended = rs.getBoolean("SUSPENDED");
         this.lastMod = rs.getDate("LAST_MOD");
         this.createdDate = rs.getDate("CREATED_DATE");
+        this.waitForFileProcessed = rs.getBoolean("WAIT_FOR_FILE_PROCESSED");
     }
 
     public Subscription(JSONObject jo) throws InvalidObjectException {
@@ -249,7 +252,7 @@ public class Subscription extends Syncable {
 
             this.metadataOnly = jo.getBoolean("metadataOnly");
             this.suspended = jo.optBoolean("suspend", false);
-
+            this.waitForFileProcessed = jo.optBoolean("waitForFileProcessed", false);
             this.subscriber = jo.optString("subscriber", "");
             JSONObject jol = jo.optJSONObject("links");
             this.links = (jol == null) ? (new SubLinks()) : (new SubLinks(jol));
@@ -323,6 +326,14 @@ public class Subscription extends Syncable {
         this.suspended = suspended;
     }
 
+    public boolean getWaitForFileProcessed() {
+        return waitForFileProcessed;
+    }
+
+    public void setWaitForFileProcessed(boolean waitForFileProcessed) {
+        this.waitForFileProcessed = waitForFileProcessed;
+    }
+
     public String getSubscriber() {
         return subscriber;
     }
@@ -357,6 +368,7 @@ public class Subscription extends Syncable {
         jo.put("suspend", suspended);
         jo.put(LAST_MOD_KEY, lastMod.getTime());
         jo.put(CREATED_DATE, createdDate.getTime());
+        jo.put("waitForFileProcessed", waitForFileProcessed);
         return jo;
     }
 
@@ -394,7 +406,7 @@ public class Subscription extends Syncable {
             }
 
             // Create the SUBSCRIPTIONS row
-            String sql = "insert into SUBSCRIPTIONS (SUBID, FEEDID, DELIVERY_URL, DELIVERY_USER, DELIVERY_PASSWORD, DELIVERY_USE100, METADATA_ONLY, SUBSCRIBER, SUSPENDED, GROUPID) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "insert into SUBSCRIPTIONS (SUBID, FEEDID, DELIVERY_URL, DELIVERY_USER, DELIVERY_PASSWORD, DELIVERY_USE100, METADATA_ONLY, SUBSCRIBER, SUSPENDED, GROUPID, WAIT_FOR_FILE_PROCESSED) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             ps = c.prepareStatement(sql, new String[]{SUBID_COL});
             ps.setInt(1, subid);
             ps.setInt(2, feedid);
@@ -406,6 +418,7 @@ public class Subscription extends Syncable {
             ps.setString(8, getSubscriber());
             ps.setBoolean(9, isSuspended());
             ps.setInt(10, groupid); //New field is added - Groups feature Rally:US708115 - 1610
+            ps.setBoolean(11, getWaitForFileProcessed());
             ps.execute();
             ps.close();
             // Update the row to set the URLs
@@ -436,7 +449,7 @@ public class Subscription extends Syncable {
         boolean rv = true;
         PreparedStatement ps = null;
         try {
-            String sql = "update SUBSCRIPTIONS set DELIVERY_URL = ?, DELIVERY_USER = ?, DELIVERY_PASSWORD = ?, DELIVERY_USE100 = ?, METADATA_ONLY = ?, SUSPENDED = ?, GROUPID = ? where SUBID = ?";
+            String sql = "update SUBSCRIPTIONS set DELIVERY_URL = ?, DELIVERY_USER = ?, DELIVERY_PASSWORD = ?, DELIVERY_USE100 = ?, METADATA_ONLY = ?, SUSPENDED = ?, GROUPID = ?, WAIT_FOR_FILE_PROCESSED = ? where SUBID = ?";
             ps = c.prepareStatement(sql);
             ps.setString(1, delivery.getUrl());
             ps.setString(2, delivery.getUser());
@@ -445,7 +458,8 @@ public class Subscription extends Syncable {
             ps.setInt(5, isMetadataOnly() ? 1 : 0);
             ps.setInt(6, suspended ? 1 : 0);
             ps.setInt(7, groupid); //New field is added - Groups feature Rally:US708115 - 1610
-            ps.setInt(8, subid);
+            ps.setInt(8, waitForFileProcessed ? 1 : 0);
+            ps.setInt(9, subid);
             ps.executeUpdate();
         } catch (SQLException e) {
             rv = false;
