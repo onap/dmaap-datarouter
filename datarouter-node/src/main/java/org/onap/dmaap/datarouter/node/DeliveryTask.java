@@ -87,7 +87,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
         metafile = new File(mfn);
         boolean monly = di.isMetaDataOnly();
         date = Long.parseLong(pubid.substring(0, pubid.indexOf('.')));
-        Vector<String[]> hdrv = new Vector<String[]>();
+        Vector<String[]> hdrv = new Vector<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(metafile))) {
             String s = br.readLine();

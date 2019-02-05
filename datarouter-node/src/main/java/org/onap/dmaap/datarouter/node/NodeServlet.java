@@ -40,7 +40,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.regex.Pattern;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -155,16 +154,13 @@ public class NodeServlet extends HttpServlet {
         } catch (IOException ioe) {
             logger.error("IOException" + ioe.getMessage());
             eelflogger.info(EelfMsgs.EXIT);
-        } catch (ServletException se) {
-            logger.error("ServletException" + se.getMessage());
-            eelflogger.info(EelfMsgs.EXIT);
         }
     }
 
     /**
      * Handle all DELETE requests
      */
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         NodeUtils.setIpAndFqdnForEelf("doDelete");
         NodeUtils.setRequestIdAndInvocationId(req);
         eelflogger.info(EelfMsgs.ENTRY);
@@ -173,17 +169,12 @@ public class NodeServlet extends HttpServlet {
         try {
             common(req, resp, false);
         } catch (IOException ioe) {
-            logger.error("IOException" + ioe.getMessage());
-            eelflogger.info(EelfMsgs.EXIT);
-        } catch (ServletException se) {
-            logger.error("ServletException" + se.getMessage());
+            logger.error("IOException " + ioe.getMessage());
             eelflogger.info(EelfMsgs.EXIT);
         }
-
     }
 
-    private void common(HttpServletRequest req, HttpServletResponse resp, boolean isput)
-            throws ServletException, IOException {
+    private void common(HttpServletRequest req, HttpServletResponse resp, boolean isput) throws IOException {
         if (down(resp)) {
             eelflogger.info(EelfMsgs.EXIT);
             return;
@@ -221,7 +212,47 @@ public class NodeServlet extends HttpServlet {
         String xpubid = null;
         String rcvd = NodeUtils.logts(System.currentTimeMillis()) + ";from=" + ip + ";by=" + lip;
         Target[] targets = null;
-        if (fileid.startsWith("/publish/")) {
+        if (fileid.startsWith("/delete/")) {
+            try {
+                fileid = fileid.substring(8);
+                int i = fileid.indexOf('/');
+                if (i == -1 || i == fileid.length() - 1) {
+                    logger.info("NODE0112 Rejecting bad URI for DELETE of " + req.getPathInfo() + " from " + req
+                            .getRemoteAddr());
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND,
+                            "Invalid request URI. Expecting <subId>/<pubId>.");
+                    eelflogger.info(EelfMsgs.EXIT);
+                    return;
+                }
+                int subId = Integer.parseInt(fileid.substring(0, i));
+                pubid = fileid.substring(i + 1);
+                int subIdDir = subId - (subId % 100);
+                String filePath = config.getSpoolBase() + "/s/" + subIdDir + "/" + subId +
+                        "/" + pubid;
+                String metaFilePath = filePath + ".M";
+                File fileToDelete = new File(filePath);
+                File metaFileToDelete = new File(metaFilePath);
+                if (fileToDelete.delete() && metaFileToDelete.delete()) {
+                    logger.info("NODE0113 Successfully deleted files (" + fileToDelete.getName() + ", " +
+                            metaFileToDelete.getName() + ") from DR Node: " + config.getMyName());
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                    eelflogger.info(EelfMsgs.EXIT);
+                    return;
+                } else {
+                    logger.error("NODE0114 Unable to delete files (" + fileToDelete.getName() + ", " +
+                            metaFileToDelete.getName() + ") from DR Node: " + config.getMyName());
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found on server.");
+                    eelflogger.info(EelfMsgs.EXIT);
+                    return;
+                }
+            } catch (IOException ioe) {
+                logger.error("NODE0115 Unable to delete files (" + pubid + ", " + pubid + ".M) from DR Node: "
+                        + config.getMyName() + ". Error: " + ioe.getMessage());
+                eelflogger.info(EelfMsgs.EXIT);
+                return;
+            }
+        }
+        else if (fileid.startsWith("/publish/")) {
             fileid = fileid.substring(9);
             int i = fileid.indexOf('/');
             if (i == -1 || i == fileid.length() - 1) {
@@ -315,8 +346,8 @@ public class NodeServlet extends HttpServlet {
             mx.append(req.getMethod()).append('\t').append(fileid).append('\n');
             Enumeration hnames = req.getHeaderNames();
             String ctype = null;
-            Boolean hasRequestIdHeader = false;
-            Boolean hasInvocationIdHeader = false;
+            boolean hasRequestIdHeader = false;
+            boolean hasInvocationIdHeader = false;
             while (hnames.hasMoreElements()) {
                 String hn = (String) hnames.nextElement();
                 String hnlc = hn.toLowerCase();

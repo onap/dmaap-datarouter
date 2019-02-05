@@ -57,6 +57,10 @@ public class LogManager extends TimerTask {
             return (10000L);
         }
 
+        public long getWaitForFileProcessFailureTimer() {
+            return (600000L);
+        }
+
         public double getFailureBackoff() {
             return (2.0);
         }
@@ -101,7 +105,7 @@ public class LogManager extends TimerTask {
         public Uploader() {
             dq = new DeliveryQueue(this,
                 new DestInfo("LogUpload", uploaddir, null, null, null, config.getMyName(), config.getMyAuth(), false,
-                    false));
+                    false, false));
             setDaemon(true);
             setName("Log Uploader");
             start();

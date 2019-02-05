@@ -62,6 +62,7 @@ public class SubscriptionTest {
         subscription.setMetadataOnly(false);
         subscription.setSubscriber(subscriber);
         subscription.setSuspended(false);
+        subscription.setWaitForFileProcessed(false);
         subscription.setLinks(subLinks);
 
         Assert.assertEquals(2, subscription.getGroupid());
@@ -69,5 +70,6 @@ public class SubscriptionTest {
         Assert.assertEquals(subLinks, subscription.getLinks());
         Assert.assertFalse(subscription.isMetadataOnly());
         Assert.assertFalse(subscription.isSuspended());
+        Assert.assertFalse(subscription.getWaitForFileProcessed());
     }
 }

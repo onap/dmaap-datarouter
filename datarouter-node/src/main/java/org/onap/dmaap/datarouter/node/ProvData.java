@@ -173,7 +173,8 @@ public class ProvData {
                     String password = gvas(jdel, "password");
                     boolean monly = jsub.getBoolean("metadataOnly");
                     boolean use100 = jdel.getBoolean("use100");
-                    psv.add(new NodeConfig.ProvSubscription(sid, fid, delurl, id, NodeUtils.getAuthHdr(id, password), monly, use100));
+                    boolean waitForFileProcessed = jsub.getBoolean("waitForFileProcessed");
+                    psv.add(new NodeConfig.ProvSubscription(sid, fid, delurl, id, NodeUtils.getAuthHdr(id, password), monly, use100, waitForFileProcessed));
                 }
             }
             JSONObject jparams = jcfg.optJSONObject("parameters");
