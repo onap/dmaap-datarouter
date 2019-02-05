@@ -3,27 +3,46 @@
 
 Release-notes
 ==============
+Version: 1.0.7 (Casablanca)
+---------------------------
 
-Version: 1.0.1
---------------
-
-:Release Date: 2018-09-20
-
+:Release Date: 2018-11-30
 
 New Features:
 
- - Implements a RESTful HTTPS API for creating feeds to publish files to and subscribe to,
-   as well as perform CRUD operations on these feeds.
- - Implements a RESTful HTTPS API for subscribing to feeds and perform CRUD operations on these subscriptions.
- - Implements a RESTful HTTPS API for publishing to feeds and perform CRUD operations on these published files.
++--------------+------------------------------------------------------------------+
+| JIRA ID      | Description                                                      |
++==============+==================================================================+
+| DMAAP-20     | REST api for publishing data to DR                               |
++--------------+------------------------------------------------------------------+
+| DMAAP-21     | REST api for subscribing to data in DR                           |
++--------------+------------------------------------------------------------------+
 
+Bug Fixes:
 
-
-Bug Fixes
-NA
++----------------+---------------------------------------------------------------------------------------------------------------------------------+
+| JIRA ID        | Description                                                                                                                     |
++================+=================================================================================================================================+
+| DMAAP-877      | DR Logging API not storing Feed/Sub data                                                                                        |
++----------------+---------------------------------------------------------------------------------------------------------------------------------+
+| DMAAP-850      | Second subscriber not receiving the published file                                                                              |
++----------------+---------------------------------------------------------------------------------------------------------------------------------+
+| DMAAP-596      | DR - datarouter-prov container fails to come up successfully                                                                    |
++----------------+---------------------------------------------------------------------------------------------------------------------------------+
+| DMAAP-565      | Incorrect nexusUrl parameter in datarouter pom files                                                                            |
++----------------+---------------------------------------------------------------------------------------------------------------------------------+
 
 Known Issues
-NA
+N/A
+
+Security Issues
+N/A
+
+Upgrade Notes
+N/A
+
+Deprecation Notes
+N/A
 
 Other
-NA
+N/A
