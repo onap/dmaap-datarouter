@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fcaa4226_20bd7c0b",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-05T09:04:53Z",
+      "side": 1,
+      "message": "defaultValue",
+      "range": {
+        "startLine": 371,
+        "startChar": 51,
+        "endLine": 371,
+        "endChar": 64
+      },
+      "revId": "90568a018dcf1e6e72d0d9a51f015065dec12fd5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5b331caa_7d2565c2",
+        "filename": "datarouter-prov/src/main/resources/misc/sql_init_01.sql",
+        "patchSetId": 2
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-05T09:04:53Z",
+      "side": 1,
+      "message": "This is milliseconds and I don\u0027t think its multiplied by 1000 in the code base",
+      "range": {
+        "startLine": 138,
+        "startChar": 26,
+        "endLine": 138,
+        "endChar": 28
+      },
+      "revId": "90568a018dcf1e6e72d0d9a51f015065dec12fd5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
