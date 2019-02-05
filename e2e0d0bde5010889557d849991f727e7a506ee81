@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "088331e7_9faa0807",
+        "filename": "docs/data-router/release-notes.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2019-02-05T14:11:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28cbd29b_7da15b9a",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 13
+      },
+      "revId": "e2e0d0bde5010889557d849991f727e7a506ee81",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ee2570d2_c5a26d7e",
         "filename": "docs/data-router/release-notes.rst",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2019-02-05T13:19:49Z",
       "side": 1,
       "message": "Most of the projects seem to have a generic not and link to the wiki.\n\nSee SDNC for example - https://onap.readthedocs.io/en/latest/submodules/sdnc/oam.git/docs/release-notes.html",
+      "range": {
+        "startLine": 38,
+        "startChar": 2,
+        "endLine": 38,
+        "endChar": 15
+      },
+      "revId": "e2e0d0bde5010889557d849991f727e7a506ee81",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c4d23cf1_d68acfe2",
+        "filename": "docs/data-router/release-notes.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2019-02-05T14:11:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee2570d2_c5a26d7e",
       "range": {
         "startLine": 38,
         "startChar": 2,
