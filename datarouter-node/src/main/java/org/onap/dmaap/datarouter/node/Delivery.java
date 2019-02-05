@@ -25,6 +25,7 @@ package org.onap.dmaap.datarouter.node;
 
 import java.util.*;
 import java.io.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
@@ -74,7 +75,7 @@ public class Delivery {
     private int threads;
     private int curthreads;
     private NodeConfigManager config;
-    private Hashtable<String, DeliveryQueue> dqs = new Hashtable<String, DeliveryQueue>();
+    private ConcurrentHashMap<String, DeliveryQueue> dqs = new ConcurrentHashMap<>();
     private DeliveryQueue[] queues = new DeliveryQueue[0];
     private int qpos = 0;
     private long nextcheck;
@@ -117,7 +118,7 @@ public class Delivery {
         if (cur >= start) {
             return;
         }
-        Vector<DelItem> cv = new Vector<DelItem>();
+        ArrayList<DelItem> cv = new ArrayList<>();
         for (String sdir : dqs.keySet()) {
             for (String meta : (new File(sdir)).list()) {
                 if (!meta.endsWith(".M") || meta.charAt(0) == '.') {
@@ -187,7 +188,7 @@ public class Delivery {
         DestInfo[] alldis = config.getAllDests();
         DeliveryQueue[] nqs = new DeliveryQueue[alldis.length];
         qpos = 0;
-        Hashtable<String, DeliveryQueue> ndqs = new Hashtable<String, DeliveryQueue>();
+        ConcurrentHashMap<String, DeliveryQueue> ndqs = new ConcurrentHashMap<>();
         for (DestInfo di : alldis) {
             String spl = di.getSpool();
             DeliveryQueue dq = dqs.get(spl);

@@ -87,7 +87,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
         metafile = new File(mfn);
         boolean monly = di.isMetaDataOnly();
         date = Long.parseLong(pubid.substring(0, pubid.indexOf('.')));
-        Vector<String[]> hdrv = new Vector<String[]>();
+        ArrayList<String[]> hdrv = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(metafile))) {
             String s = br.readLine();
@@ -109,13 +109,13 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 if (length == 0 && h.toLowerCase().startsWith("content-")) {
                     continue;
                 }
-                if (h.equalsIgnoreCase("content-type")) {
+                if ("content-type".equalsIgnoreCase(h)) {
                     ctype = v;
                 }
-                if (h.equalsIgnoreCase("x-onap-requestid")) {
+                if ("x-onap-requestid".equalsIgnoreCase(h)) {
                     MDC.put(MDC_KEY_REQUEST_ID, v);
                 }
-                if (h.equalsIgnoreCase("x-invocationid")) {
+                if ("x-invocationid".equalsIgnoreCase(h)) {
                     MDC.put("InvocationId", v);
                     v = UUID.randomUUID().toString();
                     newInvocationId = v;
@@ -123,7 +123,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 hdrv.add(new String[]{h, v});
             }
         } catch (Exception e) {
-            loggerDeliveryTask.error("Exception "+e.getStackTrace(),e);
+            loggerDeliveryTask.error("Exception "+ Arrays.toString(e.getStackTrace()),e);
         }
         hdrs = hdrv.toArray(new String[hdrv.size()][]);
         url = dth.getDestURL(fileid);
@@ -203,7 +203,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 } catch (ProtocolException pe) {
                     dth.reportDeliveryExtra(this, -1L);
                     // Rcvd error instead of 100-continue
-                    loggerDeliveryTask.error("Exception "+pe.getStackTrace(),pe);
+                    loggerDeliveryTask.error("Exception "+ Arrays.toString(pe.getStackTrace()),pe);
                 }
                 if (os != null) {
                     long sofar = 0;
@@ -259,7 +259,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
             }
             dth.reportStatus(this, rc, xpubid, rmsg);
         } catch (Exception e) {
-            loggerDeliveryTask.error("Exception "+e.getStackTrace(),e);
+            loggerDeliveryTask.error("Exception "+ Arrays.toString(e.getStackTrace()),e);
             dth.reportException(this, e);
         }
     }

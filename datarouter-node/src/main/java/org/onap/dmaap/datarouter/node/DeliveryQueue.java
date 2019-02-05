@@ -26,6 +26,7 @@ package org.onap.dmaap.datarouter.node;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Mechanism for monitoring and controlling delivery of files to a destination.
@@ -66,14 +67,14 @@ import java.util.*;
 public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     private DeliveryQueueHelper dqh;
     private DestInfo di;
-    private Hashtable<String, DeliveryTask> working = new Hashtable<String, DeliveryTask>();
-    private Hashtable<String, DeliveryTask> retry = new Hashtable<String, DeliveryTask>();
+    private ConcurrentHashMap<String, DeliveryTask> working = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, DeliveryTask> retry = new ConcurrentHashMap<>();
     private int todoindex;
     private boolean failed;
     private long failduration;
     private long resumetime;
     File dir;
-    private Vector<DeliveryTask> todo = new Vector<DeliveryTask>();
+    private ArrayList<DeliveryTask> todo = new ArrayList<>();
 
     /**
      * Try to cancel a delivery task.
@@ -195,7 +196,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
         while (true) {
             if (todoindex >= todo.size()) {
                 todoindex = 0;
-                todo = new Vector<DeliveryTask>();
+                todo = new ArrayList<>();
                 String[] files = dir.list();
                 Arrays.sort(files);
                 for (String fname : files) {
@@ -224,7 +225,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
                     }
                     todo.add(dt);
                 }
-                retry = new Hashtable<String, DeliveryTask>();
+                retry = new ConcurrentHashMap<>();
             }
             if (todoindex < todo.size()) {
                 DeliveryTask dt = todo.get(todoindex);
