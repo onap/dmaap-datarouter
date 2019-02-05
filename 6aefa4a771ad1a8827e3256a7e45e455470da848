@@ -22,6 +22,30 @@
       "revId": "6aefa4a771ad1a8827e3256a7e45e455470da848",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e2cab3f0_9ec84520",
+        "filename": "docs/data-router/release-notes.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2019-02-05T16:27:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2956f8de_8b270e46",
+      "range": {
+        "startLine": 6,
+        "startChar": 9,
+        "endLine": 6,
+        "endChar": 14
+      },
+      "revId": "6aefa4a771ad1a8827e3256a7e45e455470da848",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
