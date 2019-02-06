@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import static org.hamcrest.Matchers.notNullValue;
@@ -49,6 +51,7 @@ import static org.mockito.Mockito.*;
 public class NodeServletTest {
 
     private NodeServlet nodeServlet;
+    private Delivery delivery;
 
     @Mock
     private HttpServletRequest request;
@@ -59,16 +62,22 @@ public class NodeServletTest {
     ListAppender<ILoggingEvent> listAppender;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         listAppender = setTestLogger();
-        nodeServlet = new NodeServlet();
         setBehalfHeader("Stub_Value");
         when(request.getPathInfo()).thenReturn("2");
         when(request.isSecure()).thenReturn(true);
+        createFilesAndDirectories();
         setUpConfig();
         setUpNodeMainDelivery();
+        nodeServlet = new NodeServlet(delivery);
         when(request.getHeader("Authorization")).thenReturn("User1");
         when(request.getHeader("X-DMAAP-DR-PUBLISH-ID")).thenReturn("User1");
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        deleteCreatedDirectories();
     }
 
     @Test
@@ -213,6 +222,53 @@ public class NodeServletTest {
         verifyEnteringExitCalled(listAppender);
     }
 
+    @Test
+    public void Given_Request_Is_HTTP_DELETE_File_With_Invalid_Endpoint_Then_Not_Found_Response_Is_Generated() throws Exception {
+        when(request.getPathInfo()).thenReturn("/delete/1");
+        setHeadersForValidRequest(false);
+        nodeServlet.doDelete(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_DELETE_File_And_Is_Not_Privileged_Subscription_Then_Not_Found_Response_Is_Generated() throws Exception {
+        when(request.getPathInfo()).thenReturn("/delete/1/dmaap-dr-node.1234567");
+        setHeadersForValidRequest(false);
+        setUpConfigToReturnUnprivilegedSubscriber();
+        nodeServlet.doDelete(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_UNAUTHORIZED));
+        verifyEnteringExitCalled(listAppender);
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_DELETE_File_And_Subscription_Does_Not_Exist_Then_Not_Found_Response_Is_Generated() throws Exception {
+        when(request.getPathInfo()).thenReturn("/delete/1/dmaap-dr-node.1234567");
+        setHeadersForValidRequest(false);
+        setUpConfigToReturnNullOnIsDeletePermitted();
+        nodeServlet.doDelete(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND));
+        verifyEnteringExitCalled(listAppender);
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_DELETE_File_Then_Request_Succeeds() throws IOException {
+        when(request.getPathInfo()).thenReturn("/delete/1/dmaap-dr-node.1234567");
+        setHeadersForValidRequest(false);
+        createFilesAndDirectories();
+        nodeServlet.doDelete(request, response);
+        verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+        verifyEnteringExitCalled(listAppender);
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_DELETE_File_And_File_Does_Not_Exist_Then_Not_Found_Response_Is_Generated() throws IOException {
+        when(request.getPathInfo()).thenReturn("/delete/1/nonExistingFile");
+        setHeadersForValidRequest(false);
+        nodeServlet.doDelete(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
+    }
 
     private void setBehalfHeader(String headerValue) {
         when(request.getHeader("X-DMAAP-DR-ON-BEHALF-OF")).thenReturn(headerValue);
@@ -232,21 +288,46 @@ public class NodeServletTest {
         assertEquals(3, listAppender.list.size());
     }
 
-    private void setUpConfig() throws IllegalAccessException{
+    private void setUpConfig() throws IllegalAccessException {
         NodeConfigManager config = mock(NodeConfigManager.class);
         PowerMockito.mockStatic(NodeConfigManager.class);
         when(config.isShutdown()).thenReturn(false);
         when(config.isConfigured()).thenReturn(true);
-        when(config.getSpoolDir()).thenReturn("spool/dir");
+        when(config.getSpoolDir()).thenReturn("spool/f");
+        when(config.getSpoolBase()).thenReturn("spool");
         when(config.getLogDir()).thenReturn("log/dir");
         when(config.getPublishId()).thenReturn("User1");
         when(config.isAnotherNode(anyString(), anyString())).thenReturn(true);
         when(config.getEventLogInterval()).thenReturn("40");
+        when(config.isDeletePermitted("1")).thenReturn(true);
+        when(config.getAllDests()).thenReturn(new DestInfo[0]);
+        FieldUtils.writeDeclaredStaticField(NodeServlet.class, "config", config, true);
+        FieldUtils.writeDeclaredStaticField(NodeMain.class, "nodeConfigManager", config, true);
+        delivery = new Delivery(config);
+        PowerMockito.when(NodeConfigManager.getInstance()).thenReturn(config);
+    }
+
+    private void setUpConfigToReturnUnprivilegedSubscriber() throws IllegalAccessException {
+        NodeConfigManager config = mock(NodeConfigManager.class);
+        PowerMockito.mockStatic(NodeConfigManager.class);
+        when(config.isShutdown()).thenReturn(false);
+        when(config.isConfigured()).thenReturn(true);
+        when(config.isDeletePermitted("1")).thenReturn(false);
         FieldUtils.writeDeclaredStaticField(NodeServlet.class, "config", config, true);
         FieldUtils.writeDeclaredStaticField(NodeMain.class, "nodeConfigManager", config, true);
         PowerMockito.when(NodeConfigManager.getInstance()).thenReturn(config);
     }
 
+    private void setUpConfigToReturnNullOnIsDeletePermitted() throws IllegalAccessException {
+        NodeConfigManager config = mock(NodeConfigManager.class);
+        PowerMockito.mockStatic(NodeConfigManager.class);
+        when(config.isShutdown()).thenReturn(false);
+        when(config.isConfigured()).thenReturn(true);
+        when(config.isDeletePermitted("1")).thenThrow(new NullPointerException());
+        FieldUtils.writeDeclaredStaticField(NodeServlet.class, "config", config, true);
+        FieldUtils.writeDeclaredStaticField(NodeMain.class, "nodeConfigManager", config, true);
+        PowerMockito.when(NodeConfigManager.getInstance()).thenReturn(config);
+    }
 
     private void setUpNodeMainDelivery() throws IllegalAccessException{
         Delivery delivery = mock(Delivery.class);
@@ -312,5 +393,32 @@ public class NodeServletTest {
         when(request.getHeaders("Content-Type")).thenReturn(contentTypeHeader);
         when(request.getHeaders("X-DMAAP-DR-ON-BEHALF-OF")).thenReturn(behalfHeader);
         when(request.getHeaders("X-DMAAP-DR-META")).thenReturn(metaDataHeader);
+    }
+
+    private void createFilesAndDirectories() throws IOException {
+        File nodeDir = new File("spool/n/172.0.0.1");
+        File spoolDir = new File("spool/s/0/1");
+        File dataFile = new File("spool/s/0/1/dmaap-dr-node.1234567");
+        File metaDataFile = new File("spool/s/0/1/dmaap-dr-node.1234567.M");
+        nodeDir.mkdirs();
+        spoolDir.mkdirs();
+        dataFile.createNewFile();
+        metaDataFile.createNewFile();
+    }
+
+    private static void deleteCreatedDirectories() {
+        File spoolDir = new File("spool");
+        delete(spoolDir);
+    }
+
+    private static void delete(File file) {
+        if (file.isDirectory()) {
+            for (File f: file.listFiles()) {
+                delete(f);
+            }
+        }
+        if (!file.delete()) {
+            System.out.println("Failed to delete: " + file);
+        }
     }
 }

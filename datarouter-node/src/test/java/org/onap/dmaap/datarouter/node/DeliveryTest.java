@@ -97,7 +97,7 @@ public class DeliveryTest {
 
   private DestInfo[] createDestInfoObjects() {
     DestInfo[] destInfos = new DestInfo[1];
-    DestInfo destInfo = new DestInfo("node.datarouternew.com", "spool/s/0/1", "1", "logs/", "/subs/1", "user1", "Basic dXNlcjE6cGFzc3dvcmQx", false, true);
+    DestInfo destInfo = new DestInfo("node.datarouternew.com", "spool/s/0/1", "1", "logs/", "/subs/1", "user1", "Basic dXNlcjE6cGFzc3dvcmQx", false, true, false);
     destInfos[0] = destInfo;
     return destInfos;
   }
