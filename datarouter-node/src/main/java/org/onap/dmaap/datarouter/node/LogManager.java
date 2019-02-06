@@ -57,6 +57,10 @@ public class LogManager extends TimerTask {
             return (10000L);
         }
 
+        public long getWaitForFileProcessFailureTimer() {
+            return (600000L);
+        }
+
         public double getFailureBackoff() {
             return (2.0);
         }
@@ -77,14 +81,14 @@ public class LogManager extends TimerTask {
             return (86400000);
         }
 
-        public String getDestURL(DestInfo dest, String fileid) {
+        public String getDestURL(DestInfo destinationInfo, String fileid) {
             return (config.getEventLogUrl());
         }
 
-        public void handleUnreachable(DestInfo dest) {
+        public void handleUnreachable(DestInfo destinationInfo) {
         }
 
-        public boolean handleRedirection(DestInfo dest, String location, String fileid) {
+        public boolean handleRedirection(DestInfo destinationInfo, String location, String fileid) {
             return (false);
         }
 
@@ -101,7 +105,7 @@ public class LogManager extends TimerTask {
         public Uploader() {
             dq = new DeliveryQueue(this,
                 new DestInfo("LogUpload", uploaddir, null, null, null, config.getMyName(), config.getMyAuth(), false,
-                    false));
+                    false, false));
             setDaemon(true);
             setName("Log Uploader");
             start();

@@ -145,7 +145,7 @@ public class NodeMain {
         ctxt = new ServletContextHandler(0);
         ctxt.setContextPath("/");
         server.setHandler(ctxt);
-        ctxt.addServlet(new ServletHolder(new NodeServlet()), "/*");
+        ctxt.addServlet(new ServletHolder(new NodeServlet(delivery)), "/*");
         nodeMainLogger.info("NODE0005 Data Router Node Activating Service");
         server.start();
         server.join();
