@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "d95e90cf_2794b6e7",
+        "filename": "datarouter-docker-compose/src/main/resources/database/sql_init_01.sql",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-06T16:54:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4d3c6ff_48bcc57c",
+      "range": {
+        "startLine": 47,
+        "startChar": 4,
+        "endLine": 47,
+        "endChar": 27
+      },
+      "revId": "7b9398e5a2a17f2501d425851fe073445bdfb3d2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a2a6d6cf_8a58c839",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2019-02-06T08:42:58Z",
       "side": 1,
       "message": "I think we should be checking it a subscribers is allowed to delete the file",
+      "range": {
+        "startLine": 215,
+        "startChar": 8,
+        "endLine": 215,
+        "endChar": 44
+      },
+      "revId": "7b9398e5a2a17f2501d425851fe073445bdfb3d2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f4fe4457_89e35563",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-06T16:54:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a2a6d6cf_8a58c839",
       "range": {
         "startLine": 215,
         "startChar": 8,
