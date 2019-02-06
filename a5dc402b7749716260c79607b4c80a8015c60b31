@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5aa68cdf_2f9c3abe",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryQueueHelper.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-06T08:29:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e4b01fc6_c8ca3b65",
+      "range": {
+        "startLine": 37,
+        "startChar": 4,
+        "endLine": 37,
+        "endChar": 10
+      },
+      "revId": "a5dc402b7749716260c79607b4c80a8015c60b31",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9b82f54c_9bdda0f0",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DestInfo.java",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2019-02-04T17:39:42Z",
       "side": 1,
       "message": "Should we pass this in?\nNeed javadocs for it?",
+      "range": {
+        "startLine": 65,
+        "startChar": 28,
+        "endLine": 65,
+        "endChar": 42
+      },
+      "revId": "a5dc402b7749716260c79607b4c80a8015c60b31",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "93dc1fb7_44d7ef2d",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DestInfo.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-06T08:29:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b82f54c_9bdda0f0",
       "range": {
         "startLine": 65,
         "startChar": 28,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "21f62197_d42250ee",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-06T08:29:28Z",
+      "side": 1,
+      "message": "Parameter can be changed using internal api as discussed",
+      "parentUuid": "a58d4ab7_90203ade",
+      "range": {
+        "startLine": 191,
+        "startChar": 8,
+        "endLine": 191,
+        "endChar": 38
+      },
+      "revId": "a5dc402b7749716260c79607b4c80a8015c60b31",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e237e597_c1e7dd99",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
         "patchSetId": 1
@@ -82,6 +154,30 @@
       "writtenOn": "2019-02-04T17:39:42Z",
       "side": 1,
       "message": "Not sure about this error message.",
+      "range": {
+        "startLine": 223,
+        "startChar": 79,
+        "endLine": 223,
+        "endChar": 87
+      },
+      "revId": "a5dc402b7749716260c79607b4c80a8015c60b31",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d4a24030_a9abd775",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-06T08:29:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e237e597_c1e7dd99",
       "range": {
         "startLine": 223,
         "startChar": 79,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "05b1d789_f6e1fccf",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-06T08:29:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "49854d99_986b39ce",
+      "range": {
+        "startLine": 236,
+        "startChar": 29,
+        "endLine": 236,
+        "endChar": 48
+      },
+      "revId": "a5dc402b7749716260c79607b4c80a8015c60b31",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ad70bb5e_290b3e47",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
         "patchSetId": 1
@@ -128,6 +248,30 @@
       "writtenOn": "2019-02-04T17:39:42Z",
       "side": 1,
       "message": "Same as above",
+      "range": {
+        "startLine": 241,
+        "startChar": 43,
+        "endLine": 241,
+        "endChar": 77
+      },
+      "revId": "a5dc402b7749716260c79607b4c80a8015c60b31",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9462c9ff_f5d23d57",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-06T08:29:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ad70bb5e_290b3e47",
       "range": {
         "startLine": 241,
         "startChar": 43,
@@ -163,6 +307,30 @@
     },
     {
       "key": {
+        "uuid": "bb6d2fd4_ae7b0e75",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-06T08:29:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97b5e1f7_7b86820c",
+      "range": {
+        "startLine": 242,
+        "startChar": 71,
+        "endLine": 242,
+        "endChar": 76
+      },
+      "revId": "a5dc402b7749716260c79607b4c80a8015c60b31",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "806083bf_7cca051a",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
         "patchSetId": 1
@@ -174,6 +342,30 @@
       "writtenOn": "2019-02-04T17:39:42Z",
       "side": 1,
       "message": "As above.\n\nAlso, maybe log the ioe.",
+      "range": {
+        "startLine": 247,
+        "startChar": 66,
+        "endLine": 247,
+        "endChar": 77
+      },
+      "revId": "a5dc402b7749716260c79607b4c80a8015c60b31",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "58310f03_fcdc546e",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-06T08:29:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "806083bf_7cca051a",
       "range": {
         "startLine": 247,
         "startChar": 66,
