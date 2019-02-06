@@ -75,6 +75,7 @@ CREATE TABLE LOG_RECORDS (
 
     RECORD_ID      BIGINT UNSIGNED NOT NULL PRIMARY KEY, /* unique ID for this record */
     CONTENT_LENGTH_2 BIGINT,
+    FILENAME       VARCHAR(256),        /* Name of the file being published on DR */
 
     INDEX (FEEDID) USING BTREE,
     INDEX (DELIVERY_SUBID) USING BTREE,

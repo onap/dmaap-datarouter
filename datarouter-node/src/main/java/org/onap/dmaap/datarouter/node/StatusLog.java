@@ -53,7 +53,7 @@ public class StatusLog {
     }
 
     /**
-     * Parse an interval of the form xxhyymzzs and round it to the nearest whole fraction of 24 hours.  If no units are specified, assume seconds.
+     * Parse an interval of the form xxhyymzzs and round it to the nearest whole fraction of 24 hours.If no units are specified, assume seconds.
      */
     public static long parseInterval(String interval, int def) {
         try {

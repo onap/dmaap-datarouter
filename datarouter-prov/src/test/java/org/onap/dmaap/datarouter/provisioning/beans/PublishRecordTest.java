@@ -56,6 +56,7 @@ public class PublishRecordTest {
     publishRecord.setRemoteAddr("172.100.0.4");
     publishRecord.setStatus(201);
     publishRecord.setUser("user2");
+    publishRecord.setFileName("fileName");
     LOGJSONObject publishRecordJson = createPublishRecordJson();
     Assert.assertEquals(publishRecordJson.toString(), publishRecord.asJSONObject().toString());
   }
@@ -72,6 +73,7 @@ public class PublishRecordTest {
     publishRecordMap.put("type", "pub");
     publishRecordMap.put("date", "2018-08-29T10:10:10.543Z");
     publishRecordMap.put("contentLength", 285);
+    publishRecordMap.put("fileName", "fileName");
     return  new LOGJSONObject(publishRecordMap);
   }
 }
