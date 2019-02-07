@@ -231,6 +231,7 @@ public class NodeConfig {
         private String credentials;
         private boolean metaonly;
         private boolean use100;
+        private boolean privilegedSubscriber;
 
         /**
          * Construct a subscription configuration entry
@@ -243,9 +244,10 @@ public class NodeConfig {
          * Authorization header.
          * @param metaonly Is this a meta data only subscription?
          * @param use100 Should we send Expect: 100-continue?
+         * @param privilegedSubscriber Can we wait to receive a delete file call before deleting file
          */
         public ProvSubscription(String subid, String feedid, String url, String authuser, String credentials,
-                boolean metaonly, boolean use100) {
+                boolean metaonly, boolean use100, boolean privilegedSubscriber) {
             this.subid = subid;
             this.feedid = feedid;
             this.url = url;
@@ -253,6 +255,7 @@ public class NodeConfig {
             this.credentials = credentials;
             this.metaonly = metaonly;
             this.use100 = use100;
+            this.privilegedSubscriber = privilegedSubscriber;
         }
 
         /**
@@ -302,6 +305,13 @@ public class NodeConfig {
          */
         public boolean isUsing100() {
             return (use100);
+        }
+
+        /**
+         * Can we wait to receive a delete file call before deleting file
+         */
+        public boolean isPrivilegedSubscriber() {
+            return (privilegedSubscriber);
         }
     }
 
@@ -462,11 +472,12 @@ public class NodeConfig {
         Target[] targets;
     }
 
-    private Hashtable<String, String> params = new Hashtable<String, String>();
-    private Hashtable<String, Feed> feeds = new Hashtable<String, Feed>();
-    private Hashtable<String, DestInfo> nodeinfo = new Hashtable<String, DestInfo>();
-    private Hashtable<String, DestInfo> subinfo = new Hashtable<String, DestInfo>();
-    private Hashtable<String, IsFrom> nodes = new Hashtable<String, IsFrom>();
+    private Hashtable<String, String> params = new Hashtable<>();
+    private Hashtable<String, Feed> feeds = new Hashtable<>();
+    private Hashtable<String, DestInfo> nodeinfo = new Hashtable<>();
+    private Hashtable<String, DestInfo> subinfo = new Hashtable<>();
+    private Hashtable<String, IsFrom> nodes = new Hashtable<>();
+    private Hashtable<String, ProvSubscription> provSubscriptions = new Hashtable<>();
     private String myname;
     private String myauth;
     private DestInfo[] alldests;
@@ -486,7 +497,7 @@ public class NodeConfig {
         for (ProvParam p : pd.getParams()) {
             params.put(p.getName(), p.getValue());
         }
-        Vector<DestInfo> div = new Vector<DestInfo>();
+        Vector<DestInfo> destInfos = new Vector<DestInfo>();
         myauth = NodeUtils.getNodeAuthHdr(myname, nodeauthkey);
         for (ProvNode pn : pd.getNodes()) {
             String cn = pn.getCName();
@@ -495,9 +506,9 @@ public class NodeConfig {
             }
             String auth = NodeUtils.getNodeAuthHdr(cn, nodeauthkey);
             DestInfo di = new DestInfo("n:" + cn, spooldir + "/n/" + cn, null, "n2n-" + cn,
-                    "https://" + cn + ":" + port + "/internal/publish", cn, myauth, false, true);
+                    "https://" + cn + ":" + port + "/internal/publish", cn, myauth, false, true, false);
             (new File(di.getSpool())).mkdirs();
-            div.add(di);
+            destInfos.add(di);
             nodeinfo.put(cn, di);
             nodes.put(auth, new IsFrom(cn));
         }
@@ -533,7 +544,7 @@ public class NodeConfig {
             }
             egrtab.put(pfe.getSubId(), pfe.getNode());
         }
-        Hashtable<String, Vector<SubnetMatcher>> pfstab = new Hashtable<String, Vector<SubnetMatcher>>();
+        Hashtable<String, Vector<SubnetMatcher>> pfstab = new Hashtable<>();
         for (ProvFeedSubnet pfs : pd.getFeedSubnets()) {
             Vector<SubnetMatcher> v = pfstab.get(pfs.getFeedId());
             if (v == null) {
@@ -542,46 +553,47 @@ public class NodeConfig {
             }
             v.add(new SubnetMatcher(pfs.getCidr()));
         }
-        Hashtable<String, StringBuffer> ttab = new Hashtable<String, StringBuffer>();
-        HashSet<String> allfeeds = new HashSet<String>();
+        Hashtable<String, StringBuffer> feedTargets = new Hashtable<>();
+        HashSet<String> allfeeds = new HashSet<>();
         for (ProvFeed pfx : pd.getFeeds()) {
             if (pfx.getStatus() == null) {
                 allfeeds.add(pfx.getId());
             }
         }
-        for (ProvSubscription ps : pd.getSubscriptions()) {
-            String sid = ps.getSubId();
-            String fid = ps.getFeedId();
-            if (!allfeeds.contains(fid)) {
+        for (ProvSubscription provSubscription : pd.getSubscriptions()) {
+            String subId = provSubscription.getSubId();
+            String feedId = provSubscription.getFeedId();
+            if (!allfeeds.contains(feedId)) {
                 continue;
             }
-            if (subinfo.get(sid) != null) {
+            if (subinfo.get(subId) != null) {
                 continue;
             }
             int sididx = 999;
             try {
-                sididx = Integer.parseInt(sid);
+                sididx = Integer.parseInt(subId);
                 sididx -= sididx % 100;
             } catch (Exception e) {
             }
-            String siddir = sididx + "/" + sid;
-            DestInfo di = new DestInfo("s:" + sid, spooldir + "/s/" + siddir, sid, fid, ps.getURL(), ps.getAuthUser(),
-                    ps.getCredentials(), ps.isMetaDataOnly(), ps.isUsing100());
-            (new File(di.getSpool())).mkdirs();
-            div.add(di);
-            subinfo.put(sid, di);
-            String egr = egrtab.get(sid);
+            String subscriptionDirectory = sididx + "/" + subId;
+            DestInfo destinationInfo = new DestInfo("s:" + subId,
+                    spooldir + "/s/" + subscriptionDirectory, provSubscription);
+            (new File(destinationInfo.getSpool())).mkdirs();
+            destInfos.add(destinationInfo);
+            provSubscriptions.put(subId, provSubscription);
+            subinfo.put(subId, destinationInfo);
+            String egr = egrtab.get(subId);
             if (egr != null) {
-                sid = pf.getPath(egr) + sid;
+                subId = pf.getPath(egr) + subId;
             }
-            StringBuffer sb = ttab.get(fid);
+            StringBuffer sb = feedTargets.get(feedId);
             if (sb == null) {
                 sb = new StringBuffer();
-                ttab.put(fid, sb);
+                feedTargets.put(feedId, sb);
             }
-            sb.append(' ').append(sid);
+            sb.append(' ').append(subId);
         }
-        alldests = div.toArray(new DestInfo[div.size()]);
+        alldests = destInfos.toArray(new DestInfo[destInfos.size()]);
         for (ProvFeed pfx : pd.getFeeds()) {
             String fid = pfx.getId();
             Feed f = feeds.get(fid);
@@ -609,7 +621,7 @@ public class NodeConfig {
             } else {
                 f.redirections = v2.toArray(new Redirection[v2.size()]);
             }
-            StringBuffer sb = ttab.get(fid);
+            StringBuffer sb = feedTargets.get(fid);
             if (sb == null) {
                 f.targets = new Target[0];
             } else {
@@ -709,6 +721,16 @@ public class NodeConfig {
             }
         }
         return ("Publisher not permitted for this feed");
+    }
+
+    /**
+     * Check whether delete file is allowed.
+     *
+     * @param subId The ID of the subscription being requested.
+     */
+    public boolean isDeletePermitted(String subId) {
+        ProvSubscription provSubscription = provSubscriptions.get(subId);
+        return provSubscription.isPrivilegedSubscriber();
     }
 
     /**

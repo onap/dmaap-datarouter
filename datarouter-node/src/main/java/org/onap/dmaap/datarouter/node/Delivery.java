@@ -267,4 +267,18 @@ public class Delivery {
             }
         }
     }
+
+    /**
+     * Mark the task in spool a success
+     */
+    public synchronized boolean markTaskSuccess(String spool, String pubId) {
+        boolean succeeded = false;
+        if (spool != null) {
+            DeliveryQueue dq = dqs.get(spool);
+            if (dq != null) {
+                succeeded = dq.markTaskSuccess(pubId);
+            }
+        }
+        return succeeded;
+    }
 }

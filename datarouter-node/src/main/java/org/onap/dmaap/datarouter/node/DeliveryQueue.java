@@ -64,16 +64,16 @@ import java.util.*;
  * failure timer is active or if no files are found in a directory scan.
  */
 public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
-    private DeliveryQueueHelper dqh;
-    private DestInfo di;
-    private Hashtable<String, DeliveryTask> working = new Hashtable<String, DeliveryTask>();
-    private Hashtable<String, DeliveryTask> retry = new Hashtable<String, DeliveryTask>();
+    private DeliveryQueueHelper deliveryQueueHelper;
+    private DestInfo destinationInfo;
+    private Hashtable<String, DeliveryTask> working = new Hashtable<>();
+    private Hashtable<String, DeliveryTask> retry = new Hashtable<>();
     private int todoindex;
     private boolean failed;
     private long failduration;
     private long resumetime;
     File dir;
-    private Vector<DeliveryTask> todo = new Vector<DeliveryTask>();
+    private Vector<DeliveryTask> todo = new Vector<>();
 
     /**
      * Try to cancel a delivery task.
@@ -139,11 +139,15 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
         if (!failed) {
             failed = true;
             if (failduration == 0) {
-                failduration = dqh.getInitFailureTimer();
+                if (destinationInfo.isPrivilegedSubscriber()) {
+                    failduration = deliveryQueueHelper.getWaitForFileProcessFailureTimer();
+                } else{
+                    failduration = deliveryQueueHelper.getInitFailureTimer();
+                }
             }
             resumetime = System.currentTimeMillis() + failduration;
-            long maxdur = dqh.getMaxFailureTimer();
-            failduration = (long) (failduration * dqh.getFailureBackoff());
+            long maxdur = deliveryQueueHelper.getMaxFailureTimer();
+            failduration = (long) (failduration * deliveryQueueHelper.getFailureBackoff());
             if (failduration > maxdur) {
                 failduration = maxdur;
             }
@@ -184,7 +188,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
      */
     public synchronized DeliveryTask peekNext() {
         long now = System.currentTimeMillis();
-        long mindate = now - dqh.getExpirationTimer();
+        long mindate = now - deliveryQueueHelper.getExpirationTimer();
         if (failed) {
             if (now > resumetime) {
                 failed = false;
@@ -246,32 +250,32 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     /**
      * Create a delivery queue for a given destination info
      */
-    public DeliveryQueue(DeliveryQueueHelper dqh, DestInfo di) {
-        this.dqh = dqh;
-        this.di = di;
-        dir = new File(di.getSpool());
+    public DeliveryQueue(DeliveryQueueHelper deliveryQueueHelper, DestInfo destinationInfo) {
+        this.deliveryQueueHelper = deliveryQueueHelper;
+        this.destinationInfo = destinationInfo;
+        dir = new File(destinationInfo.getSpool());
         dir.mkdirs();
     }
 
     /**
      * Update the destination info for this delivery queue
      */
-    public void config(DestInfo di) {
-        this.di = di;
+    public void config(DestInfo destinationInfo) {
+        this.destinationInfo = destinationInfo;
     }
 
     /**
      * Get the dest info
      */
-    public DestInfo getDestInfo() {
-        return (di);
+    public DestInfo getDestinationInfo() {
+        return (destinationInfo);
     }
 
     /**
      * Get the config manager
      */
     public DeliveryQueueHelper getConfig() {
-        return (dqh);
+        return (deliveryQueueHelper);
     }
 
     /**
@@ -294,22 +298,27 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
      */
     public void reportStatus(DeliveryTask task, int status, String xpubid, String location) {
         if (status < 300) {
-            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), di.getAuthUser(), status, xpubid);
-            markSuccess(task);
-        } else if (status < 400 && dqh.isFollowRedirects()) {
-            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), di.getAuthUser(), status, location);
-            if (dqh.handleRedirection(di, location, task.getFileId())) {
+            if (destinationInfo.isPrivilegedSubscriber()) {
+                StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), destinationInfo.getAuthUser(), status, xpubid);
+                markFailWithRetry(task);
+            } else {
+                StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), destinationInfo.getAuthUser(), status, xpubid);
+                markSuccess(task);
+            }
+        } else if (status < 400 && deliveryQueueHelper.isFollowRedirects()) {
+            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), destinationInfo.getAuthUser(), status, location);
+            if (deliveryQueueHelper.handleRedirection(destinationInfo, location, task.getFileId())) {
                 markRedirect(task);
             } else {
                 StatusLog.logExp(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), "notRetryable", task.getAttempts());
                 markFailNoRetry(task);
             }
-        } else if (status < 500) {
-            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), di.getAuthUser(), status, location);
+        } else if (status < 500 && status != 429) {
+            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), destinationInfo.getAuthUser(), status, location);
             StatusLog.logExp(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), "notRetryable", task.getAttempts());
             markFailNoRetry(task);
         } else {
-            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), di.getAuthUser(), status, location);
+            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), destinationInfo.getAuthUser(), status, location);
             markFailWithRetry(task);
         }
     }
@@ -318,8 +327,8 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
      * Delivery failed by reason of an exception
      */
     public void reportException(DeliveryTask task, Exception exception) {
-        StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), di.getAuthUser(), -1, exception.toString());
-        dqh.handleUnreachable(di);
+        StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), destinationInfo.getAuthUser(), -1, exception.toString());
+        deliveryQueueHelper.handleUnreachable(destinationInfo);
         markFailWithRetry(task);
     }
 
@@ -330,14 +339,14 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
      * @return The feed ID
      */
     public String getFeedId(String subid) {
-        return (dqh.getFeedId(subid));
+        return (deliveryQueueHelper.getFeedId(subid));
     }
 
     /**
      * Get the URL to deliver a message to given the file ID
      */
     public String getDestURL(String fileid) {
-        return (dqh.getDestURL(di, fileid));
+        return (deliveryQueueHelper.getDestURL(destinationInfo, fileid));
     }
 
     /**
@@ -346,8 +355,8 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
      */
     public void run() {
         DeliveryTask t;
-        long endtime = System.currentTimeMillis() + dqh.getFairTimeLimit();
-        int filestogo = dqh.getFairFileLimit();
+        long endtime = System.currentTimeMillis() + deliveryQueueHelper.getFairTimeLimit();
+        int filestogo = deliveryQueueHelper.getFairFileLimit();
         while ((t = getNext()) != null) {
             t.run();
             if (--filestogo <= 0 || System.currentTimeMillis() > endtime) {
@@ -368,5 +377,25 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
      */
     public void resetQueue() {
         resumetime = System.currentTimeMillis();
+    }
+
+    /**
+     * Get task if in queue and mark as success
+     */
+    public boolean markTaskSuccess(String pubId) {
+        DeliveryTask task = working.get(pubId);
+        if (task != null) {
+            markSuccess(task);
+            return true;
+        }
+        task = retry.get(pubId);
+        if (task != null) {
+            retry.remove(pubId);
+            task.clean();
+            resumetime = 0;
+            failduration = 0;
+            return true;
+        }
+        return false;
     }
 }

@@ -22,7 +22,6 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
-import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -39,7 +38,6 @@ import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -48,15 +46,12 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
@@ -283,6 +278,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("version", "2.0");
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
+                jo.put("privilegedSubscriber", true);
                 jo.put("delivery", JSObject);
                 jo.put("subscriber", "differentSubscriber");
                 jo.put("sync", true);
@@ -305,6 +301,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("version", "2.0");
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
+                jo.put("privilegedSubscriber", true);
                 jo.put("delivery", JSObject);
                 jo.put("sync", true);
                 return jo;
@@ -333,6 +330,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("version", "2.0");
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
+                jo.put("privilegedSubscriber", true);
                 jo.put("delivery", JSObject);
                 jo.put("sync", true);
                 jo.put("changeowner", true);
@@ -505,6 +503,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setGroupid(1);
         subscription.setMetadataOnly(false);
         subscription.setSuspended(false);
+        subscription.setPrivilegedSubscriber(false);
         subscription.doInsert(db.getConnection());
     }
 
@@ -518,6 +517,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setGroupid(1);
         subscription.setMetadataOnly(false);
         subscription.setSuspended(false);
+        subscription.setPrivilegedSubscriber(false);
         subscription.changeOwnerShip();
         subscription.doUpdate(db.getConnection());
     }

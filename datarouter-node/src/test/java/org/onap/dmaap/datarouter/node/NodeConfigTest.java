@@ -210,6 +210,7 @@ public class NodeConfigTest {
         delivery.put("password", "password1");
         delivery.put("use100", true);
         subscription.put("delivery", delivery);
+        subscription.put("privilegedSubscriber", false);
         subscriptions.put(subscription);
         provData.put("subscriptions", subscriptions);
     }

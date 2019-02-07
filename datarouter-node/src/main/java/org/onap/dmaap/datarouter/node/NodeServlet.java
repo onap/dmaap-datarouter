@@ -40,11 +40,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.regex.Pattern;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 import org.slf4j.MDC;
 
@@ -67,6 +67,7 @@ public class NodeServlet extends HttpServlet {
     //Adding EELF Logger Rally:US664892
     private static EELFLogger eelflogger = EELFManager.getInstance()
             .getLogger(NodeServlet.class);
+    private Delivery delivery;
 
     static {
         final String ws = "\\s*";
@@ -78,6 +79,10 @@ public class NodeServlet extends HttpServlet {
         final String item = string + ws + ":" + ws + value + ws;
         final String object = ws + "\\{" + ws + "(?:" + item + "(?:" + "," + ws + item + ")*)?\\}" + ws;
         MetaDataPattern = Pattern.compile(object, Pattern.DOTALL);
+    }
+
+    NodeServlet(Delivery delivery) {
+        this.delivery = delivery;
     }
 
     /**
@@ -155,16 +160,13 @@ public class NodeServlet extends HttpServlet {
         } catch (IOException ioe) {
             logger.error("IOException" + ioe.getMessage());
             eelflogger.info(EelfMsgs.EXIT);
-        } catch (ServletException se) {
-            logger.error("ServletException" + se.getMessage());
-            eelflogger.info(EelfMsgs.EXIT);
         }
     }
 
     /**
      * Handle all DELETE requests
      */
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         NodeUtils.setIpAndFqdnForEelf("doDelete");
         NodeUtils.setRequestIdAndInvocationId(req);
         eelflogger.info(EelfMsgs.ENTRY);
@@ -173,38 +175,14 @@ public class NodeServlet extends HttpServlet {
         try {
             common(req, resp, false);
         } catch (IOException ioe) {
-            logger.error("IOException" + ioe.getMessage());
-            eelflogger.info(EelfMsgs.EXIT);
-        } catch (ServletException se) {
-            logger.error("ServletException" + se.getMessage());
+            logger.error("IOException " + ioe.getMessage());
             eelflogger.info(EelfMsgs.EXIT);
         }
-
     }
 
-    private void common(HttpServletRequest req, HttpServletResponse resp, boolean isput)
-            throws ServletException, IOException {
-        if (down(resp)) {
-            eelflogger.info(EelfMsgs.EXIT);
-            return;
-        }
-        if (!req.isSecure()) {
-            logger.info(
-                    "NODE0104 Rejecting insecure PUT or DELETE of " + req.getPathInfo() + " from " + req
-                            .getRemoteAddr());
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "https required on publish requests");
-            eelflogger.info(EelfMsgs.EXIT);
-            return;
-        }
-        String fileid = req.getPathInfo();
-        if (fileid == null) {
-            logger.info("NODE0105 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + " from " + req
-                    .getRemoteAddr());
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND,
-                    "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.");
-            eelflogger.info(EelfMsgs.EXIT);
-            return;
-        }
+    private void common(HttpServletRequest req, HttpServletResponse resp, boolean isput) throws IOException {
+        String fileid = getFileId(req, resp);
+        if (fileid == null) return;
         String feedid = null;
         String user = null;
         String credentials = req.getHeader("Authorization");
@@ -221,7 +199,11 @@ public class NodeServlet extends HttpServlet {
         String xpubid = null;
         String rcvd = NodeUtils.logts(System.currentTimeMillis()) + ";from=" + ip + ";by=" + lip;
         Target[] targets = null;
-        if (fileid.startsWith("/publish/")) {
+        if (fileid.startsWith("/delete/")) {
+            deleteFile(req, resp, fileid, pubid);
+            return;
+        }
+        else if (fileid.startsWith("/publish/")) {
             fileid = fileid.substring(9);
             int i = fileid.indexOf('/');
             if (i == -1 || i == fileid.length() - 1) {
@@ -315,8 +297,8 @@ public class NodeServlet extends HttpServlet {
             mx.append(req.getMethod()).append('\t').append(fileid).append('\n');
             Enumeration hnames = req.getHeaderNames();
             String ctype = null;
-            Boolean hasRequestIdHeader = false;
-            Boolean hasInvocationIdHeader = false;
+            boolean hasRequestIdHeader = false;
+            boolean hasInvocationIdHeader = false;
             while (hnames.hasMoreElements()) {
                 String hn = (String) hnames.nextElement();
                 String hnlc = hn.toLowerCase();
@@ -447,6 +429,90 @@ public class NodeServlet extends HttpServlet {
             } catch (Exception e) {
             }
         }
+    }
+
+    private void deleteFile(HttpServletRequest req, HttpServletResponse resp, String fileid, String pubid) {
+        try {
+            fileid = fileid.substring(8);
+            int i = fileid.indexOf('/');
+            if (i == -1 || i == fileid.length() - 1) {
+                logger.info("NODE0112 Rejecting bad URI for DELETE of " + req.getPathInfo() + " from " + req
+                        .getRemoteAddr());
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND,
+                        "Invalid request URI. Expecting <subId>/<pubId>.");
+                eelflogger.info(EelfMsgs.EXIT);
+                return;
+            }
+            String subscriptionId = fileid.substring(0, i);
+            int subId = Integer.parseInt(subscriptionId);
+            pubid = fileid.substring(i + 1);
+            String errorMessage = "Unable to delete files (" + pubid + ", " + pubid + ".M) from DR Node: "
+                            + config.getMyName() + ".";
+            int subIdDir = subId - (subId % 100);
+            if (!isAuthorizedToDelete(resp, subscriptionId, errorMessage)) {
+                return;
+            }
+            boolean result = delivery.markTaskSuccess(config.getSpoolBase() + "/s/" + subIdDir + "/" + subId, pubid);
+            if (result) {
+                logger.info("NODE0115 Successfully deleted files (" + pubid + ", " + pubid + ".M) from DR Node: "
+                        + config.getMyName());
+                resp.setStatus(HttpServletResponse.SC_OK);
+                eelflogger.info(EelfMsgs.EXIT);
+            } else {
+                logger.error("NODE0116 " + errorMessage);
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found on server.");
+                eelflogger.info(EelfMsgs.EXIT);
+            }
+        } catch (IOException ioe) {
+            logger.error("NODE0117 Unable to delete files (" + pubid + ", " + pubid + ".M) from DR Node: "
+                    + config.getMyName() + ". Error: " + ioe.getMessage());
+            eelflogger.info(EelfMsgs.EXIT);
+        }
+    }
+
+    @Nullable
+    private String getFileId(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        if (down(resp)) {
+            eelflogger.info(EelfMsgs.EXIT);
+            return null;
+        }
+        if (!req.isSecure()) {
+            logger.info(
+                    "NODE0104 Rejecting insecure PUT or DELETE of " + req.getPathInfo() + " from " + req
+                            .getRemoteAddr());
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "https required on publish requests");
+            eelflogger.info(EelfMsgs.EXIT);
+            return null;
+        }
+        String fileid = req.getPathInfo();
+        if (fileid == null) {
+            logger.info("NODE0105 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + " from " + req
+                    .getRemoteAddr());
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND,
+                    "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.");
+            eelflogger.info(EelfMsgs.EXIT);
+            return null;
+        }
+        return fileid;
+    }
+
+    private boolean isAuthorizedToDelete(HttpServletResponse resp, String subscriptionId, String errorMessage) throws IOException {
+        try {
+            boolean deletePermitted = config.isDeletePermitted(subscriptionId);
+            if (!deletePermitted) {
+                logger.error("NODE0113 " + errorMessage + " Error: Subscription "
+                        + subscriptionId + " is not a privileged subscription");
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                eelflogger.info(EelfMsgs.EXIT);
+                return false;
+            }
+        } catch (NullPointerException npe) {
+            logger.error("NODE0114 " + errorMessage + " Error: Subscription " + subscriptionId + " does not exist");
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+            eelflogger.info(EelfMsgs.EXIT);
+            return false;
+        }
+        return true;
     }
 
     private int getIdFromPath(HttpServletRequest req) {
