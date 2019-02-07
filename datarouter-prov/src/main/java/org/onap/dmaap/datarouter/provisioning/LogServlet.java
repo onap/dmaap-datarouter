@@ -287,6 +287,7 @@ public class LogServlet extends BaseServlet {
         map.put("statusSQL", "");
         map.put("resultSQL", "");
         map.put("reasonSQL", "");
+        map.put("filenameSQL", "");
 
         s = req.getParameter("publishId");
         if (s != null) {
@@ -295,6 +296,11 @@ public class LogServlet extends BaseServlet {
                 return map;
             }
             map.put("publishSQL", " AND PUBLISH_ID = '"+s+"'");
+        }
+
+        s = req.getParameter("filename");
+        if (s != null) {
+            map.put("filenameSQL", " AND FILENAME = '"+s+"'");
         }
 
         s = req.getParameter("statusCode");
@@ -388,7 +394,7 @@ public class LogServlet extends BaseServlet {
         if (type.equals("all") || type.equals("pub")) {
             String sql = "select * from LOG_RECORDS where FEEDID = "+feedid
                 + " AND TYPE = 'pub'"
-                + map.get("timeSQL") + map.get("publishSQL") + map.get("statusSQL");
+                + map.get("timeSQL") + map.get("publishSQL") + map.get("statusSQL") + map.get("filenameSQL");
             getRecordsForSQL(sql, rh);
         }
     }
@@ -397,7 +403,7 @@ public class LogServlet extends BaseServlet {
         if (type.equals("all") || type.equals("del")) {
             String sql = "select * from LOG_RECORDS where FEEDID = "+feedid
                 + " AND TYPE = 'del'"
-                + map.get("timeSQL") + map.get("publishSQL") + map.get("resultSQL");
+                + map.get("timeSQL") + map.get("publishSQL") + map.get("resultSQL") + map.get("filenameSQL");
             getRecordsForSQL(sql, rh);
         }
     }
@@ -406,7 +412,7 @@ public class LogServlet extends BaseServlet {
         if (type.equals("all") || type.equals("del")) {
             String sql = "select * from LOG_RECORDS where DELIVERY_SUBID = "+subid
                 + " AND TYPE = 'del'"
-                + map.get("timeSQL") + map.get("publishSQL") + map.get("resultSQL");
+                + map.get("timeSQL") + map.get("publishSQL") + map.get("resultSQL") + map.get("filenameSQL");
             getRecordsForSQL(sql, rh);
         }
     }
@@ -417,7 +423,7 @@ public class LogServlet extends BaseServlet {
             if (st == null || st.length() == 0) {
                 String sql = "select * from LOG_RECORDS where FEEDID = "+feedid
                     + " AND TYPE = 'exp'"
-                    + map.get("timeSQL") + map.get("publishSQL") + map.get("reasonSQL");
+                    + map.get("timeSQL") + map.get("publishSQL") + map.get("reasonSQL") + map.get("filenameSQL");
                 getRecordsForSQL(sql, rh);
             }
         }
@@ -429,7 +435,7 @@ public class LogServlet extends BaseServlet {
             if (st == null || st.length() == 0) {
                 String sql = "select * from LOG_RECORDS where DELIVERY_SUBID = "+subid
                     + " AND TYPE = 'exp'"
-                    + map.get("timeSQL") + map.get("publishSQL") + map.get("reasonSQL");
+                    + map.get("timeSQL") + map.get("publishSQL") + map.get("reasonSQL") + map.get("filenameSQL");
                 getRecordsForSQL(sql, rh);
             }
         }
