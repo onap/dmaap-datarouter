@@ -22,6 +22,30 @@
       "revId": "668a3d5d90cd01cb93e709af932cbfa1a5ca2f74",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "808709cc_5cc3f2ee",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/LogServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-02-07T12:09:50Z",
+      "side": 1,
+      "message": "As I explained, currently there seems to be a bug in prov where any logging requests seem to Always be using the sublogging methods rather than the feedlog methods. to ensure this works correctly I\u0027ve changed the sql query in every method to query for the filename, because otherwise the subscription queries will return values when they shouldn\u0027t.",
+      "parentUuid": "61f85199_6d215ba3",
+      "range": {
+        "startLine": 415,
+        "startChar": 85,
+        "endLine": 415,
+        "endChar": 108
+      },
+      "revId": "668a3d5d90cd01cb93e709af932cbfa1a5ca2f74",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
