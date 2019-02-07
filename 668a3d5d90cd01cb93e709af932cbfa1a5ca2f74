@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "61f85199_6d215ba3",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/LogServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-02-07T09:39:48Z",
+      "side": 1,
+      "message": "Dont think we need this on all methods.\nDFC quuery should ideally be \".../feed/{feedId}?type\u003dpub?filename\u003d{fileName}\"",
+      "range": {
+        "startLine": 415,
+        "startChar": 85,
+        "endLine": 415,
+        "endChar": 108
+      },
+      "revId": "668a3d5d90cd01cb93e709af932cbfa1a5ca2f74",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
