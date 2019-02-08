@@ -69,7 +69,7 @@ public class LogServlet extends BaseServlet {
     private static final String FMT_1 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     private static final String FMT_2 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
-    private static  boolean isfeedlog;
+    private boolean isfeedlog;
 
     public abstract class RowHandler {
         private final ServletOutputStream out;
@@ -281,12 +281,14 @@ public class LogServlet extends BaseServlet {
                 map.put("err", "bad type");
                 return map;
             }
-        } else
+        } else {
             map.put("type", "all");
+        }
         map.put("publishSQL", "");
         map.put("statusSQL", "");
         map.put("resultSQL", "");
         map.put("reasonSQL", "");
+        map.put("filenameSQL", "");
 
         s = req.getParameter("publishId");
         if (s != null) {
@@ -295,6 +297,11 @@ public class LogServlet extends BaseServlet {
                 return map;
             }
             map.put("publishSQL", " AND PUBLISH_ID = '"+s+"'");
+        }
+
+        s = req.getParameter("filename");
+        if (s != null) {
+            map.put("filenameSQL", " AND FILENAME = '"+s+"'");
         }
 
         s = req.getParameter("statusCode");
@@ -388,7 +395,7 @@ public class LogServlet extends BaseServlet {
         if (type.equals("all") || type.equals("pub")) {
             String sql = "select * from LOG_RECORDS where FEEDID = "+feedid
                 + " AND TYPE = 'pub'"
-                + map.get("timeSQL") + map.get("publishSQL") + map.get("statusSQL");
+                + map.get("timeSQL") + map.get("publishSQL") + map.get("statusSQL") + map.get("filenameSQL");
             getRecordsForSQL(sql, rh);
         }
     }
