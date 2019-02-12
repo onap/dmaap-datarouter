@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "728974ba_a1ab0d7c",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryQueue.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2019-02-12T17:28:34Z",
+      "side": 1,
+      "message": "Can this line be placed outside of if-else instead of here and line 305?",
+      "range": {
+        "startLine": 302,
+        "startChar": 0,
+        "endLine": 302,
+        "endChar": 204
+      },
+      "revId": "1bfaeca3577167704682e8270ec3cc978de0cc60",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "685cb15e_abcaa059",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfig.java",
+        "patchSetId": 8
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 4411
+      },
+      "writtenOn": "2019-02-12T17:28:34Z",
+      "side": 1,
+      "message": "Can remove this.",
+      "range": {
+        "startLine": 500,
+        "startChar": 48,
+        "endLine": 500,
+        "endChar": 56
+      },
+      "revId": "1bfaeca3577167704682e8270ec3cc978de0cc60",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
