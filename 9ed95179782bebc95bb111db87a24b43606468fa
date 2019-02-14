@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "4ed1d0c2_6f2ebc61",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryQueue.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-14T09:58:03Z",
+      "side": 1,
+      "message": "Added a comment, PM Mapper will be using 429 to enable rate limiting. So if they are receiving files too quickly they can respond with 429 and get the file later",
+      "parentUuid": "d956d0b2_83b75dc0",
+      "range": {
+        "startLine": 315,
+        "startChar": 41,
+        "endLine": 315,
+        "endChar": 42
+      },
+      "revId": "9ed95179782bebc95bb111db87a24b43606468fa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a0818ea1_dc666205",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
         "patchSetId": 9
@@ -42,6 +66,24 @@
     },
     {
       "key": {
+        "uuid": "b829e6bc_f5ddf542",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-14T09:58:03Z",
+      "side": 1,
+      "message": "The authorization below is checking the feed user and password which we felt was irrelevant in this case. We just check that the subscription is \"privileged\" before attempting to delete the file.",
+      "parentUuid": "a0818ea1_dc666205",
+      "revId": "9ed95179782bebc95bb111db87a24b43606468fa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f6587d8_5f51f86a",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
         "patchSetId": 9
@@ -53,6 +95,24 @@
       "writtenOn": "2019-02-13T16:43:47Z",
       "side": 1,
       "message": "is this really an error?  shouldn\u0027t some subscribers normally not be privileged?",
+      "revId": "9ed95179782bebc95bb111db87a24b43606468fa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "be079149_641a873b",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-14T09:58:03Z",
+      "side": 1,
+      "message": "Would it be better if it stated. \"NODE0113 Error: Unable to delete X and Y from DR Node Z. Reason: Subscription \u003cid\u003e is not a privileged subscription\"",
+      "parentUuid": "1f6587d8_5f51f86a",
       "revId": "9ed95179782bebc95bb111db87a24b43606468fa",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
