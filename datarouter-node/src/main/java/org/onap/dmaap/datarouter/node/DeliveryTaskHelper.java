@@ -38,7 +38,7 @@ public interface DeliveryTaskHelper {
      * @param task      The task that failed
      * @param exception The exception that occurred
      */
-    public void reportException(DeliveryTask task, Exception exception);
+    void reportException(DeliveryTask task, Exception exception);
 
     /**
      * Report that a delivery attempt completed (successfully or unsuccessfully)
@@ -48,7 +48,7 @@ public interface DeliveryTaskHelper {
      * @param xpubid   The publish ID from the far end (if any)
      * @param location The redirection location for a 3XX response
      */
-    public void reportStatus(DeliveryTask task, int status, String xpubid, String location);
+    void reportStatus(DeliveryTask task, int status, String xpubid, String location);
 
     /**
      * Report that a delivery attempt either failed while sending data or that an error was returned instead of a 100 Continue.
@@ -56,14 +56,14 @@ public interface DeliveryTaskHelper {
      * @param task The task that failed
      * @param sent The number of bytes sent or -1 if an error was returned instead of 100 Continue.
      */
-    public void reportDeliveryExtra(DeliveryTask task, long sent);
+    void reportDeliveryExtra(DeliveryTask task, long sent);
 
     /**
      * Get the destination information for the delivery queue
      *
      * @return The destination information
      */
-    public DestInfo getDestInfo();
+    DestInfo getDestinationInfo();
 
     /**
      * Given a file ID, get the URL to deliver to
@@ -71,7 +71,7 @@ public interface DeliveryTaskHelper {
      * @param fileid The file id
      * @return The URL to deliver to
      */
-    public String getDestURL(String fileid);
+    String getDestURL(String fileid);
 
     /**
      * Get the feed ID for a subscription
@@ -79,5 +79,5 @@ public interface DeliveryTaskHelper {
      * @param subid The subscription ID
      * @return The feed iD
      */
-    public String getFeedId(String subid);
+    String getFeedId(String subid);
 }

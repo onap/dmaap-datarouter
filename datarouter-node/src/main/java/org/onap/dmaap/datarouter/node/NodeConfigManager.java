@@ -57,6 +57,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private Timer timer = new Timer("Node Configuration Timer", true);
     private long maxfailuretimer;
     private long initfailuretimer;
+    private long waitForFileProcessFailureTimer;
     private long expirationtimer;
     private double failurebackoff;
     private long fairtimelimit;
@@ -187,6 +188,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         followredirects = Boolean.parseBoolean(getProvParam("FOLLOW_REDIRECTS", "false"));
         eventloginterval = getProvParam("LOGROLL_INTERVAL", "30s");
         initfailuretimer = 10000;
+        waitForFileProcessFailureTimer = 600000;
         maxfailuretimer = 3600000;
         expirationtimer = 86400000;
         failurebackoff = 2.0;
@@ -197,6 +199,10 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         fdpstop = 0.2;
         try {
             initfailuretimer = (long) (Double.parseDouble(getProvParam("DELIVERY_INIT_RETRY_INTERVAL")) * 1000);
+        } catch (Exception e) {
+        }
+        try {
+            waitForFileProcessFailureTimer = (long) (Double.parseDouble(getProvParam("DELIVERY_FILE_PROCESS_INTERVAL")) * 1000);
         } catch (Exception e) {
         }
         try {
@@ -329,6 +335,16 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
+     * Check whether delete file is allowed.
+     *
+     * @param subId The ID of the subscription being requested
+     * @return True if the delete file is permitted for the subscriber.
+     */
+    public boolean isDeletePermitted(String subId) {
+        return (config.isDeletePermitted(subId));
+    }
+
+    /**
      * Check who the user is given the feed ID and the offered credentials.
      *
      * @param feedid The ID of the feed specified
@@ -407,13 +423,13 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     /**
      * Get the URL to deliver a message to.
      *
-     * @param destinfo The destination information
+     * @param destinationInfo The destination information
      * @param fileid The file ID
      * @return The URL to deliver to
      */
-    public String getDestURL(DestInfo destinfo, String fileid) {
-        String subid = destinfo.getSubId();
-        String purl = destinfo.getURL();
+    public String getDestURL(DestInfo destinationInfo, String fileid) {
+        String subid = destinationInfo.getSubId();
+        String purl = destinationInfo.getURL();
         if (followredirects && subid != null) {
             purl = rdmgr.lookup(subid, purl);
         }
@@ -430,10 +446,10 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     /**
      * Set up redirection on receipt of a 3XX from a target URL
      */
-    public boolean handleRedirection(DestInfo destinfo, String redirto, String fileid) {
+    public boolean handleRedirection(DestInfo destinationInfo, String redirto, String fileid) {
         fileid = "/" + fileid;
-        String subid = destinfo.getSubId();
-        String purl = destinfo.getURL();
+        String subid = destinationInfo.getSubId();
+        String purl = destinationInfo.getURL();
         if (followredirects && subid != null && redirto.endsWith(fileid)) {
             redirto = redirto.substring(0, redirto.length() - fileid.length());
             if (!redirto.equals(purl)) {
@@ -447,8 +463,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     /**
      * Handle unreachable target URL
      */
-    public void handleUnreachable(DestInfo destinfo) {
-        String subid = destinfo.getSubId();
+    public void handleUnreachable(DestInfo destinationInfo) {
+        String subid = destinationInfo.getSubId();
         if (followredirects && subid != null) {
             rdmgr.forget(subid);
         }
@@ -459,6 +475,13 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      */
     public long getInitFailureTimer() {
         return (initfailuretimer);
+    }
+
+    /**
+     * Get the timeout before retrying after delivery and wait for file processing
+     */
+    public long getWaitForFileProcessFailureTimer() {
+        return (waitForFileProcessFailureTimer);
     }
 
     /**
