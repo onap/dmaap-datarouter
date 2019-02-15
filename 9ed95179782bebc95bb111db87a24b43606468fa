@@ -152,6 +152,24 @@
       "revId": "9ed95179782bebc95bb111db87a24b43606468fa",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0f06480e_d201637b",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 1111
+      },
+      "writtenOn": "2019-02-15T15:52:16Z",
+      "side": 1,
+      "message": "I get it!  you only get here via delete API.  It isn\u0027t a general check after any file delivery. Sorry for the confusion",
+      "parentUuid": "0012508f_10827c0f",
+      "revId": "9ed95179782bebc95bb111db87a24b43606468fa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
