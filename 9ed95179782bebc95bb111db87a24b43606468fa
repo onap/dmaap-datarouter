@@ -116,6 +116,24 @@
       "revId": "9ed95179782bebc95bb111db87a24b43606468fa",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c7c09c5_48df00a5",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 1111
+      },
+      "writtenOn": "2019-02-15T15:07:17Z",
+      "side": 1,
+      "message": "I didn\u0027t have a problem so much with the wording.  Perhaps I misunderstood this function?  I thought it was determining whether the file could be deleted or not. And the legacy case is that the file would be deleted.  So it just seemed odd to log an error on the case where you determine that delete is not permitted.",
+      "parentUuid": "be079149_641a873b",
+      "revId": "9ed95179782bebc95bb111db87a24b43606468fa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
