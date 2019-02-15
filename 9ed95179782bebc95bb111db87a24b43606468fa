@@ -134,6 +134,24 @@
       "revId": "9ed95179782bebc95bb111db87a24b43606468fa",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0012508f_10827c0f",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-15T15:39:14Z",
+      "side": 1,
+      "message": "Ah ok I see your point but is there a possibility where a file existed on the dr-node that failed to be delivered to a subscriber that wasn\u0027t \"privileged\" and some subscriber tried to use this API to delete it. That is the case that we were trying to handle here but if you feel it is not relevant we can remove it.",
+      "parentUuid": "3c7c09c5_48df00a5",
+      "revId": "9ed95179782bebc95bb111db87a24b43606468fa",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
