@@ -43,8 +43,7 @@ import javax.persistence.Persistence;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 
@@ -59,6 +58,9 @@ public class LogServletTest extends DrServletTestBase {
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
+
+    @Mock
+    private ServletOutputStream s;
 
     ListAppender<ILoggingEvent> listAppender;
 
@@ -184,6 +186,38 @@ public class LogServletTest extends DrServletTestBase {
     }
 
     @Test
+    public void Given_Request_Is_GetPublishRecordsForFeed_And_Type_Is_Publish_With_Filename_That_exists_A_STATUS_OK_Response_Is_Generated_And_Correct_Value_Returned()
+            throws Exception {
+        when(request.getParameter("type")).thenReturn("pub");
+        when(request.getPathInfo()).thenReturn("/1");
+        when(request.getParameter("publishId")).thenReturn("ID");
+        when(request.getParameter("expiryReason")).thenReturn(null);
+        when(request.getParameter("statusCode")).thenReturn("204");
+        when(request.getParameter("filename")).thenReturn("file123");
+        logServlet.doGet(request, response);
+        verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+        verify(s, times(1)).print("[");
+        verify(s, times(1)).print(matches("\n\\{\"statusCode\":204,\"publishId\":\"ID\",\"requestURI\":\"URL/file123\",\"sourceIP\":\"172.0.0.8\",\"method\":\"PUT\",\"contentType\":\"application/vnd.dmaap-dr.log-list; version=1.0\",\"endpointId\":\"user\",\"type\":\"pub\",\"date\":\"2050-05-14T1[6-7]:46:04.422Z\",\"contentLength\":100,\"fileName\":\"file123\"}"));
+        verify(s, times(1)).print("[");
+    }
+
+    @Test
+    public void Given_Request_Is_GetPublishRecordsForFeed_And_Type_Is_Publish_With_Filename_That_Doesnt_exist_A_STATUS_OK_Response_Is_Generated_And_Empty_Array_Returned()
+            throws Exception {
+        when(request.getParameter("type")).thenReturn("pub");
+        when(request.getPathInfo()).thenReturn("/1");
+        when(request.getParameter("publishId")).thenReturn("ID");
+        when(request.getParameter("expiryReason")).thenReturn(null);
+        when(request.getParameter("statusCode")).thenReturn("204");
+        when(request.getParameter("filename")).thenReturn("file456");
+        logServlet.doGet(request, response);
+        verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+        verify(s, times(1)).print("[");
+        verify(s, times(0)).print(matches("\n\\{\"statusCode\":204,\"publishId\":\"ID\",\"requestURI\":\"URL/file123\",\"sourceIP\":\"172.0.0.8\",\"method\":\"PUT\",\"contentType\":\"application/vnd.dmaap-dr.log-list; version=1.0\",\"endpointId\":\"user\",\"type\":\"pub\",\"date\":\"2050-05-14T1[6-7]:46:04.422Z\",\"contentLength\":100,\"fileName\":\"file123\"}"));
+        verify(s, times(1)).print("[");
+    }
+
+    @Test
     public void Given_Request_Is_getDeliveryRecordsForFeed_And_Type_Is_Delivery_A_STATUS_OK_Response_Is_Generated()
             throws Exception {
         when(request.getParameter("type")).thenReturn("del");
@@ -232,9 +266,9 @@ public class LogServletTest extends DrServletTestBase {
         when(request.getParameter("publishId")).thenReturn("bad_PublishID");
         when(request.getParameter("statusCode")).thenReturn("-1");
         when(request.getParameter("expiryReason")).thenReturn("other");
-        when(request.getParameter("start")).thenReturn(null);
-        when(request.getParameter("end")).thenReturn(null);
-        ServletOutputStream s = mock(ServletOutputStream.class);
+        when(request.getParameter("start")).thenReturn("2536159564422");
+        when(request.getParameter("end")).thenReturn("2536159564422");
+        s = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(s);
     }
 }

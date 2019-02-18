@@ -68,7 +68,7 @@ public class PublishRecord extends BaseLogRecord {
         this.remoteAddr = rs.getString("REMOTE_ADDR");
         this.user = rs.getString("USER");
         this.status = rs.getInt("STATUS");
-        this.fileName = StringUtils.substringAfterLast(this.getRequestUri(), "/");
+        this.fileName = rs.getString("FILENAME");
     }
 
     public String getFeedFileid() {
