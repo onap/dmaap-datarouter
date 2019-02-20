@@ -27,7 +27,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.authz.impl.AuthzResource.ResourceType;
@@ -39,7 +40,7 @@ import org.onap.dmaap.datarouter.authz.impl.AuthzResource.ResourceType;
  */
 public class ProvAuthorizer implements Authorizer {
 
-    private Logger log;
+    private EELFLogger log;
     private ProvDataProvider provData;
 
     private static final String SUBJECT_HEADER = "X-DMAAP-DR-ON-BEHALF-OF";  // HTTP header carrying requester identity
@@ -49,7 +50,7 @@ public class ProvAuthorizer implements Authorizer {
      */
     public ProvAuthorizer(ProvDataProvider provData) {
         this.provData = provData;
-        this.log = Logger.getLogger(this.getClass());
+        this.log = EELFManager.getInstance().getLogger(this.getClass());
     }
 
     /**

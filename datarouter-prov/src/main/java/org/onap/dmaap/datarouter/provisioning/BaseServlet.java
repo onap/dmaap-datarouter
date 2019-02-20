@@ -45,8 +45,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.onap.dmaap.datarouter.authz.Authorizer;
@@ -64,8 +65,6 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.ThrottleFilter;
 import org.json.JSONException;
 import org.slf4j.MDC;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -215,11 +214,11 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     /**
      * This logger is used to log provisioning events
      */
-    protected static Logger eventlogger;
+    protected static EELFLogger eventlogger;
     /**
      * This logger is used to log internal events (errors, etc.)
      */
-    protected static Logger intlogger;
+    protected static EELFLogger intlogger;
     /**
      * Authorizer - interface to the Policy Engine
      */
@@ -245,12 +244,9 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * Initialize data common to all the provisioning server servlets.
      */
     protected BaseServlet() {
-        if (eventlogger == null) {
-            eventlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.events");
-        }
-        if (intlogger == null) {
-            intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
-        }
+        this.eventlogger = EELFManager.getInstance().getLogger("EventLog");
+        this.intlogger = EELFManager.getInstance().getLogger("InternalLog");
+
         if (authz == null) {
             authz = new ProvAuthorizer(this);
         }
@@ -539,7 +535,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             try {
                 mailprops.load(inStream);
             } catch (IOException e) {
-                intlogger.fatal("PROV9003 Opening properties: " + e.getMessage());
+                intlogger.error("PROV9003 Opening properties: " + e.getMessage());
                 System.exit(1);
             } finally {
                 try {

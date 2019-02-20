@@ -41,7 +41,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 import org.slf4j.MDC;
 
@@ -54,7 +53,6 @@ public class NodeUtils {
 
     private static EELFLogger eelfLogger = EELFManager.getInstance()
             .getLogger(NodeUtils.class);
-    private static Logger nodeUtilsLogger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeUtils");
 
     private NodeUtils() {
     }
@@ -96,7 +94,7 @@ public class NodeUtils {
             md.update(key.getBytes());
             return (getAuthHdr(node, base64Encode(md.digest())));
         } catch (Exception exception) {
-            nodeUtilsLogger
+            eelfLogger
                     .error("Exception in generating Credentials for given node name:= " + exception.toString(),
                             exception);
             return (null);
@@ -119,14 +117,13 @@ public class NodeUtils {
             try (FileInputStream fileInputStream = new FileInputStream(ksfile)) {
                 ks.load(fileInputStream, kspass.toCharArray());
             } catch (IOException ioException) {
-                nodeUtilsLogger.error("IOException occurred while opening FileInputStream: " + ioException.getMessage(),
+                eelfLogger.error("IOException occurred while opening FileInputStream: " + ioException.getMessage(),
                         ioException);
                 return (null);
             }
         } catch (Exception e) {
             setIpAndFqdnForEelf("getCanonicalName");
             eelfLogger.error(EelfMsgs.MESSAGE_KEYSTORE_LOAD_ERROR, ksfile, e.toString());
-            nodeUtilsLogger.error("NODE0401 Error loading my keystore file + " + ksfile + " " + e.toString(), e);
             return (null);
         }
         return (getCanonicalName(ks));
@@ -161,7 +158,7 @@ public class NodeUtils {
                 }
             }
         } catch (Exception e) {
-            nodeUtilsLogger.error("NODE0402 Error extracting my name from my keystore file " + e.toString(), e);
+            eelfLogger.error("NODE0402 Error extracting my name from my keystore file " + e.toString(), e);
         }
         return (null);
     }
@@ -176,7 +173,7 @@ public class NodeUtils {
         try {
             return (InetAddress.getByName(ip).getAddress());
         } catch (Exception exception) {
-            nodeUtilsLogger
+            eelfLogger
                     .error("Exception in generating byte array for given IP address := " + exception.toString(),
                             exception);
         }
@@ -255,7 +252,7 @@ public class NodeUtils {
             MDC.put(MDC_SERVER_FQDN, InetAddress.getLocalHost().getHostName());
             MDC.put(MDC_SERVER_IP_ADDRESS, InetAddress.getLocalHost().getHostAddress());
         } catch (Exception exception) {
-            nodeUtilsLogger
+            eelfLogger
                     .error("Exception in generating byte array for given IP address := " + exception.toString(),
                             exception);
         }
@@ -279,7 +276,7 @@ public class NodeUtils {
         MDC.put("InvocationId", invId);
     }
 
-    public static void sendResponseError(HttpServletResponse response, int errorCode, Logger intlogger) {
+    public static void sendResponseError(HttpServletResponse response, int errorCode, EELFLogger intlogger) {
         try {
             response.sendError(errorCode);
         } catch (IOException ioe) {

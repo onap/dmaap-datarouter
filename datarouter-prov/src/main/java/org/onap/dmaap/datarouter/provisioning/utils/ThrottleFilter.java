@@ -43,7 +43,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationSupport;
 import org.eclipse.jetty.server.*;
@@ -101,7 +102,7 @@ public class ThrottleFilter extends TimerTask implements Filter {
     private static int m_minutes = 0;            // sampling period
     private static int action = ACTION_DROP;    // action to take (throttle or drop)
 
-    private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+    private static EELFLogger logger = EELFManager.getInstance().getLogger("InternalLog");
     private static Map<String, Counter> map = new HashMap<String, Counter>();
     private static final Timer rolex = new Timer();
 

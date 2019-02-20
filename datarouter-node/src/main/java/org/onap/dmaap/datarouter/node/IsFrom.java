@@ -24,7 +24,8 @@
 
 package org.onap.dmaap.datarouter.node;
 
-import org.apache.log4j.Logger;
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 
 import java.util.*;
 import java.net.*;
@@ -36,7 +37,7 @@ public class IsFrom {
     private long nextcheck;
     private String[] ips;
     private String fqdn;
-    private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.IsFrom");
+    private static EELFLogger logger = EELFManager.getInstance().getLogger(IsFrom.class);
 
     /**
      * Configure the JVM DNS cache to have a 10 second TTL.  This needs to be called very very early or it won't have any effect.

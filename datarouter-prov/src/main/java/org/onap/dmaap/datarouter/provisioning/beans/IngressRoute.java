@@ -39,8 +39,9 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
@@ -53,7 +54,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  */
 public class IngressRoute extends NodeClass implements Comparable<IngressRoute> {
 
-    private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+    private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
     private final int seq;
     private final int feedid;
     private final String userid;
