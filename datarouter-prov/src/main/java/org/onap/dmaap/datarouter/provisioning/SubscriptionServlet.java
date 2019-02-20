@@ -78,7 +78,7 @@ public class SubscriptionServlet extends ProxyServlet {
             if (message != null) {
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                 return;
             }
@@ -91,7 +91,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Missing " + BEHALF_HEADER + " header.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -100,7 +100,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Missing or bad subscription number.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -109,7 +109,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Missing or bad subscription number.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
                 return;
             }
@@ -119,7 +119,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Policy Engine disallows access.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                 return;
             }
@@ -129,13 +129,13 @@ public class SubscriptionServlet extends ProxyServlet {
                 activeSubs--;
                 // send response
                 elr.setResult(HttpServletResponse.SC_NO_CONTENT);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 provisioningDataChanged();
             } else {
                 // Something went wrong with the DELETE
                 elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, intlogger);
             }
         } finally {
@@ -159,7 +159,7 @@ public class SubscriptionServlet extends ProxyServlet {
             if (message != null) {
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                 return;
             }
@@ -172,7 +172,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Missing " + BEHALF_HEADER + " header.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -181,7 +181,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Missing or bad subscription number.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -190,7 +190,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Missing or bad subscription number.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
                 return;
             }
@@ -200,14 +200,14 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Policy Engine disallows access.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                 return;
             }
 
             // send response
             elr.setResult(HttpServletResponse.SC_OK);
-            eventlogger.info(elr);
+            eventlogger.info(elr.toString());
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType(SUBFULL_CONTENT_TYPE);
             try {
@@ -235,7 +235,7 @@ public class SubscriptionServlet extends ProxyServlet {
             if (message != null) {
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                 return;
             }
@@ -248,7 +248,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Missing " + BEHALF_HEADER + " header.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -257,7 +257,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Missing or bad subscription number.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -266,7 +266,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Missing or bad subscription number.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
                 return;
             }
@@ -276,7 +276,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Policy Engine disallows access.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                 return;
             }
@@ -287,7 +287,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Incorrect content-type";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message, eventlogger);
                 return;
             }
@@ -296,7 +296,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Badly formed JSON";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -310,7 +310,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = e.getMessage();
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -323,7 +323,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "This subscriber must be modified by the same subscriber that created it.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -332,7 +332,7 @@ public class SubscriptionServlet extends ProxyServlet {
             if (doUpdate(sub)) {
                 // send response
                 elr.setResult(HttpServletResponse.SC_OK);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 resp.setStatus(HttpServletResponse.SC_OK);
                 resp.setContentType(SUBFULL_CONTENT_TYPE);
                 try {
@@ -359,7 +359,7 @@ public class SubscriptionServlet extends ProxyServlet {
             } else {
                 // Something went wrong with the UPDATE
                 elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, intlogger);
             }
         } finally {
@@ -373,13 +373,6 @@ public class SubscriptionServlet extends ProxyServlet {
      */
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) {
-// OLD pre-3.0 code
-//        String message = "POST not allowed for the subscriptionURL.";
-//        EventLogRecord elr = new EventLogRecord(req);
-//        elr.setMessage(message);
-//        elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-//        eventlogger.info(elr);
-//        resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, message);
 
         setIpFqdnRequestIDandInvocationIDForEelf("doPost", req);
         eelflogger.info(EelfMsgs.ENTRY);
@@ -390,7 +383,7 @@ public class SubscriptionServlet extends ProxyServlet {
             if (message != null) {
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                 return;
             }
@@ -403,7 +396,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Missing " + BEHALF_HEADER + " header.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -412,7 +405,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Missing or bad subscription number.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -423,7 +416,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Incorrect content-type";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message, eventlogger);
                 return;
             }
@@ -433,7 +426,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Policy Engine disallows access.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                 return;
             }
@@ -442,7 +435,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Badly formed JSON";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -458,13 +451,13 @@ public class SubscriptionServlet extends ProxyServlet {
                 }
                 // send response
                 elr.setResult(HttpServletResponse.SC_ACCEPTED);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 resp.setStatus(HttpServletResponse.SC_ACCEPTED);
             } catch (JSONException e) {
                 message = "Badly formed JSON";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
             }
         } finally {

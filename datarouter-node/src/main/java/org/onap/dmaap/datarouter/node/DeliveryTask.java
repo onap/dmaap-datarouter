@@ -30,7 +30,6 @@ import java.util.*;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-import org.apache.log4j.Logger;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 import org.slf4j.MDC;
 
@@ -44,7 +43,6 @@ import static com.att.eelf.configuration.Configuration.*;
  * the file and its delivery data as well as to attempt delivery.
  */
 public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
-    private static Logger loggerDeliveryTask = Logger.getLogger("org.onap.dmaap.datarouter.node.DeliveryTask");
     private static EELFLogger eelflogger = EELFManager.getInstance()
             .getLogger(DeliveryTask.class);
     private DeliveryTaskHelper deliveryTaskHelper;
@@ -123,7 +121,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 hdrv.add(new String[]{h, v});
             }
         } catch (Exception e) {
-            loggerDeliveryTask.error("Exception "+e.getStackTrace(),e);
+            eelflogger.error("Exception "+e.getStackTrace(),e);
         }
         hdrs = hdrv.toArray(new String[hdrv.size()][]);
         url = deliveryTaskHelper.getDestURL(fileid);
@@ -203,7 +201,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 } catch (ProtocolException pe) {
                     deliveryTaskHelper.reportDeliveryExtra(this, -1L);
                     // Rcvd error instead of 100-continue
-                    loggerDeliveryTask.error("Exception "+pe.getStackTrace(),pe);
+                    eelflogger.error("Exception "+pe.getStackTrace(),pe);
                 }
                 if (os != null) {
                     long sofar = 0;
@@ -259,7 +257,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
             }
             deliveryTaskHelper.reportStatus(this, rc, xpubid, rmsg);
         } catch (Exception e) {
-            loggerDeliveryTask.error("Exception "+e.getStackTrace(),e);
+            eelflogger.error("Exception "+e.getStackTrace(),e);
             deliveryTaskHelper.reportException(this, e);
         }
     }

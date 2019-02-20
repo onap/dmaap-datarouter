@@ -138,7 +138,7 @@ public class RouteServlet extends ProxyServlet {
         if (!isAuthorizedForInternal(req)) {
             elr.setMessage("Unauthorized.");
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
+            eventlogger.info(elr.toString());
             sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
             return;
         }
@@ -226,14 +226,14 @@ public class RouteServlet extends ProxyServlet {
         }
         if (rv) {
             elr.setResult(HttpServletResponse.SC_OK);
-            eventlogger.info(elr);
+            eventlogger.info(elr.toString());
             resp.setStatus(HttpServletResponse.SC_OK);
             provisioningDataChanged();
             provisioningParametersChanged();
         } else {
             // Something went wrong with the DELETE
             elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            eventlogger.info(elr);
+            eventlogger.info(elr.toString());
             sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
         }
     }
@@ -246,7 +246,7 @@ public class RouteServlet extends ProxyServlet {
         if (!isAuthorizedForInternal(req)) {
             elr.setMessage("Unauthorized.");
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
+            eventlogger.info(elr.toString());
             sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
             return;
         }
@@ -327,7 +327,7 @@ public class RouteServlet extends ProxyServlet {
         if (!isAuthorizedForInternal(req)) {
             elr.setMessage("Unauthorized.");
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
+            eventlogger.info(elr.toString());
             sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
             return;
         }
@@ -342,7 +342,7 @@ public class RouteServlet extends ProxyServlet {
         if (!isAuthorizedForInternal(req)) {
             elr.setMessage("Unauthorized.");
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr);
+            eventlogger.info(elr.toString());
             sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
             return;
         }
@@ -368,7 +368,7 @@ public class RouteServlet extends ProxyServlet {
                 int seq = (t != null) ? Integer.parseInt(t) : (IngressRoute.getMaxSequence() + 100);
                 ins = new Insertable[] { new IngressRoute(seq, feedid, user, subnet, NodeClass.lookupNodeNames(nodepatt)) };
             } catch (Exception e) {
-                intlogger.info(e);
+                intlogger.info(e.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments in 'add ingress' command.", intlogger);
                 return;
             }
@@ -384,7 +384,7 @@ public class RouteServlet extends ProxyServlet {
                 String node = NodeClass.normalizeNodename(req.getParameter("node"));
                 ins = new Insertable[] { new EgressRoute(subid, node) };
             } catch (Exception e) {
-                intlogger.info(e);
+                intlogger.info(e.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments in 'add egress' command.", intlogger);
                 return;
             }
@@ -410,7 +410,7 @@ public class RouteServlet extends ProxyServlet {
                 }
                 ins = new Insertable[] { nr };
             } catch (IllegalArgumentException e) {
-                intlogger.info(e);
+                intlogger.info(e.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments in 'add network' command.", intlogger);
                 return;
             }
@@ -425,14 +425,14 @@ public class RouteServlet extends ProxyServlet {
         }
         if (rv) {
             elr.setResult(HttpServletResponse.SC_OK);
-            eventlogger.info(elr);
+            eventlogger.info(elr.toString());
             resp.setStatus(HttpServletResponse.SC_OK);
             provisioningDataChanged();
             provisioningParametersChanged();
         } else {
             // Something went wrong with the INSERT
             elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            eventlogger.info(elr);
+            eventlogger.info(elr.toString());
             sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, intlogger);
         }
     }

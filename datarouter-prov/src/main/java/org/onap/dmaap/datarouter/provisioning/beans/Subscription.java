@@ -35,7 +35,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
-import org.apache.log4j.Logger;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
@@ -55,7 +57,7 @@ public class Subscription extends Syncable {
     private static final String GROUPID_KEY = "groupid";
     private static final String LAST_MOD_KEY = "last_mod";
     private static final String CREATED_DATE = "created_date";
-    private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+    private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
     private static int nextSubid = getMaxSubID() + 1;
 
     private int subid;
@@ -111,7 +113,7 @@ public class Subscription extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error(e);
+            intlogger.error(e.toString());
         }
         return list;
     }

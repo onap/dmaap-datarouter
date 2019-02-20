@@ -27,7 +27,8 @@ package org.onap.dmaap.datarouter.provisioning;
 import java.security.*;
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
@@ -107,7 +108,7 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
         Security.setProperty("networkaddress.cache.ttl", "4");
-        Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+        EELFLogger logger = EELFManager.getInstance().getLogger("InternalLog");;
 
         // Check DB is accessible and contains the expected tables
         if (!checkDatabase()) {
