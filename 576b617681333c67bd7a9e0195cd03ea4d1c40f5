@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "71fc601e_3f64c709",
+        "filename": "datarouter-node/src/main/resources/node.properties",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-02-25T10:23:20Z",
+      "side": 1,
+      "message": "Don\u0027t know why this changes sometimes, could you change it back",
+      "range": {
+        "startLine": 5,
+        "startChar": 14,
+        "endLine": 5,
+        "endChar": 15
+      },
+      "revId": "576b617681333c67bd7a9e0195cd03ea4d1c40f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
