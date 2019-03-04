@@ -26,7 +26,7 @@
     <groupId>org.onap.dmaap.datarouter</groupId>
     <artifactId>parent</artifactId>
     <name>dmaap-datarouter</name>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>2.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>https://github.com/att/DMAAP_DATAROUTER</url>
     <parent>
@@ -35,7 +35,7 @@
         <version>1.2.3</version>
     </parent>
     <properties>
-        <datarouter.version>2.0.1-SNAPSHOT</datarouter.version>
+        <datarouter.version>2.0.2-SNAPSHOT</datarouter.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -59,7 +59,6 @@
         <releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
         <stagingNexusPath>/content/repositories/staging/</stagingNexusPath>
         <sitePath>/content/sites/site/org/onap/dmaap/datarouter/${project.artifactId}/${project.version}</sitePath>
-        <docker.maven.plugin.version>1.0.0</docker.maven.plugin.version>
         <skip.docker.build>true</skip.docker.build>
         <skip.docker.tag>true</skip.docker.tag>
         <skip.docker.push>true</skip.docker.push>
@@ -73,14 +72,6 @@
     </modules>
     <build>
         <plugins>
-            <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>${docker.maven.plugin.version}</version>
-                <configuration>
-                    <skipDockerBuild>true</skipDockerBuild>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
