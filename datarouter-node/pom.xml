@@ -38,6 +38,10 @@
         <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
         <sitePath>/content/sites/site/${project.groupId}/${project.artifactId}/${project.version}</sitePath>
         <docker.location>${basedir}/target/${artifactId}</docker.location>
+
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>yyyyMMdd'T'HHmmss'Z'</maven.build.timestamp.format>
+
         <datarouter.node.image.name>onap/dmaap/datarouter-node</datarouter.node.image.name>
     </properties>
     <dependencies>
@@ -226,41 +230,79 @@
             </properties>
             <build>
                 <plugins>
+
+                    <!-- Setup image tags per https://wiki.onap.org/display/DW/Independent+Versioning+and+Release+Process#IndependentVersioningandReleaseProcess-StandardizedDockerTagging -->
                     <plugin>
-                        <groupId>com.spotify</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <version>${docker.maven.plugin.version}</version>
-                        <configuration>
-                            <imageName>${onap.nexus.dockerregistry.daily}/${datarouter.node.image.name}</imageName>
-                            <baseImage>java:8</baseImage>
-                            <serverId>${onap.nexus.dockerregistry.daily}</serverId>
-                            <skipDockerBuild>false</skipDockerBuild>
-                            <imageTags>
-                                <imageTag>${project.version}</imageTag>
-                                <imageTag>latest</imageTag>
-                            </imageTags>
-                            <forceTags>true</forceTags>
-                            <entryPoint>["/startup.sh", "start"]</entryPoint>
-                            <resources>
-                                <resource>
-                                    <targetPath>/opt</targetPath>
-                                    <directory>${project.build.directory}/opt</directory>
-                                </resource>
-                                <resource>
-                                    <targetPath>/</targetPath>
-                                    <directory>${docker.location}</directory>
-                                    <include>startup.sh</include>
-                                </resource>
-                            </resources>
-                            <runs>
-                                <run>chmod 0700 /startup.sh</run>
-                            </runs>
-                            <exposes>
-                                <expose>8080</expose>
-                                <expose>8443</expose>
-                            </exposes>
-                        </configuration>
+                      <groupId>org.codehaus.groovy.maven</groupId>
+                      <artifactId>gmaven-plugin</artifactId>
+                      <executions>
+                          <execution>
+                              <phase>validate</phase>
+                              <goals>
+                                  <goal>execute</goal>
+                              </goals>
+                              <configuration>
+                                  <properties>
+                                      <ver>${project.version}</ver>
+                                      <timestamp>${maven.build.timestamp}</timestamp>
+                                  </properties>
+                                  <source>
+                                      println 'ver: ' + project.properties['ver'];
+                                      if ( project.properties['ver'].endsWith("-SNAPSHOT") ) {
+                                          project.properties['dockertag1']=project.properties['ver'] + "-latest";
+                                          project.properties['dockertag2']=project.properties['ver'] + "-" + project.properties['timestamp'];
+                                      } else {
+                                          project.properties['dockertag1']=project.properties['ver'] + "-STAGING-latest";
+                                          project.properties['dockertag2']=project.properties['ver'] + "-STAGING-" + project.properties['timestamp'];
+                                      }
+                                      println 'docker tag 1: ' + project.properties['dockertag1'];
+                                      println 'docker tag 2: ' + project.properties['dockertag2'];
+                                  </source>
+                              </configuration>
+                          </execution>
+                      </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.28.0</version>  
+                        <configuration>
+                            <verbose>${docker.verbose}</verbose>
+                            <apiVersion>${docker.apiVersion}</apiVersion>
+                            <pullRegistry>${docker.pull.registry}</pullRegistry>
+                            <images>
+                                <image>                            
+                                    <name>${onap.nexus.dockerregistry.daily}/${datarouter.node.image.name}</name>
+                                    <build>
+                                        <cleanup>try</cleanup>
+                                        <dockerFileDir>${basedir}/target/docker-stage</dockerFileDir>
+                                        <dockerFile>Dockerfile</dockerFile>
+                                        <tags>
+                                            <tag>${dockertag1}</tag>
+                                            <tag>${dockertag2}</tag>
+                                        </tags>
+                                    </build>
+                                </image>
+                            </images>
+                        </configuration>
+                         <executions>
+                             <execution>
+                                 <id>generate-images</id>
+                                 <phase>install</phase>
+                                 <goals>
+                                     <goal>build</goal>
+                                 </goals>
+                             </execution>
+                             <execution>
+                                 <id>push-images</id>
+                                 <phase>deploy</phase>
+                                 <goals>
+                                     <goal>push</goal>
+                                 </goals>
+                             </execution>
+                         </executions>
+                    </plugin>
+                    
                 </plugins>
             </build>
         </profile>
@@ -308,7 +350,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <outputDirectory>${basedir}/target/opt/app/datartr/lib</outputDirectory>
+                    <outputDirectory>${basedir}/target/docker-stage/opt/app/datartr/lib</outputDirectory>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
@@ -335,12 +377,12 @@
                 <executions>
                     <execution>
                         <id>copy-docker-file</id>
-                        <phase>package</phase>
+                        <phase>validate</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${docker.location}</outputDirectory>
+                            <outputDirectory>${basedir}/target/docker-stage</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
@@ -354,13 +396,33 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy-resources</id>
+                        <id>copy-startup-script</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/opt/app/datartr/etc</outputDirectory>
+                            <outputDirectory>${basedir}/target/docker-stage/opt</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/main/resources/docker</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>startup.sh</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-2</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/docker-stage/opt/app/datartr/etc</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${basedir}/src/main/resources</directory>
@@ -373,13 +435,32 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy-resources-1</id>
+                        <id>copy-resources-3</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/opt/app/datartr/aaf_certs</outputDirectory>
+                            <outputDirectory>${basedir}/target/docker-stage/opt/app/datartr</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/data</directory>
+                                    <includes>
+                                        <include>misc/**</include>
+                                        <include>**/**</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-4</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/docker-stage/opt/app/datartr/aaf_certs</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${basedir}/aaf_certs</directory>
@@ -405,7 +486,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/opt/app/datartr/lib</outputDirectory>
+                            <outputDirectory>${project.build.directory}/docker-stage/opt/app/datartr/lib</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
