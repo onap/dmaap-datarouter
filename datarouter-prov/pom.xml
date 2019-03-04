@@ -41,6 +41,9 @@
 
         <docker.location>${basedir}/target/${artifactId}</docker.location>
         <datarouter.prov.image.name>onap/dmaap/datarouter-prov</datarouter.prov.image.name>
+
+        <docker.verbose>true</docker.verbose>
+        <docker.apiVersion>1.23</docker.apiVersion>
     </properties>
     <dependencies>
         <dependency>
@@ -265,39 +268,37 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.spotify</groupId>
+                        <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
-                        <version>1.0.0</version>
+                        <version>0.28.0</version>  
                         <configuration>
-                            <imageName>${onap.nexus.dockerregistry.daily}/${datarouter.prov.image.name}</imageName>
-                            <baseImage>java:8</baseImage>
-                            <serverId>${onap.nexus.dockerregistry.daily}</serverId>
-                            <skipDockerBuild>false</skipDockerBuild>
-                            <imageTags>
-                                <imageTag>${project.version}</imageTag>
-                                <imageTag>latest</imageTag>
-                            </imageTags>
-                            <forceTags>true</forceTags>
-                            <entryPoint>["/startup.sh", "start"]</entryPoint>
-                            <resources>
-                                <resource>
-                                    <targetPath>/opt</targetPath>
-                                    <directory>${project.build.directory}/opt</directory>
-                                </resource>
-                                <resource>
-                                    <targetPath>/</targetPath>
-                                    <directory>${docker.location}</directory>
-                                    <include>startup.sh</include>
-                                </resource>
-                            </resources>
-                            <runs>
-                                <run>chmod 0700 /startup.sh</run>
-                            </runs>
-                            <exposes>
-                                <expose>8080</expose>
-                                <expose>8443</expose>
-                            </exposes>
+                            <verbose>${docker.verbose}</verbose>
+                            <apiVersion>${docker.apiVersion}</apiVersion>
+                            <pullRegistry>${docker.pull.registry}</pullRegistry>
+                            <images>
+                                <image>                            
+                                    <name>${onap.nexus.dockerregistry.daily}/${datarouter.prov.image.name}</name>
+                                    <build>
+                                        <cleanup>try</cleanup>
+                                        <dockerFileDir>${basedir}/target/docker-stage</dockerFileDir>
+                                        <dockerFile>Dockerfile</dockerFile>
+                                        <tags>
+                                            <tag>${project.version}</tag>
+                                            <tag>latest</tag>
+                                        </tags>
+                                    </build>
+                                </image>
+                            </images>
                         </configuration>
+                         <executions>
+                             <execution>
+                                 <id>generate-images</id>
+                                 <phase>package</phase>
+                                 <goals>
+                                     <goal>build</goal>
+                                 </goals>
+                             </execution>
+                         </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -350,7 +351,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <outputDirectory>${basedir}/target/opt/app/datartr/lib</outputDirectory>
+                    <outputDirectory>${basedir}/target/docker-stage/opt/app/datartr/lib</outputDirectory>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
@@ -379,43 +380,47 @@
                 </configuration>
                 <version>3.6.0</version>
             </plugin>
+
+            <!-- Copy files to docker-stage to be included in image -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.7</version>
                 <executions>
                     <execution>
-                        <id>copy-docker-file</id>
-                        <phase>package</phase>
+                        <id>copy-dockerfile</id>
+                        <phase>validate</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${docker.location}</outputDirectory>
+                            <outputDirectory>${basedir}/target/docker-stage</outputDirectory>
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
                                     <directory>${basedir}/src/main/resources/docker</directory>
                                     <filtering>true</filtering>
                                     <includes>
-                                        <include>**/*</include>
+                                        <include>Dockerfile</include>
                                     </includes>
                                 </resource>
                             </resources>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy-resources-1</id>
+                        <id>copy-startup-script</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/opt/app/datartr/lib</outputDirectory>
+                            <outputDirectory>${basedir}/target/docker-stage/opt</outputDirectory>
+                            <overwrite>true</overwrite>
                             <resources>
                                 <resource>
-                                    <directory>${project.basedir}/src/main/resources</directory>
+                                    <directory>${basedir}/src/main/resources/docker</directory>
+                                    <filtering>true</filtering>
                                     <includes>
-                                        <include>**/*.jar</include>
+                                        <include>startup.sh</include>
                                     </includes>
                                 </resource>
                             </resources>
@@ -428,7 +433,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/opt/app/datartr/etc</outputDirectory>
+                            <outputDirectory>${basedir}/target/docker-stage/opt/app/datartr/etc</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${basedir}/src/main/resources</directory>
@@ -447,7 +452,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/opt/app/datartr</outputDirectory>
+                            <outputDirectory>${basedir}/target/docker-stage/opt/app/datartr</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${basedir}/data</directory>
@@ -466,7 +471,7 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/opt/app/datartr/aaf_certs</outputDirectory>
+                            <outputDirectory>${basedir}/target/docker-stage/opt/app/datartr/aaf_certs</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${basedir}/aaf_certs</directory>
@@ -492,7 +497,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/opt/app/datartr/lib</outputDirectory>
+                            <outputDirectory>${basedir}/target/docker-stage/opt/app/datartr/aaf_certs</outputDirectory>
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
