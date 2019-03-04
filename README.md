@@ -144,4 +144,44 @@ MariaDB - 10.2.14
 
 Self Signed SSL certificates
 
+## This section describes how to build and test datarouter containers on a host such as
+a laptop or remote server.
+
+- Install git, maven, docker
+    - See https://wiki.onap.org/display/DW/Setting+Up+Your+Development+Environment
+    - See https://docs.docker.com/install/
+
+### Build
+- in terminal 
+> git clone https://gerrit.onap.org/r/dmaap/datarouter
+> cd datarouter
+> mvn clean install -DskipTests -Pdocker
+> docker images
+REPOSITORY                                               TAG                 IMAGE ID            CREATED             SIZE
+nexus3.onap.org:10003/onap/dmaap/datarouter-subscriber   2.0.0-SNAPSHOT      0dfc99a7612c        13 seconds ago      99.2MB
+nexus3.onap.org:10003/onap/dmaap/datarouter-subscriber   latest              0dfc99a7612c        13 seconds ago      99.2MB
+nexus3.onap.org:10003/onap/dmaap/datarouter-node         2.0.0-SNAPSHOT      6573f4bdc310        27 seconds ago      116MB
+nexus3.onap.org:10003/onap/dmaap/datarouter-node         latest              6573f4bdc310        27 seconds ago      116MB
+nexus3.onap.org:10003/onap/dmaap/datarouter-prov         2.0.0-SNAPSHOT      9e4148737c18        47 seconds ago      148MB
+nexus3.onap.org:10003/onap/dmaap/datarouter-prov         latest              9e4148737c18        47 seconds ago      148MB
+openjdk                                                  8-jre-alpine        1b46cc2ba839        3 weeks ago         85MB
+nexus3.onap.org:10001/openjdk                            8-jre-alpine        1b46cc2ba839        3 weeks ago         85MB
+
+### Test
+> cd datarouter-docker-compose/src/main/resources
+- edit docker-compose, change nexus 0001 (remote pull repo) to 0003 (local build)
+> docker-compose up
+
+- terminal 2
+>  docker container ls -a
+CONTAINER ID        IMAGE                                                    COMMAND                  CREATED              STATUS                        PORTS                                                                   NAMES
+c193317ec860        nexus3.onap.org:10003/onap/dmaap/datarouter-node         "sh startup.sh"          About a minute ago   Up About a minute             0.0.0.0:9090->8080/tcp, 0.0.0.0:9443->8443/tcp                          datarouter-node
+e8dab741550e        nexus3.onap.org:10003/onap/dmaap/datarouter-prov         "sh startup.sh"          About a minute ago   Up About a minute (healthy)   0.0.0.0:8080->8080/tcp, 0.0.0.0:8443->8443/tcp, 0.0.0.0:443->8443/tcp   datarouter-prov
+cf0e996f0f31        nexus3.onap.org:10003/onap/dmaap/datarouter-subscriber   "sh startup.sh"          About a minute ago   Up About a minute             8080/tcp, 0.0.0.0:7070->7070/tcp, 8443/tcp                              subscriber-node
+73affb6364f9        mariadb:10.2.14                                          "docker-entrypoint.s…"   About a minute ago   Up About a minute (healthy)   0.0.0.0:3306->3306/tcp                                                  mariadb
+
+> docker exec -it datarouter-node /bin/sh
+    # curl http://dmaap-dr-prov:8080/internal/prov
+> docker exec -it datarouter-prov /bin/sh
+    # curl -v -X POST -H "Content-Type : application/vnd.dmaap-dr.feed" -H "X-DMAAP-DR-ON-BEHALF-OF: rs873m" --data-ascii @/opt/app/datartr/addFeed3.txt --post301 --location-trusted  -k https://dmaap-dr-prov:8443
 
