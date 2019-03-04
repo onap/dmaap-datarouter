@@ -33,6 +33,10 @@
     <packaging>jar</packaging>
     <name>datarouter-subscriber</name>
     <properties>
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>yyyyMMdd'T'HHmmss'Z'</maven.build.timestamp.format>
+        <skip.docker.push>true</skip.docker.push>
+        <skip.docker.build>true</skip.docker.build>
         <sonar.language>java</sonar.language>
         <sonar.skip>false</sonar.skip>
         <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
@@ -164,17 +168,47 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.codehaus.groovy.maven</groupId>
+                        <artifactId>gmaven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>execute</goal>
+                                </goals>
+                                <configuration>
+                                    <properties>
+                                        <ver>${project.version}</ver>
+                                        <timestamp>${maven.build.timestamp}</timestamp>
+                                    </properties>
+                                    <source>
+                                        println project.properties['ver'];
+                                        if ( project.properties['ver'].endsWith("-SNAPSHOT") ) {
+                                            project.properties['dockertag1']=project.properties['ver'] + "-latest";
+                                            project.properties['dockertag2']=project.properties['ver'] + "-" + project.properties['timestamp'];
+                                        } else {
+                                            project.properties['dockertag1']=project.properties['ver']+ "-STAGING-latest";
+                                            project.properties['dockertag2']=project.properties['ver'] + "-STAGING-" + project.properties['timestamp'];
+                                        }
+                                        println 'docker tag 1: ' + project.properties['dockertag1'];
+                                        println 'docker tag 2: ' + project.properties['dockertag2'];
+                                    </source>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>com.spotify</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
                         <version>${docker.maven.plugin.version}</version>
                         <configuration>
                             <imageName>${onap.nexus.dockerregistry.daily}/${datarouter.prov.image.name}</imageName>
                             <baseImage>java:8</baseImage>
-                            <serverId>${onap.nexus.dockerregistry.daily}</serverId>
+                            <serverId>docker-hub</serverId>
                             <skipDockerBuild>false</skipDockerBuild>
                             <imageTags>
-                                <imageTag>${project.version}</imageTag>
-                                <imageTag>latest</imageTag>
+                                <imageTag>${dockertag1}</imageTag>
+                                <imageTag>${dockertag2}</imageTag>
                             </imageTags>
                             <forceTags>true</forceTags>
                             <entryPoint>["/startup.sh", "start"]</entryPoint>
@@ -197,6 +231,64 @@
                                 <expose>8443</expose>
                             </exposes>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <id>build-image</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <skipDockerBuild>${skip.docker.build}</skipDockerBuild>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>tag-image-project-version</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>tag</goal>
+                                </goals>
+                                <configuration>
+                                    <image>onap/dmaap/datarouter</image>
+                                    <newName>${docker.push.registry}/onap/dmaap/datarouter:${dockertag2}</newName>
+                                    <skipDockerTag>${skip.docker.push}</skipDockerTag>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>tag-image-latest</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>tag</goal>
+                                </goals>
+                                <configuration>
+                                    <image>onap/dmaap/datarouter</image>
+                                    <newName>${docker.push.registry}/onap/dmaap/datarouter:${dockertag1}</newName>
+                                    <skipDockerTag>${skip.docker.push}</skipDockerTag>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>push-image</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>push</goal>
+                                </goals>
+                                <configuration>
+                                    <imageName>${docker.push.registry}/onap/dmaap/datarouter:${dockertag2}</imageName>
+                                    <skipDockerPush>${skip.docker.push}</skipDockerPush>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>push-image-latest</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>push</goal>
+                                </goals>
+                                <configuration>
+                                    <imageName>${docker.push.registry}/onap/dmaap/datarouter:${dockertag1}</imageName>
+                                    <skipDockerPush>${skip.docker.push}</skipDockerPush>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
