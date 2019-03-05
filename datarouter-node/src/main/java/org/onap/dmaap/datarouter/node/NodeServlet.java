@@ -67,7 +67,7 @@ public class NodeServlet extends HttpServlet {
     //Adding EELF Logger Rally:US664892
     private static EELFLogger eelflogger = EELFManager.getInstance()
             .getLogger(NodeServlet.class);
-    private Delivery delivery;
+    private final Delivery delivery;
 
     static {
         final String ws = "\\s*";

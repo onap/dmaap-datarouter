@@ -69,7 +69,7 @@ public class LogServlet extends BaseServlet {
     private static final String FMT_1 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     private static final String FMT_2 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
-    private boolean isfeedlog;
+    private final boolean isfeedlog;
 
     public abstract class RowHandler {
         private final ServletOutputStream out;
