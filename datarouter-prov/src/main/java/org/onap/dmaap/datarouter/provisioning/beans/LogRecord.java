@@ -33,7 +33,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.text.ParseException;
 import java.util.Iterator;
-import org.apache.log4j.Logger;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
 
@@ -53,7 +55,7 @@ public class LogRecord extends BaseLogRecord {
      * @param bs the {@link RLEBitSet} listing the record IDs to print
      * @throws IOException
      */
-    private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.beans");
+    private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
 
     public static void printLogRecords(OutputStream os, RLEBitSet bs) throws IOException {
         final String sql = "select * from LOG_RECORDS where RECORD_ID >= ? AND RECORD_ID <= ?";

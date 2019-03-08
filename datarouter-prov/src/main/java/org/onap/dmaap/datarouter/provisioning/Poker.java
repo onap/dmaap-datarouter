@@ -36,7 +36,9 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
-import org.apache.log4j.Logger;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -72,13 +74,13 @@ public class Poker extends TimerTask {
     private long timer1;
     private long timer2;
     private String thisPod;        // DNS name of this machine
-    private Logger logger;
+    private EELFLogger logger;
     private String provString;
 
     private Poker() {
         timer1 = timer2 = 0;
         Timer rolex = new Timer();
-        logger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+        logger = EELFManager.getInstance().getLogger("InternalLog");;
         try {
             thisPod = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {

@@ -24,7 +24,8 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
-import org.apache.log4j.Logger;
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
@@ -43,7 +44,7 @@ import java.util.Date;
  * @version $Id: Feed.java,v 1.13 2013/10/28 18:06:52 eby Exp $
  */
 public class Feed extends Syncable {
-    private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+    private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
     private static int next_feedid = getMaxFeedID() + 1;
 
     private int feedid;

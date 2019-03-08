@@ -32,7 +32,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import org.apache.log4j.Logger;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 
 /**
@@ -44,7 +46,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
 public abstract class NodeClass extends Syncable {
 
     private static Map<String, Integer> map;
-    private static Logger intLogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+    private static EELFLogger intLogger = EELFManager.getInstance().getLogger("InternalLog");
     public NodeClass() {
         // init on first use
         if (map == null) {

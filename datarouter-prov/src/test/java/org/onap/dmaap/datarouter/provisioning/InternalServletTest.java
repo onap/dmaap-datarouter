@@ -170,6 +170,8 @@ public class InternalServletTest extends DrServletTestBase {
       throws Exception {
     when(request.getPathInfo()).thenReturn("/logs/testFile.txt");
     File testFile = new File("unit-test-logs/testFile.txt");
+    File testDir = new File("unit-test-logs");
+    testDir.mkdirs();
     testFile.createNewFile();
     testFile.deleteOnExit();
     ServletOutputStream outStream = mock(ServletOutputStream.class);
