@@ -74,49 +74,65 @@ public class PublishServlet extends BaseServlet {
     }
 
     @Override
-    public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+    public void doDelete(HttpServletRequest req, HttpServletResponse resp){
         setUpEelfForPublishServlet(req, "doDelete");
         eelflogger.info(EelfMsgs.ENTRY);
         try {
             eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             redirect(req, resp);
-        } finally {
+        }
+        catch (ServletException se){
+            intlogger.error("ServletException " + se.getMessage());
+        }
+        finally {
             eelflogger.info(EelfMsgs.EXIT);
         }
     }
 
     @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         setUpEelfForPublishServlet(req, "doGet");
         eelflogger.info(EelfMsgs.ENTRY);
         try {
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         redirect(req, resp);
-        } finally {
+        }
+        catch (ServletException se){
+            intlogger.error("ServletException " + se.getMessage());
+        }
+        finally {
             eelflogger.info(EelfMsgs.EXIT);
         }
     }
 
     @Override
-    public void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+    public void doPut(HttpServletRequest req, HttpServletResponse resp) {
         setUpEelfForPublishServlet(req, "doPut");
         eelflogger.info(EelfMsgs.ENTRY);
         try {
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         redirect(req, resp);
-        } finally {
+        }
+        catch (ServletException se){
+            intlogger.error("ServletException " + se.getMessage());
+        }
+        finally {
             eelflogger.info(EelfMsgs.EXIT);
         }
     }
 
     @Override
-    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) {
         setUpEelfForPublishServlet(req, "doPost");
         eelflogger.info(EelfMsgs.ENTRY);
         try {
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
         redirect(req, resp);
-        } finally {
+        }
+        catch (ServletException se){
+            intlogger.error("ServletException " + se.getMessage());
+        }
+        finally {
             eelflogger.info(EelfMsgs.EXIT);
         }
 
