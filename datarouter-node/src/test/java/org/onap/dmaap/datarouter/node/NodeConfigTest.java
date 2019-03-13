@@ -211,6 +211,7 @@ public class NodeConfigTest {
         delivery.put("use100", true);
         subscription.put("delivery", delivery);
         subscription.put("privilegedSubscriber", false);
+        subscription.put("decompress", false);
         subscriptions.put(subscription);
         provData.put("subscriptions", subscriptions);
     }

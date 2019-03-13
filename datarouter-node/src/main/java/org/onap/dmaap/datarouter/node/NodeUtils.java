@@ -26,6 +26,8 @@ package org.onap.dmaap.datarouter.node;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -37,6 +39,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.zip.GZIPInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
@@ -62,7 +65,7 @@ public class NodeUtils {
     /**
      * Base64 encode a byte array
      *
-     * @param raw The bytes to be encoded
+     * @param  raw The bytes to be encoded
      * @return The encoded string
      */
     public static String base64Encode(byte[] raw) {
@@ -284,6 +287,23 @@ public class NodeUtils {
             response.sendError(errorCode);
         } catch (IOException ioe) {
             intlogger.error("IOException" + ioe.getMessage());
+        }
+    }
+
+    /**
+     * Method to check to see if file is of type gzip
+     *
+     * @param   file The name of the file to be checked
+     * @return  True if the file is of type gzip
+     */
+    public static boolean isFiletypeGzip(File file){
+        try(FileInputStream fileInputStream = new FileInputStream(file);
+            GZIPInputStream gzip = new GZIPInputStream(fileInputStream)) {
+
+            return true;
+        }catch (IOException e){
+            nodeUtilsLogger.error("NODE0403 " + file.toString() + " Not in gzip(gz) format: " + e.toString() + e);
+            return false;
         }
     }
 
