@@ -232,6 +232,7 @@ public class NodeConfig {
         private boolean metaonly;
         private boolean use100;
         private boolean privilegedSubscriber;
+        private boolean decompress;
 
         /**
          * Construct a subscription configuration entry
@@ -245,9 +246,10 @@ public class NodeConfig {
          * @param metaonly Is this a meta data only subscription?
          * @param use100 Should we send Expect: 100-continue?
          * @param privilegedSubscriber Can we wait to receive a delete file call before deleting file
+         * @param decompress To see if the they want there information compressed or decompressed
          */
         public ProvSubscription(String subid, String feedid, String url, String authuser, String credentials,
-                boolean metaonly, boolean use100, boolean privilegedSubscriber) {
+                boolean metaonly, boolean use100, boolean privilegedSubscriber, boolean decompress) {
             this.subid = subid;
             this.feedid = feedid;
             this.url = url;
@@ -256,6 +258,7 @@ public class NodeConfig {
             this.metaonly = metaonly;
             this.use100 = use100;
             this.privilegedSubscriber = privilegedSubscriber;
+            this.decompress = decompress;
         }
 
         /**
@@ -312,6 +315,13 @@ public class NodeConfig {
          */
         public boolean isPrivilegedSubscriber() {
             return (privilegedSubscriber);
+        }
+
+        /**
+         * Should i decompress the file before sending it on
+         */
+        public boolean isDecompress() {
+            return (decompress);
         }
     }
 
@@ -506,7 +516,7 @@ public class NodeConfig {
             }
             String auth = NodeUtils.getNodeAuthHdr(cn, nodeauthkey);
             DestInfo di = new DestInfo("n:" + cn, spooldir + "/n/" + cn, null, "n2n-" + cn,
-                    "https://" + cn + ":" + port + "/internal/publish", cn, myauth, false, true, false);
+                    "https://" + cn + ":" + port + "/internal/publish", cn, myauth, false, true, false, false);
             (new File(di.getSpool())).mkdirs();
             destInfos.add(di);
             nodeinfo.put(cn, di);

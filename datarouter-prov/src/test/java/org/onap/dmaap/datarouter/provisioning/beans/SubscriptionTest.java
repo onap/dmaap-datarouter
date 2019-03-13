@@ -64,6 +64,7 @@ public class SubscriptionTest {
         subscription.setSuspended(false);
         subscription.setPrivilegedSubscriber(false);
         subscription.setLinks(subLinks);
+        subscription.setDecompress(false);
 
         Assert.assertEquals(2, subscription.getGroupid());
         Assert.assertEquals(subDelivery, subscription.getDelivery());
@@ -71,5 +72,6 @@ public class SubscriptionTest {
         Assert.assertFalse(subscription.isMetadataOnly());
         Assert.assertFalse(subscription.isSuspended());
         Assert.assertFalse(subscription.isPrivilegedSubscriber());
+        Assert.assertFalse(subscription.isDecompress());
     }
 }

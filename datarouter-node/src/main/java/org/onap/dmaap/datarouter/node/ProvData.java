@@ -174,7 +174,8 @@ public class ProvData {
                     boolean monly = jsub.getBoolean("metadataOnly");
                     boolean use100 = jdel.getBoolean("use100");
                     boolean privilegedSubscriber = jsub.getBoolean("privilegedSubscriber");
-                    psv.add(new NodeConfig.ProvSubscription(sid, fid, delurl, id, NodeUtils.getAuthHdr(id, password), monly, use100, privilegedSubscriber));
+                    boolean decompress = jsub.getBoolean("decompress");
+                    psv.add(new NodeConfig.ProvSubscription(sid, fid, delurl, id, NodeUtils.getAuthHdr(id, password), monly, use100, privilegedSubscriber, decompress));
                 }
             }
             JSONObject jparams = jcfg.optJSONObject("parameters");

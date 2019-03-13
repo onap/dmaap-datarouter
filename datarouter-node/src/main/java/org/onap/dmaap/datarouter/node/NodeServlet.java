@@ -24,8 +24,6 @@
 
 package org.onap.dmaap.datarouter.node;
 
-import static org.onap.dmaap.datarouter.node.NodeUtils.sendResponseError;
-
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.io.File;
@@ -47,6 +45,8 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 import org.slf4j.MDC;
+
+import static org.onap.dmaap.datarouter.node.NodeUtils.*;
 
 /**
  * Servlet for handling all http and https requests to the data router node
@@ -299,6 +299,7 @@ public class NodeServlet extends HttpServlet {
             String ctype = null;
             boolean hasRequestIdHeader = false;
             boolean hasInvocationIdHeader = false;
+            String compression = null;
             while (hnames.hasMoreElements()) {
                 String hn = (String) hnames.nextElement();
                 String hnlc = hn.toLowerCase();
@@ -312,6 +313,7 @@ public class NodeServlet extends HttpServlet {
                     Enumeration hvals = req.getHeaders(hn);
                     while (hvals.hasMoreElements()) {
                         String hv = (String) hvals.nextElement();
+                        logger.info("hnlc: "+hnlc+" hv: "+hv);
                         if ("content-type".equals(hnlc)) {
                             ctype = hv;
                         }
@@ -338,6 +340,10 @@ public class NodeServlet extends HttpServlet {
                                 eelflogger.info(EelfMsgs.EXIT);
                                 return;
                             }
+                        }
+                        if ("compression".equals(hnlc)){
+                            logger.info("NODE ouch: hnlc: "+hnlc+" hv: "+hv);
+                            compression = hv;
                         }
                         mx.append(hn).append('\t').append(hv).append('\n');
                     }
@@ -390,6 +396,7 @@ public class NodeServlet extends HttpServlet {
                 }
                 mw.close();
                 meta.renameTo(new File(dbase + ".M"));
+
             }
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
             resp.getOutputStream().close();

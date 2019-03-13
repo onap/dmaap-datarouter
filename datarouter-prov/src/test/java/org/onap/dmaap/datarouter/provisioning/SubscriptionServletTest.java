@@ -279,6 +279,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
                 jo.put("privilegedSubscriber", true);
+                jo.put("decompress", true);
                 jo.put("delivery", JSObject);
                 jo.put("subscriber", "differentSubscriber");
                 jo.put("sync", true);
@@ -303,6 +304,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("suspend", true);
                 jo.put("privilegedSubscriber", true);
                 jo.put("delivery", JSObject);
+                jo.put("decompress", true);
                 jo.put("sync", true);
                 return jo;
             }
@@ -331,6 +333,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
                 jo.put("privilegedSubscriber", true);
+                jo.put("decompress", true);
                 jo.put("delivery", JSObject);
                 jo.put("sync", true);
                 jo.put("changeowner", true);
@@ -431,6 +434,8 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
                 jo.put("delivery", JSObject);
+                jo.put("privilegedSubscriber", false);
+                jo.put("decompress", false);
                 jo.put("failed", false);
                 return jo;
             }
@@ -504,6 +509,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setMetadataOnly(false);
         subscription.setSuspended(false);
         subscription.setPrivilegedSubscriber(false);
+        subscription.setDecompress(false);
         subscription.doInsert(db.getConnection());
     }
 
@@ -518,6 +524,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setMetadataOnly(false);
         subscription.setSuspended(false);
         subscription.setPrivilegedSubscriber(false);
+        subscription.setDecompress(false);
         subscription.changeOwnerShip();
         subscription.doUpdate(db.getConnection());
     }
