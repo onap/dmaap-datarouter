@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "76622ce7_c4c16cdb",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-13T09:40:00Z",
+      "side": 1,
+      "message": "There\u0027s actually no need for the try/catch block if you just remove this exception that doesn\u0027t need to be thrown",
+      "range": {
+        "startLine": 149,
+        "startChar": 76,
+        "endLine": 149,
+        "endChar": 99
+      },
+      "revId": "8376c80d80c04c8eac4c32afe4fa3adff50822cb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
