@@ -24,8 +24,6 @@
 
 package org.onap.dmaap.datarouter.node;
 
-import static org.onap.dmaap.datarouter.node.NodeUtils.sendResponseError;
-
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.io.File;
@@ -47,6 +45,8 @@ import org.apache.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 import org.slf4j.MDC;
+
+import static org.onap.dmaap.datarouter.node.NodeUtils.*;
 
 /**
  * Servlet for handling all http and https requests to the data router node
@@ -390,6 +390,7 @@ public class NodeServlet extends HttpServlet {
                 }
                 mw.close();
                 meta.renameTo(new File(dbase + ".M"));
+
             }
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
             resp.getOutputStream().close();

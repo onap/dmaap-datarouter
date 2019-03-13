@@ -105,7 +105,7 @@ public class LogManager extends TimerTask {
         public Uploader() {
             dq = new DeliveryQueue(this,
                 new DestInfo("LogUpload", uploaddir, null, null, null, config.getMyName(), config.getMyAuth(), false,
-                    false, false));
+                    false, false, false));
             setDaemon(true);
             setName("Log Uploader");
             start();

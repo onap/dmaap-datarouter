@@ -69,6 +69,7 @@ public class Subscription extends Syncable {
     private Date lastMod;
     private Date createdDate;
     private boolean privilegedSubscriber;
+    private boolean decompress;
 
     public static Subscription getSubscriptionMatching(Subscription sub) {
         SubDelivery deli = sub.getDelivery();
@@ -202,6 +203,7 @@ public class Subscription extends Syncable {
         this.lastMod = new Date();
         this.createdDate = new Date();
         this.privilegedSubscriber = false;
+        this.decompress = false;
     }
 
     public Subscription(ResultSet rs) throws SQLException {
@@ -217,6 +219,7 @@ public class Subscription extends Syncable {
         this.lastMod = rs.getDate("LAST_MOD");
         this.createdDate = rs.getDate("CREATED_DATE");
         this.privilegedSubscriber = rs.getBoolean("PRIVILEGED_SUBSCRIBER");
+        this.decompress  = rs.getBoolean("DECOMPRESS");
     }
 
     public Subscription(JSONObject jo) throws InvalidObjectException {
@@ -253,6 +256,7 @@ public class Subscription extends Syncable {
             this.metadataOnly = jo.getBoolean("metadataOnly");
             this.suspended = jo.optBoolean("suspend", false);
             this.privilegedSubscriber = jo.optBoolean("privilegedSubscriber", false);
+            this.decompress = jo.optBoolean("decompress", false);
             this.subscriber = jo.optString("subscriber", "");
             JSONObject jol = jo.optJSONObject("links");
             this.links = (jol == null) ? (new SubLinks()) : (new SubLinks(jol));
@@ -355,6 +359,14 @@ public class Subscription extends Syncable {
         this.links = links;
     }
 
+    public boolean isDecompress() {
+        return decompress;
+    }
+
+    public void setDecompress(boolean decompress) {
+        this.decompress = decompress;
+    }
+
     @Override
     public JSONObject asJSONObject() {
         JSONObject jo = new JSONObject();
@@ -369,6 +381,7 @@ public class Subscription extends Syncable {
         jo.put(LAST_MOD_KEY, lastMod.getTime());
         jo.put(CREATED_DATE, createdDate.getTime());
         jo.put("privilegedSubscriber", privilegedSubscriber);
+        jo.put("decompress", decompress);
         return jo;
     }
 
@@ -406,7 +419,7 @@ public class Subscription extends Syncable {
             }
 
             // Create the SUBSCRIPTIONS row
-            String sql = "insert into SUBSCRIPTIONS (SUBID, FEEDID, DELIVERY_URL, DELIVERY_USER, DELIVERY_PASSWORD, DELIVERY_USE100, METADATA_ONLY, SUBSCRIBER, SUSPENDED, GROUPID, PRIVILEGED_SUBSCRIBER) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "insert into SUBSCRIPTIONS (SUBID, FEEDID, DELIVERY_URL, DELIVERY_USER, DELIVERY_PASSWORD, DELIVERY_USE100, METADATA_ONLY, SUBSCRIBER, SUSPENDED, GROUPID, PRIVILEGED_SUBSCRIBER, DECOMPRESS) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             ps = c.prepareStatement(sql, new String[]{SUBID_COL});
             ps.setInt(1, subid);
             ps.setInt(2, feedid);
@@ -419,6 +432,7 @@ public class Subscription extends Syncable {
             ps.setBoolean(9, isSuspended());
             ps.setInt(10, groupid); //New field is added - Groups feature Rally:US708115 - 1610
             ps.setBoolean(11, isPrivilegedSubscriber());
+            ps.setBoolean(12, isDecompress());
             ps.execute();
             ps.close();
             // Update the row to set the URLs
@@ -449,7 +463,7 @@ public class Subscription extends Syncable {
         boolean rv = true;
         PreparedStatement ps = null;
         try {
-            String sql = "update SUBSCRIPTIONS set DELIVERY_URL = ?, DELIVERY_USER = ?, DELIVERY_PASSWORD = ?, DELIVERY_USE100 = ?, METADATA_ONLY = ?, SUSPENDED = ?, GROUPID = ?, PRIVILEGED_SUBSCRIBER = ? where SUBID = ?";
+            String sql = "update SUBSCRIPTIONS set DELIVERY_URL = ?, DELIVERY_USER = ?, DELIVERY_PASSWORD = ?, DELIVERY_USE100 = ?, METADATA_ONLY = ?, SUSPENDED = ?, GROUPID = ?, PRIVILEGED_SUBSCRIBER = ?, DECOMPRESS = ? where SUBID = ?";
             ps = c.prepareStatement(sql);
             ps.setString(1, delivery.getUrl());
             ps.setString(2, delivery.getUser());
@@ -459,7 +473,8 @@ public class Subscription extends Syncable {
             ps.setInt(6, suspended ? 1 : 0);
             ps.setInt(7, groupid); //New field is added - Groups feature Rally:US708115 - 1610
             ps.setInt(8, privilegedSubscriber ? 1 : 0);
-            ps.setInt(9, subid);
+            ps.setInt(9, decompress ? 1 : 0);
+            ps.setInt(10, subid);
             ps.executeUpdate();
         } catch (SQLException e) {
             rv = false;
