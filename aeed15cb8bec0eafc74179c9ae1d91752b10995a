@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9feadcfa_6da2e317",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-14T11:39:32Z",
+      "side": 1,
+      "message": "Not sure what the right code style is but we have finally on the same line as the bracket everywhere else in the code base so might be best to stick to that. Same for the others above",
+      "range": {
+        "startLine": 122,
+        "startChar": 8,
+        "endLine": 123,
+        "endChar": 7
+      },
+      "revId": "aeed15cb8bec0eafc74179c9ae1d91752b10995a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
