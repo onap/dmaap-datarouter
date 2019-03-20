@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "128162f0_56fc5a2f",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-03-20T10:05:14Z",
+      "side": 1,
+      "message": "Can we get this changed to 2.0.2-SNAPSHOT???",
+      "range": {
+        "startLine": 29,
+        "startChar": 17,
+        "endLine": 29,
+        "endChar": 31
+      },
+      "revId": "79912d70a563abeb6b7420db480b46d72ca402dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f5773184_5878e9cb",
+        "filename": "datarouter-prov/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-03-20T10:05:14Z",
+      "side": 1,
+      "message": "Can we get this changed to 2.0.2-SNAPSHOT",
+      "range": {
+        "startLine": 29,
+        "startChar": 17,
+        "endLine": 29,
+        "endChar": 31
+      },
+      "revId": "79912d70a563abeb6b7420db480b46d72ca402dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2234869a_4228b573",
+        "filename": "datarouter-subscriber/pom.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-03-20T10:05:14Z",
+      "side": 1,
+      "message": "Can we get this changed to 2.0.2-SNAPSHOT",
+      "range": {
+        "startLine": 29,
+        "startChar": 17,
+        "endLine": 29,
+        "endChar": 31
+      },
+      "revId": "79912d70a563abeb6b7420db480b46d72ca402dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
