@@ -24,68 +24,42 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
-import static com.att.eelf.configuration.Configuration.MDC_SERVER_FQDN;
-
-import static com.att.eelf.configuration.Configuration.MDC_SERVER_IP_ADDRESS;
-import static com.att.eelf.configuration.Configuration.MDC_SERVICE_NAME;
-import static com.att.eelf.configuration.Configuration.MDC_KEY_REQUEST_ID;
-
-
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.security.cert.X509Certificate;
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.authz.impl.ProvAuthorizer;
 import org.onap.dmaap.datarouter.authz.impl.ProvDataProvider;
-import org.onap.dmaap.datarouter.provisioning.beans.Deleteable;
-import org.onap.dmaap.datarouter.provisioning.beans.Feed;
-import org.onap.dmaap.datarouter.provisioning.beans.Group;
-import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
-import org.onap.dmaap.datarouter.provisioning.beans.NodeClass;
-import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
-import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
-import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
+import org.onap.dmaap.datarouter.provisioning.beans.*;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.PasswordProcessor;
 import org.onap.dmaap.datarouter.provisioning.utils.ThrottleFilter;
-import org.json.JSONException;
 import org.slf4j.MDC;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
-import java.util.regex.Pattern;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
+import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.security.GeneralSecurityException;
+import java.security.cert.X509Certificate;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.regex.Pattern;
+
+import static com.att.eelf.configuration.Configuration.*;
 
 /**
  * This is the base class for all Servlets in the provisioning code. It provides standard constants and some common
@@ -98,6 +72,8 @@ import javax.mail.internet.MimeMultipart;
 public class BaseServlet extends HttpServlet implements ProvDataProvider {
 
     public static final String BEHALF_HEADER = "X-DMAAP-DR-ON-BEHALF-OF";
+    public static final String EXCLUDE_AAF_HEADER = "X-EXCLUDE-AAF";
+
     static final String FEED_BASECONTENT_TYPE = "application/vnd.dmaap-dr.feed";
     public static final String FEED_CONTENT_TYPE = "application/vnd.dmaap-dr.feed; version=2.0";
     public static final String FEEDFULL_CONTENT_TYPE = "application/vnd.dmaap-dr.feed-full; version=2.0";
@@ -110,7 +86,9 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
 
     //Adding groups functionality, ...1610
     static final String GROUP_BASECONTENT_TYPE = "application/vnd.dmaap-dr.group";
-    static final String GROUPFULL_CONTENT_TYPE = "application/vnd.dmaap-dr.group-full; version=2.0";
+    static final String GROUP_CONTENT_TYPE = "application/vnd.dmaap-dr.group; version=2.0";
+    public static final String GROUPFULL_CONTENT_TYPE = "application/vnd.dmaap-dr.group-full; version=2.0";
+    public static final String GROUPLIST_CONTENT_TYPE = "application/vnd.dmaap-dr.fegrouped-list; version=1.0";
 
 
     public static final String LOGLIST_CONTENT_TYPE = "application/vnd.dmaap-dr.log-list; version=1.0";
@@ -173,6 +151,10 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     private static String[] nodes = new String[0];
     /**
+     * [DATARTR-27] Poke all the DR nodes : Array of nodes names and/or FQDNs
+     */
+    private static String[] drnodes = new String[0];
+    /**
      * Array of node IP addresses
      */
     private static InetAddress[] nodeAddresses = new InetAddress[0];
@@ -196,10 +178,10 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * The current number of subscriptions in the system
      */
     static int activeSubs = 0;
-    /**
-     * The domain used to generate a FQDN from the "bare" node names
-     */
+
+    /** The domain used to generate a FQDN from the "bare" node names */
     private static String provDomain = "web.att.com";
+
     /**
      * The standard FQDN of the provisioning server in this Data Router ecosystem
      */
@@ -210,7 +192,8 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     private static String activeProvName = "feeds-drtr.web.att.com";
 
-    private static String staticRoutingNodes = STATIC_ROUTING_NODES; //Adding new param for static Routing - Rally:US664862-1610
+    //Adding new param for static Routing - Rally:US664862-1610
+    private static String staticRoutingNodes = STATIC_ROUTING_NODES;
 
     /**
      * This logger is used to log provisioning events
@@ -240,6 +223,9 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     //DMAAP-597 (Tech Dept) REST request source IP auth relaxation to accommodate OOM kubernetes deploy
     private static String isAddressAuthEnabled = (new DB()).getProperties()
         .getProperty("org.onap.dmaap.datarouter.provserver.isaddressauthenabled", "false");
+
+    static String isCadiEnabled = (new DB()).getProperties()
+            .getProperty("org.onap.dmaap.datarouter.provserver.cadi.enabled", "false");
 
     /**
      * Initialize data common to all the provisioning server servlets.
@@ -277,7 +263,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         }
     }
 
-    int getIdFromPath(HttpServletRequest req) {
+    public static int getIdFromPath(HttpServletRequest req) {
         String path = req.getPathInfo();
         if (path == null || path.length() < 2) {
             return -1;
@@ -309,6 +295,36 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     }
 
     /**
+     * This method encrypt/decrypt the key in the JSON passed by user request inside the authorisation header object in request before logging the JSON.
+     *
+     * @param jo- the JSON passed in http request.
+     * @param maskKey- the key to be masked in the JSON passed.
+     * @param action- whether to mask the key or unmask it in a JSON passed.
+     * @return the JSONObject, or null if the stream cannot be parsed.
+     */
+    public static JSONObject maskJSON(JSONObject jo, String maskKey, boolean action)  {
+        if(!jo.isNull("authorization")) {
+            JSONObject j2 = jo.getJSONObject("authorization");
+            JSONArray ja = j2.getJSONArray("endpoint_ids");
+            for (int i = 0; i < ja.length(); i++) {
+                if((!ja.getJSONObject(i).isNull(maskKey))) {
+                    String password = ja.getJSONObject(i).get(maskKey).toString();
+                    try {
+                        if(action) {
+                            ja.getJSONObject(i).put(maskKey, PasswordProcessor.encrypt(password));
+                        } else {
+                            ja.getJSONObject(i).put(maskKey, PasswordProcessor.decrypt(password));
+                        }
+                    } catch (JSONException | GeneralSecurityException e) {
+                        intlogger.info("Error reading JSON while masking: "+e);
+                    }
+                }
+            }
+        }
+        return jo;
+    }
+
+    /**
      * Check if the remote host is authorized to perform provisioning. Is the request secure? Is it coming from an
      * authorized IP address or network (configured via PROV_AUTH_ADDRESSES)? Does it have a valid client certificate
      * (configured via PROV_AUTH_SUBJECTS)?
@@ -324,7 +340,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         if (requireSecure && !request.isSecure()) {
             return "Request must be made over an HTTPS connection.";
         }
-
         // Is remote IP authorized?
         String remote = request.getRemoteAddr();
         try {
@@ -337,12 +352,12 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 return "Unauthorized address: " + remote;
             }
         } catch (UnknownHostException e) {
+            intlogger.error("PROV0051 BaseServlet.isAuthorizedForProvisioning: ", e);
             return "Unauthorized address: " + remote;
         }
-
         // Does remote have a valid certificate?
         if (requireCert) {
-            X509Certificate certs[] = (X509Certificate[]) request.getAttribute(CERT_ATTRIBUTE);
+            X509Certificate[] certs = (X509Certificate[]) request.getAttribute(CERT_ATTRIBUTE);
             if (certs == null || certs.length == 0) {
                 return "Client certificate is missing.";
             }
@@ -353,7 +368,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 return "No authorized certificate found.";
             }
         }
-
         // No problems!
         return null;
     }
@@ -365,7 +379,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * @return true iff authorized
      */
     boolean isAuthorizedForInternal(HttpServletRequest request) {
-
         try {
             if (!Boolean.parseBoolean(isAddressAuthEnabled)) {
                 return true;
@@ -388,7 +401,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 return true;
             }
         } catch (UnknownHostException e) {
-            // ignore
+            intlogger.error("PROV0052 BaseServlet.isAuthorizedForInternal: ", e);
         }
         return false;
     }
@@ -432,6 +445,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 }
             }
         } catch (UnknownHostException e) {
+            intlogger.error("PROV0053 BaseServlet.addressMatchesNetwork: ", e);
             return false;
         }
         return true;
@@ -441,7 +455,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * Something has changed in the provisioning data. Start the timers that will cause the pre-packaged JSON string to
      * be regenerated, and cause nodes and the other provisioning server to be notified.
      */
-    public static void provisioningDataChanged() {
+    static void provisioningDataChanged() {
         long now = System.currentTimeMillis();
         Poker p = Poker.getPoker();
         p.setTimers(now + (pokeTimer1 * 1000L), now + (pokeTimer2 * 1000L));
@@ -450,7 +464,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     /**
      * Something in the parameters has changed, reload all parameters from the DB.
      */
-    public static void provisioningParametersChanged() {
+    static void provisioningParametersChanged() {
         Map<String, String> map = Parameters.getParameters();
         requireSecure = getBoolean(map, Parameters.PROV_REQUIRE_SECURE);
         requireCert = getBoolean(map, Parameters.PROV_REQUIRE_CERT);
@@ -461,11 +475,12 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         maxSubs = getInt(map, Parameters.PROV_MAXSUB_COUNT, DEFAULT_MAX_SUBS);
         pokeTimer1 = getInt(map, Parameters.PROV_POKETIMER1, DEFAULT_POKETIMER1);
         pokeTimer2 = getInt(map, Parameters.PROV_POKETIMER2, DEFAULT_POKETIMER2);
+        /**
+         * The domain used to generate a FQDN from the "bare" node names
+         */
         provDomain = getString(map, Parameters.PROV_DOMAIN, DEFAULT_DOMAIN);
         provName = getString(map, Parameters.PROV_NAME, DEFAULT_PROVSRVR_NAME);
         activeProvName = getString(map, Parameters.PROV_ACTIVE_NAME, provName);
-        staticRoutingNodes = getString(map, Parameters.STATIC_ROUTING_NODES,
-            ""); //Adding new param for static Routing - Rally:US664862-1610
         initialActivePod = getString(map, Parameters.ACTIVE_POD, "");
         initialStandbyPod = getString(map, Parameters.STANDBY_POD, "");
         staticRoutingNodes = getString(map, Parameters.STATIC_ROUTING_NODES,
@@ -491,6 +506,9 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             }
         }
 
+        //[DATARTR-27] Poke all the DR nodes: assigning DR Nodes
+        drnodes = nodes.clone();
+
         //Reset Nodes arr after - removing static routing Nodes, Rally Userstory - US664862 .
         List<String> filterNodes = new ArrayList<>();
         for (String node : nodes) {
@@ -498,7 +516,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 filterNodes.add(node);
             }
         }
-        nodes = filterNodes.toArray(new String[filterNodes.size()]);
+        nodes = filterNodes.toArray(new String[0]);
 
         nodeAddresses = na;
         NodeClass.setNodes(nodes);        // update NODES table
@@ -535,17 +553,11 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     private void loadMailProperties() {
         if (mailprops == null) {
             mailprops = new Properties();
-            InputStream inStream = getClass().getClassLoader().getResourceAsStream(MAILCONFIG_FILE);
-            try {
+            try (InputStream inStream = getClass().getClassLoader().getResourceAsStream(MAILCONFIG_FILE)) {
                 mailprops.load(inStream);
             } catch (IOException e) {
                 intlogger.fatal("PROV9003 Opening properties: " + e.getMessage());
                 System.exit(1);
-            } finally {
-                try {
-                    inStream.close();
-                } catch (IOException e) {
-                }
             }
         }
     }
@@ -612,8 +624,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             Transport.send(msg);
             intlogger.info("HTTPS relaxation mail is sent to - : " + email);
 
-        } catch (AddressException e) {
-            intlogger.error("Invalid email address, unable to send https relaxation mail to - : " + email);
         } catch (MessagingException e) {
             intlogger.error("Invalid email address, unable to send https relaxation mail to - : " + email);
         }
@@ -634,6 +644,14 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     public static String[] getNodes() {
         return nodes;
+    }
+
+    /**[DATARTR-27] Poke all the DR nodes
+     * Get an array of all node names in the DR network.
+     * @return an array of Strings
+     */
+    public static String[] getDRNodes() {
+        return drnodes;
     }
 
     /**
@@ -981,7 +999,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         setMDC(req, "X-InvocationID", "InvocationId");
     }
 
-    void setMDC(HttpServletRequest req, String headerName, String keyName) {
+    private void setMDC(HttpServletRequest req, String headerName, String keyName) {
         String mdcId = req.getHeader(headerName);
         if (StringUtils.isBlank(mdcId)) {
             mdcId = UUID.randomUUID().toString();
@@ -1003,5 +1021,75 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             intlogger.error("Exception: " + e.getMessage());
         }
 
+    }
+    /*
+     * AAF changes: TDP EPIC US# 307413
+     * @Method - getFeedPermission - Forming permission string for feed part to check AAF access in CADI Framework
+     * @Params - aaf_instance Passing aaf_instance as it's used in permission string
+     * @Params - useraction Passing integer values to set different actions in permission string
+     */
+    String getFeedPermission(String aaf_instance, int useraction) {
+        try {
+            Properties props = (new DB()).getProperties();
+            String type = props.getProperty("org.onap.dmaap.datarouter.provserver.aaf.feed.type", "org.onap.dmaap-dr.feed");
+            String action  = null;
+            if (useraction == 0)
+                action="create";
+            else if (useraction == 1)
+                action="edit";
+            else if (useraction == 2)
+                action="delete";
+            else if (useraction == 3)
+                action="publish";
+            else if (useraction == 4)
+                action="suspend";
+            else if (useraction == 5)
+                action="restore";
+            if (aaf_instance == null || aaf_instance.equals("")) {
+                aaf_instance = props.getProperty("org.onap.dmaap.datarouter.provserver.aaf.instance", "org.onap.dmaap-dr.NoInstanceDefined");
+            }
+            return type + "|" + aaf_instance + "|" + action;
+        } catch (Exception e) {
+            intlogger.error("PROV7005 BaseServlet.getFeedPermission: ", e);
+        }
+        return null;
+    }
+    /*
+     * AAF changes: TDP EPIC US# 307413
+     * @Method - getSubscriberPermission - Forming permission string for subscription part to check AAF access in CADI Framework
+     * @Params - aaf_instance Passing aaf_instance as it's used in permission string
+     * @Params - useraction Passing integer values to set different actions in permission string
+     */
+    String getSubscriberPermission(String aaf_instance, int useraction) {
+        try {
+            Properties props = (new DB()).getProperties();
+            String type  = props.getProperty("org.onap.dmaap.datarouter.provserver.aaf.sub.type", "org.onap.dmaap-dr.sub");
+            String action  = null;
+            if (useraction == 0){
+                action ="subscribe";
+                type = props.getProperty("org.onap.dmaap.datarouter.provserver.aaf.feed.type", "org.onap.dmaap-dr.feed");
+            }
+            else if (useraction == 1)
+                action="edit";
+            else if (useraction == 2)
+                action="delete";
+            else if (useraction == 3)
+                action="restore";
+            else if (useraction == 4)
+                action="suspend";
+            else if (useraction == 5)
+                action="publish";
+            else if (useraction == 6){ //New AAF Requirement to add subscriber by publisher, on publisher approval only
+                action="approveSub";
+                type = props.getProperty("org.onap.dmaap.datarouter.provserver.aaf.feed.type", "org.onap.dmaap-dr.feed");
+            }
+            if (aaf_instance == null || aaf_instance.equals("")) {
+                aaf_instance = props.getProperty("org.onap.dmaap.datarouter.provserver.aaf.instance", "org.onap.dmaap-dr.NoInstanceDefined");
+            }
+            return type + "|" + aaf_instance + "|" + action;
+        } catch (Exception e) {
+            intlogger.error("PROV7005 BaseServlet.getSubscriberPermission: ", e);
+        }
+        return null;
     }
 }

@@ -420,7 +420,7 @@ Request Parameters:
 | delivery               | Address and credentials for     |     Body         |   Object   |              |     Y       |                                      |
 |                        | delivery                        |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| follow_redirect        | Set to true if feed redirection |     Body         |   Boolean  |              |     Y       | * true                               |
+| followRedirect        | Set to true if feed redirection |     Body         |   Boolean  |              |     Y       | * true                               |
 |                        | is expected                     |                  |            |              |             | * false                              |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 | metadata_only          | Set to true if subscription is  |     Body         |   Boolean  |              |     Y       | * true                               |
@@ -534,7 +534,7 @@ Request Parameters:
 | delivery               | Address and credentials for     |     Body         |   Object   |              |     Y       |                                      |
 |                        | delivery                        |                  |            |              |             |                                      |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
-| follow_redirect        | Set to true if feed redirection |     Body         |   Boolean  |              |     Y       | * true                               |
+| followRedirect        | Set to true if feed redirection |     Body         |   Boolean  |              |     Y       | * true                               |
 |                        | is expected                     |                  |            |              |             | * false                              |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+--------------------------------------+
 | metadata_only          | Set to true if subscription is  |     Body         |   Boolean  |              |     Y       | * true                               |

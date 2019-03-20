@@ -24,22 +24,21 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
-import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.eelf.EelfMsgs;
+import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.JSONUtilities;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.util.List;
 
 import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.sendResponseError;
 
@@ -55,7 +54,7 @@ public class DRFeedsServlet extends ProxyServlet {
 
     //Adding EELF Logger Rally:US664892
     private static EELFLogger eelflogger = EELFManager.getInstance()
-        .getLogger(DRFeedsServlet.class);
+            .getLogger(DRFeedsServlet.class);
 
     /**
      * DELETE on the &lt;drFeedsURL&gt; -- not supported.
@@ -109,8 +108,8 @@ public class DRFeedsServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
-            String path = req
-                    .getRequestURI(); // Note: I think this should be getPathInfo(), but that doesn't work (Jetty bug?)
+            // Note: I think this should be getPathInfo(), but that doesn't work (Jetty bug?)
+            String path = req.getRequestURI();
             if (path != null && !path.equals("/")) {
                 message = "Bad URL.";
                 elr.setMessage(message);
@@ -236,8 +235,8 @@ public class DRFeedsServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
-            String path = req
-                    .getRequestURI(); // Note: I think this should be getPathInfo(), but that doesn't work (Jetty bug?)
+            // Note: I think this should be getPathInfo(), but that doesn't work (Jetty bug?)
+            String path = req.getRequestURI();
             if (path != null && !path.equals("/")) {
                 message = "Bad URL.";
                 elr.setMessage(message);
@@ -255,16 +254,6 @@ public class DRFeedsServlet extends ProxyServlet {
                 elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
                 eventlogger.info(elr);
                 sendResponseError(resp, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message, eventlogger);
-                return;
-            }
-            // Check with the Authorizer
-            AuthorizationResponse aresp = authz.decide(req);
-            if (!aresp.isAuthorized()) {
-                message = "Policy Engine disallows access.";
-                elr.setMessage(message);
-                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
-                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                 return;
             }
             JSONObject jo = getJSONfromInput(req);
@@ -288,7 +277,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_CONFLICT, message, eventlogger);
                 return;
             }
-            Feed feed = null;
+            Feed feed;
             try {
                 feed = new Feed(jo);
             } catch (InvalidObjectException e) {
@@ -299,6 +288,60 @@ public class DRFeedsServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
+
+            /*
+             * START - AAF changes
+             * TDP EPIC US# 307413
+             * CADI code - No legacy user check as all new users will be AAF users
+             */
+            String aafInstance = feed.getAafInstance();
+            if (Boolean.parseBoolean(isCadiEnabled)) {
+                if ((aafInstance == null || aafInstance.equals("") || (aafInstance.equalsIgnoreCase("legacy")) && req.getHeader(EXCLUDE_AAF_HEADER).equalsIgnoreCase("true"))) {
+                    // Check with the Authorizer
+                    AuthorizationResponse aresp = authz.decide(req);
+                    if (!aresp.isAuthorized()) {
+                        message = "Policy Engine disallows access.";
+                        elr.setMessage(message);
+                        elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                        eventlogger.info(elr);
+                        sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                        return;
+                    }
+                } else {
+                    if (req.getHeader(EXCLUDE_AAF_HEADER).equalsIgnoreCase("true")) {
+                        message = "DRFeedsServlet.doPost() -Invalid request exclude_AAF should not be true if passing AAF_Instance value= " + aafInstance;
+                        elr.setMessage(message);
+                        elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                        eventlogger.info(elr);
+                        sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                        return;
+                    }
+                    String permission = getFeedPermission(aafInstance, 0);
+                    eventlogger.info("DRFeedsServlet.doPost().. Permission String - " + permission);
+                    if (!req.isUserInRole(permission)) {
+                        message = "AAF disallows access to permission - " + permission;
+                        elr.setMessage(message);
+                        elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                        eventlogger.info(elr);
+                        sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                        return;
+                    }
+                }
+            } else {
+                AuthorizationResponse aresp = authz.decide(req);
+                if (!aresp.isAuthorized()) {
+                    message = "Policy Engine disallows access.";
+                    elr.setMessage(message);
+                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                    eventlogger.info(elr);
+                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                    return;
+                }
+            }
+            /*
+             * END - AAF changes
+             */
+
             feed.setPublisher(bhdr);    // set from X-DMAAP-DR-ON-BEHALF-OF header
 
             // Check if this feed already exists

@@ -135,7 +135,17 @@ public class ProvData {
                     String fid = gvas(jfeed, "feedid");
                     String fname = gvas(jfeed, "name");
                     String fver = gvas(jfeed, "version");
-                    pfv.add(new NodeConfig.ProvFeed(fid, fname + "//" + fver, stat));
+                    String createdDate = gvas(jfeed, "created_date");
+                    /*
+                     * START - AAF changes
+                     * TDP EPIC US# 307413
+                     * Passing aaf_instance to ProvFeed from feeds json passed by prov to identify legacy/AAF feeds
+                     */
+                    String aaf_instance = gvas(jfeed, "aaf_instance");
+                    pfv.add(new NodeConfig.ProvFeed(fid, fname + "//" + fver, stat,createdDate, aaf_instance));
+                    /*
+                     * END - AAF changes
+                     */
                     JSONObject jauth = jfeed.optJSONObject("authorization");
                     if (jauth == null) {
                         continue;
@@ -175,7 +185,8 @@ public class ProvData {
                     boolean use100 = jdel.getBoolean("use100");
                     boolean privilegedSubscriber = jsub.getBoolean("privilegedSubscriber");
                     boolean decompress = jsub.getBoolean("decompress");
-                    psv.add(new NodeConfig.ProvSubscription(sid, fid, delurl, id, NodeUtils.getAuthHdr(id, password), monly, use100, privilegedSubscriber, decompress));
+                    boolean followRedirect = jsub.getBoolean("follow_redirect");
+                    psv.add(new NodeConfig.ProvSubscription(sid, fid, delurl, id, NodeUtils.getAuthHdr(id, password), monly, use100, privilegedSubscriber, followRedirect, decompress));
                 }
             }
             JSONObject jparams = jcfg.optJSONObject("parameters");
