@@ -26,6 +26,10 @@ package org.onap.dmaap.datarouter.node;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
+import org.apache.log4j.Logger;
+import org.onap.aaf.cadi.PropAccess;
+import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -33,8 +37,6 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.Properties;
 import java.util.Timer;
-import org.apache.log4j.Logger;
-import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 
 
 /**
@@ -95,32 +97,54 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private String eventlogsuffix;
     private String eventloginterval;
     private boolean followredirects;
+    private String [] enabledprotocols;
+    private String aafType;
+    private String aafInstance;
+    private String aafAction;
+    private String aafURL;
+    private boolean cadiEnabled;
 
 
     /**
      * Get the default node configuration manager
      */
     public static NodeConfigManager getInstance() {
-        return (base);
+        return base;
     }
 
     /**
      * Initialize the configuration of a Data Router node
      */
     private NodeConfigManager() {
-        Properties p = new Properties();
+
+        Properties drNodeProperties = new Properties();
         try {
-            p.load(new FileInputStream(System
+            logger.info("NODE0301 Loading local config file node.properties");
+            drNodeProperties.load(new FileInputStream(System
                     .getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties")));
         } catch (Exception e) {
-
             NodeUtils.setIpAndFqdnForEelf("NodeConfigManager");
             eelflogger.error(EelfMsgs.MESSAGE_PROPERTIES_LOAD_ERROR);
             logger.error("NODE0301 Unable to load local configuration file " + System
-                            .getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties"),
-                    e);
+                            .getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties"), e);
         }
-        provurl = p.getProperty("ProvisioningURL", "https://feeds-drtr.web.att.com/internal/prov");
+        provurl = drNodeProperties.getProperty("ProvisioningURL", "https://dmaap-dr-prov:8443/internal/prov");
+        /*
+         * START - AAF changes: TDP EPIC US# 307413
+         * Pull AAF settings from node.properties
+         */
+        aafType = drNodeProperties.getProperty("AAFType", "org.onap.dmaap-dr.feed");
+        aafInstance = drNodeProperties.getProperty("AAFInstance", "legacy");
+        aafAction = drNodeProperties.getProperty("AAFAction", "publish");
+        aafURL = drNodeProperties.getProperty("AafUrl", "https://aaf-onap-test.osaaf.org:8095");
+        cadiEnabled = Boolean.parseBoolean(drNodeProperties.getProperty("CadiEnabled", "false"));
+        /*
+         * END - AAF changes: TDP EPIC US# 307413
+         * Pull AAF settings from node.properties
+         */
+        //Disable and enable protocols*/
+        enabledprotocols = ((drNodeProperties.getProperty("NodeHttpsProtocols")).trim()).split("\\|");
+
         try {
             provhost = (new URL(provurl)).getHost();
         } catch (Exception e) {
@@ -130,14 +154,14 @@ public class NodeConfigManager implements DeliveryQueueHelper {
             System.exit(1);
         }
         logger.info("NODE0303 Provisioning server is " + provhost);
-        eventlogurl = p.getProperty("LogUploadURL", "https://feeds-drtr.web.att.com/internal/logs");
+        eventlogurl = drNodeProperties.getProperty("LogUploadURL", "https://feeds-drtr.web.att.com/internal/logs");
         provcheck = new IsFrom(provhost);
-        gfport = Integer.parseInt(p.getProperty("IntHttpPort", "8080"));
-        svcport = Integer.parseInt(p.getProperty("IntHttpsPort", "8443"));
-        port = Integer.parseInt(p.getProperty("ExtHttpsPort", "443"));
-        long minpfinterval = Long.parseLong(p.getProperty("MinProvFetchInterval", "10000"));
-        long minrsinterval = Long.parseLong(p.getProperty("MinRedirSaveInterval", "10000"));
-        spooldir = p.getProperty("SpoolDir", "spool");
+        gfport = Integer.parseInt(drNodeProperties.getProperty("IntHttpPort", "8080"));
+        svcport = Integer.parseInt(drNodeProperties.getProperty("IntHttpsPort", "8443"));
+        port = Integer.parseInt(drNodeProperties.getProperty("ExtHttpsPort", "443"));
+        long minpfinterval = Long.parseLong(drNodeProperties.getProperty("MinProvFetchInterval", "10000"));
+        long minrsinterval = Long.parseLong(drNodeProperties.getProperty("MinRedirSaveInterval", "10000"));
+        spooldir = drNodeProperties.getProperty("SpoolDir", "spool");
         File fdir = new File(spooldir + "/f");
         fdir.mkdirs();
         for (File junk : fdir.listFiles()) {
@@ -145,26 +169,26 @@ public class NodeConfigManager implements DeliveryQueueHelper {
                 junk.delete();
             }
         }
-        logdir = p.getProperty("LogDir", "logs");
+        logdir = drNodeProperties.getProperty("LogDir", "logs");
         (new File(logdir)).mkdirs();
-        logretention = Long.parseLong(p.getProperty("LogRetention", "30")) * 86400000L;
+        logretention = Long.parseLong(drNodeProperties.getProperty("LogRetention", "30")) * 86400000L;
         eventlogprefix = logdir + "/events";
         eventlogsuffix = ".log";
-        String redirfile = p.getProperty("RedirectionFile", "etc/redirections.dat");
-        kstype = p.getProperty("KeyStoreType", "jks");
-        ksfile = p.getProperty("KeyStoreFile", "etc/keystore");
-        kspass = p.getProperty("KeyStorePassword", "changeme");
-        kpass = p.getProperty("KeyPassword", "changeme");
-        tstype = p.getProperty("TrustStoreType", "jks");
-        tsfile = p.getProperty("TrustStoreFile");
-        tspass = p.getProperty("TrustStorePassword", "changeme");
+        String redirfile = drNodeProperties.getProperty("RedirectionFile", "etc/redirections.dat");
+        kstype = drNodeProperties.getProperty("KeyStoreType", "jks");
+        ksfile = drNodeProperties.getProperty("KeyStoreFile", "etc/keystore");
+        kspass = drNodeProperties.getProperty("KeyStorePassword", "changeme");
+        kpass = drNodeProperties.getProperty("KeyPassword", "changeme");
+        tstype = drNodeProperties.getProperty("TrustStoreType", "jks");
+        tsfile = drNodeProperties.getProperty("TrustStoreFile");
+        tspass = drNodeProperties.getProperty("TrustStorePassword", "changeme");
         if (tsfile != null && tsfile.length() > 0) {
             System.setProperty("javax.net.ssl.trustStoreType", tstype);
             System.setProperty("javax.net.ssl.trustStore", tsfile);
             System.setProperty("javax.net.ssl.trustStorePassword", tspass);
         }
-        nak = p.getProperty("NodeAuthKey", "Node123!");
-        quiesce = new File(p.getProperty("QuiesceFile", "etc/SHUTDOWN"));
+        nak = drNodeProperties.getProperty("NodeAuthKey", "Node123!");
+        quiesce = new File(drNodeProperties.getProperty("QuiesceFile", "etc/SHUTDOWN"));
         myname = NodeUtils.getCanonicalName(kstype, ksfile, kspass);
         if (myname == null) {
             NodeUtils.setIpAndFqdnForEelf("NodeConfigManager");
@@ -253,7 +277,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
 
     private void fetchconfig() {
         try {
-            System.out.println("provurl:: " + provurl);
+            logger.info("NodeConfigMan.fetchConfig: provurl:: " + provurl);
             Reader r = new InputStreamReader((new URL(provurl)).openStream());
             config = new NodeConfig(new ProvData(r), myname, spooldir, port, nak);
             localconfig();
@@ -263,6 +287,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
                 try {
                     rr.run();
                 } catch (Exception e) {
+                    logger.error("NODE0518 Exception fetchconfig: " + e);
                 }
             }
         } catch (Exception e) {
@@ -278,12 +303,12 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * fetch the provisioning data, ignore the request.  If the data has been fetched very recently (default 10
      * seconds), wait a while before fetching again.
      */
-    public synchronized void gofetch(String remoteaddr) {
-        if (provcheck.isFrom(remoteaddr)) {
-            logger.info("NODE0307 Received configuration fetch request from provisioning server " + remoteaddr);
+    public synchronized void gofetch(String remoteAddr) {
+        if (provcheck.isReachable(remoteAddr)) {
+            logger.info("NODE0307 Received configuration fetch request from provisioning server " + remoteAddr);
             pfetcher.request();
         } else {
-            logger.info("NODE0308 Received configuration fetch request from unexpected server " + remoteaddr);
+            logger.info("NODE0308 Received configuration fetch request from unexpected server " + remoteAddr);
         }
     }
 
@@ -345,6 +370,17 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
+     *	Check whether publication is allowed for AAF Feed.
+     *
+     *	@param feedid	The ID of the feed being requested
+     *	@param ip	The requesting IP address
+     *	@return	True if the IP and credentials are valid for the specified feed.
+     */
+    public String isPublishPermitted(String feedid, String ip) {
+        return(config.isPublishPermitted(feedid, ip));
+    }
+        
+    /**
      * Check who the user is given the feed ID and the offered credentials.
      *
      * @param feedid The ID of the feed specified
@@ -353,6 +389,15 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      */
     public String getAuthUser(String feedid, String credentials) {
         return (config.getAuthUser(feedid, credentials));
+    }
+
+    /**
+     * AAF changes: TDP EPIC US# 307413
+     * Check AAF_instance for feed ID in NodeConfig
+     * @param feedid The ID of the feed specified
+     */
+    public String getAafInstance(String feedid) {
+        return(config.getAafInstance(feedid));
     }
 
     /**
@@ -461,6 +506,23 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
+     *	Set up redirection on receipt of a 3XX from a target URL
+     */
+    public boolean handleRedirectionSubLevel(DeliveryTask task, DestInfo destinfo, String redirto, String fileid) {
+        fileid = "/" + fileid;
+        String subid = destinfo.getSubId();
+        String purl = destinfo.getURL();
+        if (task.getFollowRedirects() && subid != null && redirto.endsWith(fileid)) {
+            redirto = redirto.substring(0, redirto.length() - fileid.length());
+            if (!redirto.equals(purl)) {
+                rdmgr.redirect(subid, purl, redirto);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Handle unreachable target URL
      */
     public void handleUnreachable(DestInfo destinationInfo) {
@@ -527,6 +589,15 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      */
     public Target[] getTargets(String feedid) {
         return (config.getTargets(feedid));
+    }
+
+    /**
+     *	Get the creation date for a feed
+     *	@param feedid	The feed ID
+     *	@return	the timestamp of creation date of feed id passed
+     */
+    public String getCreatedDate(String feedid) {
+        return(config.getCreatedDate(feedid));
     }
 
     /**
@@ -698,6 +769,16 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
+     * Disable and enable protocols
+     * */
+    public String[] getEnabledprotocols() {
+        return enabledprotocols;
+    }
+    public void setEnabledprotocols(String[] enabledprotocols) {
+        this.enabledprotocols = enabledprotocols.clone();
+    }
+
+    /**
      * Get the spool directory for a subscription
      */
     public String getSpoolDir(String subid, String remoteaddr) {
@@ -715,5 +796,60 @@ public class NodeConfigManager implements DeliveryQueueHelper {
             logger.info("NODE0312 Received subscription reset request from unexpected server " + remoteaddr);
             return (null);
         }
+    }
+
+    public String getAafType() {
+        return aafType;
+    }
+    public void setAafType(String aafType) {
+        this.aafType = aafType;
+    }
+    public String getAafInstance() {
+        return aafInstance;
+    }
+    public void setAafInstance(String aafInstance) {
+        this.aafInstance = aafInstance;
+    }
+    public String getAafAction() {
+        return aafAction;
+    }
+    public void setAafAction(String aafAction) {
+        this.aafAction = aafAction;
+    }
+    /*
+     * Get aafURL from SWM variable
+     * */
+    public String getAafURL() {
+        return aafURL;
+    }
+    public void setAafURL(String aafURL) {
+        this.aafURL = aafURL;
+    }
+
+    public boolean getCadiEnabeld() {
+        return cadiEnabled;
+    }
+    public void setCadiEnabled(boolean cadiEnabled) {
+        this.cadiEnabled = cadiEnabled;
+    }
+
+    /**
+     * Returns pr
+     *
+     * @param aaf_instance The aaf instance
+     * @return The permissions
+     */
+    protected String getPermission(String aaf_instance) {
+        try {
+            String type = getAafType();
+            String action = getAafAction();
+            if (aaf_instance == null || aaf_instance.equals("")) {
+                aaf_instance = getAafInstance();
+            }
+            return type + "|" + aaf_instance + "|" + action;
+        } catch (Exception e) {
+            logger.error("NODE0543 NodeConfigManager.getPermission: ", e);
+        }
+        return null;
     }
 }

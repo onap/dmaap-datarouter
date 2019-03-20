@@ -107,17 +107,37 @@ public class FeedServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
                 return;
             }
-            // Check with the Authorizer
-            AuthorizationResponse aresp = authz.decide(req);
-            if (! aresp.isAuthorized()) {
-                message = "Policy Engine disallows access.";
-                elr.setMessage(message);
-                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
-                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                return;
+            /*
+             * START - AAF changes
+             * TDP EPIC US# 307413
+             * CADI code - check on permissions based on Legacy/AAF users to allow to delete/remove feed
+             */
+            String aafInstance = feed.getAafInstance();
+            if (aafInstance == null || aafInstance.equals("") || aafInstance.equalsIgnoreCase("legacy")) {
+                AuthorizationResponse aresp = authz.decide(req);
+                if (! aresp.isAuthorized()) {
+                    message = "Policy Engine disallows access.";
+                    elr.setMessage(message);
+                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                    eventlogger.info(elr);
+                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                    return;
+                }
+            } else {
+                String permission = getFeedPermission(aafInstance, 2);
+                eventlogger.info("FeedServlet.doDelete().. Permission String - " + permission);
+                if (!req.isUserInRole(permission)) {
+                    message = "AAF disallows access to permission - " + permission;
+                    elr.setMessage(message);
+                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                    eventlogger.info(elr);
+                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                    return;
+                }
             }
-
+            /*
+             * END - AAF changes
+             */
             // Delete FEED table entry (set DELETED flag)
             feed.setDeleted(true);
             if (doUpdate(feed)) {
@@ -286,7 +306,7 @@ public class FeedServlet extends ProxyServlet {
             }
             if (intlogger.isDebugEnabled())
                 intlogger.debug(jo.toString());
-            Feed feed = null;
+            Feed feed;
             try {
                 feed = new Feed(jo);
             } catch (InvalidObjectException e) {
@@ -317,24 +337,50 @@ public class FeedServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
-            if (!oldFeed.getVersion().equals(feed.getVersion())) {
-                message = "The version of the feed may not be updated.";
-                elr.setMessage(message);
-                elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
-                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
-                return;
+            //  US DSCDR-19 for DCAE if version is not null, version can't be changed
+            if ((oldFeed.getVersion() != null) && (feed.getVersion() != null)) {
+                if (!oldFeed.getVersion().equals(feed.getVersion())) {
+                    message = "The version of the feed may not be updated.";
+                    elr.setMessage(message);
+                    elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
+                    eventlogger.info(elr);
+                    sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+                    return;
+                }
             }
-            // Check with the Authorizer
-            AuthorizationResponse aresp = authz.decide(req);
-            if (! aresp.isAuthorized()) {
-                message = "Policy Engine disallows access.";
-                elr.setMessage(message);
-                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
-                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                return;
+
+            /*
+             * START - AAF changes
+             * TDP EPIC US# 307413
+             * CADI code - check on permissions based on Legacy/AAF users to allow feed edit/update/modify
+             */
+            String aafInstance = feed.getAafInstance();
+            if (aafInstance == null || aafInstance.equals("") || aafInstance.equalsIgnoreCase("legacy")) {
+                // Check with the Authorizer
+                AuthorizationResponse aresp = authz.decide(req);
+                if (!aresp.isAuthorized()) {
+                    message = "Policy Engine disallows access.";
+                    elr.setMessage(message);
+                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                    eventlogger.info(elr);
+                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                    return;
+                }
+            } else {
+                String permission = getFeedPermission(aafInstance, 1);
+                eventlogger.info("FeedServlet.doPut().. Permission String - " + permission);
+                if (!req.isUserInRole(permission)) {
+                    message = "AAF disallows access to permission - " + permission;
+                    elr.setMessage(message);
+                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                    eventlogger.info(elr);
+                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                    return;
+                }
             }
+            /*
+             * END - AAF changes
+             */
 
             // Update FEEDS table entries
             if (doUpdate(feed)) {

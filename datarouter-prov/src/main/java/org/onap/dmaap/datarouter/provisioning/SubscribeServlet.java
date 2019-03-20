@@ -128,17 +128,6 @@ public class SubscribeServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
                 return;
             }
-            // Check with the Authorizer
-            AuthorizationResponse aresp = authz.decide(req);
-            if (!aresp.isAuthorized()) {
-                message = "Policy Engine disallows access.";
-                elr.setMessage(message);
-                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
-                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                return;
-            }
-
             // Display a list of URLs
             Collection<String> list = Subscription.getSubscriptionUrlList(feedid);
             String t = JSONUtilities.createJSONArray(list);
@@ -228,17 +217,6 @@ public class SubscribeServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
                 return;
             }
-            // Check with the Authorizer
-            AuthorizationResponse aresp = authz.decide(req);
-            if (!aresp.isAuthorized()) {
-                message = "Policy Engine disallows access.";
-                elr.setMessage(message);
-                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
-                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                return;
-            }
-
             // check content type is SUB_CONTENT_TYPE, version 1.0
             ContentHeader ch = getContentHeader(req);
             String ver = ch.getAttribute("version");
@@ -272,7 +250,7 @@ public class SubscribeServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_CONFLICT, message, eventlogger);
                 return;
             }
-            Subscription sub = null;
+            Subscription sub;
             try {
                 sub = new Subscription(jo);
             } catch (InvalidObjectException e) {
@@ -286,13 +264,70 @@ public class SubscribeServlet extends ProxyServlet {
             }
             sub.setFeedid(feedid);
             sub.setSubscriber(bhdr);    // set from X-DMAAP-DR-ON-BEHALF-OF header
+            /*
+             * START - AAF changes
+             * TDP EPIC US# 307413
+             * CADI code - check on permissions based on Legacy/AAF users to allow to create/add subscription
+             */
+            String feedAafInstance = feed.getAafInstance();
+            String subAafInstance = sub.getAafInstance();
+            boolean subAafLegacyEmptyOrNull = (subAafInstance == null || subAafInstance.equals("") || subAafInstance.equalsIgnoreCase("legacy"));
 
+            // This extra check added to verify AAF feed with AAF subscriber having empty aaf instance check
+            if (feedAafInstance == null || feedAafInstance.equals("") || feedAafInstance.equalsIgnoreCase("legacy")) {
+                if (subAafLegacyEmptyOrNull) {
+                    AuthorizationResponse aresp = authz.decide(req);
+                    if (!aresp.isAuthorized()) {
+                        message = "Policy Engine disallows access";
+                        elr.setMessage(message);
+                        elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                        eventlogger.info(elr);
+                        sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                        return;
+                    }
+                } else {
+                    //If Legacy Feed and AAF instance provided in Subscriber JSON
+                    message = "AAF Subscriber can not be added to legacy Feed- " + feedid;
+                    elr.setMessage(message);
+                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                    eventlogger.info(elr);
+                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                    return;
+                }
+            } else {
+                //New AAF Requirement to add legacy subscriber to AAF Feed
+                if (subAafLegacyEmptyOrNull) {
+                    AuthorizationResponse aresp = authz.decide(req);
+                    if (!aresp.isAuthorized()) {
+                        message = "Policy Engine disallows access.";
+                        elr.setMessage(message);
+                        elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                        eventlogger.info(elr);
+                        sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                        return;
+                    }
+                } else {
+                    //New AAF Requirement to add subscriber by publisher on publisher approval only
+                    String permission = getSubscriberPermission(subAafInstance, 6);
+                    eventlogger.info("SubscribeServlet.doPost().. Permission String - " + permission);
+                    if (!req.isUserInRole(permission)) {
+                        message = "AAF disallows access to permission - " + permission;
+                        elr.setMessage(message);
+                        elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                        eventlogger.info(elr);
+                        sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                        return;
+                    }
+                }
+            }
+            /*
+             * END - AAF changes
+             */
             // Check if this subscription already exists; not an error (yet), just warn
             Subscription sub2 = Subscription.getSubscriptionMatching(sub);
             if (sub2 != null) {
                 intlogger.warn(
-                    "PROV0011 Creating a duplicate subscription: new subid=" + sub.getSubid() + ", old subid=" + sub2
-                        .getSubid());
+                    "PROV0011 Creating a duplicate subscription: new subid=" + sub.getSubid() + ", old subid=" + sub2.getSubid());
             }
 
             // Create SUBSCRIPTIONS table entries

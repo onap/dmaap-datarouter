@@ -64,6 +64,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     private String feedid;
     private String subid;
     private int attempts;
+    private boolean followRedirects;
     private String[][] hdrs;
     private String newInvocationId;
 
@@ -80,7 +81,8 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
         this.deliveryTaskHelper = deliveryTaskHelper;
         this.pubid = pubid;
         destInfo = deliveryTaskHelper.getDestinationInfo();
-        subid = destInfo.getSubId();
+        subid = destInfo.getSubId();  
+        this.followRedirects = destInfo.isFollowRedirects();
         feedid = destInfo.getLogData();
         spool = destInfo.getSpool();
         String dfn = spool + "/" + pubid;
@@ -125,7 +127,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 hdrv.add(new String[]{h, v});
             }
         } catch (Exception e) {
-            loggerDeliveryTask.error("Exception "+e.getStackTrace(),e);
+            loggerDeliveryTask.error("Exception "+ Arrays.toString(e.getStackTrace()), e);
         }
         hdrs = hdrv.toArray(new String[hdrv.size()][]);
         url = deliveryTaskHelper.getDestURL(fileid);
@@ -245,7 +247,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
             }
             deliveryTaskHelper.reportStatus(this, rc, xpubid, rmsg);
         } catch (Exception e) {
-            loggerDeliveryTask.error("Exception " + e.getStackTrace(), e);
+            loggerDeliveryTask.error("Exception " + Arrays.toString(e.getStackTrace()), e);
             deliveryTaskHelper.reportException(this, e);
         }
     }
@@ -324,7 +326,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
         } catch (ProtocolException pe) {
             deliveryTaskHelper.reportDeliveryExtra(this, -1L);
             // Rcvd error instead of 100-continue
-            loggerDeliveryTask.error("Exception " + pe.getStackTrace(), pe);
+            loggerDeliveryTask.error("Exception " + Arrays.toString(pe.getStackTrace()), pe);
         }
         return outputStream;
     }
@@ -408,5 +410,12 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
      */
     public String getFeedId() {
         return (feedid);
+    }
+
+    /**
+     *	Get the followRedirects for this delivery task
+     */
+    public boolean getFollowRedirects() {
+        return(followRedirects);
     }
 }
