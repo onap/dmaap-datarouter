@@ -1,0 +1,458 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "02aa097e_7ecfbb33",
+        "filename": "datarouter-docker-compose/src/main/resources/database/sql_init_01.sql",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "Was this intentional?",
+      "range": {
+        "startLine": 7,
+        "startChar": 31,
+        "endLine": 7,
+        "endChar": 35
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6dfade13_ea753092",
+        "filename": "datarouter-docker-compose/src/main/resources/prov_data/provserver.properties",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "typo passwordencryption?",
+      "range": {
+        "startLine": 61,
+        "startChar": 37,
+        "endLine": 61,
+        "endChar": 55
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ee52e9f8_68504a3e",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DRNodeCadiFilter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "Not needed here",
+      "range": {
+        "startLine": 47,
+        "startChar": 56,
+        "endLine": 47,
+        "endChar": 70
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0e7ded17_5d45302f",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryTask.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "Remove trailing space",
+      "range": {
+        "startLine": 84,
+        "startChar": 36,
+        "endLine": 84,
+        "endChar": 38
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7692965b_f6ee7bcf",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryTask.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "Remove tab",
+      "range": {
+        "startLine": 416,
+        "startChar": 6,
+        "endLine": 416,
+        "endChar": 7
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63541463_c6c8131d",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfig.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "Just a feed is it? and \u0027{\u0027 up beside method name",
+      "range": {
+        "startLine": 133,
+        "startChar": 44,
+        "endLine": 133,
+        "endChar": 48
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a268d4f4_0e663952",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfig.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 523,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "Could this be changed to aafInstance?",
+      "range": {
+        "startLine": 523,
+        "startChar": 15,
+        "endLine": 523,
+        "endChar": 27
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e00b82fd_dc65bf74",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfig.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 795,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "Removes tabs",
+      "range": {
+        "startLine": 795,
+        "startChar": 6,
+        "endLine": 795,
+        "endChar": 7
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aed0a1bc_bee37596",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 837,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "permissions?",
+      "range": {
+        "startLine": 837,
+        "startChar": 15,
+        "endLine": 837,
+        "endChar": 17
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4d2e93b9_ad1ec932",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeMain.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "Not sure what the point of the inner class is",
+      "range": {
+        "startLine": 178,
+        "startChar": 55,
+        "endLine": 178,
+        "endChar": 60
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f018824a_318e1083",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeMain.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "main",
+      "range": {
+        "startLine": 182,
+        "startChar": 78,
+        "endLine": 182,
+        "endChar": 86
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7053bfac_5f03d50a",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "remove tab",
+      "range": {
+        "startLine": 236,
+        "startChar": 43,
+        "endLine": 236,
+        "endChar": 44
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ef1d51e0_834f7be4",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 455,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "Does not being able to close the OutputStream mean the publish failed?\nMaybe move setStatus to 204 below this if it is the case",
+      "range": {
+        "startLine": 455,
+        "startChar": 26,
+        "endLine": 455,
+        "endChar": 36
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b045fa70_80405dfe",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/PathUtil.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "Remove",
+      "range": {
+        "startLine": 26,
+        "startChar": 1,
+        "endLine": 26,
+        "endChar": 2
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "303a2ebc_06e2edb4",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/ProvData.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "aafInstance",
+      "range": {
+        "startLine": 144,
+        "startChar": 27,
+        "endLine": 144,
+        "endChar": 39
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "addba747_2cf8eb88",
+        "filename": "datarouter-node/src/test/java/org/onap/dmaap/datarouter/node/DRNodeCadiFilterTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "Curly bracket in line above",
+      "range": {
+        "startLine": 73,
+        "startChar": 4,
+        "endLine": 73,
+        "endChar": 5
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "34da50bb_34c02ca7",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "group?",
+      "range": {
+        "startLine": 91,
+        "startChar": 82,
+        "endLine": 91,
+        "endChar": 91
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df72974b_829c4049",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 1047,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "Maybe we could use a switch here on String action, found it hard to know what the number meant in the code base in other places",
+      "range": {
+        "startLine": 1036,
+        "startChar": 12,
+        "endLine": 1047,
+        "endChar": 33
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ff9988c_a3d0f8d3",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/beans/Subscription.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "Extra space",
+      "range": {
+        "startLine": 262,
+        "startChar": 26,
+        "endLine": 262,
+        "endChar": 30
+      },
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99ceff85_00b8d942",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "Move 1 space",
+      "revId": "007867d7e84247a6c14862666f3c1ed18d0fd1f5",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
