@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "49e94cdc_6108fc75",
+        "filename": "datarouter-docker-compose/src/main/resources/prov_data/provserver.properties",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-21T15:09:57Z",
+      "side": 1,
+      "message": "passwordencryption?",
+      "range": {
+        "startLine": 61,
+        "startChar": 37,
+        "endLine": 61,
+        "endChar": 55
+      },
+      "revId": "a9d56fae90af9f51db956f87ed47ece06a05cc01",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
