@@ -22,59 +22,75 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.argThat;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
-
-import java.util.HashSet;
-import java.util.Set;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
-import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
+import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.*;
+import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 
 @RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor("org.onap.dmaap.datarouter.provisioning.beans.Feed")
 public class DRFeedsServletTest extends DrServletTestBase {
 
     private static DRFeedsServlet drfeedsServlet;
+    private static EntityManagerFactory emf;
+    private static EntityManager em;
+    private DB db;
 
     @Mock
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
 
-    ListAppender<ILoggingEvent> listAppender;
+    private ListAppender<ILoggingEvent> listAppender;
+
+    @BeforeClass
+    public static void init() {
+        emf = Persistence.createEntityManagerFactory("dr-unit-tests");
+        em = emf.createEntityManager();
+        System.setProperty(
+                "org.onap.dmaap.datarouter.provserver.properties",
+                "src/test/resources/h2Database.properties");
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+        em.clear();
+        em.close();
+        emf.close();
+    }
 
     @Before
     public void setUp() throws Exception {
-        super.setUp();
         listAppender = setTestLogger(DRFeedsServlet.class);
         drfeedsServlet = new DRFeedsServlet();
+        db = new DB();
         setAuthoriserToReturnRequestIsAuthorized();
         setPokerToNotCreateTimersWhenDeleteFeedIsCalled();
         setupValidAuthorisedRequest();
@@ -137,14 +153,11 @@ public class DRFeedsServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_GET_And_Request_Succeeds_With_Valid_Name_And_Version() throws Exception {
         ServletOutputStream outStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outStream);
-        when(request.getParameter("name")).thenReturn("stub_name");
-        when(request.getParameter("version")).thenReturn("stub_version");
-        PowerMockito.mockStatic(Feed.class);
-        Feed feed = mock(Feed.class);
-        PowerMockito.when(Feed.getFeedByNameVersion(anyString(), anyString())).thenReturn(feed);
-        when(feed.asJSONObject(true)).thenReturn(mock(JSONObject.class));
+        when(request.getParameter("name")).thenReturn("Feed1");
+        when(request.getParameter("version")).thenReturn("v0.1");
         drfeedsServlet.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+        verify(response).setContentType(BaseServlet.FEEDFULL_CONTENT_TYPE);
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -205,11 +218,111 @@ public class DRFeedsServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_POST_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated()
+    public void Given_Request_Is_HTTP_POST_And_CadiEnabled_Is_True_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated()
         throws Exception {
         setAuthoriserToReturnRequestNotAuthorized();
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isCadiEnabled", "true", true);
+        when(request.getHeader(DRFeedsServlet.EXCLUDE_AAF_HEADER)).thenReturn("true");
+        JSONObject JSObject = buildRequestJsonObject();
+        DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                JSONObject jo = new JSONObject();
+                jo.put("name", "not_stub_name");
+                jo.put("version", "1.0");
+                jo.put("authorization", JSObject);
+                jo.put("aaf_instance", "legacy");
+                return jo;
+            }
+        };
         drfeedsServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_POST_And_CadiEnabled_Is_False_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated()
+            throws Exception {
+        setAuthoriserToReturnRequestNotAuthorized();
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isCadiEnabled", "false", true);
+        when(request.getHeader(DRFeedsServlet.EXCLUDE_AAF_HEADER)).thenReturn("true");
+        JSONObject JSObject = buildRequestJsonObject();
+        DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                JSONObject jo = new JSONObject();
+                jo.put("name", "not_stub_name");
+                jo.put("version", "1.0");
+                jo.put("authorization", JSObject);
+                jo.put("aaf_instance", "legacy");
+                return jo;
+            }
+        };
+        drfeedsServlet.doPost(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_POST_And_AAF_DRFeed_And_Exclude_AAF_Is_True_Then_Forbidden_Response_Is_Generated() throws Exception {
+        when(request.getHeader(DRFeedsServlet.EXCLUDE_AAF_HEADER)).thenReturn("true");
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isCadiEnabled", "true", true);
+        JSONObject JSObject = buildRequestJsonObject();
+        DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                JSONObject jo = new JSONObject();
+                jo.put("name", "not_stub_name");
+                jo.put("version", "1.0");
+                jo.put("authorization", JSObject);
+                jo.put("aaf_instance", "https://aaf-onap-test.osaaf.org:8095");
+                return jo;
+            }
+        };
+        drfeedsServlet.doPost(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), contains("Invalid request exclude_AAF"));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_POST_And_AAF_DRFeed_And_Exclude_AAF_Is_False_Without_Permissions_Then_Forbidden_Response_Is_Generated() throws Exception {
+        when(request.getHeader(DRFeedsServlet.EXCLUDE_AAF_HEADER)).thenReturn("false");
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isCadiEnabled", "true", true);
+        JSONObject JSObject = buildRequestJsonObject();
+        DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                JSONObject jo = new JSONObject();
+                jo.put("name", "not_stub_name");
+                jo.put("version", "1.0");
+                jo.put("authorization", JSObject);
+                jo.put("aaf_instance", "*");
+                return jo;
+            }
+        };
+        drfeedsServlet.doPost(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), contains("AAF disallows access to permission"));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_POST_And_AAF_DRFeed_And_Exclude_AAF_Is_False_With_Permissions_Then_Created_OK_Response_Is_Generated() throws Exception {
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isCadiEnabled", "true", true);
+        ServletOutputStream outStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outStream);
+        when(request.getHeader(DRFeedsServlet.EXCLUDE_AAF_HEADER)).thenReturn("false");
+        JSONObject JSObject = buildRequestJsonObject();
+        when(request.isUserInRole("org.onap.dmaap-dr.feed|*|create")).thenReturn(true);
+        DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                JSONObject jo = new JSONObject();
+                jo.put("name", "not_stub_name");
+                jo.put("version", "1.0");
+                jo.put("authorization", JSObject);
+                jo.put("aaf_instance", "*");
+                return jo;
+            }
+
+            @Override
+            protected boolean doInsert(Insertable bean) {
+                return true;
+            }
+        };
+        drfeedsServlet.doPost(request, response);
+        verify(response).setStatus(eq(HttpServletResponse.SC_CREATED));
+        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -235,13 +348,9 @@ public class DRFeedsServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_POST_And_Feed_Is_Not_Valid_Object_Bad_Request_Response_Is_Generated()
         throws Exception {
-        when(request.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP")).thenReturn(null);
-        JSONObject JSObject = buildRequestJsonObject();
-
         DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                return jo;
+                return new JSONObject();
             }
         };
 
@@ -252,30 +361,36 @@ public class DRFeedsServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_POST_And_Feed_Already_Exists_Bad_Request_Response_Is_Generated()
         throws Exception {
-        setFeedToReturnInvalidFeedIdSupplied();
+        when(request.getParameter("name")).thenReturn("AafFeed");
+        when(request.getParameter("version")).thenReturn("v0.1");
+        when(request.getHeader(DRFeedsServlet.EXCLUDE_AAF_HEADER)).thenReturn("false");
+        when(request.isUserInRole("org.onap.dmaap-dr.feed|*|create")).thenReturn(true);
         JSONObject JSObject = buildRequestJsonObject();
         DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
-                jo.put("name", "not_stub_name");
-                jo.put("version", "1.0");
+                jo.put("name", "AafFeed");
+                jo.put("version", "v0.1");
                 jo.put("authorization", JSObject);
+                jo.put("aaf_instance", "*");
                 return jo;
             }
         };
         drfeedsServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), contains("This feed already exists in the database"));
     }
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_POST_Fails_Bad_Request_Response_Is_Generated() throws Exception {
         JSONObject JSObject = buildRequestJsonObject();
+        when(request.getHeader(DRFeedsServlet.EXCLUDE_AAF_HEADER)).thenReturn("true");
         DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "2.0");
                 jo.put("authorization", JSObject);
+                jo.put("aaf_instance", "legacy");
                 return jo;
             }
 
@@ -287,32 +402,6 @@ public class DRFeedsServletTest extends DrServletTestBase {
         drfeedsServlet.doPost(request, response);
         verify(response)
             .sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
-    }
-
-
-    @Test
-    public void Given_Request_Is_HTTP_POST_And_Change_On_Feeds_Succeeds_A_STATUS_OK_Response_Is_Generated()
-        throws Exception {
-        ServletOutputStream outStream = mock(ServletOutputStream.class);
-        when(response.getOutputStream()).thenReturn(outStream);
-        JSONObject JSObject = buildRequestJsonObject();
-        DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                jo.put("name", "stub_name");
-                jo.put("version", "1.0");
-                jo.put("authorization", JSObject);
-                return jo;
-            }
-
-            @Override
-            protected boolean doInsert(Insertable bean) {
-                return true;
-            }
-        };
-        drfeedsServlet.doPost(request, response);
-        verify(response).setStatus(eq(HttpServletResponse.SC_CREATED));
-        verifyEnteringExitCalled(listAppender);
     }
 
     @NotNull
@@ -335,7 +424,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
 
     private void setUpValidSecurityOnHttpRequest() throws Exception {
         when(request.isSecure()).thenReturn(true);
-        Set<String> authAddressesAndNetworks = new HashSet<String>();
+        Set<String> authAddressesAndNetworks = new HashSet<>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils
             .writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks,
@@ -346,29 +435,6 @@ public class DRFeedsServletTest extends DrServletTestBase {
 
     private void setBehalfHeader(String headerValue) {
         when(request.getHeader(BEHALF_HEADER)).thenReturn(headerValue);
-    }
-
-    private void setValidPathInfoInHttpHeader() {
-        when(request.getPathInfo()).thenReturn("/123");
-    }
-
-    private void setFeedToReturnInvalidFeedIdSupplied() {
-        PowerMockito.mockStatic(Feed.class);
-        PowerMockito.when(Feed.getFeedById(anyInt())).thenReturn(null);
-        when(Feed.getFeedByNameVersion(anyString(), anyString())).thenReturn(mock(Feed.class));
-    }
-
-    private void setFeedToReturnValidFeedForSuppliedId() {
-        PowerMockito.mockStatic(Feed.class);
-        Feed feed = mock(Feed.class);
-        PowerMockito.when(Feed.getFeedById(anyInt())).thenReturn(feed);
-        when(feed.isDeleted()).thenReturn(false);
-        when(feed.asJSONObject(true)).thenReturn(mock(JSONObject.class));
-        when(feed.getPublisher()).thenReturn("Stub_Value");
-        when(feed.getName()).thenReturn("stub_name");
-        when(feed.getVersion()).thenReturn("1.0");
-        when(feed.asLimitedJSONObject()).thenReturn(mock(JSONObject.class));
-        PowerMockito.when(feed.getFeedByNameVersion(anyString(), anyString())).thenReturn(null);
     }
 
     private void setAuthoriserToReturnRequestNotAuthorized() throws IllegalAccessException {
@@ -395,13 +461,10 @@ public class DRFeedsServletTest extends DrServletTestBase {
     private void setupValidAuthorisedRequest() throws Exception {
         setUpValidSecurityOnHttpRequest();
         setBehalfHeader("Stub_Value");
-        setValidPathInfoInHttpHeader();
-        setFeedToReturnValidFeedForSuppliedId();
     }
 
-    private void setUpValidContentHeadersAndJSONOnHttpRequest() {
+    private void setUpValidContentHeadersAndJSONOnHttpRequest() throws IllegalAccessException {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.feed; version=1.0");
         when(request.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
-
     }
 }

@@ -215,6 +215,11 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.onap.aaf.authz</groupId>
+            <artifactId>aaf-cadi-aaf</artifactId>
+            <version>${aaf-cadi-aaf.version}</version>
+        </dependency>
     </dependencies>
     <profiles>
         <profile>

@@ -39,7 +39,8 @@ public class DestInfo {
     private boolean use100;
     private boolean privilegedSubscriber;
     private boolean decompress;
-
+    private boolean followRedirects;
+    private String aafInstance;
     /**
      * Create a destination information object.
      *
@@ -53,9 +54,10 @@ public class DestInfo {
      * @param    metaonly    Is this a metadata only delivery?
      * @param    use100    Should I use expect 100-continue?
      * @param    privilegedSubscriber   Can we wait to receive a file processed acknowledgement before deleting file
+     * @param    followRedirects Is follow redirect of destination enabled?
      * @param    decompress     To see if the they want there information compressed or decompressed
      */
-    public DestInfo(String name, String spool, String subid, String logdata, String url, String authuser, String authentication, boolean metaonly, boolean use100, boolean privilegedSubscriber, boolean decompress) {
+    public DestInfo(String name, String spool, String subid, String logdata, String url, String authuser, String authentication, boolean metaonly, boolean use100, boolean privilegedSubscriber, boolean followRedirects, boolean decompress) {
         this.name = name;
         this.spool = spool;
         this.subid = subid;
@@ -66,6 +68,7 @@ public class DestInfo {
         this.metaonly = metaonly;
         this.use100 = use100;
         this.privilegedSubscriber = privilegedSubscriber;
+        this.followRedirects = followRedirects;
         this.decompress = decompress;
     }
 
@@ -87,6 +90,7 @@ public class DestInfo {
         this.metaonly = subscription.isMetaDataOnly();
         this.use100 = subscription.isUsing100();
         this.privilegedSubscriber = subscription.isPrivilegedSubscriber();
+        this.followRedirects = subscription.getFollowRedirect();
         this.decompress = subscription.isDecompress();
     }
 
@@ -183,6 +187,15 @@ public class DestInfo {
      */
     public boolean isPrivilegedSubscriber() {
         return (privilegedSubscriber);
+    }
+
+    /**
+    * Should I follow redirects?
+    *
+    * @return True if I should.
+    */
+    public boolean isFollowRedirects() {
+        return (followRedirects);
     }
 
     /**

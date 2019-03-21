@@ -22,6 +22,7 @@
  ******************************************************************************/
 
 package org.onap.dmaap.datarouter.node;
+
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,12 +30,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import static org.junit.Assert.*;
 import java.io.File;
 
-
-
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
 public class DeliveryQueueTest {
@@ -55,7 +54,7 @@ public class DeliveryQueueTest {
     }
 
     @Test
-    public void Given_New_DeliveryQueue_Directory_Is_Created_As_Defined_By_DestInfo() throws Exception {
+    public void Given_New_DeliveryQueue_Directory_Is_Created_As_Defined_By_DestInfo() {
         when(destInfo.getSpool()).thenReturn("tmp");
         File file = new File("tmp");
         assertTrue(file.exists());
@@ -63,14 +62,14 @@ public class DeliveryQueueTest {
     }
 
     @Test
-    public void Given_Delivery_Task_Failed_And_Resume_Time_Not_Reached_Return_Null() throws Exception{
+    public void Given_Delivery_Task_Failed_And_Resume_Time_Not_Reached_Return_Null() throws Exception {
         FieldUtils.writeField(deliveryQueue,"failed",true,true);
         FieldUtils.writeField(deliveryQueue,"resumetime",System.currentTimeMillis()*2,true);
         assertNull(deliveryQueue.peekNext());
     }
 
     @Test
-    public void Given_Delivery_Task_Return_Next_Delivery_Task_Id() throws Exception{
+    public void Given_Delivery_Task_Return_Next_Delivery_Task_Id() throws Exception {
         prepareFiles();
         when(destInfo.getSpool()).thenReturn(dirPath);
         deliveryQueue = new DeliveryQueue(deliveryQueueHelper, destInfo);
@@ -81,19 +80,19 @@ public class DeliveryQueueTest {
     }
 
     @Test
-    public void Given_Delivery_Task_Cancel_And_FileId_Is_Null_Return_Zero() throws Exception{
+    public void Given_Delivery_Task_Cancel_And_FileId_Is_Null_Return_Zero() {
         long rc = deliveryQueue.cancelTask("123.node.datarouternew.com");
         assertEquals(0, rc);
     }
 
-    private void prepareFiles() throws Exception{
+    private void prepareFiles() throws Exception {
         createFolder(dirPath);
         createFile(FileName1, dirPath);
         String[] files = new String[2];
         files[0] = dirPath + FileName1;
     }
 
-    private void createFolder(String dirName) throws Exception{
+    private void createFolder(String dirName) throws Exception {
         String dirPath = dirName;
 
         File newDirectory = new File(dirPath);
@@ -101,13 +100,13 @@ public class DeliveryQueueTest {
         if (isCreated) {
             System.out.println("1. Successfully created directories, path: " + newDirectory.getCanonicalPath());
         } else if (newDirectory.exists()) {
-            System.out.printf("1. Directory path already exist, path: " + newDirectory.getCanonicalPath());
+            System.out.print("1. Directory path already exist, path: " + newDirectory.getCanonicalPath());
         } else {
             System.out.println("1. Unable to create directory");
         }
     }
 
-    private void createFile( String file, String dir) throws Exception{
+    private void createFile(String file, String dir) throws Exception {
         String FileName = file;
         String dirPath = dir;
 

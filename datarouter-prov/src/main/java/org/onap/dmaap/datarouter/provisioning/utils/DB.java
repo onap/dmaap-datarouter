@@ -185,8 +185,8 @@ public class DB {
             connection = getConnection();
             Set<String> actualTables = getTableSet(connection);
             boolean initialize = false;
-            for (String table : expectedTables) {
-                initialize |= !actualTables.contains(table.toLowerCase());
+            for (String tableName : expectedTables) {
+                initialize |= !actualTables.contains(tableName);
             }
             if (initialize) {
                 intlogger.info("PROV9001: First time startup; The database is being initialized.");
@@ -211,13 +211,13 @@ public class DB {
      * @return the set of table names
      */
     private Set<String> getTableSet(Connection connection) {
-        Set<String> tables = new HashSet<String>();
+        Set<String> tables = new HashSet<>();
         try {
             DatabaseMetaData md = connection.getMetaData();
             ResultSet rs = md.getTables(null, null, "%", null);
             if (rs != null) {
                 while (rs.next()) {
-                    tables.add(rs.getString("TABLE_NAME"));
+                    tables.add(rs.getString("TABLE_NAME").toUpperCase());
                 }
                 rs.close();
             }

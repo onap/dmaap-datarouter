@@ -59,7 +59,7 @@ public class NodeServletTest {
     @Mock
     private HttpServletResponse response;
 
-    ListAppender<ILoggingEvent> listAppender;
+    private ListAppender<ILoggingEvent> listAppender;
 
     @Before
     public void setUp() throws Exception {
