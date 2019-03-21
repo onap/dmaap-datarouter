@@ -25,6 +25,7 @@ package org.onap.dmaap.datarouter.provisioning.beans;
 import org.json.JSONObject;
 import org.junit.*;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -32,8 +33,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.io.InvalidObjectException;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import static org.mockito.Matchers.anyString;
 
 @RunWith(PowerMockRunner.class)
 public class FeedTest {
@@ -113,5 +119,66 @@ public class FeedTest {
         Feed feed2 = feed;
         Boolean bool = feed.equals(feed2);
         Assert.assertEquals(true, bool);
+    }
+
+    @Test
+    public void Validate_getFeedByNameVersion_Returns_Valid_Feed()
+    {
+        feed = Feed.getFeedByNameVersion("Feed1","v0.1");
+        Assert.assertEquals(feed.toString(), "FEED: feedid=1, name=Feed1, version=v0.1");
+    }
+
+    @Test
+    public void Given_doDelete_Throws_SQLException_Then_Returns_False() throws SQLException {
+        Connection spyConnection = CreateSpyForDbConnection();
+        Mockito.doThrow(new SQLException()).when(spyConnection).prepareStatement(anyString());
+        Assert.assertEquals(feed.doDelete(spyConnection), false);
+    }
+
+    @Test
+    public void Given_doInsert_Throws_SQLException_Then_Returns_False() throws SQLException {
+        Connection connection = db.getConnection();
+        FeedAuthorization fa = new FeedAuthorization();
+        Set setA = new HashSet();
+        setA.add(new FeedEndpointID("1", "Name"));
+        Set setB = new HashSet();
+        setB.add("172.0.0.1");
+        fa.setEndpoint_ids(setA);
+        fa.setEndpoint_addrs(setB);
+        feed.setAuthorization(fa);
+        Assert.assertEquals(feed.doInsert(connection), false);
+
+    }
+
+    @Test
+    public void Given_doUpdate_Throws_SQLException_Then_Returns_False() throws SQLException {
+        Connection spyConnection = CreateSpyForDbConnection();
+        Mockito.doThrow(new SQLException()).when(spyConnection).prepareStatement(anyString());
+        Assert.assertEquals(feed.doUpdate(spyConnection), false);
+
+    }
+
+    @Test
+    public void Validate_Set_Get_Methods_Return_Correct_Values(){
+        feed.setName("testName");
+        feed.setVersion("v1.0");
+        feed.setGroupid(1);
+        feed.setDescription("test feed");
+        feed.setBusiness_description("test feed");
+        feed.setSuspended(false);
+        feed.setPublisher("publish");
+
+        Assert.assertEquals(feed.getName(), "testName");
+        Assert.assertEquals(feed.getVersion(), "v1.0");
+        Assert.assertEquals(feed.getGroupid(), 1);
+        Assert.assertEquals(feed.getDescription(), "test feed");
+        Assert.assertEquals(feed.getBusiness_description(), "test feed");
+        Assert.assertEquals(feed.isSuspended(), false);
+        Assert.assertEquals(feed.getPublisher(), "publish");
+    }
+
+    private Connection CreateSpyForDbConnection() throws SQLException {
+        Connection conn = db.getConnection();
+        return Mockito.spy(conn);
     }
 }
