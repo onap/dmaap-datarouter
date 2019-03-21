@@ -158,6 +158,9 @@ VALUES (23, 1, 'http://delivery_url', 'user1', 'somepassword', 'sub123', 'selfli
 INSERT INTO FEED_ENDPOINT_IDS(FEEDID, USERID, PASSWORD)
 VALUES (1, 'USER', 'PASSWORD');
 
+INSERT INTO FEED_ENDPOINT_ADDRS(FEEDID, ADDR)
+VALUES (1, '172.0.0.1');
+
 INSERT INTO FEEDS(FEEDID, GROUPID, NAME, VERSION, DESCRIPTION, BUSINESS_DESCRIPTION, AUTH_CLASS, PUBLISHER, SELF_LINK, PUBLISH_LINK, SUBSCRIBE_LINK, LOG_LINK)
 VALUES (1, 1,'Feed1','v0.1', 'First Feed for testing', 'First Feed for testing', 'auth_class', 'pub','self_link','publish_link','subscribe_link','log_link');
 
