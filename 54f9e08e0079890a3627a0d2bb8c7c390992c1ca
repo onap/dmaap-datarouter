@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "28635bde_1a254f6f",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/beans/LogRecordTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-03-21T09:39:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "47e2c254_9a5e466b",
+      "range": {
+        "startLine": 50,
+        "startChar": 4,
+        "endLine": 51,
+        "endChar": 24
+      },
+      "revId": "54f9e08e0079890a3627a0d2bb8c7c390992c1ca",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "97647097_900a5501",
         "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/beans/LogRecordTest.java",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2019-03-21T08:52:23Z",
       "side": 1,
       "message": "Could you add an AfterClass method as well to just close all the resources",
+      "range": {
+        "startLine": 53,
+        "startChar": 5,
+        "endLine": 53,
+        "endChar": 16
+      },
+      "revId": "54f9e08e0079890a3627a0d2bb8c7c390992c1ca",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fe60fe5b_b6e30077",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/beans/LogRecordTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-03-21T09:39:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97647097_900a5501",
       "range": {
         "startLine": 53,
         "startChar": 5,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "774b456f_28e2276d",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/beans/LogRecordTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-03-21T09:39:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "331472f5_ec4d51d0",
+      "range": {
+        "startLine": 72,
+        "startChar": 34,
+        "endLine": 72,
+        "endChar": 35
+      },
+      "revId": "54f9e08e0079890a3627a0d2bb8c7c390992c1ca",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6540a1a1_a161fd04",
         "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/beans/LogRecordTest.java",
         "patchSetId": 1
@@ -82,6 +154,30 @@
       "writtenOn": "2019-03-21T08:52:23Z",
       "side": 1,
       "message": "Can this method be moved to the bottom of the file",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 5
+      },
+      "revId": "54f9e08e0079890a3627a0d2bb8c7c390992c1ca",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "222a2775_329ff462",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/beans/LogRecordTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-03-21T09:39:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6540a1a1_a161fd04",
       "range": {
         "startLine": 82,
         "startChar": 0,
