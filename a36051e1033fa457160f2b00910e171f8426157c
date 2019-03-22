@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1fc7d4a4_70921656",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/LogfileLoader.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 4419
+      },
+      "writtenOn": "2019-03-22T15:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a70687c_4415fbb7",
+      "range": {
+        "startLine": 226,
+        "startChar": 0,
+        "endLine": 227,
+        "endChar": 53
+      },
+      "revId": "a36051e1033fa457160f2b00910e171f8426157c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "92a04fb2_db4e5043",
         "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/utils/LogfileLoaderTest.java",
         "patchSetId": 1
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "d967ca1c_d9b8265e",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/utils/LogfileLoaderTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4419
+      },
+      "writtenOn": "2019-03-22T15:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "92a04fb2_db4e5043",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 80
+      },
+      "revId": "a36051e1033fa457160f2b00910e171f8426157c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0567580c_7e00a0cc",
         "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/utils/LogfileLoaderTest.java",
         "patchSetId": 1
@@ -59,6 +107,30 @@
       "writtenOn": "2019-03-22T14:42:07Z",
       "side": 1,
       "message": "Can you change the names of this and below methods to prepFileTypeExp naming convention, and they can be private",
+      "range": {
+        "startLine": 122,
+        "startChar": 16,
+        "endLine": 122,
+        "endChar": 34
+      },
+      "revId": "a36051e1033fa457160f2b00910e171f8426157c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "699b75e0_1abeb889",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/utils/LogfileLoaderTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 4419
+      },
+      "writtenOn": "2019-03-22T15:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0567580c_7e00a0cc",
       "range": {
         "startLine": 122,
         "startChar": 16,
