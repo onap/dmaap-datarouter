@@ -21,16 +21,15 @@
 # *
 #-------------------------------------------------------------------------------
 {
-                "delivery" :
-
-                {
-                                "url" : "http://172.100.0.3:7070/",
-                                "user" : "datarouter",
-                                "password" : "datarouter",
-                                "use100" : true
-                },
-                "metadataOnly" : false,
-                "suspend" : false,
-                "groupid" : 29,
-                "subscriber" : "sg481n"
+"delivery" :
+    {
+        "url" : "http://172.100.0.3:7070/",
+        "user" : "datarouter",
+        "password" : "datarouter",
+        "use100" : true
+    },
+"metadataOnly" : false,
+"suspend" : false,
+"groupid" : 29,
+"subscriber" : "sg481n"
 }

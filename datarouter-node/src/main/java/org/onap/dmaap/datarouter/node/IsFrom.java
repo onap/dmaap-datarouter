@@ -26,6 +26,7 @@ package org.onap.dmaap.datarouter.node;
 
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.util.*;
 import java.net.*;
 
@@ -62,24 +63,37 @@ public class IsFrom {
         long now = System.currentTimeMillis();
         if (now > nextcheck) {
             nextcheck = now + 10000;
-            Vector<String> v = new Vector<>();
+            ArrayList<String> hostAddrArray = new ArrayList<>();
             try {
                 InetAddress[] addrs = InetAddress.getAllByName(fqdn);
-                for (InetAddress a : addrs) {
-                    v.add(a.getHostAddress());
+                for (InetAddress addr : addrs) {
+                    hostAddrArray.add(addr.getHostAddress());
                 }
             } catch (UnknownHostException e) {
                 logger.debug("IsFrom: UnknownHostEx: " + e.toString(), e);
             }
-            ips = v.toArray(new String[v.size()]);
+            ips = hostAddrArray.toArray(new String[0]);
             logger.info("IsFrom: DNS ENTRIES FOR FQDN " + fqdn + " : " + Arrays.toString(ips));
         }
-        for (String s : ips) {
-            if (s.equals(ip) || s.equals(System.getenv("DMAAP_DR_PROV_SERVICE_HOST"))) {
-                return (true);
+        for (String ipAddr : ips) {
+            if (ipAddr.equals(ip)) {
+                return true;
             }
         }
-        return (false);
+        return false;
+    }
+
+    synchronized boolean isReachable(String ip) {
+        try {
+            if (InetAddress.getByName(ip).isReachable(1000)) {
+                return true;
+            }
+        } catch (UnknownHostException e) {
+            logger.debug("IsFrom: UnknownHostEx: " + e.toString(), e);
+        } catch (IOException e) {
+            logger.debug("IsFrom: Failed to parse IP : " + ip + " : " + e.toString(), e);
+        }
+        return false;
     }
 
     /**
