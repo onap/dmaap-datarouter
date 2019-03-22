@@ -218,7 +218,7 @@ public class LogfileLoader extends Thread {
         }
     }
 
-    private boolean pruneRecords() {
+    boolean pruneRecords() {
         boolean did1 = false;
         long count = countRecords();
         long threshold = DEFAULT_LOG_RETENTION;
@@ -282,7 +282,7 @@ public class LogfileLoader extends Thread {
         return did1;
     }
 
-    private long countRecords() {
+    long countRecords() {
         long count = 0;
         Connection conn = null;
         try {
@@ -303,7 +303,7 @@ public class LogfileLoader extends Thread {
         return count;
     }
 
-    private Map<Long, Long> getHistogram() {
+    Map<Long, Long> getHistogram() {
         Map<Long, Long> map = new HashMap<Long, Long>();
         Connection conn = null;
         try {
@@ -382,7 +382,7 @@ public class LogfileLoader extends Thread {
     }
 
     @SuppressWarnings("resource")
-    private int[] process(File f) {
+    int[] process(File f) {
         int ok = 0, total = 0;
         try {
             Connection conn = db.getConnection();
@@ -442,7 +442,7 @@ public class LogfileLoader extends Thread {
         return new int[]{ok, total};
     }
 
-    private Loadable[] buildRecords(String line) throws ParseException {
+    Loadable[] buildRecords(String line) throws ParseException {
         String[] pp = line.split("\\|");
         if (pp != null && pp.length >= 7) {
             String rtype = pp[1].toUpperCase();
