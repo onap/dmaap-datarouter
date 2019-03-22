@@ -73,6 +73,14 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.28.0</version>
+                <configuration>
+                    <skipDockerBuild>true</skipDockerBuild>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
                 <version>1.6.7</version>
