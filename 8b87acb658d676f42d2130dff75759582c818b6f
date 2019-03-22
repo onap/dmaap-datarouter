@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d0aa94f1_3e43bf1f",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/beans/FeedTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-22T14:35:44Z",
+      "side": 1,
+      "message": "Move curly bracket to same line as method name",
+      "range": {
+        "startLine": 111,
+        "startChar": 2,
+        "endLine": 126,
+        "endChar": 5
+      },
+      "revId": "8b87acb658d676f42d2130dff75759582c818b6f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
