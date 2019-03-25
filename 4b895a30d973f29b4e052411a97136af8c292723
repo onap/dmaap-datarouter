@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "88646b92_1cb11672",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/utils/LogfileLoaderTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-03-25T10:30:52Z",
+      "side": 1,
+      "message": "this same call is made in every test method - why not create a @before method to instantiate this?",
+      "range": {
+        "startLine": 80,
+        "startChar": 8,
+        "endLine": 80,
+        "endChar": 54
+      },
+      "revId": "4b895a30d973f29b4e052411a97136af8c292723",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "69521b7c_ad68e222",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/utils/LogfileLoaderTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-03-25T10:30:52Z",
+      "side": 1,
+      "message": "these 3 methods are the same except for their filecontent string - why not make it one method, and pass a different string into it depending on the test?",
+      "range": {
+        "startLine": 119,
+        "startChar": 17,
+        "endLine": 119,
+        "endChar": 32
+      },
+      "revId": "4b895a30d973f29b4e052411a97136af8c292723",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
