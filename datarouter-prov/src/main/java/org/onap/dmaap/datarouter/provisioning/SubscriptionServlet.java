@@ -58,7 +58,7 @@ import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.send
 @SuppressWarnings("serial")
 public class SubscriptionServlet extends ProxyServlet {
 
-    public static final String SUBCNTRL_CONTENT_TYPE = "application/vnd.dmaap-dr.subscription-control";
+    private static final String SUBCNTRL_CONTENT_TYPE = "application/vnd.dmaap-dr.subscription-control";
     //Adding EELF Logger Rally:US664892
     private static EELFLogger eelflogger = EELFManager.getInstance()
         .getLogger(SubscriptionServlet.class);
@@ -113,17 +113,37 @@ public class SubscriptionServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
                 return;
             }
-            // Check with the Authorizer
-            AuthorizationResponse aresp = authz.decide(req);
-            if (!aresp.isAuthorized()) {
-                message = "Policy Engine disallows access.";
-                elr.setMessage(message);
-                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
-                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                return;
+            /*
+             * START - AAF changes
+             * TDP EPIC US# 307413
+             * CADI code - check on permissions based on Legacy/AAF users to allow to delete/remove subscription
+             */
+            String aafInstance = sub.getAafInstance();
+            if (aafInstance == null || aafInstance.equals("") || aafInstance.equalsIgnoreCase("legacy")) {
+                AuthorizationResponse aresp = authz.decide(req);
+                if (!aresp.isAuthorized()) {
+                    message = "Policy Engine disallows access.";
+                    elr.setMessage(message);
+                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                    eventlogger.info(elr);
+                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                    return;
+                }
+            } else {
+                String permission = getSubscriberPermission(aafInstance, BaseServlet.DELETE_PERMISSION);
+                eventlogger.info("SubscriptionServlet.doDelete().. Permission String - " + permission);
+                if (!req.isUserInRole(permission)) {
+                    message = "AAF disallows access to permission - " + permission;
+                    elr.setMessage(message);
+                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                    eventlogger.info(elr);
+                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                    return;
+                }
             }
-
+            /*
+             * END - AAF changes
+             */
             // Delete Subscription
             if (doDelete(sub)) {
                 activeSubs--;
@@ -270,16 +290,6 @@ public class SubscriptionServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
                 return;
             }
-            // Check with the Authorizer
-            AuthorizationResponse aresp = authz.decide(req);
-            if (!aresp.isAuthorized()) {
-                message = "Policy Engine disallows access.";
-                elr.setMessage(message);
-                elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
-                sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                return;
-            }
             // check content type is SUB_CONTENT_TYPE, version 1.0
             ContentHeader ch = getContentHeader(req);
             String ver = ch.getAttribute("version");
@@ -314,6 +324,38 @@ public class SubscriptionServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
+
+            /*
+             * START - AAF changes
+             * TDP EPIC US# 307413
+             * CADI code - check on permissions based on Legacy/AAF users to allow to delete/remove subscription
+             */
+            String aafInstance = sub.getAafInstance();
+            if (aafInstance == null || aafInstance.equals("") || aafInstance.equalsIgnoreCase("legacy")) {
+                AuthorizationResponse aresp = authz.decide(req);
+                if (!aresp.isAuthorized()) {
+                    message = "Policy Engine disallows access.";
+                    elr.setMessage(message);
+                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                    eventlogger.info(elr);
+                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                    return;
+                }
+            } else {
+                String permission = getSubscriberPermission(aafInstance, BaseServlet.EDIT_PERMISSION);
+                eventlogger.info("SubscriptionServlet.doDelete().. Permission String - " + permission);
+                if (!req.isUserInRole(permission)) {
+                    message = "AAF disallows access to permission - " + permission;
+                    elr.setMessage(message);
+                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
+                    eventlogger.info(elr);
+                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
+                    return;
+                }
+            }
+            /*
+             * END - AAF changes
+             */
             sub.setSubid(oldsub.getSubid());
             sub.setFeedid(oldsub.getFeedid());
             sub.setSubscriber(bhdr);    // set from X-DMAAP-DR-ON-BEHALF-OF header
@@ -373,13 +415,6 @@ public class SubscriptionServlet extends ProxyServlet {
      */
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) {
-// OLD pre-3.0 code
-//        String message = "POST not allowed for the subscriptionURL.";
-//        EventLogRecord elr = new EventLogRecord(req);
-//        elr.setMessage(message);
-//        elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-//        eventlogger.info(elr);
-//        resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, message);
 
         setIpFqdnRequestIDandInvocationIDForEelf("doPost", req);
         eelflogger.info(EelfMsgs.ENTRY);

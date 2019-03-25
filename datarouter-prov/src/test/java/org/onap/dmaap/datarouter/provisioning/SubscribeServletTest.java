@@ -27,19 +27,24 @@ import ch.qos.logback.core.read.ListAppender;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
-import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
+import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,20 +59,39 @@ import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 
 @RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.provisioning.beans.Feed", "org.onap.dmaap.datarouter.provisioning.beans.Subscription"})
+@PrepareForTest(Subscription.class)
 public class SubscribeServletTest extends DrServletTestBase {
     private static SubscribeServlet subscribeServlet;
+    private static EntityManagerFactory emf;
+    private static EntityManager em;
+    private DB db;
 
     @Mock
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
 
-    ListAppender<ILoggingEvent> listAppender;
+    private ListAppender<ILoggingEvent> listAppender;
+
+    @BeforeClass
+    public static void init() {
+        emf = Persistence.createEntityManagerFactory("dr-unit-tests");
+        em = emf.createEntityManager();
+        System.setProperty(
+                "org.onap.dmaap.datarouter.provserver.properties",
+                "src/test/resources/h2Database.properties");
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+        em.clear();
+        em.close();
+        emf.close();
+    }
 
     @Before
     public void setUp() throws Exception {
-        super.setUp();
+        db = new DB();
         listAppender = setTestLogger(SubscribeServlet.class);
         subscribeServlet = new SubscribeServlet();
         setAuthoriserToReturnRequestIsAuthorized();
@@ -110,26 +134,18 @@ public class SubscribeServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_Feed_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated() throws Exception {
-        setFeedToReturnInvalidFeedIdSupplied();
+        when(request.getPathInfo()).thenReturn("/123");
         subscribeServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
     }
-
-
-    @Test
-    public void Given_Request_Is_HTTP_GET_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated() throws Exception {
-        setAuthoriserToReturnRequestNotAuthorized();
-        subscribeServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
-    }
-
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_Request_Succeeds() throws Exception {
         ServletOutputStream outStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outStream);
+        when(request.getPathInfo()).thenReturn("/1");
         PowerMockito.mockStatic(Subscription.class);
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("{}");
         PowerMockito.when(Subscription.getSubscriptionUrlList(anyInt())).thenReturn(list);
         subscribeServlet.doGet(request, response);
@@ -171,7 +187,7 @@ public class SubscribeServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Feed_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated() throws Exception {
-        setFeedToReturnInvalidFeedIdSupplied();
+        when(request.getPathInfo()).thenReturn("/123");
         subscribeServlet.doPost(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
     }
@@ -179,41 +195,7 @@ public class SubscribeServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_POST_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated() throws Exception {
         setAuthoriserToReturnRequestNotAuthorized();
-        subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_POST_And_Content_Header_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.feed; version=1.1");
-        when(request.getContentType()).thenReturn("stub_contentType");
-        subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), argThat(notNullValue(String.class)));
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_POST_And_Request_Contains_Badly_Formed_JSON_Then_Bad_Request_Response_Is_Generated() throws Exception {
-        subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_POST_And_Active_Feeds_Equals_Max_Feeds_Then_Bad_Request_Response_Is_Generated() throws Exception {
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "maxSubs", 0, true);
-        SubscribeServlet subscribeServlet = new SubscribeServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
-                return new JSONObject();
-            }
-        };
-        subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_CONFLICT), argThat(notNullValue(String.class)));
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_POST_And_POST_Fails_Bad_Request_Response_Is_Generated() throws Exception {
-        PowerMockito.mockStatic(Subscription.class);
-        PowerMockito.when(Subscription.getSubscriptionMatching(mock(Subscription.class))).thenReturn(null);
-        PowerMockito.when(Subscription.countActiveSubscriptions()).thenReturn(0);
+        when(request.getPathInfo()).thenReturn("/1");
         JSONObject JSObject = buildRequestJsonObject();
         SubscribeServlet subscribeServlet = new SubscribeServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -226,23 +208,18 @@ public class SubscribeServletTest extends DrServletTestBase {
                 jo.put("sync", false);
                 return jo;
             }
-
             @Override
             protected boolean doInsert(Insertable bean) {
                 return false;
             }
         };
         subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
     }
 
-
     @Test
-    public void Given_Request_Is_HTTP_POST_And_Change_On_Feeds_Succeeds_A_STATUS_OK_Response_Is_Generated() throws Exception {
-        ServletOutputStream outStream = mock(ServletOutputStream.class);
-        when(response.getOutputStream()).thenReturn(outStream);
-        PowerMockito.mockStatic(Subscription.class);
-        PowerMockito.when(Subscription.getSubscriptionMatching(mock(Subscription.class))).thenReturn(null);
+    public void Given_Request_Is_HTTP_POST_And_AAF_Subscriber_Added_To_Legacy_Feed_Then_Forbidden_Response_Is_Generated() throws Exception {
+        when(request.getPathInfo()).thenReturn("/1");
         JSONObject JSObject = buildRequestJsonObject();
         SubscribeServlet subscribeServlet = new SubscribeServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -252,7 +229,85 @@ public class SubscribeServletTest extends DrServletTestBase {
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
                 jo.put("delivery", JSObject);
-                jo.put("sync", true);
+                jo.put("aaf_instance", "*");
+                jo.put("follow_redirect", false);
+                jo.put("sync", false);
+                return jo;
+            }
+            @Override
+            protected boolean doInsert(Insertable bean) {
+                return false;
+            }
+        };
+        subscribeServlet.doPost(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), contains("AAF Subscriber can not be added to legacy Feed"));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_POST_And_Legacy_Subscriber_Added_To_AAF_Feed_And_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated() throws Exception {
+        setAuthoriserToReturnRequestNotAuthorized();
+        when(request.getPathInfo()).thenReturn("/2");
+        JSONObject JSObject = buildRequestJsonObject();
+        SubscribeServlet subscribeServlet = new SubscribeServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                JSONObject jo = new JSONObject();
+                jo.put("name", "stub_name");
+                jo.put("version", "2.0");
+                jo.put("metadataOnly", true);
+                jo.put("suspend", true);
+                jo.put("delivery", JSObject);
+                jo.put("aaf_instance", "legacy");
+                jo.put("follow_redirect", false);
+                jo.put("sync", false);
+                return jo;
+            }
+        };
+        subscribeServlet.doPost(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), contains("Policy Engine disallows access."));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_POST_And_AAF_Subscriber_Added_To_AAF_Feed_Without_Permissions_Then_Forbidden_Response_Is_Generated() throws Exception {
+        when(request.getPathInfo()).thenReturn("/2");
+        JSONObject JSObject = buildRequestJsonObject();
+        SubscribeServlet subscribeServlet = new SubscribeServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                JSONObject jo = new JSONObject();
+                jo.put("name", "stub_name");
+                jo.put("version", "2.0");
+                jo.put("metadataOnly", true);
+                jo.put("suspend", true);
+                jo.put("delivery", JSObject);
+                jo.put("aaf_instance", "*");
+                jo.put("follow_redirect", false);
+                jo.put("sync", false);
+                return jo;
+            }
+        };
+        subscribeServlet.doPost(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), contains("AAF disallows access to permission"));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_POST_And_AAF_Subscriber_Added_To_AAF_Feed_With_Permissions_Then_OK_Response_Is_Generated() throws Exception {
+        ServletOutputStream outStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(outStream);
+        when(request.getPathInfo()).thenReturn("/2");
+        when(request.isUserInRole("org.onap.dmaap-dr.feed|*|approveSub")).thenReturn(true);
+        PowerMockito.mockStatic(Subscription.class);
+        PowerMockito.when(Subscription.getSubscriptionMatching(new Subscription())).thenReturn(null);
+        JSONObject JSObject = buildRequestJsonObject();
+        SubscribeServlet subscribeServlet = new SubscribeServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                JSONObject jo = new JSONObject();
+                jo.put("name", "stub_name");
+                jo.put("version", "2.0");
+                jo.put("metadataOnly", true);
+                jo.put("suspend", true);
+                jo.put("delivery", JSObject);
+                jo.put("aaf_instance", "*");
+                jo.put("follow_redirect", false);
+                jo.put("sync", false);
                 return jo;
             }
 
@@ -266,6 +321,63 @@ public class SubscribeServletTest extends DrServletTestBase {
         verifyEnteringExitCalled(listAppender);
     }
 
+    @Test
+    public void Given_Request_Is_HTTP_POST_And_Content_Header_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated() throws Exception {
+        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.feed; version=1.1");
+        when(request.getContentType()).thenReturn("stub_contentType");
+        when(request.getPathInfo()).thenReturn("/1");
+        subscribeServlet.doPost(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), argThat(notNullValue(String.class)));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_POST_And_Request_Contains_Badly_Formed_JSON_Then_Bad_Request_Response_Is_Generated() throws Exception {
+        when(request.getPathInfo()).thenReturn("/1");
+        subscribeServlet.doPost(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_POST_And_Active_Feeds_Equals_Max_Feeds_Then_Bad_Request_Response_Is_Generated() throws Exception {
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "maxSubs", 0, true);
+        when(request.getPathInfo()).thenReturn("/1");
+        SubscribeServlet subscribeServlet = new SubscribeServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                return new JSONObject();
+            }
+        };
+        subscribeServlet.doPost(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_CONFLICT), argThat(notNullValue(String.class)));
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_POST_And_POST_Fails_Bad_Request_Response_Is_Generated() throws Exception {
+        when(request.getPathInfo()).thenReturn("/2");
+        PowerMockito.mockStatic(Subscription.class);
+        PowerMockito.when(Subscription.getSubscriptionMatching(new Subscription())).thenReturn(null);
+        JSONObject JSObject = buildRequestJsonObject();
+        SubscribeServlet subscribeServlet = new SubscribeServlet() {
+            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+                JSONObject jo = new JSONObject();
+                jo.put("name", "stub_name");
+                jo.put("version", "2.0");
+                jo.put("metadataOnly", true);
+                jo.put("suspend", true);
+                jo.put("delivery", JSObject);
+                jo.put("aaf_instance", "legacy");
+                jo.put("follow_redirect", false);
+                jo.put("sync", false);
+                return jo;
+            }
+
+            @Override
+            protected boolean doInsert(Insertable bean) {
+                return false;
+            }
+        };
+        subscribeServlet.doPost(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+    }
 
     @NotNull
     private JSONObject buildRequestJsonObject() {
@@ -279,7 +391,7 @@ public class SubscribeServletTest extends DrServletTestBase {
 
     private void setUpValidSecurityOnHttpRequest() throws Exception {
         when(request.isSecure()).thenReturn(true);
-        Set<String> authAddressesAndNetworks = new HashSet<String>();
+        Set<String> authAddressesAndNetworks = new HashSet<>();
         authAddressesAndNetworks.add(("127.0.0.1"));
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "authorizedAddressesAndNetworks", authAddressesAndNetworks, true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", false, true);
@@ -288,27 +400,6 @@ public class SubscribeServletTest extends DrServletTestBase {
 
     private void setBehalfHeader(String headerValue) {
         when(request.getHeader(BEHALF_HEADER)).thenReturn(headerValue);
-    }
-
-    private void setValidPathInfoInHttpHeader() {
-        when(request.getPathInfo()).thenReturn("/123");
-    }
-
-    private void setFeedToReturnInvalidFeedIdSupplied() {
-        PowerMockito.mockStatic(Feed.class);
-        PowerMockito.when(Feed.getFeedById(anyInt())).thenReturn(null);
-    }
-
-    private void setFeedToReturnValidFeedForSuppliedId() {
-        PowerMockito.mockStatic(Feed.class);
-        Feed feed = mock(Feed.class);
-        PowerMockito.when(Feed.getFeedById(anyInt())).thenReturn(feed);
-        when(feed.isDeleted()).thenReturn(false);
-        when(feed.asJSONObject(true)).thenReturn(mock(JSONObject.class));
-        when(feed.getPublisher()).thenReturn("Stub_Value");
-        when(feed.getName()).thenReturn("stub_name");
-        when(feed.getVersion()).thenReturn("1.0");
-        when(feed.asLimitedJSONObject()).thenReturn(mock(JSONObject.class));
     }
 
     private void setAuthoriserToReturnRequestNotAuthorized() throws IllegalAccessException {
@@ -335,8 +426,6 @@ public class SubscribeServletTest extends DrServletTestBase {
     private void setupValidAuthorisedRequest() throws Exception {
         setUpValidSecurityOnHttpRequest();
         setBehalfHeader("Stub_Value");
-        setValidPathInfoInHttpHeader();
-        setFeedToReturnValidFeedForSuppliedId();
     }
 
     private void setUpValidContentHeadersAndJSONOnHttpRequest() {

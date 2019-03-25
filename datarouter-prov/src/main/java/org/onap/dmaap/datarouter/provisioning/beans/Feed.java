@@ -24,17 +24,21 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.JSONUtilities;
+import org.onap.dmaap.datarouter.provisioning.utils.PasswordProcessor;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 
 import java.io.InvalidObjectException;
+import java.security.GeneralSecurityException;
 import java.sql.*;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 
 /**
  * The representation of a Feed.  Feeds can be retrieved from the DB, or stored/updated in the DB.
@@ -59,6 +63,7 @@ public class Feed extends Syncable {
     private boolean suspended;
     private Date last_mod;
     private Date created_date;
+    private String aaf_instance;
 
     /**
      * Check if a feed ID is valid.
@@ -82,7 +87,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.log(Level.WARN, "PROV0024 Feed.isFeedValid: ", e);
         }
         return count != 0;
     }
@@ -132,8 +137,8 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.info("countActiveFeeds: " + e.getMessage());
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.info("PROV0025 Feed.countActiveFeeds: " + e.getMessage());
+            intlogger.log(Level.WARN, "PROV0025 Feed.countActiveFeeds: ", e);
         }
         return count;
     }
@@ -153,8 +158,8 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.info("getMaxFeedID: " + e.getMessage());
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.info("PROV0026 Feed.getMaxFeedID: "+e.getMessage());
+            intlogger.log(Level.WARN, "PROV0026 Feed.getMaxFeedID: ", e);
         }
         return max;
     }
@@ -200,7 +205,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.log(Level.WARN, "PROV0027 Feed.getAllFeeds: ", e);
         }
         return map.values();
     }
@@ -234,7 +239,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.log(Level.WARN, "PROV0028 Feed.getFilteredFeedUrlList: ", e);
         }
         return list;
     }
@@ -271,7 +276,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.log(Level.WARN, "PROV0029 Feed.getFeedBySQL: ", e);
         }
         return feed;
     }
@@ -294,6 +299,7 @@ public class Feed extends Syncable {
         this.suspended = false;
         this.last_mod = new Date();
         this.created_date = new Date();
+        this.aaf_instance = "";
     }
 
     public Feed(ResultSet rs) throws SQLException {
@@ -315,6 +321,7 @@ public class Feed extends Syncable {
         this.suspended = rs.getBoolean("SUSPENDED");
         this.last_mod = rs.getDate("LAST_MOD");
         this.created_date = rs.getTimestamp("CREATED_DATE");
+        this.aaf_instance = rs.getString("AAF_INSTANCE");
     }
 
     public Feed(JSONObject jo) throws InvalidObjectException {
@@ -322,41 +329,49 @@ public class Feed extends Syncable {
         try {
             // The JSONObject is assumed to contain a vnd.dmaap-dr.feed representation
             this.feedid = jo.optInt("feedid", -1);
-            this.groupid = jo.optInt("groupid"); //New field is added - Groups feature Rally:US708115 - 1610
+            this.groupid = jo.optInt("groupid");
             this.name = jo.getString("name");
+            this.aaf_instance = jo.optString("aaf_instance", "legacy");
+            if(!(aaf_instance.equalsIgnoreCase("legacy"))){
+                if (aaf_instance.length() > 255){
+                    throw new InvalidObjectException("aaf_instance field is too long");
+                }
+            }
             if (name.length() > 255)
                 throw new InvalidObjectException("name field is too long");
-            this.version = jo.getString("version");
-            if (version.length() > 20)
+            try {
+                this.version = jo.getString("version");
+            } catch (JSONException e) {
+                this.version = null;
+            }
+            if(version != null && version.length() > 20)
                 throw new InvalidObjectException("version field is too long");
             this.description = jo.optString("description");
-            this.business_description = jo.optString("business_description"); // New field is added - Groups feature Rally:US708102 - 1610
+            this.business_description = jo.optString("business_description");
             if (description.length() > 1000)
                 throw new InvalidObjectException("technical description field is too long");
-
-            if (business_description.length() > 1000) // New field is added - Groups feature Rally:US708102 - 1610
+            if (business_description.length() > 1000)
                 throw new InvalidObjectException("business description field is too long");
-
             this.authorization = new FeedAuthorization();
             JSONObject jauth = jo.getJSONObject("authorization");
             this.authorization.setClassification(jauth.getString("classification"));
             if (this.authorization.getClassification().length() > 32)
                 throw new InvalidObjectException("classification field is too long");
-            JSONArray ja = jauth.getJSONArray("endpoint_ids");
-            for (int i = 0; i < ja.length(); i++) {
-                JSONObject id = ja.getJSONObject(i);
+            JSONArray endPointIds = jauth.getJSONArray("endpoint_ids");
+            for (int i = 0; i < endPointIds.length(); i++) {
+                JSONObject id = endPointIds.getJSONObject(i);
                 FeedEndpointID fid = new FeedEndpointID(id.getString("id"), id.getString("password"));
-                if (fid.getId().length() > 20)
+                if (fid.getId().length() > 60)
                     throw new InvalidObjectException("id field is too long (" + fid.getId() + ")");
                 if (fid.getPassword().length() > 32)
-                    throw new InvalidObjectException("password field is too long (" + fid.getPassword() + ")");
+                    throw new InvalidObjectException("password field is too long ("+ fid.getPassword()+")");  //Fortify scan fixes - Privacy Violation
                 this.authorization.getEndpoint_ids().add(fid);
             }
             if (this.authorization.getEndpoint_ids().size() < 1)
                 throw new InvalidObjectException("need to specify at least one endpoint_id");
-            ja = jauth.getJSONArray("endpoint_addrs");
-            for (int i = 0; i < ja.length(); i++) {
-                String addr = ja.getString(i);
+            endPointIds = jauth.getJSONArray("endpoint_addrs");
+            for (int i = 0; i < endPointIds.length(); i++) {
+                String addr = endPointIds.getString(i);
                 if (!JSONUtilities.validIPAddrOrSubnet(addr))
                     throw new InvalidObjectException("bad IP addr or subnet mask: " + addr);
                 this.authorization.getEndpoint_addrs().add(addr);
@@ -368,8 +383,10 @@ public class Feed extends Syncable {
             JSONObject jol = jo.optJSONObject("links");
             this.links = (jol == null) ? (new FeedLinks()) : (new FeedLinks(jol));
         } catch (InvalidObjectException e) {
+            intlogger.log(Level.WARN, "PROV0030 Feed.Feed: ", e);
             throw e;
         } catch (Exception e) {
+            intlogger.error("PROV0031 Feed.Feed: invalid JSON: "+e);
             throw new InvalidObjectException("invalid JSON: " + e.getMessage());
         }
     }
@@ -387,6 +404,14 @@ public class Feed extends Syncable {
         fl.setPublish(URLUtilities.generatePublishURL(feedid));
         fl.setSubscribe(URLUtilities.generateSubscribeURL(feedid));
         fl.setLog(URLUtilities.generateFeedLogURL(feedid));
+    }
+
+    public String getAafInstance() {
+        return aaf_instance;
+    }
+
+    public void setAaf_instance(String aaf_instance) {
+        this.aaf_instance = aaf_instance;
     }
 
     //new getter setters for groups- Rally:US708115 - 1610
@@ -499,6 +524,7 @@ public class Feed extends Syncable {
         jo.put("suspend", suspended);
         jo.put("last_mod", last_mod.getTime());
         jo.put("created_date", created_date.getTime());
+        jo.put("aaf_instance", aaf_instance);
         return jo;
     }
 
@@ -581,7 +607,7 @@ public class Feed extends Syncable {
             }
 
             // Finally, create the FEEDS row
-            sql = "insert into FEEDS (FEEDID, NAME, VERSION, DESCRIPTION, AUTH_CLASS, PUBLISHER, SELF_LINK, PUBLISH_LINK, SUBSCRIBE_LINK, LOG_LINK, DELETED, SUSPENDED,BUSINESS_DESCRIPTION, GROUPID) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?)";
+            sql = "insert into FEEDS (FEEDID, NAME, VERSION, DESCRIPTION, AUTH_CLASS, PUBLISHER, SELF_LINK, PUBLISH_LINK, SUBSCRIBE_LINK, LOG_LINK, DELETED, SUSPENDED,BUSINESS_DESCRIPTION, GROUPID, AAF_INSTANCE) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             try(PreparedStatement ps2 = c.prepareStatement(sql)) {
                 ps2.setInt(1, feedid);
                 ps2.setString(2, getName());
@@ -595,8 +621,9 @@ public class Feed extends Syncable {
                 ps2.setString(10, getLinks().getLog());
                 ps2.setBoolean(11, isDeleted());
                 ps2.setBoolean(12, isSuspended());
-                ps2.setString(13, getBusiness_description()); // New field is added - Groups feature Rally:US708102 - 1610
-                ps2.setInt(14, groupid); //New field is added - Groups feature Rally:US708115 - 1610
+                ps2.setString(13, getBusiness_description());
+                ps2.setInt(14, groupid);
+                ps2.setString(15, getAafInstance());
                 ps2.executeUpdate();
             }
         } catch (SQLException e) {
@@ -675,8 +702,8 @@ public class Feed extends Syncable {
             ps.setString(2, getAuthorization().getClassification());
             ps.setInt(3, deleted ? 1 : 0);
             ps.setInt(4, suspended ? 1 : 0);
-            ps.setString(5, getBusiness_description()); // New field is added - Groups feature Rally:US708102 - 1610
-            ps.setInt(6, groupid); //New field is added - Groups feature Rally:US708115 - 1610
+            ps.setString(5, getBusiness_description());
+            ps.setInt(6, groupid);
             ps.setInt(7, feedid);
             ps.executeUpdate();
             ps.close();
@@ -760,6 +787,8 @@ public class Feed extends Syncable {
             return false;
         if (suspended != of.suspended)
             return false;
+        if (!aaf_instance.equals(of.aaf_instance))
+            return false;
         return true;
     }
 
@@ -770,6 +799,6 @@ public class Feed extends Syncable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(feedid, groupid, name, version, description, business_description, authorization, publisher, links, deleted, suspended, last_mod, created_date);
+        return super.hashCode();
     }
 }
