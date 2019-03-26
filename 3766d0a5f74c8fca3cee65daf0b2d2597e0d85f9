@@ -22,6 +22,30 @@
       "revId": "3766d0a5f74c8fca3cee65daf0b2d2597e0d85f9",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8d13b4c6_6c0d70da",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 4407
+      },
+      "writtenOn": "2019-03-26T11:08:53Z",
+      "side": 1,
+      "message": "A new column here is not the answer to problem that we don\u0027t tell the user anything we send when publishing a file to them. So i think the answer is we maybe create something where we tell them the header\u0027s we send them along with the metadata when pushing a file to them. This does not fall into the category here. Another ticket would be need to be done out lining what we wanted if anything to put into documentation.",
+      "parentUuid": "54b72f91_cd8de783",
+      "range": {
+        "startLine": 433,
+        "startChar": 30,
+        "endLine": 433,
+        "endChar": 40
+      },
+      "revId": "3766d0a5f74c8fca3cee65daf0b2d2597e0d85f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
