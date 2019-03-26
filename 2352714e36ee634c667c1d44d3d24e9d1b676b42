@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "15d2f156_d24e7bce",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-03-26T14:32:13Z",
+      "side": 1,
+      "message": "Table alignment out by one.\nSame below",
+      "range": {
+        "startLine": 433,
+        "startChar": 59,
+        "endLine": 433,
+        "endChar": 62
+      },
+      "revId": "2352714e36ee634c667c1d44d3d24e9d1b676b42",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
