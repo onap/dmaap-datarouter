@@ -23,22 +23,18 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
-import java.io.InvalidObjectException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.PasswordProcessor;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
+
+import java.io.InvalidObjectException;
+import java.security.GeneralSecurityException;
+import java.sql.*;
+import java.util.Date;
+import java.util.*;
 
 /**
  * The representation of a Subscription.  Subscriptions can be retrieved from the DB, or stored/updated in the DB.
@@ -62,6 +58,7 @@ public class Subscription extends Syncable {
     private int feedid;
     private int groupid; //New field is added - Groups feature Rally:US708115 - 1610
     private SubDelivery delivery;
+    private boolean followRedirect;
     private boolean metadataOnly;
     private String subscriber;
     private SubLinks links;
@@ -69,18 +66,20 @@ public class Subscription extends Syncable {
     private Date lastMod;
     private Date createdDate;
     private boolean privilegedSubscriber;
+    private String aafInstance;
     private boolean decompress;
 
     public static Subscription getSubscriptionMatching(Subscription sub) {
         SubDelivery deli = sub.getDelivery();
         String sql = String.format(
-                "select * from SUBSCRIPTIONS where FEEDID = %d and DELIVERY_URL = \"%s\" and DELIVERY_USER = \"%s\" and DELIVERY_PASSWORD = \"%s\" and DELIVERY_USE100 = %d and METADATA_ONLY = %d",
+                "select * from SUBSCRIPTIONS where FEEDID = %d and DELIVERY_URL = \"%s\" and DELIVERY_USER = \"%s\" and DELIVERY_PASSWORD = \"%s\" and DELIVERY_USE100 = %d and METADATA_ONLY = %d and FOLLOW_REDIRECTS = %d",
                 sub.getFeedid(),
                 deli.getUrl(),
                 deli.getUser(),
                 deli.getPassword(),
                 deli.isUse100() ? 1 : 0,
-                sub.isMetadataOnly() ? 1 : 0
+                sub.isMetadataOnly() ? 1 : 0,
+                sub.isFollowRedirect() ? 1 :0
         );
         List<Subscription> list = getSubscriptionsForSQL(sql);
         return !list.isEmpty() ? list.get(0) : null;
@@ -145,7 +144,6 @@ public class Subscription extends Syncable {
             DB db = new DB();
             @SuppressWarnings("resource")
             Connection conn = db.getConnection();
-
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, String.valueOf(feedid));
                 try (ResultSet rs = stmt.executeQuery()) {
@@ -197,12 +195,14 @@ public class Subscription extends Syncable {
         this.groupid = -1; //New field is added - Groups feature Rally:US708115 - 1610
         this.delivery = new SubDelivery(url, user, password, false);
         this.metadataOnly = false;
+        this.followRedirect = false;
         this.subscriber = "";
         this.links = new SubLinks();
         this.suspended = false;
         this.lastMod = new Date();
         this.createdDate = new Date();
         this.privilegedSubscriber = false;
+        this.aafInstance = "";
         this.decompress = false;
     }
 
@@ -212,13 +212,14 @@ public class Subscription extends Syncable {
         this.groupid = rs.getInt("GROUPID"); //New field is added - Groups feature Rally:US708115 - 1610
         this.delivery = new SubDelivery(rs);
         this.metadataOnly = rs.getBoolean("METADATA_ONLY");
+        this.followRedirect = rs.getBoolean("FOLLOW_REDIRECTS");
         this.subscriber = rs.getString("SUBSCRIBER");
-        this.links = new SubLinks(rs.getString("SELF_LINK"), URLUtilities.generateFeedURL(feedid),
-                rs.getString("LOG_LINK"));
+        this.links = new SubLinks(rs.getString("SELF_LINK"), URLUtilities.generateFeedURL(feedid), rs.getString("LOG_LINK"));
         this.suspended = rs.getBoolean("SUSPENDED");
         this.lastMod = rs.getDate("LAST_MOD");
         this.createdDate = rs.getDate("CREATED_DATE");
         this.privilegedSubscriber = rs.getBoolean("PRIVILEGED_SUBSCRIBER");
+        this.aafInstance = rs.getString("AAF_INSTANCE");
         this.decompress  = rs.getBoolean("DECOMPRESS");
     }
 
@@ -229,7 +230,11 @@ public class Subscription extends Syncable {
             this.subid = jo.optInt(SUBID_KEY, -1);
             this.feedid = jo.optInt(FEEDID_KEY, -1);
             this.groupid = jo.optInt(GROUPID_KEY, -1); //New field is added - Groups feature Rally:US708115 - 1610
-
+            this.aafInstance = jo.optString("aaf_instance", "legacy");
+            if(!(aafInstance.equalsIgnoreCase("legacy"))){
+                if (aafInstance.length() > 255)
+                    throw new InvalidObjectException("aaf_instance field is too long");
+            }
             JSONObject jdeli = jo.getJSONObject("delivery");
             String url = jdeli.getString("url");
             String user = jdeli.getString("user");
@@ -245,15 +250,15 @@ public class Subscription extends Syncable {
             if (url.length() > 256) {
                 throw new InvalidObjectException("delivery url field is too long");
             }
-            if (user.length() > 20) {
+            if (user.length() > 60) {
                 throw new InvalidObjectException("delivery user field is too long");
             }
             if (password.length() > 32) {
                 throw new InvalidObjectException("delivery password field is too long");
             }
             this.delivery = new SubDelivery(url, user, password, use100);
-
             this.metadataOnly = jo.getBoolean("metadataOnly");
+            this.followRedirect = jo.optBoolean("follow_redirect", false);
             this.suspended = jo.optBoolean("suspend", false);
             this.privilegedSubscriber = jo.optBoolean("privilegedSubscriber", false);
             this.decompress = jo.optBoolean("decompress", false);
@@ -296,6 +301,13 @@ public class Subscription extends Syncable {
         SubLinks sl = getLinks();
         sl.setFeed(URLUtilities.generateFeedURL(feedid));
     }
+    public String getAafInstance() {
+        return aafInstance;
+    }
+
+    public void setAafInstance(String aafInstance) {
+        this.aafInstance = aafInstance;
+    }
 
     //New getter setters for Groups feature Rally:US708115 - 1610
     public int getGroupid() {
@@ -322,7 +334,14 @@ public class Subscription extends Syncable {
         this.metadataOnly = metadataOnly;
     }
 
-    public boolean isSuspended() {
+    private boolean isFollowRedirect() {
+        return followRedirect;
+    }
+    public void setFollowRedirect(boolean followRedirect) {
+        this.followRedirect = followRedirect;
+    }
+
+    boolean isSuspended() {
         return suspended;
     }
 
@@ -355,7 +374,7 @@ public class Subscription extends Syncable {
         return links;
     }
 
-    public void setLinks(SubLinks links) {
+    void setLinks(SubLinks links) {
         this.links = links;
     }
 
@@ -375,12 +394,14 @@ public class Subscription extends Syncable {
         jo.put(GROUPID_KEY, groupid); //New field is added - Groups feature Rally:US708115 - 1610
         jo.put("delivery", delivery.asJSONObject());
         jo.put("metadataOnly", metadataOnly);
+        jo.put("follow_redirect", followRedirect);
         jo.put("subscriber", subscriber);
         jo.put("links", links.asJSONObject());
         jo.put("suspend", suspended);
         jo.put(LAST_MOD_KEY, lastMod.getTime());
         jo.put(CREATED_DATE, createdDate.getTime());
         jo.put("privilegedSubscriber", privilegedSubscriber);
+        jo.put("aaf_instance", aafInstance);
         jo.put("decompress", decompress);
         return jo;
     }
@@ -419,7 +440,7 @@ public class Subscription extends Syncable {
             }
 
             // Create the SUBSCRIPTIONS row
-            String sql = "insert into SUBSCRIPTIONS (SUBID, FEEDID, DELIVERY_URL, DELIVERY_USER, DELIVERY_PASSWORD, DELIVERY_USE100, METADATA_ONLY, SUBSCRIBER, SUSPENDED, GROUPID, PRIVILEGED_SUBSCRIBER, DECOMPRESS) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "insert into SUBSCRIPTIONS (SUBID, FEEDID, DELIVERY_URL, DELIVERY_USER, DELIVERY_PASSWORD, DELIVERY_USE100, METADATA_ONLY, SUBSCRIBER, SUSPENDED, GROUPID, PRIVILEGED_SUBSCRIBER, FOLLOW_REDIRECTS, DECOMPRESS, AAF_INSTANCE) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             ps = c.prepareStatement(sql, new String[]{SUBID_COL});
             ps.setInt(1, subid);
             ps.setInt(2, feedid);
@@ -432,7 +453,9 @@ public class Subscription extends Syncable {
             ps.setBoolean(9, isSuspended());
             ps.setInt(10, groupid); //New field is added - Groups feature Rally:US708115 - 1610
             ps.setBoolean(11, isPrivilegedSubscriber());
-            ps.setBoolean(12, isDecompress());
+            ps.setInt(12, isFollowRedirect() ? 1 : 0);
+            ps.setBoolean(13, isDecompress());
+            ps.setString(14, getAafInstance());
             ps.execute();
             ps.close();
             // Update the row to set the URLs
@@ -446,6 +469,7 @@ public class Subscription extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0005 doInsert: " + e.getMessage());
+            intlogger.log(Level.WARN, "PROV0005 Subscription.doInsert(1): ", e);
         } finally {
             try {
                 if (ps != null) {
@@ -463,7 +487,7 @@ public class Subscription extends Syncable {
         boolean rv = true;
         PreparedStatement ps = null;
         try {
-            String sql = "update SUBSCRIPTIONS set DELIVERY_URL = ?, DELIVERY_USER = ?, DELIVERY_PASSWORD = ?, DELIVERY_USE100 = ?, METADATA_ONLY = ?, SUSPENDED = ?, GROUPID = ?, PRIVILEGED_SUBSCRIBER = ?, DECOMPRESS = ? where SUBID = ?";
+            String sql = "update SUBSCRIPTIONS set DELIVERY_URL = ?, DELIVERY_USER = ?, DELIVERY_PASSWORD = ?, DELIVERY_USE100 = ?, METADATA_ONLY = ?, SUSPENDED = ?, GROUPID = ?, PRIVILEGED_SUBSCRIBER = ?, FOLLOW_REDIRECTS = ?, DECOMPRESS = ? where SUBID = ?";
             ps = c.prepareStatement(sql);
             ps.setString(1, delivery.getUrl());
             ps.setString(2, delivery.getUser());
@@ -473,8 +497,9 @@ public class Subscription extends Syncable {
             ps.setInt(6, suspended ? 1 : 0);
             ps.setInt(7, groupid); //New field is added - Groups feature Rally:US708115 - 1610
             ps.setInt(8, privilegedSubscriber ? 1 : 0);
-            ps.setInt(9, decompress ? 1 : 0);
-            ps.setInt(10, subid);
+            ps.setInt(9, isFollowRedirect() ? 1 : 0);
+            ps.setInt(10, isDecompress() ? 1 : 0);
+            ps.setInt(11, subid);
             ps.executeUpdate();
         } catch (SQLException e) {
             rv = false;
@@ -576,19 +601,27 @@ public class Subscription extends Syncable {
         if (metadataOnly != os.metadataOnly) {
             return false;
         }
+        if (followRedirect != os.followRedirect) {
+            return false;
+        }
         if (!subscriber.equals(os.subscriber)) {
             return false;
         }
         if (!links.equals(os.links)) {
             return false;
         }
-        return suspended == os.suspended;
+        if (suspended != os.suspended) {
+            return false;
+        }
+        if (!aafInstance.equals(os.aafInstance)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(subid, feedid, groupid, delivery, metadataOnly, subscriber, links, suspended, lastMod,
-                createdDate);
+        return super.hashCode();
     }
 
     @Override

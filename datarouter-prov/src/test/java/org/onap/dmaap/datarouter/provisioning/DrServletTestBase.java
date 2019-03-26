@@ -28,24 +28,17 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.Properties;
-import java.util.Scanner;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class DrServletTestBase {
-
 
     @Before
     public void setUp() throws Exception {
@@ -61,7 +54,7 @@ public class DrServletTestBase {
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "synctask", synchronizerTask, true);
     }
 
-    public ListAppender<ILoggingEvent> setTestLogger(Class c) {
+    ListAppender<ILoggingEvent> setTestLogger(Class c) {
         Logger logger = (Logger) LoggerFactory.getLogger(c);
         ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
         listAppender.start();
@@ -69,7 +62,7 @@ public class DrServletTestBase {
         return listAppender;
     }
 
-    public void verifyEnteringExitCalled(ListAppender<ILoggingEvent> listAppender) {
+    void verifyEnteringExitCalled(ListAppender<ILoggingEvent> listAppender) {
         assertEquals("EELF0004I  Entering data router provisioning component with RequestId and InvocationId", listAppender.list.get(0).getMessage());
         assertEquals("EELF0005I  Exiting data router provisioning component with RequestId and InvocationId", listAppender.list.get(2).getMessage());
         assertEquals(3, listAppender.list.size());

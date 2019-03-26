@@ -59,7 +59,9 @@ public class NodeServletTest {
     @Mock
     private HttpServletResponse response;
 
-    ListAppender<ILoggingEvent> listAppender;
+    private ListAppender<ILoggingEvent> listAppender;
+
+    private NodeConfigManager config = mock(NodeConfigManager.class);
 
     @Before
     public void setUp() throws Exception {
@@ -216,6 +218,17 @@ public class NodeServletTest {
     }
 
     @Test
+    public void Given_Request_Is_HTTP_PUT_On_Publish_On_AAF_Feed_And_Cadi_Enabled_And_No_Permissions_Then_Forbidden_Response_Is_Generated() throws Exception {
+        when(config.getCadiEnabeld()).thenReturn(true);
+        when(config.getAafInstance("1")).thenReturn("*");
+        when(request.getPathInfo()).thenReturn("/publish/1/fileName");
+        setHeadersForValidRequest(true);
+        nodeServlet.doPut(request, response);
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verifyEnteringExitCalled(listAppender);
+    }
+
+    @Test
     public void Given_Request_Is_HTTP_DELETE_On_Publish_With_Meta_Data_Malformed_Then_Bad_Request_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn("/publish/1/fileName");
         setHeadersForValidRequest(false);
@@ -286,7 +299,6 @@ public class NodeServletTest {
     }
 
     private void setUpConfig() throws IllegalAccessException {
-        NodeConfigManager config = mock(NodeConfigManager.class);
         PowerMockito.mockStatic(NodeConfigManager.class);
         when(config.isShutdown()).thenReturn(false);
         when(config.isConfigured()).thenReturn(true);
