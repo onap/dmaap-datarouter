@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "54b72f91_cd8de783",
+        "filename": "docs/data-router/data-router.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-03-26T09:11:21Z",
+      "side": 1,
+      "message": "decompressed, same below\n\nAlso, you decided not to add a new column to explain the header that\u0027ll be sent from node?",
+      "range": {
+        "startLine": 433,
+        "startChar": 30,
+        "endLine": 433,
+        "endChar": 40
+      },
+      "revId": "3766d0a5f74c8fca3cee65daf0b2d2597e0d85f9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
