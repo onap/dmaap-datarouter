@@ -20,8 +20,10 @@
 
 package org.onap.dmaap.datarouter.provisioning.utils;
 
-import org.junit.*;
-import org.junit.rules.TemporaryFolder;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 
 import org.onap.dmaap.datarouter.provisioning.InternalServlet;
@@ -39,10 +41,10 @@ import java.io.IOException;
 import java.util.Map;
 
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
-
 import java.util.HashMap;
 
 
@@ -53,10 +55,6 @@ public class LogfileLoaderTest {
     private static EntityManagerFactory emf;
     private static EntityManager em;
     private LogfileLoader lfl = LogfileLoader.getLoader();
-
-
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
 
 
     @BeforeClass
@@ -78,8 +76,30 @@ public class LogfileLoaderTest {
     }
 
 
+    @After
+    public void tearDown() {
+        try {
+            new FileWriter("unit-test-logs/testFile1.txt").close();
+        }catch (IOException ioe){
+            System.out.println(ioe.getMessage());
+        }
+    }
+
+
     @Test
-    public void Verify_File_Processing_when_Req_Type_LOG() throws IOException {
+    public void Verify_Histogram_When_Request_Type_Post() {
+        String fileContent = "2018-08-29-10-10-10-543.|PUB|1|1|https://dmaap-dr-prov:8443/publish/1/file123/|POST|application/vnd.att-dr.feed|2|128.0.0.9|user123|200";
+        lfl.process(prepFile(fileContent));
+        Map<Long, Long> expect = new HashMap<>();
+        expect.put(17772L,1L);
+        expect.put(29353L,1L);
+        Map<Long, Long> actual = lfl.getHistogram();
+        assertEquals(actual,expect);
+    }
+
+
+    @Test
+    public void Verify_File_Processing_when_Req_Type_LOG() {
         String fileContent = "2018-08-29-10-10-10-543.|LOG|1|1|url/file123|method|1|1|type|1|128.0.0.9|user123|2|1|1|1|other|1";
         int[] actual = lfl.process(prepFile(fileContent));
         int[] expect = {0, 1};
@@ -88,7 +108,7 @@ public class LogfileLoaderTest {
 
 
     @Test
-    public void Verify_File_Processing_when_Req_Type_EXP() throws IOException {
+    public void Verify_File_Processing_when_Req_Type_EXP() {
         String fileContent = "2018-08-29-10-10-10-543.|EXP|1|1|1|'url/file123'|method|ctype|3|other|4";
         int[] actual = lfl.process(prepFile(fileContent));
         int[] expect = {0, 1};
@@ -97,29 +117,17 @@ public class LogfileLoaderTest {
 
 
     @Test
-    public void Verify_Records_Prune_When_Record_Count_Is_Less_Then_Threshold() throws IOException{
+    public void Verify_Records_Prune_When_Record_Count_Is_Less_Then_Threshold() {
         String fileContent = "2018-08-29-10-10-10-543.|PUB|1|1|https://dmaap-dr-prov:8443/publish/1/file123/|POST|application/vnd.att-dr.feed|2|128.0.0.9|user123|200";
         lfl.process(prepFile(fileContent));
         PowerMockito.mockStatic(Parameters.class);
         PowerMockito.when(Parameters.getParameter(Parameters.PROV_LOG_RETENTION)).thenReturn(new Parameters(Parameters.PROV_LOG_RETENTION, "0"));
-        Assert.assertEquals(lfl.pruneRecords(), false);
+        assertFalse(lfl.pruneRecords());
     }
 
 
-    @Test
-    public void Verify_Histogram_When_Request_Type_Post() throws Exception {
-        String fileContent = "2018-08-29-10-10-10-543.|PUB|1|1|https://dmaap-dr-prov:8443/publish/1/file123/|POST|application/vnd.att-dr.feed|2|128.0.0.9|user123|200";
-        lfl.process(prepFile(fileContent));
-        Map<Long, Long> expect = new HashMap<>();
-        expect.put(17772L,2L);
-        expect.put(29353L,1L);
-        Map<Long, Long> actual = lfl.getHistogram();
-        assertTrue(actual.equals(expect));
-    }
-
-
-    private File prepFile(String content) throws IOException{
-        File file1 = folder.newFile("myfile1.txt");
+    private File prepFile(String content){
+        File file1 = new File("unit-test-logs/testFile1.txt");
         try (FileWriter fileWriter = new FileWriter(file1)) {
             fileWriter.write(content);
         }catch (IOException e){
