@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "e8e06d75_cdde1871",
+        "filename": "datarouter-node/src/test/java/org/onap/dmaap/datarouter/node/ProvDataTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-03-27T17:35:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09479b70_cf295fdd",
+      "range": {
+        "startLine": 39,
+        "startChar": 38,
+        "endLine": 39,
+        "endChar": 45
+      },
+      "revId": "7ac0b116e6eff6d95571354aaca9af6ff9645cc9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cdb288ab_b579e5c7",
         "filename": "datarouter-node/src/test/java/org/onap/dmaap/datarouter/node/ProvDataTest.java",
         "patchSetId": 1
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "c7dff7f7_d89a2597",
+        "filename": "datarouter-node/src/test/java/org/onap/dmaap/datarouter/node/ProvDataTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-03-27T17:35:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cdb288ab_b579e5c7",
+      "range": {
+        "startLine": 43,
+        "startChar": 8,
+        "endLine": 43,
+        "endChar": 14
+      },
+      "revId": "7ac0b116e6eff6d95571354aaca9af6ff9645cc9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1acfa4f0_c5dff1e8",
         "filename": "datarouter-node/src/test/java/org/onap/dmaap/datarouter/node/ProvDataTest.java",
         "patchSetId": 1
@@ -59,6 +107,30 @@
       "writtenOn": "2019-03-27T15:09:03Z",
       "side": 1,
       "message": "A lot of unnecessary empty lines here",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 0
+      },
+      "revId": "7ac0b116e6eff6d95571354aaca9af6ff9645cc9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "19a94d89_fc569c4d",
+        "filename": "datarouter-node/src/test/java/org/onap/dmaap/datarouter/node/ProvDataTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-03-27T17:35:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1acfa4f0_c5dff1e8",
       "range": {
         "startLine": 72,
         "startChar": 0,
