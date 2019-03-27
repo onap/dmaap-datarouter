@@ -63,7 +63,7 @@
         <skip.docker.tag>true</skip.docker.tag>
         <skip.docker.push>true</skip.docker.push>
         <commons-codec.version>1.10</commons-codec.version>
-        <sonar.exclusions>datarouter-prov/src/main/java/org/onap/dmaap/datarouter/reports/*</sonar.exclusions>
+        <sonar.exclusions>datarouter-prov/src/main/java/org/onap/dmaap/datarouter/reports/**</sonar.exclusions>
     </properties>
     <modules>
         <module>datarouter-prov</module>
@@ -102,6 +102,7 @@
                         <exclude>**/generated-sources/**</exclude>
                         <exclude>**/yang-gen/**</exclude>
                         <exclude>**/pax/**</exclude>
+                        <exclude>datarouter-prov/src/main/java/org/onap/dmaap/datarouter/reports/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
