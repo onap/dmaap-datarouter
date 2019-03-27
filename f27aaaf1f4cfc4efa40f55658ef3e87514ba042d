@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a83170a5_7c34c4e5",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/utils/LogfileLoaderTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-27T16:07:13Z",
+      "side": 1,
+      "message": "This can be changed to assertEquals(expect, actual);",
+      "range": {
+        "startLine": 90,
+        "startChar": 8,
+        "endLine": 90,
+        "endChar": 18
+      },
+      "revId": "f27aaaf1f4cfc4efa40f55658ef3e87514ba042d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2eeae16b_70368124",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/utils/LogfileLoaderTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-03-27T16:07:13Z",
+      "side": 1,
+      "message": "This can be changed to assertFalse(lfl.pruneRecords());",
+      "range": {
+        "startLine": 118,
+        "startChar": 8,
+        "endLine": 118,
+        "endChar": 27
+      },
+      "revId": "f27aaaf1f4cfc4efa40f55658ef3e87514ba042d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
