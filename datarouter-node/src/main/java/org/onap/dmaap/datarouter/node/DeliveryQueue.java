@@ -72,7 +72,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     private boolean failed;
     private long failduration;
     private long resumetime;
-    File dir;
+    private File dir;
     private Vector<DeliveryTask> todo = new Vector<>();
 
     /**
@@ -80,7 +80,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
      *
      * @return The length of the task in bytes or 0 if the task cannot be cancelled.
      */
-    public synchronized long cancelTask(String pubid) {
+    synchronized long cancelTask(String pubid) {
         if (working.get(pubid) != null) {
             return (0);
         }
@@ -111,7 +111,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     /**
      * Mark that a delivery task has succeeded.
      */
-    public synchronized void markSuccess(DeliveryTask task) {
+    private synchronized void markSuccess(DeliveryTask task) {
         working.remove(task.getPublishId());
         task.clean();
         failed = false;
@@ -121,14 +121,14 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     /**
      * Mark that a delivery task has expired.
      */
-    public synchronized void markExpired(DeliveryTask task) {
+    private synchronized void markExpired(DeliveryTask task) {
         task.clean();
     }
 
     /**
      * Mark that a delivery task has failed permanently.
      */
-    public synchronized void markFailNoRetry(DeliveryTask task) {
+    private synchronized void markFailNoRetry(DeliveryTask task) {
         working.remove(task.getPublishId());
         task.clean();
         failed = false;
@@ -157,7 +157,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     /**
      * Mark that a delivery task has been redirected.
      */
-    public synchronized void markRedirect(DeliveryTask task) {
+    private synchronized void markRedirect(DeliveryTask task) {
         working.remove(task.getPublishId());
         retry.put(task.getPublishId(), task);
     }
@@ -165,7 +165,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     /**
      * Mark that a delivery task has temporarily failed.
      */
-    public synchronized void markFailWithRetry(DeliveryTask task) {
+    private synchronized void markFailWithRetry(DeliveryTask task) {
         working.remove(task.getPublishId());
         retry.put(task.getPublishId(), task);
         fdupdate();
@@ -174,7 +174,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     /**
      * Get the next task.
      */
-    public synchronized DeliveryTask getNext() {
+    synchronized DeliveryTask getNext() {
         DeliveryTask ret = peekNext();
         if (ret != null) {
             todoindex++;
@@ -186,7 +186,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     /**
      * Peek at the next task.
      */
-    public synchronized DeliveryTask peekNext() {
+    synchronized DeliveryTask peekNext() {
         long now = System.currentTimeMillis();
         long mindate = now - deliveryQueueHelper.getExpirationTimer();
         if (failed) {
@@ -199,7 +199,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
         while (true) {
             if (todoindex >= todo.size()) {
                 todoindex = 0;
-                todo = new Vector<DeliveryTask>();
+                todo = new Vector<>();
                 String[] files = dir.list();
                 Arrays.sort(files);
                 for (String fname : files) {
@@ -228,11 +228,16 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
                     }
                     todo.add(dt);
                 }
-                retry = new Hashtable<String, DeliveryTask>();
+                retry = new Hashtable<>();
             }
             if (todoindex < todo.size()) {
                 DeliveryTask dt = todo.get(todoindex);
                 if (dt.isCleaned()) {
+                    todoindex++;
+                    continue;
+                }
+                if (destinationInfo.isPrivilegedSubscriber() && dt.getResumeTime() > System.currentTimeMillis()) {
+                    retry.put(dt.getPublishId(), dt);
                     todoindex++;
                     continue;
                 }
@@ -250,7 +255,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     /**
      * Create a delivery queue for a given destination info
      */
-    public DeliveryQueue(DeliveryQueueHelper deliveryQueueHelper, DestInfo destinationInfo) {
+    DeliveryQueue(DeliveryQueueHelper deliveryQueueHelper, DestInfo destinationInfo) {
         this.deliveryQueueHelper = deliveryQueueHelper;
         this.destinationInfo = destinationInfo;
         dir = new File(destinationInfo.getSpool());
@@ -288,7 +293,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     /**
      * Message too old to deliver
      */
-    public void reportExpiry(DeliveryTask task) {
+    void reportExpiry(DeliveryTask task) {
         StatusLog.logExp(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), "retriesExhausted", task.getAttempts());
         markExpired(task);
     }
@@ -298,8 +303,9 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
      */
     public void reportStatus(DeliveryTask task, int status, String xpubid, String location) {
         if (status < 300) {
-	        StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), destinationInfo.getAuthUser(), status, xpubid);
-	        if (destinationInfo.isPrivilegedSubscriber()) {
+            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), destinationInfo.getAuthUser(), status, xpubid);
+            if (destinationInfo.isPrivilegedSubscriber()) {
+                task.setResumeTime(System.currentTimeMillis() + deliveryQueueHelper.getWaitForFileProcessFailureTimer());
                 markFailWithRetry(task);
             } else {
                 markSuccess(task);
@@ -367,21 +373,21 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     /**
      * Is there no work to do for this queue right now?
      */
-    public synchronized boolean isSkipSet() {
+    synchronized boolean isSkipSet() {
         return (peekNext() == null);
     }
 
     /**
      * Reset the retry timer
      */
-    public void resetQueue() {
+    void resetQueue() {
         resumetime = System.currentTimeMillis();
     }
 
     /**
      * Get task if in queue and mark as success
      */
-    public boolean markTaskSuccess(String pubId) {
+    boolean markTaskSuccess(String pubId) {
         DeliveryTask task = working.get(pubId);
         if (task != null) {
             markSuccess(task);
@@ -391,7 +397,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
         if (task != null) {
             retry.remove(pubId);
             task.clean();
-            resumetime = 0;
+            resetQueue();
             failduration = 0;
             return true;
         }
