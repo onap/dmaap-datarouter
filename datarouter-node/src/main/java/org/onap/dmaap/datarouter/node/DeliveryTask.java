@@ -66,6 +66,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     private int attempts;
     private String[][] hdrs;
     private String newInvocationId;
+    private long resumeTime;
 
 
     /**
@@ -76,7 +77,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
      *                           the base for the file name in the spool directory and is of
      *                           the form <milliseconds since 1970>.<fqdn of initial data router node>
      */
-    public DeliveryTask(DeliveryTaskHelper deliveryTaskHelper, String pubid) {
+    DeliveryTask(DeliveryTaskHelper deliveryTaskHelper, String pubid) {
         this.deliveryTaskHelper = deliveryTaskHelper;
         this.pubid = pubid;
         destInfo = deliveryTaskHelper.getDestinationInfo();
@@ -89,6 +90,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
         metafile = new File(mfn);
         boolean monly = destInfo.isMetaDataOnly();
         date = Long.parseLong(pubid.substring(0, pubid.indexOf('.')));
+        resumeTime = System.currentTimeMillis();
         Vector<String[]> hdrv = new Vector<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(metafile))) {
@@ -165,7 +167,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     /**
      * Get the publish ID
      */
-    public String getPublishId() {
+    String getPublishId() {
         return (pubid);
     }
 
@@ -332,7 +334,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     /**
      * Remove meta and data files
      */
-    public void clean() {
+    void clean() {
         datafile.delete();
         metafile.delete();
         eelflogger.info(EelfMsgs.INVOKE, newInvocationId);
@@ -341,9 +343,23 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     }
 
     /**
+     * Set the resume time for a delivery task.
+     */
+    void setResumeTime(long resumeTime) {
+        this.resumeTime = resumeTime;
+    }
+
+    /**
+     * Get the resume time for a delivery task.
+     */
+    long getResumeTime() {
+        return resumeTime;
+    }
+
+    /**
      * Has this delivery task been cleaned?
      */
-    public boolean isCleaned() {
+    boolean isCleaned() {
         return (hdrs == null);
     }
 
@@ -357,7 +373,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     /**
      * Get creation date as encoded in the publish ID.
      */
-    public long getDate() {
+    long getDate() {
         return (date);
     }
 
@@ -371,42 +387,42 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     /**
      * Get the content type
      */
-    public String getCType() {
+    String getCType() {
         return (ctype);
     }
 
     /**
      * Get the method
      */
-    public String getMethod() {
+    String getMethod() {
         return (method);
     }
 
     /**
      * Get the file ID
      */
-    public String getFileId() {
+    String getFileId() {
         return (fileid);
     }
 
     /**
      * Get the number of delivery attempts
      */
-    public int getAttempts() {
+    int getAttempts() {
         return (attempts);
     }
 
     /**
      * Get the (space delimited list of) subscription ID for this delivery task
      */
-    public String getSubId() {
+    String getSubId() {
         return (subid);
     }
 
     /**
      * Get the feed ID for this delivery task
      */
-    public String getFeedId() {
+    String getFeedId() {
         return (feedid);
     }
 }
