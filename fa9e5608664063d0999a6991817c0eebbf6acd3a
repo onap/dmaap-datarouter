@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8d6fed7e_5feab92d",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/utils/LogfileLoaderTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-01T13:17:58Z",
+      "side": 1,
+      "message": "Instead of deleting the test, I think this doesn\u0027t clean up as you think it does.\n\nYou could possibly create the File as an instance variable File file1 \u003d new File(\"unit-test-logs/testFile1.txt\") at the top of the file.\n\nIn the tearDown then I think file1.delete() would work",
+      "range": {
+        "startLine": 82,
+        "startChar": 59,
+        "endLine": 82,
+        "endChar": 64
+      },
+      "revId": "fa9e5608664063d0999a6991817c0eebbf6acd3a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
