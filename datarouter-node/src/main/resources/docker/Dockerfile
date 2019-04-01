@@ -25,10 +25,16 @@ MAINTAINER DMAAP Team
 COPY /opt /opt
 
 # curl used for healthcheck
-CMD apt update && apt add curl
+RUN apk update && apk add curl
 
 EXPOSE 8080 8443
 
 WORKDIR /opt
 RUN chmod 0700 startup.sh
 ENTRYPOINT ["sh", "startup.sh"]
+
+RUN addgroup -S onap \
+    && adduser -S datarouter -G onap \
+    && chown -R datarouter:onap /opt/
+
+USER datarouter
