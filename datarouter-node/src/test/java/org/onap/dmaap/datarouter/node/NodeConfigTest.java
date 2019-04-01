@@ -193,6 +193,7 @@ public class NodeConfigTest {
         endpointAddrs.put("172.0.0.1");
         auth.put("endpoint_addrs", endpointAddrs);
         feed.put("authorization", auth);
+        feed.put("aaf_instance", "legacy");
         feeds.put(feed);
         provData.put("feeds", feeds);
     }
@@ -211,6 +212,7 @@ public class NodeConfigTest {
         delivery.put("use100", true);
         subscription.put("delivery", delivery);
         subscription.put("privilegedSubscriber", false);
+        subscription.put("follow_redirect", false);
         subscription.put("decompress", false);
         subscriptions.put(subscription);
         provData.put("subscriptions", subscriptions);

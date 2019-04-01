@@ -82,7 +82,7 @@ public class LogfileLoader extends Thread {
     /**
      * This is a singleton -- there is only one LogfileLoader object in the server
      */
-    private static LogfileLoader p;
+    private static LogfileLoader logfileLoader;
 
     /**
      * Get the singleton LogfileLoader object, and start it if it is not running.
@@ -90,11 +90,11 @@ public class LogfileLoader extends Thread {
      * @return the LogfileLoader
      */
     public static synchronized LogfileLoader getLoader() {
-        if (p == null)
-            p = new LogfileLoader();
-        if (!p.isAlive())
-            p.start();
-        return p;
+        if (logfileLoader == null)
+            logfileLoader = new LogfileLoader();
+        if (!logfileLoader.isAlive())
+            logfileLoader.start();
+        return logfileLoader;
     }
 
     /**

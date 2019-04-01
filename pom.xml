@@ -55,6 +55,7 @@
         <thoughtworks.version>1.4.10</thoughtworks.version>
         <google.guava.version>26.0-jre</google.guava.version>
         <qos.logback.version>1.2.3</qos.logback.version>
+        <aaf-cadi-aaf.version>2.1.10</aaf-cadi-aaf.version>
         <snapshotNexusPath>/content/repositories/snapshots/</snapshotNexusPath>
         <releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
         <stagingNexusPath>/content/repositories/staging/</stagingNexusPath>

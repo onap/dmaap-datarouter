@@ -26,25 +26,24 @@ package org.onap.dmaap.datarouter.node;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Writer;
+import org.apache.log4j.Logger;
+import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
+import org.slf4j.MDC;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.regex.Pattern;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.apache.log4j.Logger;
+
+import static org.onap.dmaap.datarouter.node.NodeUtils.sendResponseError;
+
 import org.jetbrains.annotations.Nullable;
-import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
-import org.slf4j.MDC;
 
 import static org.onap.dmaap.datarouter.node.NodeUtils.*;
 
@@ -64,9 +63,8 @@ public class NodeServlet extends HttpServlet {
     private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeServlet");
     private static NodeConfigManager config;
     private static Pattern MetaDataPattern;
-    //Adding EELF Logger Rally:US664892
-    private static EELFLogger eelflogger = EELFManager.getInstance()
-            .getLogger(NodeServlet.class);
+    private static EELFLogger eelflogger = EELFManager.getInstance().getLogger(NodeServlet.class);
+    private boolean isAAFFeed = false;
     private final Delivery delivery;
 
     static {
@@ -88,6 +86,7 @@ public class NodeServlet extends HttpServlet {
     /**
      * Get the NodeConfigurationManager
      */
+    @Override
     public void init() {
         config = NodeConfigManager.getInstance();
         logger.info("NODE0101 Node Servlet Configured");
@@ -97,14 +96,15 @@ public class NodeServlet extends HttpServlet {
         if (config.isShutdown() || !config.isConfigured()) {
             sendResponseError(resp, HttpServletResponse.SC_SERVICE_UNAVAILABLE, logger);
             logger.info("NODE0102 Rejecting request: Service is being quiesced");
-            return (true);
+            return true;
         }
-        return (false);
+        return false;
     }
 
     /**
      * Handle a GET for /internal/fetchProv
      */
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         NodeUtils.setIpAndFqdnForEelf("doGet");
         NodeUtils.setRequestIdAndInvocationId(req);
@@ -149,12 +149,13 @@ public class NodeServlet extends HttpServlet {
     /**
      * Handle all PUT requests
      */
+    @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
         NodeUtils.setIpAndFqdnForEelf("doPut");
         NodeUtils.setRequestIdAndInvocationId(req);
         eelflogger.info(EelfMsgs.ENTRY);
         eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader("X-DMAAP-DR-ON-BEHALF-OF"),
-                    getIdFromPath(req) + "");
+                getIdFromPath(req) + "");
         try {
             common(req, resp, true);
         } catch (IOException ioe) {
@@ -166,6 +167,7 @@ public class NodeServlet extends HttpServlet {
     /**
      * Handle all DELETE requests
      */
+    @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         NodeUtils.setIpAndFqdnForEelf("doDelete");
         NodeUtils.setRequestIdAndInvocationId(req);
@@ -215,6 +217,27 @@ public class NodeServlet extends HttpServlet {
                 return;
             }
             feedid = fileid.substring(0, i);
+
+            if (config.getCadiEnabeld()) {
+                String path = req.getPathInfo();
+                if (!path.startsWith("/internal") && feedid != null) {
+                    String aafInstance = config.getAafInstance(feedid);
+                    if (!(aafInstance.equalsIgnoreCase("legacy"))) {
+                        isAAFFeed = true;
+                        String permission = config.getPermission(aafInstance);
+                        logger.info("NodeServlet.common() permission string - " + permission);
+                        //Check in CADI Framework API if user has AAF permission or not
+                        if (!req.isUserInRole(permission)) {
+                            String message = "AAF disallows access to permission string - " + permission;
+                            logger.info("NODE0106 Rejecting unauthenticated PUT or DELETE of " + req.getPathInfo() + " from " + req.getRemoteAddr());
+                            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
+                            eelflogger.info(EelfMsgs.EXIT);
+                            return;
+                        }
+                    }
+                }
+            }
+
             fileid = fileid.substring(i + 1);
             pubid = config.getPublishId();
             xpubid = req.getHeader("X-DMAAP-DR-PUBLISH-ID");
@@ -228,6 +251,7 @@ public class NodeServlet extends HttpServlet {
             }
             fileid = fileid.substring(18);
             pubid = req.getHeader("X-DMAAP-DR-PUBLISH-ID");
+            user = "datartr";   // SP6 : Added usr as datartr to avoid null entries for internal routing
             targets = config.parseRouting(req.getHeader("X-DMAAP-DR-ROUTING"));
         } else {
             logger.info("NODE0105 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + " from " + req
@@ -257,17 +281,34 @@ public class NodeServlet extends HttpServlet {
         String logurl = "https://" + hp + "/internal/publish/" + fileid;
         if (feedid != null) {
             logurl = "https://" + hp + "/publish/" + feedid + "/" + fileid;
-            String reason = config.isPublishPermitted(feedid, credentials, ip);
-            if (reason != null) {
-                logger.info(
-                        "NODE0111 Rejecting unauthorized publish attempt to feed " + feedid + " fileid " + fileid
-                                + " from "
-                                + ip + " reason " + reason);
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN, reason);
-                eelflogger.info(EelfMsgs.EXIT);
-                return;
+            //Cadi code starts
+            if (!isAAFFeed) {
+                String reason = config.isPublishPermitted(feedid, credentials, ip);
+                if (reason != null) {
+                    logger.info("NODE0111 Rejecting unauthorized publish attempt to feed " + PathUtil.cleanString(feedid) + " fileid " + PathUtil.cleanString(fileid) + " from " + PathUtil.cleanString(ip) + " reason " + PathUtil.cleanString(reason));
+                    resp.sendError(HttpServletResponse.SC_FORBIDDEN, reason);
+                    eelflogger.info(EelfMsgs.EXIT);
+                    return;
+                }
+                user = config.getAuthUser(feedid, credentials);
+            } else {
+                String reason = config.isPublishPermitted(feedid, ip);
+                if (reason != null) {
+                    logger.info("NODE0111 Rejecting unauthorized publish attempt to feed " + PathUtil.cleanString(feedid) + " fileid " + PathUtil.cleanString(fileid) + " from " + PathUtil.cleanString(ip) + " reason   Invalid AAF user- " + PathUtil.cleanString(reason));
+                    String message = "Invalid AAF user- " + PathUtil.cleanString(reason);
+                    logger.info("NODE0106 Rejecting unauthenticated PUT or DELETE of " + PathUtil.cleanString(req.getPathInfo()) + " from " + PathUtil.cleanString(req.getRemoteAddr()));
+                    resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
+                    return;
+                }
+                if ((req.getUserPrincipal() != null) && (req.getUserPrincipal().getName() != null)) {
+                    String userName = req.getUserPrincipal().getName();
+                    String[] attid = userName.split("@");
+                    user = attid[0];
+                } else {
+                    user = "AAFUser";
+                }
             }
-            user = config.getAuthUser(feedid, credentials);
+            //Cadi code Ends
             String newnode = config.getIngressNode(feedid, user, ip);
             if (newnode != null) {
                 String port = "";
@@ -276,17 +317,17 @@ public class NodeServlet extends HttpServlet {
                     port = ":" + iport;
                 }
                 String redirto = "https://" + newnode + port + "/publish/" + feedid + "/" + fileid;
-                logger.info(
-                        "NODE0108 Redirecting publish attempt for feed " + feedid + " user " + user + " ip " + ip
-                                + " to "
-                                + redirto);
-                resp.sendRedirect(redirto);
+                logger.info("NODE0108 Redirecting publish attempt for feed " + PathUtil.cleanString(feedid) + " user " + PathUtil.cleanString(user) + " ip " + PathUtil.cleanString(ip) + " to " + PathUtil.cleanString(redirto));  //Fortify scan fixes - log forging
+                resp.sendRedirect(PathUtil.cleanString(redirto));         //Fortify scan fixes-open redirect - 2 issues
                 eelflogger.info(EelfMsgs.EXIT);
                 return;
             }
             resp.setHeader("X-DMAAP-DR-PUBLISH-ID", pubid);
         }
-        String fbase = config.getSpoolDir() + "/" + pubid;
+        if (req.getPathInfo().startsWith("/internal/publish/")) {
+            feedid = req.getHeader("X-DMAAP-DR-FEED-ID");
+        }
+        String fbase = PathUtil.cleanString(config.getSpoolDir() + "/" + pubid);  //Fortify scan fixes-Path manipulation
         File data = new File(fbase);
         File meta = new File(fbase + ".M");
         OutputStream dos = null;
@@ -323,17 +364,13 @@ public class NodeServlet extends HttpServlet {
                         }
                         if ("x-dmaap-dr-meta".equals(hnlc)) {
                             if (hv.length() > 4096) {
-                                logger.info(
-                                        "NODE0109 Rejecting publish attempt with metadata too long for feed " + feedid
-                                                + " user " + user + " ip " + ip);
+                                logger.info("NODE0109 Rejecting publish attempt with metadata too long for feed " + PathUtil.cleanString(feedid) + " user " + PathUtil.cleanString(user) + " ip " + PathUtil.cleanString(ip));  //Fortify scan fixes - log forging
                                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Metadata too long");
                                 eelflogger.info(EelfMsgs.EXIT);
                                 return;
                             }
                             if (!MetaDataPattern.matcher(hv.replaceAll("\\\\.", "X")).matches()) {
-                                logger.info(
-                                        "NODE0109 Rejecting publish attempt with malformed metadata for feed " + feedid
-                                                + " user " + user + " ip " + ip);
+                                logger.info("NODE0109 Rejecting publish attempt with malformed metadata for feed " + PathUtil.cleanString(feedid) + " user " + PathUtil.cleanString(user) + " ip " + PathUtil.cleanString(ip));  //Fortify scan fixes - log forging
                                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Malformed metadata");
                                 eelflogger.info(EelfMsgs.EXIT);
                                 return;
@@ -343,10 +380,10 @@ public class NodeServlet extends HttpServlet {
                     }
                 }
             }
-            if(!hasRequestIdHeader){
+            if (!hasRequestIdHeader) {
                 mx.append("X-ONAP-RequestID\t").append(MDC.get("RequestId")).append('\n');
             }
-            if(!hasInvocationIdHeader){
+            if (!hasInvocationIdHeader) {
                 mx.append("X-InvocationID\t").append(MDC.get("InvocationId")).append('\n');
             }
             mx.append("X-DMAAP-DR-RECEIVED\t").append(rcvd).append('\n');
@@ -368,9 +405,9 @@ public class NodeServlet extends HttpServlet {
                 try {
                     exlen = Long.parseLong(req.getHeader("Content-Length"));
                 } catch (Exception e) {
+                    logger.error("NODE0529 Exception common: " + e);
                 }
-                StatusLog.logPubFail(pubid, feedid, logurl, req.getMethod(), ctype, exlen, data.length(), ip, user,
-                        ioe.getMessage());
+                StatusLog.logPubFail(pubid, feedid, logurl, req.getMethod(), ctype, exlen, data.length(), ip, user, ioe.getMessage());
                 eelflogger.info(EelfMsgs.EXIT);
                 throw ioe;
             }
@@ -381,7 +418,7 @@ public class NodeServlet extends HttpServlet {
                     // TODO: unknown destination
                     continue;
                 }
-                String dbase = di.getSpool() + "/" + pubid;
+                String dbase = PathUtil.cleanString(di.getSpool() + "/" + pubid);  //Fortify scan fixes-Path Manipulation
                 Files.createLink(Paths.get(dbase), dpath);
                 mw = new FileWriter(meta);
                 mw.write(metadata);
@@ -393,13 +430,25 @@ public class NodeServlet extends HttpServlet {
 
             }
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            resp.getOutputStream().close();
-            StatusLog.logPub(pubid, feedid, logurl, req.getMethod(), ctype, data.length(), ip, user,
-                    HttpServletResponse.SC_NO_CONTENT);
+            try {
+                resp.getOutputStream().close();
+            } catch (IOException ioe) {
+                long exlen = -1;
+                try {
+                    exlen = Long.parseLong(req.getHeader("Content-Length"));
+                } catch (Exception e) {
+                    logger.debug("NODE00000 Exception common: " + e);
+                }
+                StatusLog.logPubFail(pubid, feedid, logurl, req.getMethod(), ctype, exlen, data.length(), ip, user, ioe.getMessage());
+                //Fortify scan fixes - log forging
+                logger.info("NODE0110 IO Exception while closing IO stream " + PathUtil.cleanString(feedid) + " user " + PathUtil.cleanString(user) + " ip " + PathUtil.cleanString(ip) + " " + ioe.toString(), ioe);
+
+                throw ioe;
+            }
+
+            StatusLog.logPub(pubid, feedid, logurl, req.getMethod(), ctype, data.length(), ip, user, HttpServletResponse.SC_NO_CONTENT);
         } catch (IOException ioe) {
-            logger.info(
-                    "NODE0110 IO Exception receiving publish attempt for feed " + feedid + " user " + user + " ip " + ip
-                            + " " + ioe.toString(), ioe);
+            logger.info("NODE0110 IO Exception receiving publish attempt for feed " + feedid + " user " + user + " ip " + ip + " " + ioe.toString(), ioe);
             eelflogger.info(EelfMsgs.EXIT);
             throw ioe;
         } finally {
@@ -407,27 +456,32 @@ public class NodeServlet extends HttpServlet {
                 try {
                     is.close();
                 } catch (Exception e) {
+                    logger.error("NODE0530 Exception common: " + e);
                 }
             }
             if (dos != null) {
                 try {
                     dos.close();
                 } catch (Exception e) {
+                    logger.error("NODE0531 Exception common: " + e);
                 }
             }
             if (mw != null) {
                 try {
                     mw.close();
                 } catch (Exception e) {
+                    logger.error("NODE0532 Exception common: " + e);
                 }
             }
             try {
                 data.delete();
             } catch (Exception e) {
+                logger.error("NODE0533 Exception common: " + e);
             }
             try {
                 meta.delete();
             } catch (Exception e) {
+                logger.error("NODE0534 Exception common: " + e);
             }
         }
     }
@@ -448,7 +502,7 @@ public class NodeServlet extends HttpServlet {
             int subId = Integer.parseInt(subscriptionId);
             pubid = fileid.substring(i + 1);
             String errorMessage = "Unable to delete files (" + pubid + ", " + pubid + ".M) from DR Node: "
-                            + config.getMyName() + ".";
+                    + config.getMyName() + ".";
             int subIdDir = subId - (subId % 100);
             if (!isAuthorizedToDelete(resp, subscriptionId, errorMessage)) {
                 return;

@@ -259,6 +259,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.onap.aaf.authz</groupId>
+            <artifactId>aaf-cadi-aaf</artifactId>
+            <version>${aaf-cadi-aaf.version}</version>
+        </dependency>
     </dependencies>
     <profiles>
         <profile>
