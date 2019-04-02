@@ -66,6 +66,7 @@ public class ProvDataTest {
                   "\"feedid\":1," +
                   "\"decompress\":false," +
                   "\"groupid\":1," +
+                  "\"follow_redirect\": true," +
                   "\"metadataOnly\":false," +
                   "\"links\":{" +
                     "\"feed\":\"https://dmaap-dr-prov/feed/1\"" +
