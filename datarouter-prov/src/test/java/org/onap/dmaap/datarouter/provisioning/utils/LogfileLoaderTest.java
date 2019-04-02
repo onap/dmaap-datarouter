@@ -87,18 +87,6 @@ public class LogfileLoaderTest {
 
 
     @Test
-    public void Verify_Histogram_When_Request_Type_Post() {
-        String fileContent = "2018-08-29-10-10-10-543.|PUB|1|1|https://dmaap-dr-prov:8443/publish/1/file123/|POST|application/vnd.att-dr.feed|2|128.0.0.9|user123|200";
-        lfl.process(prepFile(fileContent));
-        Map<Long, Long> expect = new HashMap<>();
-        expect.put(17772L,1L);
-        expect.put(29353L,1L);
-        Map<Long, Long> actual = lfl.getHistogram();
-        assertEquals(actual,expect);
-    }
-
-
-    @Test
     public void Verify_File_Processing_when_Req_Type_LOG() {
         String fileContent = "2018-08-29-10-10-10-543.|LOG|1|1|url/file123|method|1|1|type|1|128.0.0.9|user123|2|1|1|1|other|1";
         int[] actual = lfl.process(prepFile(fileContent));
