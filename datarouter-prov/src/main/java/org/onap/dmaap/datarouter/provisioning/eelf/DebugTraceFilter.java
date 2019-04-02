@@ -20,19 +20,20 @@
  * * ECOMP is a trademark and service mark of AT&T Intellectual Property.
  * *
  ******************************************************************************/
-package org.onap.dmaap.datarouter.provisioning.utils;
+package org.onap.dmaap.datarouter.provisioning.eelf;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.filter.Filter;
+import ch.qos.logback.core.spi.FilterReply;
 
-import com.att.eelf.configuration.EELFLogger;
-
-public class HttpServletUtils {
-    public static void sendResponseError(HttpServletResponse response, int errorCode, String message, EELFLogger intlogger) {
-        try {
-            response.sendError(errorCode, message);
-        } catch (IOException ioe) {
-            intlogger.error("IOException" + ioe.getMessage());
+public class DebugTraceFilter extends Filter<ILoggingEvent> {
+    @Override
+    public FilterReply decide(ILoggingEvent event) {
+        if (event.getLoggerName().contains("InternalLog") && (event.getLevel() == Level.DEBUG || event.getLevel() == Level.TRACE) ) {
+            return FilterReply.ACCEPT;
+        } else {
+            return FilterReply.DENY;
         }
     }
 }

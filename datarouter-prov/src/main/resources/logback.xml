@@ -42,13 +42,12 @@
   <!-- name="policyLogName" value="policy"-->
   <property name="errorLogName" value="errors" />
   <!-- name="metricsLogName" value="metrics" -->
-  <!-- name="auditLogName" value="audit" -->
-  <!-- name="debugLogName" value="debug" -->
-  <property name="jettyLogName" value="jetty"></property>
-  <property name="defaultPattern"    value="%d{MM/dd-HH:mm:ss.SSS}|%logger|%X{RequestId}|%X{InvocationId}|%X{ServiceInstanceId}|%thread|%X{ServiceName}|%X{InstanceUUID}|%.-5level|%X{AlertSeverity}|%X{ServerIPAddress}|%X{ServerFQDN}|%X{RemoteHost}|%X{Timer}|%msg%n" />
+  <property name="debugLogName" value="debug"/>
+  <property name="jettyLogName" value="jetty"/>
+  <property name="defaultPattern"     value="%d{MM/dd-HH:mm:ss.SSS}|%logger|%X{RequestId}|%X{InvocationId}|%X{ServiceInstanceId}|%thread|%X{ServiceName}|%X{InstanceUUID}|%.-5level|%X{AlertSeverity}|%X{ServerIPAddress}|%X{ServerFQDN}|%X{RemoteHost}|%X{Timer}|%msg%n" />
   <property name="jettyLoggerPattern" value="%d{MM/dd-HH:mm:ss.SSS}|%logger|%thread|%.-5level|%msg%n" />
 
-  <property name="debugLoggerPattern" value="%d{MM/dd-HH:mm:ss.SSS}|%X{RequestId}|%X{InvocationId}|%X{ServiceInstanceId}|%thread|%X{ServiceName}|%X{InstanceUUID}|%.-5level|%X{AlertSeverity}|%X{ServerIPAddress}|%X{ServerFQDN}|%X{RemoteHost}|%X{Timer}|[%caller{3}]|%msg%n" />
+  <property name="debugLoggerPattern" value="%d{MM/dd-HH:mm:ss.SSS}|%logger|%X{RequestId}|%X{InvocationId}|%X{ServiceInstanceId}|%thread|%X{ServiceName}|%X{InstanceUUID}|%.-5level|%X{AlertSeverity}|%X{ServerIPAddress}|%X{ServerFQDN}|%X{RemoteHost}|%X{Timer}|[%caller{3}]|%msg%n" />
 
   <property name="logDirectory" value="${logDir}" />
   <!-- property name="debugLogDirectory" value="${debugDir}/${componentName}" /-->
@@ -327,12 +326,13 @@
    <!-- ============================================================================ -->
 
 
-   <!--appender name="EELFDebug"
+   <appender name="EELFDebug"
     class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${debugLogDirectory}/${debugLogName}.log</file>
+    <file>${logDirectory}/${debugLogName}.log</file>
+       <filter class="org.onap.dmaap.datarouter.provisioning.eelf.DebugTraceFilter" />
     <rollingPolicy
       class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-      <fileNamePattern>${debugLogDirectory}/${debugLogName}.%i.log.zip
+      <fileNamePattern>${logDirectory}/${debugLogName}.%i.log.zip
       </fileNamePattern>
       <minIndex>1</minIndex>
       <maxIndex>9</maxIndex>
@@ -342,7 +342,7 @@
       <maxFileSize>5MB</maxFileSize>
     </triggeringPolicy>
     <encoder>
-      <pattern>${debugLoggerPattern}</pattern>
+      <pattern>${defaultPattern}</pattern>
     </encoder>
   </appender>
 
@@ -350,7 +350,7 @@
     <queueSize>256</queueSize>
     <appender-ref ref="EELFDebug" />
     <includeCallerData>true</includeCallerData>
-  </appender-->
+  </appender>
 
 
   <!-- ============================================================================ -->
@@ -366,6 +366,10 @@
 
      <logger name="log4j.logger.org.eclipse.jetty" additivity="false" level="info">
         <appender-ref ref="asyncEELFjettylog"/>
+    </logger>
+
+    <logger name="com.att.eelf.debug" level="debug" additivity="false">
+        <appender-ref ref="asyncEELFDebug" />
     </logger>
 
   <!-- logger name="com.att.eelf.security" level="info" additivity="false">
@@ -396,10 +400,10 @@
 
 
 
-  <root level="INFO">
+  <root level="TRACE">
     <appender-ref ref="asyncEELF" />
     <appender-ref ref="asyncEELFError" />
-     <appender-ref ref="asyncEELFjettylog" />
-  </root>
+    <appender-ref ref="asyncEELFjettylog" />
+    <appender-ref ref="asyncEELFDebug" />  </root>
 
 </configuration>

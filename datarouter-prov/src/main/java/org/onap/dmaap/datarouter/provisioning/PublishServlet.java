@@ -145,7 +145,7 @@ public class PublishServlet extends BaseServlet {
                             : "Invalid request - Missing file ID.";
                     elr.setMessage(message);
                     elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-                    eventlogger.info(elr);
+                    eventlogger.info(elr.toString());
 
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND, message);
                 } else {
@@ -162,7 +162,7 @@ public class PublishServlet extends BaseServlet {
                     String message = "Redirected to: " + newurl;
                     elr.setMessage(message);
                     elr.setResult(HttpServletResponse.SC_MOVED_PERMANENTLY);
-                    eventlogger.info(elr);
+                    eventlogger.info(elr.toString());
 
                     resp.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
                     resp.setHeader("Location", newurl);

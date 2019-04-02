@@ -31,7 +31,6 @@ import java.util.zip.GZIPInputStream;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-import org.apache.log4j.Logger;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 import org.slf4j.MDC;
 
@@ -46,7 +45,6 @@ import static org.onap.dmaap.datarouter.node.NodeUtils.isFiletypeGzip;
  * the file and its delivery data as well as to attempt delivery.
  */
 public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
-    private static Logger loggerDeliveryTask = Logger.getLogger("org.onap.dmaap.datarouter.node.DeliveryTask");
     private static EELFLogger eelflogger = EELFManager.getInstance()
             .getLogger(DeliveryTask.class);
     private DeliveryTaskHelper deliveryTaskHelper;
@@ -129,7 +127,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 hdrv.add(new String[]{h, v});
             }
         } catch (Exception e) {
-            loggerDeliveryTask.error("Exception "+ Arrays.toString(e.getStackTrace()), e);
+            eelflogger.error("Exception "+ Arrays.toString(e.getStackTrace()), e);
         }
         hdrs = hdrv.toArray(new String[hdrv.size()][]);
         url = deliveryTaskHelper.getDestURL(fileid);
@@ -249,7 +247,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
             }
             deliveryTaskHelper.reportStatus(this, rc, xpubid, rmsg);
         } catch (Exception e) {
-            loggerDeliveryTask.error("Exception " + Arrays.toString(e.getStackTrace()), e);
+            eelflogger.error("Exception "+ Arrays.toString(e.getStackTrace()),e);
             deliveryTaskHelper.reportException(this, e);
         }
     }
@@ -274,7 +272,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 outputStream.close();
             } catch (IOException e) {
                 httpURLConnection.setRequestProperty("Decompression_Status", "FAILURE");
-                loggerDeliveryTask.info("Could not decompress file");
+                eelflogger.info("Could not decompress file");
                 sendFile(httpURLConnection);
             }
 
@@ -328,7 +326,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
         } catch (ProtocolException pe) {
             deliveryTaskHelper.reportDeliveryExtra(this, -1L);
             // Rcvd error instead of 100-continue
-            loggerDeliveryTask.error("Exception " + Arrays.toString(pe.getStackTrace()), pe);
+            eelflogger.error("Exception " + Arrays.toString(pe.getStackTrace()), pe);
         }
         return outputStream;
     }

@@ -60,7 +60,6 @@ import static org.onap.dmaap.datarouter.node.NodeUtils.*;
  */
 public class NodeServlet extends HttpServlet {
 
-    private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeServlet");
     private static NodeConfigManager config;
     private static Pattern MetaDataPattern;
     private static EELFLogger eelflogger = EELFManager.getInstance().getLogger(NodeServlet.class);
@@ -89,14 +88,14 @@ public class NodeServlet extends HttpServlet {
     @Override
     public void init() {
         config = NodeConfigManager.getInstance();
-        logger.info("NODE0101 Node Servlet Configured");
+        eelflogger.info("NODE0101 Node Servlet Configured");
     }
 
     private boolean down(HttpServletResponse resp) throws IOException {
         if (config.isShutdown() || !config.isConfigured()) {
-            sendResponseError(resp, HttpServletResponse.SC_SERVICE_UNAVAILABLE, logger);
-            logger.info("NODE0102 Rejecting request: Service is being quiesced");
-            return true;
+            sendResponseError(resp, HttpServletResponse.SC_SERVICE_UNAVAILABLE, eelflogger);
+            eelflogger.info("NODE0102 Rejecting request: Service is being quiesced");
+            return (true);
         }
         return false;
     }
@@ -118,7 +117,7 @@ public class NodeServlet extends HttpServlet {
                 }
 
             } catch (IOException ioe) {
-                logger.error("IOException" + ioe.getMessage());
+                eelflogger.error("IOException" + ioe.getMessage());
             }
             String path = req.getPathInfo();
             String qs = req.getQueryString();
@@ -139,8 +138,8 @@ public class NodeServlet extends HttpServlet {
                 }
             }
 
-            logger.info("NODE0103 Rejecting invalid GET of " + path + " from " + ip);
-            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, logger);
+            eelflogger.info("NODE0103 Rejecting invalid GET of " + path + " from " + ip);
+            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, eelflogger);
         } finally {
             eelflogger.info(EelfMsgs.EXIT);
         }
@@ -159,7 +158,7 @@ public class NodeServlet extends HttpServlet {
         try {
             common(req, resp, true);
         } catch (IOException ioe) {
-            logger.error("IOException" + ioe.getMessage());
+            eelflogger.error("IOException" + ioe.getMessage());
             eelflogger.info(EelfMsgs.EXIT);
         }
     }
@@ -177,7 +176,7 @@ public class NodeServlet extends HttpServlet {
         try {
             common(req, resp, false);
         } catch (IOException ioe) {
-            logger.error("IOException " + ioe.getMessage());
+            eelflogger.error("IOException " + ioe.getMessage());
             eelflogger.info(EelfMsgs.EXIT);
         }
     }
@@ -199,7 +198,7 @@ public class NodeServlet extends HttpServlet {
         }
         String credentials = req.getHeader("Authorization");
         if (credentials == null) {
-            logger.info("NODE0106 Rejecting unauthenticated PUT or DELETE of " + req.getPathInfo() + " from " + req
+            eelflogger.info("NODE0106 Rejecting unauthenticated PUT or DELETE of " + req.getPathInfo() + " from " + req
                     .getRemoteAddr());
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Authorization header required");
             eelflogger.info(EelfMsgs.EXIT);
@@ -209,7 +208,7 @@ public class NodeServlet extends HttpServlet {
             fileid = fileid.substring(9);
             int i = fileid.indexOf('/');
             if (i == -1 || i == fileid.length() - 1) {
-                logger.info("NODE0105 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + " from " + req
+                eelflogger.info("NODE0105 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + " from " + req
                         .getRemoteAddr());
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND,
                         "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.  Possible missing fileid.");
@@ -225,11 +224,11 @@ public class NodeServlet extends HttpServlet {
                     if (!(aafInstance.equalsIgnoreCase("legacy"))) {
                         isAAFFeed = true;
                         String permission = config.getPermission(aafInstance);
-                        logger.info("NodeServlet.common() permission string - " + permission);
+                        eelflogger.info("NodeServlet.common() permission string - " + permission);
                         //Check in CADI Framework API if user has AAF permission or not
                         if (!req.isUserInRole(permission)) {
                             String message = "AAF disallows access to permission string - " + permission;
-                            logger.info("NODE0106 Rejecting unauthenticated PUT or DELETE of " + req.getPathInfo() + " from " + req.getRemoteAddr());
+                            eelflogger.info("NODE0106 Rejecting unauthenticated PUT or DELETE of " + req.getPathInfo() + " from " + req.getRemoteAddr());
                             resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
                             eelflogger.info(EelfMsgs.EXIT);
                             return;
@@ -244,7 +243,7 @@ public class NodeServlet extends HttpServlet {
             targets = config.getTargets(feedid);
         } else if (fileid.startsWith("/internal/publish/")) {
             if (!config.isAnotherNode(credentials, ip)) {
-                logger.info("NODE0107 Rejecting unauthorized node-to-node transfer attempt from " + ip);
+                eelflogger.info("NODE0107 Rejecting unauthorized node-to-node transfer attempt from " + ip);
                 resp.sendError(HttpServletResponse.SC_FORBIDDEN);
                 eelflogger.info(EelfMsgs.EXIT);
                 return;
@@ -254,7 +253,7 @@ public class NodeServlet extends HttpServlet {
             user = "datartr";   // SP6 : Added usr as datartr to avoid null entries for internal routing
             targets = config.parseRouting(req.getHeader("X-DMAAP-DR-ROUTING"));
         } else {
-            logger.info("NODE0105 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + " from " + req
+            eelflogger.info("NODE0105 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + " from " + req
                     .getRemoteAddr());
             resp.sendError(HttpServletResponse.SC_NOT_FOUND,
                     "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.");
@@ -262,7 +261,7 @@ public class NodeServlet extends HttpServlet {
             return;
         }
         if (fileid.indexOf('/') != -1) {
-            logger.info("NODE0105 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + " from " + req
+            eelflogger.info("NODE0105 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + " from " + req
                     .getRemoteAddr());
             resp.sendError(HttpServletResponse.SC_NOT_FOUND,
                     "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.");
@@ -285,7 +284,7 @@ public class NodeServlet extends HttpServlet {
             if (!isAAFFeed) {
                 String reason = config.isPublishPermitted(feedid, credentials, ip);
                 if (reason != null) {
-                    logger.info("NODE0111 Rejecting unauthorized publish attempt to feed " + PathUtil.cleanString(feedid) + " fileid " + PathUtil.cleanString(fileid) + " from " + PathUtil.cleanString(ip) + " reason " + PathUtil.cleanString(reason));
+                    eelflogger.info("NODE0111 Rejecting unauthorized publish attempt to feed " + PathUtil.cleanString(feedid) + " fileid " + PathUtil.cleanString(fileid) + " from " + PathUtil.cleanString(ip) + " reason " + PathUtil.cleanString(reason));
                     resp.sendError(HttpServletResponse.SC_FORBIDDEN, reason);
                     eelflogger.info(EelfMsgs.EXIT);
                     return;
@@ -294,9 +293,9 @@ public class NodeServlet extends HttpServlet {
             } else {
                 String reason = config.isPublishPermitted(feedid, ip);
                 if (reason != null) {
-                    logger.info("NODE0111 Rejecting unauthorized publish attempt to feed " + PathUtil.cleanString(feedid) + " fileid " + PathUtil.cleanString(fileid) + " from " + PathUtil.cleanString(ip) + " reason   Invalid AAF user- " + PathUtil.cleanString(reason));
+                    eelflogger.info("NODE0111 Rejecting unauthorized publish attempt to feed " + PathUtil.cleanString(feedid) + " fileid " + PathUtil.cleanString(fileid) + " from " + PathUtil.cleanString(ip) + " reason   Invalid AAF user- " + PathUtil.cleanString(reason));
                     String message = "Invalid AAF user- " + PathUtil.cleanString(reason);
-                    logger.info("NODE0106 Rejecting unauthenticated PUT or DELETE of " + PathUtil.cleanString(req.getPathInfo()) + " from " + PathUtil.cleanString(req.getRemoteAddr()));
+                    eelflogger.info("NODE0106 Rejecting unauthenticated PUT or DELETE of " + PathUtil.cleanString(req.getPathInfo()) + " from " + PathUtil.cleanString(req.getRemoteAddr()));
                     resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
                     return;
                 }
@@ -317,7 +316,7 @@ public class NodeServlet extends HttpServlet {
                     port = ":" + iport;
                 }
                 String redirto = "https://" + newnode + port + "/publish/" + feedid + "/" + fileid;
-                logger.info("NODE0108 Redirecting publish attempt for feed " + PathUtil.cleanString(feedid) + " user " + PathUtil.cleanString(user) + " ip " + PathUtil.cleanString(ip) + " to " + PathUtil.cleanString(redirto));  //Fortify scan fixes - log forging
+                eelflogger.info("NODE0108 Redirecting publish attempt for feed " + PathUtil.cleanString(feedid) + " user " + PathUtil.cleanString(user) + " ip " + PathUtil.cleanString(ip) + " to " + PathUtil.cleanString(redirto));  //Fortify scan fixes - log forging
                 resp.sendRedirect(PathUtil.cleanString(redirto));         //Fortify scan fixes-open redirect - 2 issues
                 eelflogger.info(EelfMsgs.EXIT);
                 return;
@@ -364,13 +363,13 @@ public class NodeServlet extends HttpServlet {
                         }
                         if ("x-dmaap-dr-meta".equals(hnlc)) {
                             if (hv.length() > 4096) {
-                                logger.info("NODE0109 Rejecting publish attempt with metadata too long for feed " + PathUtil.cleanString(feedid) + " user " + PathUtil.cleanString(user) + " ip " + PathUtil.cleanString(ip));  //Fortify scan fixes - log forging
+                                eelflogger.info("NODE0109 Rejecting publish attempt with metadata too long for feed " + PathUtil.cleanString(feedid) + " user " + PathUtil.cleanString(user) + " ip " + PathUtil.cleanString(ip));  //Fortify scan fixes - log forging
                                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Metadata too long");
                                 eelflogger.info(EelfMsgs.EXIT);
                                 return;
                             }
                             if (!MetaDataPattern.matcher(hv.replaceAll("\\\\.", "X")).matches()) {
-                                logger.info("NODE0109 Rejecting publish attempt with malformed metadata for feed " + PathUtil.cleanString(feedid) + " user " + PathUtil.cleanString(user) + " ip " + PathUtil.cleanString(ip));  //Fortify scan fixes - log forging
+                                eelflogger.info("NODE0109 Rejecting publish attempt with malformed metadata for feed " + PathUtil.cleanString(feedid) + " user " + PathUtil.cleanString(user) + " ip " + PathUtil.cleanString(ip));  //Fortify scan fixes - log forging
                                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Malformed metadata");
                                 eelflogger.info(EelfMsgs.EXIT);
                                 return;
@@ -405,7 +404,7 @@ public class NodeServlet extends HttpServlet {
                 try {
                     exlen = Long.parseLong(req.getHeader("Content-Length"));
                 } catch (Exception e) {
-                    logger.error("NODE0529 Exception common: " + e);
+                    eelflogger.error("NODE0529 Exception common: " + e);
                 }
                 StatusLog.logPubFail(pubid, feedid, logurl, req.getMethod(), ctype, exlen, data.length(), ip, user, ioe.getMessage());
                 eelflogger.info(EelfMsgs.EXIT);
@@ -437,18 +436,18 @@ public class NodeServlet extends HttpServlet {
                 try {
                     exlen = Long.parseLong(req.getHeader("Content-Length"));
                 } catch (Exception e) {
-                    logger.debug("NODE00000 Exception common: " + e);
+                    eelflogger.debug("NODE00000 Exception common: " + e);
                 }
                 StatusLog.logPubFail(pubid, feedid, logurl, req.getMethod(), ctype, exlen, data.length(), ip, user, ioe.getMessage());
                 //Fortify scan fixes - log forging
-                logger.info("NODE0110 IO Exception while closing IO stream " + PathUtil.cleanString(feedid) + " user " + PathUtil.cleanString(user) + " ip " + PathUtil.cleanString(ip) + " " + ioe.toString(), ioe);
+                eelflogger.info("NODE0110 IO Exception while closing IO stream " + PathUtil.cleanString(feedid) + " user " + PathUtil.cleanString(user) + " ip " + PathUtil.cleanString(ip) + " " + ioe.toString(), ioe);
 
                 throw ioe;
             }
 
             StatusLog.logPub(pubid, feedid, logurl, req.getMethod(), ctype, data.length(), ip, user, HttpServletResponse.SC_NO_CONTENT);
         } catch (IOException ioe) {
-            logger.info("NODE0110 IO Exception receiving publish attempt for feed " + feedid + " user " + user + " ip " + ip + " " + ioe.toString(), ioe);
+            eelflogger.info("NODE0110 IO Exception receiving publish attempt for feed " + feedid + " user " + user + " ip " + ip + " " + ioe.toString(), ioe);
             eelflogger.info(EelfMsgs.EXIT);
             throw ioe;
         } finally {
@@ -456,32 +455,32 @@ public class NodeServlet extends HttpServlet {
                 try {
                     is.close();
                 } catch (Exception e) {
-                    logger.error("NODE0530 Exception common: " + e);
+                    eelflogger.error("NODE0530 Exception common: " + e);
                 }
             }
             if (dos != null) {
                 try {
                     dos.close();
                 } catch (Exception e) {
-                    logger.error("NODE0531 Exception common: " + e);
+                    eelflogger.error("NODE0531 Exception common: " + e);
                 }
             }
             if (mw != null) {
                 try {
                     mw.close();
                 } catch (Exception e) {
-                    logger.error("NODE0532 Exception common: " + e);
+                    eelflogger.error("NODE0532 Exception common: " + e);
                 }
             }
             try {
                 data.delete();
             } catch (Exception e) {
-                logger.error("NODE0533 Exception common: " + e);
+                eelflogger.error("NODE0533 Exception common: " + e);
             }
             try {
                 meta.delete();
             } catch (Exception e) {
-                logger.error("NODE0534 Exception common: " + e);
+                eelflogger.error("NODE0534 Exception common: " + e);
             }
         }
     }
@@ -491,7 +490,7 @@ public class NodeServlet extends HttpServlet {
             fileid = fileid.substring(8);
             int i = fileid.indexOf('/');
             if (i == -1 || i == fileid.length() - 1) {
-                logger.info("NODE0112 Rejecting bad URI for DELETE of " + req.getPathInfo() + " from " + req
+                eelflogger.info("NODE0112 Rejecting bad URI for DELETE of " + req.getPathInfo() + " from " + req
                         .getRemoteAddr());
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND,
                         "Invalid request URI. Expecting <subId>/<pubId>.");
@@ -509,17 +508,17 @@ public class NodeServlet extends HttpServlet {
             }
             boolean result = delivery.markTaskSuccess(config.getSpoolBase() + "/s/" + subIdDir + "/" + subId, pubid);
             if (result) {
-                logger.info("NODE0115 Successfully deleted files (" + pubid + ", " + pubid + ".M) from DR Node: "
+                eelflogger.info("NODE0115 Successfully deleted files (" + pubid + ", " + pubid + ".M) from DR Node: "
                         + config.getMyName());
                 resp.setStatus(HttpServletResponse.SC_OK);
                 eelflogger.info(EelfMsgs.EXIT);
             } else {
-                logger.error("NODE0116 " + errorMessage);
+                eelflogger.error("NODE0116 " + errorMessage);
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found on server.");
                 eelflogger.info(EelfMsgs.EXIT);
             }
         } catch (IOException ioe) {
-            logger.error("NODE0117 Unable to delete files (" + pubid + ", " + pubid + ".M) from DR Node: "
+            eelflogger.error("NODE0117 Unable to delete files (" + pubid + ", " + pubid + ".M) from DR Node: "
                     + config.getMyName() + ". Error: " + ioe.getMessage());
             eelflogger.info(EelfMsgs.EXIT);
         }
@@ -532,7 +531,7 @@ public class NodeServlet extends HttpServlet {
             return null;
         }
         if (!req.isSecure()) {
-            logger.info(
+            eelflogger.info(
                     "NODE0104 Rejecting insecure PUT or DELETE of " + req.getPathInfo() + " from " + req
                             .getRemoteAddr());
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "https required on publish requests");
@@ -541,7 +540,7 @@ public class NodeServlet extends HttpServlet {
         }
         String fileid = req.getPathInfo();
         if (fileid == null) {
-            logger.info("NODE0105 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + " from " + req
+            eelflogger.info("NODE0105 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + " from " + req
                     .getRemoteAddr());
             resp.sendError(HttpServletResponse.SC_NOT_FOUND,
                     "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.");
@@ -555,14 +554,14 @@ public class NodeServlet extends HttpServlet {
         try {
             boolean deletePermitted = config.isDeletePermitted(subscriptionId);
             if (!deletePermitted) {
-                logger.error("NODE0113 " + errorMessage + " Error: Subscription "
+                eelflogger.error("NODE0113 " + errorMessage + " Error: Subscription "
                         + subscriptionId + " is not a privileged subscription");
                 resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 eelflogger.info(EelfMsgs.EXIT);
                 return false;
             }
         } catch (NullPointerException npe) {
-            logger.error("NODE0114 " + errorMessage + " Error: Subscription " + subscriptionId + " does not exist");
+            eelflogger.error("NODE0114 " + errorMessage + " Error: Subscription " + subscriptionId + " does not exist");
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             eelflogger.info(EelfMsgs.EXIT);
             return false;

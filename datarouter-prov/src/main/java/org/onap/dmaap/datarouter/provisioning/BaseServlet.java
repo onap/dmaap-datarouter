@@ -24,6 +24,29 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
+import static com.att.eelf.configuration.Configuration.MDC_SERVER_FQDN;
+
+import static com.att.eelf.configuration.Configuration.MDC_SERVER_IP_ADDRESS;
+import static com.att.eelf.configuration.Configuration.MDC_SERVICE_NAME;
+import static com.att.eelf.configuration.Configuration.MDC_KEY_REQUEST_ID;
+
+
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.security.cert.X509Certificate;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
@@ -216,11 +239,11 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     /**
      * This logger is used to log provisioning events
      */
-    protected static Logger eventlogger;
+    protected static EELFLogger eventlogger;
     /**
      * This logger is used to log internal events (errors, etc.)
      */
-    protected static Logger intlogger;
+    protected static EELFLogger intlogger;
     /**
      * Authorizer - interface to the Policy Engine
      */
@@ -249,12 +272,9 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * Initialize data common to all the provisioning server servlets.
      */
     protected BaseServlet() {
-        if (eventlogger == null) {
-            eventlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.events");
-        }
-        if (intlogger == null) {
-            intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
-        }
+        this.eventlogger = EELFManager.getInstance().getLogger("EventLog");
+        this.intlogger = EELFManager.getInstance().getLogger("InternalLog");
+
         if (authz == null) {
             authz = new ProvAuthorizer(this);
         }
@@ -520,7 +540,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 intlogger.debug("PROV0003 DNS lookup: " + nodes[i] + " => " + na[i].toString());
             } catch (UnknownHostException e) {
                 na[i] = null;
-                intlogger.warn("PROV0004 Cannot lookup " + nodes[i] + ": " + e);
+                intlogger.warn("PROV0004 Cannot lookup " + nodes[i] + ": " + e.getMessage());
             }
         }
 
@@ -548,7 +568,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 intlogger.debug("PROV0003 DNS lookup: " + pods[i] + " => " + na[i].toString());
             } catch (UnknownHostException e) {
                 na[i] = null;
-                intlogger.warn("PROV0004 Cannot lookup " + pods[i] + ": " + e);
+                intlogger.warn("PROV0004 Cannot lookup " + pods[i] + ": " + e.getMessage());
             }
         }
         podAddresses = na;
@@ -574,7 +594,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             try (InputStream inStream = getClass().getClassLoader().getResourceAsStream(MAILCONFIG_FILE)) {
                 mailprops.load(inStream);
             } catch (IOException e) {
-                intlogger.fatal("PROV9003 Opening properties: " + e.getMessage());
+                intlogger.error("PROV9003 Opening properties: " + e.getMessage());
                 System.exit(1);
             }
         }

@@ -24,7 +24,11 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
-import org.apache.log4j.Logger;
+import java.security.*;
+import java.util.*;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
@@ -87,7 +91,7 @@ public class Main {
     static final String KEYSTORE_PASS_PROPERTY = "org.onap.dmaap.datarouter.provserver.keystore.password";
     static final String TRUSTSTORE_PATH_PROPERTY = "org.onap.dmaap.datarouter.provserver.truststore.path";
     static final String TRUSTSTORE_PASS_PROPERTY = "org.onap.dmaap.datarouter.provserver.truststore.password";
-    public static final Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+    public static final EELFLogger intlogger = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.provisioning.internal");
 
     /**
      * The one and only {@link Server} instance in this JVM
@@ -113,9 +117,8 @@ public class Main {
      * @throws Exception if Jetty has a problem starting
      */
     public static void main(String[] args) throws Exception {
-        // Get prov properties
+        Security.setProperty("networkaddress.cache.ttl", "4");
         Properties provProperties = (new DB()).getProperties();
-
         // Check DB is accessible and contains the expected tables
         if (!checkDatabase()) {
             System.exit(1);
@@ -301,7 +304,7 @@ public class Main {
                 Thread.sleep(5000L);
                 System.exit(0);
             } catch (Exception e) {
-                intlogger.error("Exception in Main.shutdown() method " + e);
+                // ignore
             }
         });
     }

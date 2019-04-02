@@ -23,8 +23,21 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import java.io.InvalidObjectException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.PasswordProcessor;
@@ -51,7 +64,7 @@ public class Subscription extends Syncable {
     private static final String GROUPID_KEY = "groupid";
     private static final String LAST_MOD_KEY = "last_mod";
     private static final String CREATED_DATE = "created_date";
-    private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+    private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
     private static int nextSubid = getMaxSubID() + 1;
 
     private int subid;
@@ -111,7 +124,7 @@ public class Subscription extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error(e);
+            intlogger.error(e.toString());
         }
         return list;
     }
@@ -469,7 +482,7 @@ public class Subscription extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0005 doInsert: " + e.getMessage());
-            intlogger.log(Level.WARN, "PROV0005 Subscription.doInsert(1): ", e);
+            intlogger.warn("PROV0005 Subscription.doInsert(1): ", e.getMessage());
         } finally {
             try {
                 if (ps != null) {
