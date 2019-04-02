@@ -67,6 +67,7 @@ public class ProvDataTest {
                   "\"decompress\":false," +
                   "\"groupid\":1," +
                   "\"metadataOnly\":false," +
+                  "\"follow_redirect\":false," +
                   "\"links\":{" +
                     "\"feed\":\"https://dmaap-dr-prov/feed/1\"" +
                     ",\"log\":\"https://dmaap-dr-prov/sublog/1\"" +
