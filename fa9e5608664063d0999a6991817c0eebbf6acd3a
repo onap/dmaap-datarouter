@@ -22,6 +22,30 @@
       "revId": "fa9e5608664063d0999a6991817c0eebbf6acd3a",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "24a9bf70_b53e4bc9",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/utils/LogfileLoaderTest.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-02T10:10:14Z",
+      "side": 1,
+      "message": "The test failing has nothing to do with the file, entries are added to the hibernate db depending on which test is run first. So we will delete for now and come up with solution later",
+      "parentUuid": "8d6fed7e_5feab92d",
+      "range": {
+        "startLine": 82,
+        "startChar": 59,
+        "endLine": 82,
+        "endChar": 64
+      },
+      "revId": "fa9e5608664063d0999a6991817c0eebbf6acd3a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
