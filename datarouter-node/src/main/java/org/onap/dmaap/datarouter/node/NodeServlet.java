@@ -66,7 +66,6 @@ public class NodeServlet extends HttpServlet {
     private static NodeConfigManager config;
     private static Pattern MetaDataPattern;
     private static EELFLogger eelflogger = EELFManager.getInstance().getLogger(NodeServlet.class);
-    private static boolean isAAFFeed = false;
     private final Delivery delivery;
 
     static {
@@ -195,6 +194,7 @@ public class NodeServlet extends HttpServlet {
         String xpubid = null;
         String rcvd = NodeUtils.logts(System.currentTimeMillis()) + ";from=" + ip + ";by=" + lip;
         Target[] targets = null;
+        boolean isAAFFeed = false;
         if (fileid.startsWith("/delete/")) {
             deleteFile(req, resp, fileid, pubid);
             return;
