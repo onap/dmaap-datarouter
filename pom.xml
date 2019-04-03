@@ -26,7 +26,7 @@
     <groupId>org.onap.dmaap.datarouter</groupId>
     <artifactId>parent</artifactId>
     <name>dmaap-datarouter</name>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
     <url>https://github.com/att/DMAAP_DATAROUTER</url>
     <parent>
@@ -35,7 +35,8 @@
         <version>1.2.3</version>
     </parent>
     <properties>
-        <datarouter.version>2.0.2-SNAPSHOT</datarouter.version>
+        <!--revision can be set in the version.properties file at project root and is loaded by all sub modules-->
+        <revision>${snapshot_version}</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -47,6 +48,7 @@
         <sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
         <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
         <sonar.projectVersion>${project.version}</sonar.projectVersion>
+        <sonar.exclusions>**/src/main/java/org/onap/dmaap/datarouter/reports/**</sonar.exclusions>
         <jetty.version>9.4.14.v20181114</jetty.version>
         <jetty.websocket.version>8.2.0.v20160908</jetty.websocket.version>
         <javax.mail-api.version>1.5.5</javax.mail-api.version>
@@ -60,11 +62,15 @@
         <releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
         <stagingNexusPath>/content/repositories/staging/</stagingNexusPath>
         <sitePath>/content/sites/site/org/onap/dmaap/datarouter/${project.artifactId}/${project.version}</sitePath>
-        <skip.docker.build>true</skip.docker.build>
-        <skip.docker.tag>true</skip.docker.tag>
-        <skip.docker.push>true</skip.docker.push>
+        <docker.skip.build>false</docker.skip.build>
+        <io.fabric8.version>0.28.0</io.fabric8.version>
+        <docker.verbose>true</docker.verbose>
+        <docker.apiVersion>1.23</docker.apiVersion>
+        <docker.image.root>onap/dmaap/</docker.image.root>
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>yyyyMMdd'T'HHmmss'Z'</maven.build.timestamp.format>
         <commons-codec.version>1.10</commons-codec.version>
-        <sonar.exclusions>**/src/main/java/org/onap/dmaap/datarouter/reports/**</sonar.exclusions>
+        <gmaven-plugin.version>1.0</gmaven-plugin.version>
     </properties>
     <modules>
         <module>datarouter-prov</module>
@@ -77,9 +83,9 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.28.0</version>
+                <version>${io.fabric8.version}</version>
                 <configuration>
-                    <skipDockerBuild>true</skipDockerBuild>
+                    <skipBuild>${docker.skip.build}</skipBuild>
                 </configuration>
             </plugin>
             <plugin>
@@ -160,6 +166,24 @@
                         <exclude>IntegrationSuite.java</exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.0.1</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <outputDirectory>target</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
