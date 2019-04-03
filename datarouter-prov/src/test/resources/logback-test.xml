@@ -20,7 +20,7 @@
   * ECOMP is a trademark and service mark of AT&T Intellectual Property.
   *
 -->
-<configuration scan="true" scanPeriod="3 seconds" debug="true">
+<configuration scan="true" scanPeriod="3 seconds" debug="false">
   <property name="logDir" value="logs/EELF" />
   <property name="generalLogName" value="application" />
   <property name="errorLogName" value="errors" />
@@ -109,14 +109,9 @@
           <appender-ref ref="asyncEELFError" />
       </logger>
 
-     <logger name="log4j.logger.org.eclipse.jetty" additivity="false" level="info">
-        <appender-ref ref="asyncEELFjettyAndNodelog"/>
-    </logger>
-
   <root level="INFO">
     <appender-ref ref="asyncEELF" />
     <appender-ref ref="asyncEELFError" />
-     <appender-ref ref="asyncEELFjettyAndNodelog" />
   </root>
 
 </configuration>

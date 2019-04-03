@@ -26,7 +26,7 @@
     <groupId>org.onap.dmaap.datarouter</groupId>
     <artifactId>parent</artifactId>
     <name>dmaap-datarouter</name>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>2.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <url>https://github.com/att/DMAAP_DATAROUTER</url>
     <parent>
@@ -160,6 +160,17 @@
                         <exclude>IntegrationSuite.java</exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>onap-java-style</id>
+                        <configuration>
+                            <consoleOutput>false</consoleOutput>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
