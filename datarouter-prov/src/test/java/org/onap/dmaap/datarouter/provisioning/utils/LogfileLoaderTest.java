@@ -20,10 +20,11 @@
 
 package org.onap.dmaap.datarouter.provisioning.utils;
 
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 
 import org.onap.dmaap.datarouter.provisioning.InternalServlet;
@@ -38,14 +39,11 @@ import javax.persistence.Persistence;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Map;
 
-
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
-import java.util.HashMap;
+
 
 
 @RunWith(PowerMockRunner.class)
@@ -55,6 +53,9 @@ public class LogfileLoaderTest {
     private static EntityManagerFactory emf;
     private static EntityManager em;
     private LogfileLoader lfl = LogfileLoader.getLoader();
+
+    @Rule
+    public TemporaryFolder folder = new TemporaryFolder();
 
 
     @BeforeClass
@@ -76,46 +77,36 @@ public class LogfileLoaderTest {
     }
 
 
-    @After
-    public void tearDown() {
-        try {
-            new FileWriter("unit-test-logs/testFile1.txt").close();
-        }catch (IOException ioe){
-            System.out.println(ioe.getMessage());
-        }
-    }
-
-
     @Test
-    public void Verify_File_Processing_when_Req_Type_LOG() {
+    public void Verify_File_Processing_when_Req_Type_LOG() throws IOException {
         String fileContent = "2018-08-29-10-10-10-543.|LOG|1|1|url/file123|method|1|1|type|1|128.0.0.9|user123|2|1|1|1|other|1";
-        int[] actual = lfl.process(prepFile(fileContent));
+        int[] actual = lfl.process(prepFile(fileContent, "file1"));
         int[] expect = {0, 1};
         Assert.assertArrayEquals(expect, actual);
     }
 
 
     @Test
-    public void Verify_File_Processing_when_Req_Type_EXP() {
+    public void Verify_File_Processing_when_Req_Type_EXP() throws IOException{
         String fileContent = "2018-08-29-10-10-10-543.|EXP|1|1|1|'url/file123'|method|ctype|3|other|4";
-        int[] actual = lfl.process(prepFile(fileContent));
+        int[] actual = lfl.process(prepFile(fileContent, "file2"));
         int[] expect = {0, 1};
         Assert.assertArrayEquals(expect, actual);
     }
 
 
     @Test
-    public void Verify_Records_Prune_When_Record_Count_Is_Less_Then_Threshold() {
+    public void Verify_Records_Prune_When_Record_Count_Is_Less_Then_Threshold() throws IOException{
         String fileContent = "2018-08-29-10-10-10-543.|PUB|1|1|https://dmaap-dr-prov:8443/publish/1/file123/|POST|application/vnd.att-dr.feed|2|128.0.0.9|user123|200";
-        lfl.process(prepFile(fileContent));
+        lfl.process(prepFile(fileContent, "file3"));
         PowerMockito.mockStatic(Parameters.class);
         PowerMockito.when(Parameters.getParameter(Parameters.PROV_LOG_RETENTION)).thenReturn(new Parameters(Parameters.PROV_LOG_RETENTION, "0"));
         assertFalse(lfl.pruneRecords());
     }
 
 
-    private File prepFile(String content){
-        File file1 = new File("unit-test-logs/testFile1.txt");
+    private File prepFile(String content, String fileName) throws IOException{
+        File file1 = folder.newFile(fileName);
         try (FileWriter fileWriter = new FileWriter(file1)) {
             fileWriter.write(content);
         }catch (IOException e){
