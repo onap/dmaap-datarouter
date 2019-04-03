@@ -55,7 +55,7 @@ import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.send
 public class SubscribeServlet extends ProxyServlet {
 
     //Adding EELF Logger Rally:US664892
-    private static EELFLogger eelflogger = EELFManager.getInstance()
+    private static EELFLogger eelfLogger = EELFManager.getInstance()
         .getLogger(SubscribeServlet.class);
 
     /**
@@ -64,17 +64,17 @@ public class SubscribeServlet extends ProxyServlet {
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         setIpFqdnRequestIDandInvocationIDForEelf("doDelete", req);
-        eelflogger.info(EelfMsgs.ENTRY);
+        eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             String message = "DELETE not allowed for the subscribeURL.";
             EventLogRecord elr = new EventLogRecord(req);
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-            eventlogger.info(elr);
+            eventlogger.info(elr.toString());
             sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
         } finally {
-            eelflogger.info(EelfMsgs.EXIT);
+            eelfLogger.info(EelfMsgs.EXIT);
         }
     }
 
@@ -85,15 +85,15 @@ public class SubscribeServlet extends ProxyServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         setIpFqdnRequestIDandInvocationIDForEelf("doGet", req);
-        eelflogger.info(EelfMsgs.ENTRY);
+        eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             EventLogRecord elr = new EventLogRecord(req);
             String message = isAuthorizedForProvisioning(req);
             if (message != null) {
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                 return;
             }
@@ -106,7 +106,7 @@ public class SubscribeServlet extends ProxyServlet {
                 message = "Missing " + BEHALF_HEADER + " header.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -115,7 +115,7 @@ public class SubscribeServlet extends ProxyServlet {
                 message = "Missing or bad feed number.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -124,7 +124,7 @@ public class SubscribeServlet extends ProxyServlet {
                 message = "Missing or bad feed number.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
                 return;
             }
@@ -134,7 +134,7 @@ public class SubscribeServlet extends ProxyServlet {
 
             // send response
             elr.setResult(HttpServletResponse.SC_OK);
-            eventlogger.info(elr);
+            eventlogger.info(elr.toString());
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType(SUBLIST_CONTENT_TYPE);
             try {
@@ -143,7 +143,7 @@ public class SubscribeServlet extends ProxyServlet {
                 eventlogger.error("IOException: " + ioe.getMessage());
             }
         } finally {
-            eelflogger.info(EelfMsgs.EXIT);
+            eelfLogger.info(EelfMsgs.EXIT);
         }
     }
 
@@ -153,17 +153,17 @@ public class SubscribeServlet extends ProxyServlet {
     @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) {
         setIpFqdnRequestIDandInvocationIDForEelf("doPut", req);
-        eelflogger.info(EelfMsgs.ENTRY);
+        eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             String message = "PUT not allowed for the subscribeURL.";
             EventLogRecord elr = new EventLogRecord(req);
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-            eventlogger.info(elr);
+            eventlogger.info(elr.toString());
             sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
         } finally {
-            eelflogger.info(EelfMsgs.EXIT);
+            eelfLogger.info(EelfMsgs.EXIT);
         }
     }
 
@@ -174,15 +174,15 @@ public class SubscribeServlet extends ProxyServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) {
         setIpFqdnRequestIDandInvocationIDForEelf("doPost", req);
-        eelflogger.info(EelfMsgs.ENTRY);
+        eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
             EventLogRecord elr = new EventLogRecord(req);
             String message = isAuthorizedForProvisioning(req);
             if (message != null) {
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                 return;
             }
@@ -195,7 +195,7 @@ public class SubscribeServlet extends ProxyServlet {
                 message = "Missing " + BEHALF_HEADER + " header.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -204,7 +204,7 @@ public class SubscribeServlet extends ProxyServlet {
                 message = "Missing or bad feed number.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -213,7 +213,7 @@ public class SubscribeServlet extends ProxyServlet {
                 message = "Missing or bad feed number.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
                 return;
             }
@@ -225,7 +225,7 @@ public class SubscribeServlet extends ProxyServlet {
                 message = "Incorrect content-type";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message, eventlogger);
                 return;
             }
@@ -234,7 +234,7 @@ public class SubscribeServlet extends ProxyServlet {
                 message = "Badly formed JSON";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -246,7 +246,7 @@ public class SubscribeServlet extends ProxyServlet {
                 message = "Cannot create subscription; the maximum number of subscriptions has been configured.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_CONFLICT);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_CONFLICT, message, eventlogger);
                 return;
             }
@@ -258,7 +258,7 @@ public class SubscribeServlet extends ProxyServlet {
                 message = e.getMessage();
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -281,7 +281,7 @@ public class SubscribeServlet extends ProxyServlet {
                         message = "Policy Engine disallows access";
                         elr.setMessage(message);
                         elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                        eventlogger.info(elr);
+                        eventlogger.info(elr.toString());
                         sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                         return;
                     }
@@ -290,7 +290,7 @@ public class SubscribeServlet extends ProxyServlet {
                     message = "AAF Subscriber can not be added to legacy Feed- " + feedid;
                     elr.setMessage(message);
                     elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                    eventlogger.info(elr);
+                    eventlogger.info(elr.toString());
                     sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                     return;
                 }
@@ -302,7 +302,7 @@ public class SubscribeServlet extends ProxyServlet {
                         message = "Policy Engine disallows access.";
                         elr.setMessage(message);
                         elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                        eventlogger.info(elr);
+                        eventlogger.info(elr.toString());
                         sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                         return;
                     }
@@ -314,7 +314,7 @@ public class SubscribeServlet extends ProxyServlet {
                         message = "AAF disallows access to permission - " + permission;
                         elr.setMessage(message);
                         elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                        eventlogger.info(elr);
+                        eventlogger.info(elr.toString());
                         sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                         return;
                     }
@@ -334,7 +334,7 @@ public class SubscribeServlet extends ProxyServlet {
             if (doInsert(sub)) {
                 // send response
                 elr.setResult(HttpServletResponse.SC_CREATED);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 resp.setStatus(HttpServletResponse.SC_CREATED);
                 resp.setContentType(SUBFULL_CONTENT_TYPE);
                 resp.setHeader("Location", sub.getLinks().getSelf());
@@ -349,11 +349,11 @@ public class SubscribeServlet extends ProxyServlet {
                 // Something went wrong with the INSERT
                 activeSubs--;
                 elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
             }
         } finally {
-            eelflogger.info(EelfMsgs.EXIT);
+            eelfLogger.info(EelfMsgs.EXIT);
         }
     }
 }

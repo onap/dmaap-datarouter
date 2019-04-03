@@ -24,7 +24,8 @@
 
 package org.onap.dmaap.datarouter.node;
 
-import org.apache.log4j.Logger;
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 
 import java.io.IOException;
 import java.util.*;
@@ -37,7 +38,7 @@ public class IsFrom {
     private long nextcheck;
     private String[] ips;
     private String fqdn;
-    private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.IsFrom");
+    private static EELFLogger logger = EELFManager.getInstance().getLogger(IsFrom.class);
 
     /**
      * Configure the JVM DNS cache to have a 10 second TTL.  This needs to be called very very early or it won't have any effect.
@@ -70,7 +71,7 @@ public class IsFrom {
                     hostAddrArray.add(addr.getHostAddress());
                 }
             } catch (UnknownHostException e) {
-                logger.debug("IsFrom: UnknownHostEx: " + e.toString(), e);
+                logger.error("IsFrom: UnknownHostEx: " + e.toString(), e);
             }
             ips = hostAddrArray.toArray(new String[0]);
             logger.info("IsFrom: DNS ENTRIES FOR FQDN " + fqdn + " : " + Arrays.toString(ips));
@@ -89,9 +90,9 @@ public class IsFrom {
                 return true;
             }
         } catch (UnknownHostException e) {
-            logger.debug("IsFrom: UnknownHostEx: " + e.toString(), e);
+            logger.error("IsFrom: UnknownHostEx: " + e.toString(), e);
         } catch (IOException e) {
-            logger.debug("IsFrom: Failed to parse IP : " + ip + " : " + e.toString(), e);
+            logger.error("IsFrom: Failed to parse IP : " + ip + " : " + e.toString(), e);
         }
         return false;
     }

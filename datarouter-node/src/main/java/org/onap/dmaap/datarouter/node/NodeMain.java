@@ -23,7 +23,9 @@
 
 package org.onap.dmaap.datarouter.node;
 
-import org.apache.log4j.Logger;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.FilterHolder;
@@ -46,7 +48,7 @@ public class NodeMain {
     private NodeMain() {
     }
 
-    private static Logger nodeMainLogger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeMain");
+    private static EELFLogger nodeMainLogger = EELFManager.getInstance().getLogger(NodeMain.class);
 
     class Inner {
         InputStream getCadiProps() {
@@ -80,7 +82,7 @@ public class NodeMain {
                     wait();
                 } catch (Exception exception) {
                     nodeMainLogger
-                            .debug("NodeMain: waitForConfig exception. Exception Message:- " + exception.toString(),
+                            .error("NodeMain: waitForConfig exception. Exception Message:- " + exception.toString(),
                                     exception);
                 }
             }

@@ -30,7 +30,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 
@@ -67,7 +68,7 @@ public class Parameters extends Syncable {
     public static final String THROTTLE_FILTER = "THROTTLE_FILTER";
     public static final String STATIC_ROUTING_NODES = "STATIC_ROUTING_NODES"; //Adding new param for static Routing - Rally:US664862-1610
 
-    private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+    private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
 
     private String keyname;
     private String value;

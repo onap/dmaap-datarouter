@@ -24,18 +24,16 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.JSONUtilities;
-import org.onap.dmaap.datarouter.provisioning.utils.PasswordProcessor;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 
 import java.io.InvalidObjectException;
-import java.security.GeneralSecurityException;
 import java.sql.*;
 import java.util.Date;
 import java.util.*;
@@ -47,7 +45,7 @@ import java.util.*;
  * @version $Id: Feed.java,v 1.13 2013/10/28 18:06:52 eby Exp $
  */
 public class Feed extends Syncable {
-    private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+    private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
     private static int next_feedid = getMaxFeedID() + 1;
 
     private int feedid;
@@ -87,7 +85,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.log(Level.WARN, "PROV0024 Feed.isFeedValid: ", e);
+            intlogger.warn("PROV0024 Feed.isFeedValid: ", e.getMessage());
         }
         return count != 0;
     }
@@ -137,8 +135,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.info("PROV0025 Feed.countActiveFeeds: " + e.getMessage());
-            intlogger.log(Level.WARN, "PROV0025 Feed.countActiveFeeds: ", e);
+            intlogger.warn("PROV0025 Feed.countActiveFeeds: ", e.getMessage());
         }
         return count;
     }
@@ -159,7 +156,7 @@ public class Feed extends Syncable {
             db.release(conn);
         } catch (SQLException e) {
             intlogger.info("PROV0026 Feed.getMaxFeedID: "+e.getMessage());
-            intlogger.log(Level.WARN, "PROV0026 Feed.getMaxFeedID: ", e);
+            intlogger.warn("PROV0026 Feed.getMaxFeedID: ", e.getMessage());
         }
         return max;
     }
@@ -205,7 +202,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.log(Level.WARN, "PROV0027 Feed.getAllFeeds: ", e);
+            intlogger.warn("PROV0027 Feed.getAllFeeds: ", e.getMessage());
         }
         return map.values();
     }
@@ -239,7 +236,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.log(Level.WARN, "PROV0028 Feed.getFilteredFeedUrlList: ", e);
+            intlogger.warn("PROV0028 Feed.getFilteredFeedUrlList: ", e.getMessage());
         }
         return list;
     }
@@ -276,7 +273,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.log(Level.WARN, "PROV0029 Feed.getFeedBySQL: ", e);
+            intlogger.warn("PROV0029 Feed.getFeedBySQL: ", e.getMessage());
         }
         return feed;
     }
@@ -383,7 +380,7 @@ public class Feed extends Syncable {
             JSONObject jol = jo.optJSONObject("links");
             this.links = (jol == null) ? (new FeedLinks()) : (new FeedLinks(jol));
         } catch (InvalidObjectException e) {
-            intlogger.log(Level.WARN, "PROV0030 Feed.Feed: ", e);
+            intlogger.warn("PROV0030 Feed.Feed: ", e.getMessage());
             throw e;
         } catch (Exception e) {
             intlogger.error("PROV0031 Feed.Feed: invalid JSON: "+e);

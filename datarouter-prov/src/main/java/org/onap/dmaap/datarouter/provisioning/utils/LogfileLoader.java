@@ -46,7 +46,8 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.log4j.Logger;
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.onap.dmaap.datarouter.provisioning.BaseServlet;
 import org.onap.dmaap.datarouter.provisioning.beans.DeliveryExtraRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.DeliveryRecord;
@@ -106,7 +107,7 @@ public class LogfileLoader extends Thread {
      */
     private static final long SET_SIZE = (1L << 56);
 
-    private final Logger logger;
+    private final EELFLogger logger;
     private final DB db;
     private final String spooldir;
     private final long set_start;
@@ -116,7 +117,7 @@ public class LogfileLoader extends Thread {
     private boolean idle;
 
     private LogfileLoader() {
-        this.logger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+        this.logger = EELFManager.getInstance().getLogger("InternalLog");
         this.db = new DB();
         this.spooldir = db.getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
         this.set_start = getIdRange();
@@ -274,7 +275,7 @@ public class LogfileLoader extends Thread {
              }
             } catch (SQLException e) {
                 System.err.println(e);
-                logger.error(e);
+                logger.error(e.toString());
             } finally {
                 db.release(conn);
             }
@@ -296,7 +297,7 @@ public class LogfileLoader extends Thread {
            }
          } catch (SQLException e) {
             System.err.println(e);
-            logger.error(e);
+            logger.error(e.toString());
         } finally {
             db.release(conn);
         }
@@ -321,7 +322,7 @@ public class LogfileLoader extends Thread {
             }
            } catch (SQLException e) {
             System.err.println(e);
-            logger.error(e);
+            logger.error(e.toString());
         } finally {
             db.release(conn);
         }
@@ -375,7 +376,7 @@ public class LogfileLoader extends Thread {
             logger.debug(String.format("initializeNextid, next ID is %d (%x)", nextid, nextid));
         } catch (SQLException e) {
             System.err.println(e);
-            logger.error(e);
+            logger.error(e.toString());
         } finally {
             db.release(conn);
         }
@@ -415,16 +416,16 @@ public class LogfileLoader extends Thread {
                         }
                     } catch (SQLException e) {
                         logger.warn("PROV8003 Invalid value in record: " + line);
-                        logger.debug(e);
+                        logger.debug(e.toString());
                     } catch (NumberFormatException e) {
                         logger.warn("PROV8004 Invalid number in record: " + line);
-                        logger.debug(e);
+                        logger.debug(e.toString());
                     } catch (ParseException e) {
                         logger.warn("PROV8005 Invalid date in record: " + line);
-                        logger.debug(e);
+                        logger.debug(e.toString());
                     } catch (Exception e) {
                         logger.warn("PROV8006 Invalid pattern in record: " + line);
-                        logger.debug(e);
+                        logger.debug(e.toString());
                     }
                     total++;
                 }
