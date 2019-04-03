@@ -26,23 +26,18 @@
     <parent>
         <groupId>org.onap.dmaap.datarouter</groupId>
         <artifactId>parent</artifactId>
-        <version>2.0.2-SNAPSHOT</version>
+        <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>datarouter-node</artifactId>
     <packaging>jar</packaging>
-    <name>datarouter-node</name>
     <url>https://github.com/att/DMAAP_DATAROUTER</url>
     <properties>
         <sonar.skip>false</sonar.skip>
         <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
         <sitePath>/content/sites/site/${project.groupId}/${project.artifactId}/${project.version}</sitePath>
         <docker.location>${basedir}/target/${artifactId}</docker.location>
-
-        <timestamp>${maven.build.timestamp}</timestamp>
-        <maven.build.timestamp.format>yyyyMMdd'T'HHmmss'Z'</maven.build.timestamp.format>
-
-        <datarouter.node.image.name>onap/dmaap/datarouter-node</datarouter.node.image.name>
+        <datarouter.node.image.name>${docker.image.root}${artifactId}</datarouter.node.image.name>
     </properties>
     <dependencies>
         <dependency>
@@ -144,11 +139,6 @@
             <version>${jetty.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.3.2</version>
-        </dependency>
-        <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>2.4</version>
@@ -156,7 +146,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.1</version>
+            <version>2.6</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -229,17 +219,15 @@
         <profile>
             <id>docker</id>
             <properties>
-                <skipDockerBuild>false</skipDockerBuild>
-                <skipDockerTag>false</skipDockerTag>
                 <skipTests>true</skipTests>
             </properties>
             <build>
                 <plugins>
-
                     <!-- Setup image tags per https://wiki.onap.org/display/DW/Independent+Versioning+and+Release+Process#IndependentVersioningandReleaseProcess-StandardizedDockerTagging -->
                     <plugin>
-                      <groupId>org.codehaus.groovy.maven</groupId>
-                      <artifactId>gmaven-plugin</artifactId>
+                        <groupId>org.codehaus.groovy.maven</groupId>
+                        <artifactId>gmaven-plugin</artifactId>
+                        <version>${gmaven-plugin.version}</version>
                       <executions>
                           <execution>
                               <phase>validate</phase>
@@ -249,7 +237,6 @@
                               <configuration>
                                   <properties>
                                       <ver>${project.version}</ver>
-                                      <timestamp>${maven.build.timestamp}</timestamp>
                                   </properties>
                                   <source>
                                       println 'ver: ' + project.properties['ver'];
@@ -270,7 +257,7 @@
                     <plugin>
                         <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.28.0</version>
+                        <version>${io.fabric8.version}</version>
                         <configuration>
                             <verbose>${docker.verbose}</verbose>
                             <apiVersion>${docker.apiVersion}</apiVersion>
@@ -604,6 +591,24 @@
                         <configuration>
                             <dataFile>${project.build.directory}/code-coverage/jacoco-it.exec</dataFile>
                             <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>../version.properties</file>
+                            </files>
                         </configuration>
                     </execution>
                 </executions>
