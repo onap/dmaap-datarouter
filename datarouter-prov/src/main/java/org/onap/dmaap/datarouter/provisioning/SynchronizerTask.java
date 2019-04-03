@@ -50,6 +50,8 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -60,7 +62,6 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -117,7 +118,7 @@ public class SynchronizerTask extends TimerTask {
     private static final String[] stnames = {"UNKNOWN", "ACTIVE", "STANDBY"};
     private static final long ONE_HOUR = 60 * 60 * 1000L;
 
-    private final Logger logger;
+    private final EELFLogger logger;
     private final Timer rolex;
     private final String spooldir;
     private int state;
@@ -139,7 +140,7 @@ public class SynchronizerTask extends TimerTask {
 
     @SuppressWarnings("deprecation")
     private SynchronizerTask() {
-        logger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+        logger = EELFManager.getInstance().getLogger("InternalLog");
         rolex = new Timer();
         spooldir = (new DB()).getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
         state = UNKNOWN;

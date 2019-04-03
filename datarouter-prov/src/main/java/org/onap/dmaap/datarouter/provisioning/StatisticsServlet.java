@@ -70,7 +70,7 @@ public class StatisticsServlet extends BaseServlet {
     EventLogRecord elr = new EventLogRecord(req);
     elr.setMessage(message);
     elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-    eventlogger.info(elr);
+    eventlogger.info(elr.toString());
     sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
   }
 
@@ -407,7 +407,7 @@ public class StatisticsServlet extends BaseServlet {
     EventLogRecord elr = new EventLogRecord(req);
     elr.setMessage(message);
     elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-    eventlogger.info(elr);
+    eventlogger.info(elr.toString());
     sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
   }
 
@@ -420,7 +420,7 @@ public class StatisticsServlet extends BaseServlet {
     EventLogRecord elr = new EventLogRecord(req);
     elr.setMessage(message);
     elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-    eventlogger.info(elr);
+    eventlogger.info(elr.toString());
     sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
   }
 
