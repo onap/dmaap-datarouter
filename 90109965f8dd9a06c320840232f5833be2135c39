@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "7fd4069e_f74f16df",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-04-03T12:37:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cd504d9a_087999e4",
+      "range": {
+        "startLine": 122,
+        "startChar": 12,
+        "endLine": 122,
+        "endChar": 22
+      },
+      "revId": "90109965f8dd9a06c320840232f5833be2135c39",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a5d133ea_c3b48efb",
         "filename": "datarouter-node/src/main/resources/logback.xml",
         "patchSetId": 4
@@ -36,6 +60,30 @@
       "writtenOn": "2019-04-02T15:41:31Z",
       "side": 1,
       "message": "Why are we filtering for these classes here?",
+      "range": {
+        "startLine": 332,
+        "startChar": 20,
+        "endLine": 332,
+        "endChar": 55
+      },
+      "revId": "90109965f8dd9a06c320840232f5833be2135c39",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "89005a47_3554cc5c",
+        "filename": "datarouter-node/src/main/resources/logback.xml",
+        "patchSetId": 4
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-04-03T12:37:55Z",
+      "side": 1,
+      "message": "I changed the logging to not use debug as you suggested - they were actually more suited toward error logging anyway. Also removed the debug log - the \u0027jetty and node log\u0027 already writes all the debug logging.",
+      "parentUuid": "a5d133ea_c3b48efb",
       "range": {
         "startLine": 332,
         "startChar": 20,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "f8a8e306_65563ba4",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-04-03T12:37:55Z",
+      "side": 1,
+      "message": "done with imports, we\u0027ll leave the subscriber as we discussed.",
+      "parentUuid": "a336ac3a_dc3e9668",
+      "range": {
+        "startLine": 51,
+        "startChar": 17,
+        "endLine": 51,
+        "endChar": 30
+      },
+      "revId": "90109965f8dd9a06c320840232f5833be2135c39",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cc456e35_cf1a43ae",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
         "patchSetId": 4
@@ -94,6 +166,30 @@
     },
     {
       "key": {
+        "uuid": "30d021d2_63cd5fd9",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-04-03T12:37:55Z",
+      "side": 1,
+      "message": "put back the null check, works fine.",
+      "parentUuid": "cc456e35_cf1a43ae",
+      "range": {
+        "startLine": 275,
+        "startChar": 8,
+        "endLine": 276,
+        "endChar": 18
+      },
+      "revId": "90109965f8dd9a06c320840232f5833be2135c39",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "13742885_76351df1",
         "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/InternalServletTest.java",
         "patchSetId": 4
@@ -105,6 +201,30 @@
       "writtenOn": "2019-04-02T15:41:31Z",
       "side": 1,
       "message": "Does this dir not need to be created before the file?",
+      "range": {
+        "startLine": 173,
+        "startChar": 4,
+        "endLine": 173,
+        "endChar": 22
+      },
+      "revId": "90109965f8dd9a06c320840232f5833be2135c39",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "80dbd3b8_523ead9b",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/InternalServletTest.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-04-03T12:37:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "13742885_76351df1",
       "range": {
         "startLine": 173,
         "startChar": 4,
