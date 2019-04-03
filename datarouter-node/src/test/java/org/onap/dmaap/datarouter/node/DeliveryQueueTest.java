@@ -92,31 +92,14 @@ public class DeliveryQueueTest {
         files[0] = dirPath + FileName1;
     }
 
-    private void createFolder(String dirName) throws Exception {
-        String dirPath = dirName;
-
-        File newDirectory = new File(dirPath);
-        boolean isCreated = newDirectory.mkdirs();
-        if (isCreated) {
-            System.out.println("1. Successfully created directories, path: " + newDirectory.getCanonicalPath());
-        } else if (newDirectory.exists()) {
-            System.out.print("1. Directory path already exist, path: " + newDirectory.getCanonicalPath());
-        } else {
-            System.out.println("1. Unable to create directory");
-        }
+    private void createFolder(String dirName) {
+        File newDirectory = new File(dirName);
+        newDirectory.mkdirs();
     }
 
     private void createFile(String file, String dir) throws Exception {
-        String FileName = file;
-        String dirPath = dir;
-
-        File newFile = new File(dirPath + File.separator + FileName);
-        boolean isCreated = newFile.createNewFile();
-        if (isCreated) {
-            System.out.println("\n2. Successfully created new file, path: " + newFile.getCanonicalPath());
-        } else { //File may already exist
-            System.out.println("\n2. Unable to create new file: " + newFile.getCanonicalPath());
-        }
+        File newFile = new File(dir + File.separator + file);
+        newFile.createNewFile();
     }
 
     private void deleteFile(String fileName) {
