@@ -48,19 +48,9 @@ public class DRProvCadiFilter extends CadiFilter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest httpRequest = null;
-        HttpServletResponse httpResponse = null;
-        //cadi code
-        try {
-            httpRequest = (HttpServletRequest) request;
-            httpResponse = (HttpServletResponse) response;
-        } catch (ClassCastException e) {
-            try {
-                throw new ServletException("Only serving HTTP today", e);
-            } catch (ServletException e1) {
-                intlogger.error("PROV7001 DRProvCadiFilter.doFilter: ", e1);
-            }
-        }
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+
         EventLogRecord elr = new EventLogRecord(httpRequest);
         String excludeAAF = httpRequest.getHeader(BaseServlet.EXCLUDE_AAF_HEADER);//send this param value as true, if want to add legacy feed/subscriber in AAF env
 

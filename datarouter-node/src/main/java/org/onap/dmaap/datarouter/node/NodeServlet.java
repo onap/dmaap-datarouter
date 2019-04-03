@@ -27,14 +27,20 @@ package org.onap.dmaap.datarouter.node;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 import org.slf4j.MDC;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -42,10 +48,6 @@ import java.util.Enumeration;
 import java.util.regex.Pattern;
 
 import static org.onap.dmaap.datarouter.node.NodeUtils.sendResponseError;
-
-import org.jetbrains.annotations.Nullable;
-
-import static org.onap.dmaap.datarouter.node.NodeUtils.*;
 
 /**
  * Servlet for handling all http and https requests to the data router node
@@ -64,7 +66,7 @@ public class NodeServlet extends HttpServlet {
     private static NodeConfigManager config;
     private static Pattern MetaDataPattern;
     private static EELFLogger eelflogger = EELFManager.getInstance().getLogger(NodeServlet.class);
-    private boolean isAAFFeed = false;
+    private static boolean isAAFFeed = false;
     private final Delivery delivery;
 
     static {
