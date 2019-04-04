@@ -23,7 +23,8 @@
 
 package org.onap.dmaap.datarouter.reports;
 
-import org.apache.log4j.Logger;
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 
 /**
  * Base class for all the report generating classes.
@@ -34,12 +35,12 @@ import org.apache.log4j.Logger;
 abstract public class ReportBase implements Runnable {
     protected long from, to;
     protected String outfile;
-    protected Logger logger;
+    protected EELFLogger logger;
 
     public ReportBase() {
         this.from = 0;
         this.to = System.currentTimeMillis();
-        this.logger = Logger.getLogger("org.onap.dmaap.datarouter.reports");
+        this.logger = EELFManager.getInstance().getLogger("ReportLog");;
     }
 
     public void setFrom(long from) {

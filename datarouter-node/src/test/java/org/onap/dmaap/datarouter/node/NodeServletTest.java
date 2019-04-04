@@ -294,8 +294,7 @@ public class NodeServletTest {
 
     private void verifyEnteringExitCalled(ListAppender<ILoggingEvent> listAppender) {
         assertEquals("EELF0004I  Entering data router node component with RequestId and InvocationId", listAppender.list.get(0).getMessage());
-        assertEquals("EELF0005I  Exiting data router node component with RequestId and InvocationId", listAppender.list.get(2).getMessage());
-        assertEquals(3, listAppender.list.size());
+        assertEquals("EELF0005I  Exiting data router node component with RequestId and InvocationId", listAppender.list.get(listAppender.list.size() -1).getMessage());
     }
 
     private void setUpConfig() throws IllegalAccessException {

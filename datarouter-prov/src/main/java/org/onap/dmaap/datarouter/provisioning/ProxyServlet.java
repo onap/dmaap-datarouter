@@ -250,7 +250,7 @@ public class ProxyServlet extends BaseServlet {
                     copyResponseHeaders(pxyResponse, resp);
                     copyEntityContent(pxyResponse, resp);
                 } catch (IOException e) {
-                    intlogger.warn("ProxyServlet: " + e);
+                    intlogger.warn("ProxyServlet: " + e.getMessage());
                     sendResponseError(resp, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "", intlogger);
                 } finally {
                     proxy.releaseConnection();

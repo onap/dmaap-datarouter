@@ -27,7 +27,9 @@ package org.onap.dmaap.datarouter.provisioning.utils;
 import java.io.File;
 import java.util.Properties;
 import java.util.TimerTask;
-import org.apache.log4j.Logger;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 
 /**
  * This class provides a {@link TimerTask} that purges old logfiles (older than the number of days specified by the
@@ -42,14 +44,14 @@ public class PurgeLogDirTask extends TimerTask {
 
     private final String logdir;
     private final long interval;
-    private Logger utilsLogger;
+    private EELFLogger utilsLogger;
 
     public PurgeLogDirTask() {
         Properties p = (new DB()).getProperties();
         logdir = p.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
         String s = p.getProperty("org.onap.dmaap.datarouter.provserver.logretention", "30");
 
-        this.utilsLogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.utils");
+        this.utilsLogger = EELFManager.getInstance().getLogger("UtilsLog");;
 
         long n = 30;
         try {

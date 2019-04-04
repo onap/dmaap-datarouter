@@ -33,7 +33,8 @@ import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 
@@ -45,7 +46,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  */
 public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
 
-    private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+    private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
     private final int subid;
     private final int nodeid;
 
