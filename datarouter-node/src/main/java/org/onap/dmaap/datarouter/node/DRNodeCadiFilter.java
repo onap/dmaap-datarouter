@@ -19,6 +19,8 @@
  */
 package org.onap.dmaap.datarouter.node;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.apache.log4j.Logger;
 import org.onap.aaf.cadi.PropAccess;
 import org.onap.aaf.cadi.filter.CadiFilter;
@@ -33,7 +35,7 @@ import java.io.IOException;
 
 
 public class DRNodeCadiFilter extends CadiFilter {
-    private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeServlet");
+    private static EELFLogger logger = EELFManager.getInstance().getLogger(NodeServlet.class);
 
     DRNodeCadiFilter(boolean init, PropAccess access) throws ServletException {
         super(init, access);
@@ -73,7 +75,7 @@ public class DRNodeCadiFilter extends CadiFilter {
             try {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.");
             } catch (IOException e) {
-                logger.error("NODE0541 DRNodeCadiFilter.getFeedId: ", e);
+                logger.error("NODE0541 DRNodeCadiFilter.getFeedId: ", e.getMessage());
             }
             return null;
         }
@@ -87,7 +89,7 @@ public class DRNodeCadiFilter extends CadiFilter {
                 try {
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.  Possible missing fileid.");
                 } catch (IOException e) {
-                    logger.error("NODE0542 DRNodeCadiFilter.getFeedId: ", e);
+                    logger.error("NODE0542 DRNodeCadiFilter.getFeedId: ", e.getMessage());
                 }
                 return null;
             }

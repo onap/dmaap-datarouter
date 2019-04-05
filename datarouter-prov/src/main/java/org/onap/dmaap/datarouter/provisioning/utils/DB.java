@@ -41,7 +41,9 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.Set;
-import org.apache.log4j.Logger;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 
 /**
  * Load the DB JDBC driver, and manage a simple pool of connections to the DB.
@@ -51,8 +53,7 @@ import org.apache.log4j.Logger;
  */
 public class DB {
 
-    private static Logger intlogger = Logger
-        .getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+    private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
 
     private static String DB_URL;
     private static String DB_LOGIN;
@@ -83,10 +84,10 @@ public class DB {
                 HTTP_PORT = (String) props.get("org.onap.dmaap.datarouter.provserver.http.port");
                 Class.forName(DB_DRIVER);
             } catch (IOException e) {
-                intlogger.fatal("PROV9003 Opening properties: " + e.getMessage());
+                intlogger.error("PROV9003 Opening properties: " + e.getMessage());
                 System.exit(1);
             } catch (ClassNotFoundException e) {
-                intlogger.fatal("PROV9004 cannot find the DB driver: " + e);
+                intlogger.error("PROV9004 cannot find the DB driver: " + e);
                 System.exit(1);
             }
         }
@@ -194,7 +195,7 @@ public class DB {
             }
         } catch (SQLException e) {
             intlogger
-                .fatal("PROV9000: The database credentials are not working: " + e.getMessage());
+                .error("PROV9000: The database credentials are not working: " + e.getMessage());
             return false;
         } finally {
             if (connection != null) {
@@ -222,7 +223,7 @@ public class DB {
                 rs.close();
             }
         } catch (SQLException e) {
-            intlogger.fatal("PROV9010: Failed to get TABLE data from DB: " + e.getMessage());
+            intlogger.error("PROV9010: Failed to get TABLE data from DB: " + e.getMessage());
         }
         return tables;
     }
@@ -241,7 +242,7 @@ public class DB {
         try {
             String scriptFile = String.format("%s/sql_init_%02d.sql", scriptDir, scriptId);
             if (!(new File(scriptFile)).exists()) {
-                intlogger.fatal("PROV9005 Failed to load sql script from : " + scriptFile);
+                intlogger.error("PROV9005 Failed to load sql script from : " + scriptFile);
                 System.exit(1);
             }
             LineNumberReader lineReader = new LineNumberReader(new FileReader(scriptFile));
@@ -263,7 +264,7 @@ public class DB {
             lineReader.close();
             strBuilder.setLength(0);
         } catch (Exception e) {
-            intlogger.fatal("PROV9002 Error when initializing table: " + e.getMessage());
+            intlogger.error("PROV9002 Error when initializing table: " + e.getMessage());
             System.exit(1);
         }
     }
