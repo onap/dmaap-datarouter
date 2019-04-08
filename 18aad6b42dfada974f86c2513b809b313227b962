@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0b6c8892_3e154c96",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DRNodeCadiFilter.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-08T10:15:56Z",
+      "side": 1,
+      "message": "log4j reference",
+      "range": {
+        "startLine": 24,
+        "startChar": 18,
+        "endLine": 24,
+        "endChar": 23
+      },
+      "revId": "18aad6b42dfada974f86c2513b809b313227b962",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "848cb487_bc6efa7e",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-08T10:15:56Z",
+      "side": 1,
+      "message": "Log4j reference",
+      "range": {
+        "startLine": 44,
+        "startChar": 52,
+        "endLine": 44,
+        "endChar": 95
+      },
+      "revId": "18aad6b42dfada974f86c2513b809b313227b962",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0a1b618b_53dfdd1a",
+        "filename": "datarouter-node/src/main/resources/logback.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-08T10:15:56Z",
+      "side": 1,
+      "message": "log4j reference",
+      "range": {
+        "startLine": 336,
+        "startChar": 0,
+        "endLine": 338,
+        "endChar": 13
+      },
+      "revId": "18aad6b42dfada974f86c2513b809b313227b962",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "657c89d7_96e0b584",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DRProvCadiFilter.java",
+        "patchSetId": 9
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-08T10:15:56Z",
+      "side": 1,
+      "message": "log4j reference",
+      "range": {
+        "startLine": 25,
+        "startChar": 18,
+        "endLine": 25,
+        "endChar": 23
+      },
+      "revId": "18aad6b42dfada974f86c2513b809b313227b962",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "048ccf3a_bbc53273",
+        "filename": "datarouter-prov/src/main/resources/logback.xml",
+        "patchSetId": 9
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-08T10:15:56Z",
+      "side": 1,
+      "message": "log4j reference",
+      "range": {
+        "startLine": 367,
+        "startChar": 0,
+        "endLine": 369,
+        "endChar": 13
+      },
+      "revId": "18aad6b42dfada974f86c2513b809b313227b962",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
