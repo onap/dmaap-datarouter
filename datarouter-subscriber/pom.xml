@@ -26,123 +26,62 @@
     <parent>
         <groupId>org.onap.dmaap.datarouter</groupId>
         <artifactId>parent</artifactId>
-        <version>2.1.0-SNAPSHOT</version>
+        <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>datarouter-subscriber</artifactId>
     <packaging>jar</packaging>
-    <name>datarouter-subscriber</name>
     <properties>
+        <sitePath>/content/sites/site/${project.groupId}/${project.artifactId}/${project.version}</sitePath>
+        <docker.location>${basedir}/target/${project.artifactId}</docker.location>
+        <datarouter.sub.image.name>${docker.image.root}${project.artifactId}</datarouter.sub.image.name>
         <sonar.language>java</sonar.language>
         <sonar.skip>false</sonar.skip>
-        <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
-        <sitePath>/content/sites/site/${project.groupId}/${project.artifactId}/${project.version}</sitePath>
-
-        <docker.location>${basedir}/target/${artifactId}</docker.location>
-        <datarouter.prov.image.name>onap/dmaap/datarouter-subscriber</datarouter.prov.image.name>
-
-        <timestamp>${maven.build.timestamp}</timestamp>
-        <maven.build.timestamp.format>yyyyMMdd'T'HHmmss'Z'</maven.build.timestamp.format>
     </properties>
     <dependencies>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${google.guava.version}</version>
-        </dependency>
-        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>${commons-codec.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-continuation</artifactId>
-            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-util</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-deploy</artifactId>
-            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlets</artifactId>
-            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-http</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-security</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-websocket</artifactId>
-            <version>${jetty.websocket.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-io</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.thoughtworks.xstream</groupId>
-            <artifactId>xstream</artifactId>
-            <version>${thoughtworks.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${qos.logback.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${qos.logback.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.3</version>
         </dependency>
         <dependency>
             <groupId>org.sonatype.http-testing-harness</groupId>
             <artifactId>junit-runner</artifactId>
-            <version>0.11</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.databene</groupId>
-                    <artifactId>contiperf</artifactId>
-                </exclusion>
-            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
@@ -150,66 +89,26 @@
             <version>1.2.17</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.3.2</version>
-        </dependency>
     </dependencies>
     <profiles>
         <profile>
             <id>docker</id>
             <properties>
-                <skipDockerBuild>false</skipDockerBuild>
-                <skipDockerTag>false</skipDockerTag>
                 <skipTests>true</skipTests>
             </properties>
             <build>
                 <plugins>
-
-                    <!-- Setup image tags per https://wiki.onap.org/display/DW/Independent+Versioning+and+Release+Process#IndependentVersioningandReleaseProcess-StandardizedDockerTagging -->
                     <plugin>
-                      <groupId>org.codehaus.groovy.maven</groupId>
-                      <artifactId>gmaven-plugin</artifactId>
-                      <executions>
-                          <execution>
-                              <phase>validate</phase>
-                              <goals>
-                                  <goal>execute</goal>
-                              </goals>
-                              <configuration>
-                                  <properties>
-                                      <ver>${project.version}</ver>
-                                      <timestamp>${maven.build.timestamp}</timestamp>
-                                  </properties>
-                                  <source>
-                                      println 'ver: ' + project.properties['ver'];
-                                      if ( project.properties['ver'].endsWith("-SNAPSHOT") ) {
-                                          project.properties['dockertag1']=project.properties['ver'] + "-latest";
-                                          project.properties['dockertag2']=project.properties['ver'] + "-" + project.properties['timestamp'];
-                                      } else {
-                                          project.properties['dockertag1']=project.properties['ver'] + "-STAGING-latest";
-                                          project.properties['dockertag2']=project.properties['ver'] + "-STAGING-" + project.properties['timestamp'];
-                                      }
-                                      println 'docker tag 1: ' + project.properties['dockertag1'];
-                                      println 'docker tag 2: ' + project.properties['dockertag2'];
-                                  </source>
-                              </configuration>
-                          </execution>
-                      </executions>
+                        <groupId>org.codehaus.gmaven</groupId>
+                        <artifactId>gmaven-plugin</artifactId>
                     </plugin>
                     <plugin>
                         <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.28.0</version>
                         <configuration>
-                            <verbose>${docker.verbose}</verbose>
-                            <apiVersion>${docker.apiVersion}</apiVersion>
-                            <pullRegistry>${docker.pull.registry}</pullRegistry>
-                            <pushRegistry>${docker.push.registry}</pushRegistry>
                             <images>
                                 <image>
-                                    <name>${datarouter.prov.image.name}</name>
+                                    <name>${datarouter.sub.image.name}</name>
                                     <build>
                                         <cleanup>try</cleanup>
                                         <dockerFileDir>${basedir}/target/docker-stage</dockerFileDir>
@@ -222,22 +121,22 @@
                                 </image>
                             </images>
                         </configuration>
-                         <executions>
-                             <execution>
-                                 <id>generate-images</id>
-                                 <phase>install</phase>
-                                 <goals>
-                                     <goal>build</goal>
-                                 </goals>
-                             </execution>
-                             <execution>
-                                 <id>push-images</id>
-                                 <phase>deploy</phase>
-                                 <goals>
-                                     <goal>push</goal>
-                                 </goals>
-                             </execution>
-                         </executions>
+                        <executions>
+                            <execution>
+                                <id>generate-images</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>push-images</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>push</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -306,11 +205,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-                <version>3.6.0</version>
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -379,19 +273,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.10</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
                         <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/opt/app/subscriber/lib</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <outputDirectory>${project.build.directory}/docker-stage/opt/app/subscriber/lib</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -399,73 +286,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/gen/**</exclude>
-                        <exclude>**/generated-sources/**</exclude>
-                        <exclude>**/yang-gen/**</exclude>
-                        <exclude>**/pax/**</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>pre-unit-test</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                        <configuration>
-                            <destFile>${project.build.directory}/code-coverage/jacoco-ut.exec</destFile>
-                            <propertyName>surefireArgLine</propertyName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>post-unit-test</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                        <configuration>
-                            <dataFile>${project.build.directory}/code-coverage/jacoco-ut.exec</dataFile>
-                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>pre-integration-test</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                        <configuration>
-                            <destFile>${project.build.directory}/code-coverage/jacoco-it.exec</destFile>
-                            <propertyName>failsafeArgLine</propertyName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>post-integration-test</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                        <configuration>
-                            <dataFile>${project.build.directory}/code-coverage/jacoco-it.exec</dataFile>
-                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

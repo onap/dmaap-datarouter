@@ -26,7 +26,7 @@
     <groupId>org.onap.dmaap.datarouter</groupId>
     <artifactId>parent</artifactId>
     <name>dmaap-datarouter</name>
-    <version>2.1.0-SNAPSHOT</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
     <url>https://github.com/att/DMAAP_DATAROUTER</url>
     <parent>
@@ -35,36 +35,58 @@
         <version>1.2.3</version>
     </parent>
     <properties>
-        <datarouter.version>2.0.2-SNAPSHOT</datarouter.version>
+        <!--revision can be set in the version.properties file at project root and is loaded by all sub modules-->
+        <revision>${snapshot_version}</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+
+        <snapshotNexusPath>/content/repositories/snapshots/</snapshotNexusPath>
+        <releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
+        <stagingNexusPath>/content/repositories/staging/</stagingNexusPath>
+        <sitePath>/content/sites/site/org/onap/dmaap/datarouter/${project.artifactId}/${project.version}</sitePath>
+
         <sonar.language>java</sonar.language>
         <sonar.skip>false</sonar.skip>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.surefire.reportsPath>${project.build.directory}/surefire-reports</sonar.surefire.reportsPath>
         <sonar.jacoco.reportPaths>${project.build.directory}/coverage-reports/jacoco.exec</sonar.jacoco.reportPaths>
         <sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
-        <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
         <sonar.projectVersion>${project.version}</sonar.projectVersion>
+
+        <docker.skip.build>false</docker.skip.build>
+        <docker.verbose>true</docker.verbose>
+        <docker.image.root>onap/dmaap/</docker.image.root>
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>yyyyMMdd'T'HHmmss'Z'</maven.build.timestamp.format>
+
+        <!--dependency version across all modules-->
         <jetty.version>9.4.14.v20181114</jetty.version>
-        <jetty.websocket.version>8.2.0.v20160908</jetty.websocket.version>
         <javax.mail-api.version>1.5.5</javax.mail-api.version>
+        <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <dom4j.version>2.1.1</dom4j.version>
-        <xml-apis.version>1.4.01</xml-apis.version>
-        <thoughtworks.version>1.4.10</thoughtworks.version>
-        <google.guava.version>26.0-jre</google.guava.version>
         <qos.logback.version>1.2.3</qos.logback.version>
         <aaf-cadi-aaf.version>2.1.10</aaf-cadi-aaf.version>
-        <snapshotNexusPath>/content/repositories/snapshots/</snapshotNexusPath>
-        <releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
-        <stagingNexusPath>/content/repositories/staging/</stagingNexusPath>
-        <sitePath>/content/sites/site/org/onap/dmaap/datarouter/${project.artifactId}/${project.version}</sitePath>
-        <skip.docker.build>true</skip.docker.build>
-        <skip.docker.tag>true</skip.docker.tag>
-        <skip.docker.push>true</skip.docker.push>
         <commons-codec.version>1.10</commons-codec.version>
-        <sonar.exclusions>**/src/main/java/org/onap/dmaap/datarouter/reports/**</sonar.exclusions>
+        <gmaven-plugin.version>1.5</gmaven-plugin.version>
+        <io.fabric8.version>0.28.0</io.fabric8.version>
+        <docker.apiVersion>1.23</docker.apiVersion>
+        <commons-lang.version>2.4</commons-lang.version>
+        <commons-io.version>2.6</commons-io.version>
+        <httpcore.version>4.4</httpcore.version>
+        <httpclient.version>4.5.3</httpclient.version>
+        <junit-runner.version>0.11</junit-runner.version>
+        <junit.version>4.12</junit.version>
+        <mockito-core.version>1.10.19</mockito-core.version>
+        <powermock.version>1.7.4</powermock.version>
+        <powermock-api-mockito.version>1.7.4</powermock-api-mockito.version>
+        <commons-lang3.version>3.0</commons-lang3.version>
+        <eelf-core.version>0.0.1</eelf-core.version>
+        <json.version>20160810</json.version>
+        <sl4j-api.version>1.7.25</sl4j-api.version>
+        <hamcrest-lib.version>1.3</hamcrest-lib.version>
+        <annotations.version>12.0</annotations.version>
+
     </properties>
     <modules>
         <module>datarouter-prov</module>
@@ -72,85 +94,187 @@
         <module>datarouter-subscriber</module>
         <module>datarouter-docker-compose</module>
     </modules>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-library</artifactId>
+                <version>${hamcrest-lib.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${sl4j-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>xml-apis</groupId>
+                <artifactId>xml-apis</artifactId>
+                <version>${xml-apis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.dom4j</groupId>
+                <artifactId>dom4j</artifactId>
+                <version>${dom4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commons-codec.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${qos.logback.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${qos.logback.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.intellij</groupId>
+                <artifactId>annotations</artifactId>
+                <version>${annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>${javax.servlet-api.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>javax.mail-api</artifactId>
+                <version>${javax.mail-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-continuation</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-util</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-servlet</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-http</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-io</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty.cdi</groupId>
+                <artifactId>cdi-websocket</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.onap.aaf.authz</groupId>
+                <artifactId>aaf-cadi-core</artifactId>
+                <version>${aaf-cadi-aaf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${httpcore.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpclient.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.sonatype.http-testing-harness</groupId>
+                <artifactId>junit-runner</artifactId>
+                <version>${junit-runner.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.databene</groupId>
+                        <artifactId>contiperf</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito-core.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito</artifactId>
+                <version>${powermock-api-mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-junit4</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-support</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-core</artifactId>
+                <version>${powermock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.att.eelf</groupId>
+                <artifactId>eelf-core</artifactId>
+                <version>${eelf-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>${json.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <build>
         <plugins>
             <plugin>
-                <groupId>io.fabric8</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>0.28.0</version>
-                <configuration>
-                    <skipDockerBuild>true</skipDockerBuild>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.7</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <nexusUrl>${onap.nexus.url}</nexusUrl>
-                    <stagingProfileId>176c31dfe190a</stagingProfileId>
-                    <serverId>ecomp-staging</serverId>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
-                <configuration>
-                    <excludes>
-                        <exclude>**/gen/**</exclude>
-                        <exclude>**/generated-sources/**</exclude>
-                        <exclude>**/yang-gen/**</exclude>
-                        <exclude>**/pax/**</exclude>
-                        <exclude>**/src/main/java/org/onap/dmaap/datarouter/reports/**</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>pre-unit-test</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                        <configuration>
-                            <destFile>${project.build.directory}/code-coverage/jacoco-ut.exec</destFile>
-                            <propertyName>surefireArgLine</propertyName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>post-unit-test</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                        <configuration>
-                            <dataFile>${project.build.directory}/code-coverage/jacoco-ut.exec</dataFile>
-                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>pre-integration-test</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                        <configuration>
-                            <destFile>${project.build.directory}/code-coverage/jacoco-it.exec</destFile>
-                            <propertyName>failsafeArgLine</propertyName>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>post-integration-test</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                        <configuration>
-                            <dataFile>${project.build.directory}/code-coverage/jacoco-it.exec</dataFile>
-                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -160,6 +284,24 @@
                         <exclude>IntegrationSuite.java</exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.0.1</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <outputDirectory>target</outputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -173,6 +315,139 @@
                 </executions>
             </plugin>
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.6.0</version>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>2.10</version>
+                    <executions>
+                        <execution>
+                            <id>copy-dependencies</id>
+                            <goals>
+                                <goal>copy-dependencies</goal>
+                            </goals>
+                            <configuration>
+                                <overWriteReleases>false</overWriteReleases>
+                                <overWriteSnapshots>false</overWriteSnapshots>
+                                <overWriteIfNewer>true</overWriteIfNewer>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.0.1</version>
+                    <configuration>
+                        <failOnError>false</failOnError>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>2.2.1</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>cobertura-maven-plugin</artifactId>
+                    <version>2.7</version>
+                    <configuration>
+                        <formats>
+                            <format>html</format>
+                            <format>xml</format>
+                        </formats>
+                        <check/>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.gmaven</groupId>
+                    <artifactId>gmaven-plugin</artifactId>
+                    <version>${gmaven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>execute</goal>
+                            </goals>
+                            <configuration>
+                                <properties>
+                                    <ver>${project.version}</ver>
+                                </properties>
+                                <!-- Setup image tags per https://wiki.onap.org/display/DW/Independent+Versioning+and+Release+Process#IndependentVersioningandReleaseProcess-StandardizedDockerTagging -->
+                                <source>
+                                    println 'ver: ' + project.properties['ver'];
+                                    if ( project.properties['ver'].endsWith("-SNAPSHOT") ) {
+                                        project.properties['dockertag1']=project.properties['ver'] + "-latest";
+                                        project.properties['dockertag2']=project.properties['ver'] + "-" + project.properties['timestamp'];
+                                    } else {
+                                        project.properties['dockertag1']=project.properties['ver'] + "-STAGING-latest";
+                                        project.properties['dockertag2']=project.properties['ver'] + "-STAGING-" + project.properties['timestamp'];
+                                    }
+                                    println 'docker tag 1: ' + project.properties['dockertag1'];
+                                    println 'docker tag 2: ' + project.properties['dockertag2'];
+                                </source>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>${io.fabric8.version}</version>
+                    <configuration>
+                        <skipBuild>${docker.skip.build}</skipBuild>
+                        <verbose>${docker.verbose}</verbose>
+                        <apiVersion>${docker.apiVersion}</apiVersion>
+                        <pullRegistry>${docker.pull.registry}</pullRegistry>
+                        <pushRegistry>${docker.push.registry}</pushRegistry>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <version>1.0.0</version>
+                    <executions>
+                        <execution>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>read-project-properties</goal>
+                            </goals>
+                            <configuration>
+                                <files>
+                                    <file>../version.properties</file>
+                                </files>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
     <distributionManagement>
         <repository>
