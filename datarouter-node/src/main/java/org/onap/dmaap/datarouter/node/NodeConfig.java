@@ -24,12 +24,14 @@
 
 package org.onap.dmaap.datarouter.node;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Vector;
-import org.apache.log4j.Logger;
 
 /**
  * Processed configuration for this node.
@@ -39,7 +41,7 @@ import org.apache.log4j.Logger;
  * discarded.
  */
 public class NodeConfig {
-    private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.NodeConfig");
+    private static EELFLogger logger = EELFManager.getInstance().getLogger(NodeConfig.class);
     /**
      * Raw configuration entry for a data router node
      */

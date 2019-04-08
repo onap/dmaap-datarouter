@@ -36,7 +36,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 
 /**
@@ -58,7 +59,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
 public class VolumeReport extends ReportBase {
     private static final String SELECT_SQL = "select EVENT_TIME, TYPE, FEEDID, CONTENT_LENGTH, RESULT" +
             " from LOG_RECORDS where EVENT_TIME >= ? and EVENT_TIME <= ? LIMIT ?, ?";
-    private Logger loggerVolumeReport=Logger.getLogger("org.onap.dmaap.datarouter.reports");
+    private EELFLogger loggerVolumeReport= EELFManager.getInstance().getLogger("ReportLog");;
     private class Counters {
         int filespublished, filesdelivered, filesexpired;
         long bytespublished, bytesdelivered, bytesexpired;

@@ -24,7 +24,9 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
-import org.apache.log4j.Logger;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
@@ -87,7 +89,7 @@ public class Main {
     static final String KEYSTORE_PASS_PROPERTY = "org.onap.dmaap.datarouter.provserver.keystore.password";
     static final String TRUSTSTORE_PATH_PROPERTY = "org.onap.dmaap.datarouter.provserver.truststore.path";
     static final String TRUSTSTORE_PASS_PROPERTY = "org.onap.dmaap.datarouter.provserver.truststore.password";
-    public static final Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+    public static final EELFLogger intlogger = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.provisioning.internal");
 
     /**
      * The one and only {@link Server} instance in this JVM
@@ -100,7 +102,7 @@ public class Main {
             try {
                 in = getClass().getClassLoader().getResourceAsStream("drProvCadi.properties");
             } catch (Exception e) {
-                intlogger.error("Exception in Main.getCadiProps() method ", e);
+                intlogger.error("Exception in Main.getCadiProps() method ", e.getMessage());
             }
             return in;
         }
@@ -113,9 +115,8 @@ public class Main {
      * @throws Exception if Jetty has a problem starting
      */
     public static void main(String[] args) throws Exception {
-        // Get prov properties
+        Security.setProperty("networkaddress.cache.ttl", "4");
         Properties provProperties = (new DB()).getProperties();
-
         // Check DB is accessible and contains the expected tables
         if (!checkDatabase()) {
             System.exit(1);
@@ -247,7 +248,7 @@ public class Main {
                         InputStream in = obj.getCadiProps();
                         cadiProperties.load(in);
                     } catch (IOException e1) {
-                        intlogger.error("PROV0001 Exception loading CADI properties", e1);
+                        intlogger.error("PROV0001 Exception loading CADI properties", e1.getMessage());
                     }
                     cadiProperties.setProperty("aaf_locate_url", provProperties.getProperty("org.onap.dmaap.datarouter.provserver.cadi.aaf.url", "https://aaf-onap-test.osaaf.org:8095"));
                     intlogger.info("PROV0001  aaf_url set to - " + cadiProperties.getProperty("aaf_url"));
@@ -280,7 +281,7 @@ public class Main {
             server.start();
             intlogger.info("Prov Server started-" + server.getState());
         } catch (Exception e) {
-            intlogger.info("Jetty failed to start. Reporting will we unavailable", e);
+            intlogger.info("Jetty failed to start. Reporting will we unavailable", e.getMessage());
         }
         server.join();
         intlogger.info("PROV0001 **** AT&T Data Router Provisioning Server halted.");
@@ -301,7 +302,7 @@ public class Main {
                 Thread.sleep(5000L);
                 System.exit(0);
             } catch (Exception e) {
-                intlogger.error("Exception in Main.shutdown() method " + e);
+                intlogger.error("Exception in Main.shutdown() method " + e.getMessage());
             }
         });
     }

@@ -64,7 +64,7 @@ import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.send
 @SuppressWarnings("serial")
 public class LogServlet extends BaseServlet {
     //Adding EELF Logger Rally:US664892
-    private static EELFLogger eelflogger = EELFManager.getInstance().getLogger(LogServlet.class);
+    private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(LogServlet.class);
     private static final long TWENTYFOUR_HOURS = (24 * 60 * 60 * 1000L);
     private static final String FMT_1 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     private static final String FMT_2 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
@@ -148,17 +148,17 @@ public class LogServlet extends BaseServlet {
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         setIpFqdnRequestIDandInvocationIDForEelf("doDelete", req);
-        eelflogger.info(EelfMsgs.ENTRY);
+        eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             String message = "DELETE not allowed for the logURL.";
             EventLogRecord elr = new EventLogRecord(req);
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-            eventlogger.info(elr);
+            eventlogger.error(elr.toString());
             sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
         } finally {
-        eelflogger.info(EelfMsgs.EXIT);
+        eelfLogger.info(EelfMsgs.EXIT);
     }
     }
     /**
@@ -168,9 +168,9 @@ public class LogServlet extends BaseServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         setIpFqdnRequestIDandInvocationIDForEelf("doGet", req);
-        eelflogger.info(EelfMsgs.ENTRY);
+        eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             int id = getIdFromPath(req);
             if (id < 0) {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Missing or bad feed/subscription number.", eventlogger);
@@ -229,7 +229,7 @@ public class LogServlet extends BaseServlet {
                 eventlogger.error("IOException: " + ioe.getMessage());
             }
         } finally {
-            eelflogger.info(EelfMsgs.EXIT);
+            eelfLogger.info(EelfMsgs.EXIT);
         }
     }
     /**
@@ -238,17 +238,17 @@ public class LogServlet extends BaseServlet {
     @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) {
         setIpFqdnRequestIDandInvocationIDForEelf("doPut", req);
-        eelflogger.info(EelfMsgs.ENTRY);
+        eelfLogger.info(EelfMsgs.ENTRY);
         try {
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
+        eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
         String message = "PUT not allowed for the logURL.";
         EventLogRecord elr = new EventLogRecord(req);
         elr.setMessage(message);
         elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-        eventlogger.info(elr);
+        eventlogger.error(elr.toString());
         sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
         } finally {
-            eelflogger.info(EelfMsgs.EXIT);
+            eelfLogger.info(EelfMsgs.EXIT);
         }
     }
     /**
@@ -257,17 +257,17 @@ public class LogServlet extends BaseServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) {
         setIpFqdnRequestIDandInvocationIDForEelf("doPost", req);
-        eelflogger.info(EelfMsgs.ENTRY);
+        eelfLogger.info(EelfMsgs.ENTRY);
         try {
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
+        eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
         String message = "POST not allowed for the logURL.";
         EventLogRecord elr = new EventLogRecord(req);
         elr.setMessage(message);
         elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-        eventlogger.info(elr);
+        eventlogger.error(elr.toString());
         sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
         } finally {
-            eelflogger.info(EelfMsgs.EXIT);
+            eelfLogger.info(EelfMsgs.EXIT);
         }
     }
 

@@ -35,7 +35,7 @@ import org.onap.dmaap.datarouter.provisioning.BaseServlet;
  * (who made the provisioning request including the IP address, the X-DMAAP-DR-ON-BEHALF-OF
  * header value, and the client certificate), a what (what request was made; the method
  * and servlet involved), and a how (how the request was handled; the result code and
- * message returned to the client).  EventLogRecords are logged using log4j at the INFO level.
+ * message returned to the client).
  *
  * @author Robert Eby
  * @version $Id: EventLogRecord.java,v 1.1 2013/04/26 21:00:25 eby Exp $

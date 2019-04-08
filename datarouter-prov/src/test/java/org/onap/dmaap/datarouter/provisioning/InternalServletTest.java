@@ -169,7 +169,9 @@ public class InternalServletTest extends DrServletTestBase {
   public void Given_Request_Is_HTTP_GET_Starts_With_Logs_In_Endpoint_And_File_Exists_Then_Request_Returns_Ok()
       throws Exception {
     when(request.getPathInfo()).thenReturn("/logs/testFile.txt");
+    File testDir = new File("unit-test-logs");
     File testFile = new File("unit-test-logs/testFile.txt");
+    testDir.mkdirs();
     testFile.createNewFile();
     testFile.deleteOnExit();
     ServletOutputStream outStream = mock(ServletOutputStream.class);
