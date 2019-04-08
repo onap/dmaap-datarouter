@@ -5,12 +5,10 @@ Logging
 =======
 
 
-Where to Access Information
----------------------------
+**Where to Access Information**
 Data Router uses logback framework to generate logs.
 
-Error / Warning Messages
-------------------------
+**Error / Warning Messages**
 Currently Data Router does not have any unique error codes. However the following are the common HTTP error codes that
 could possibly occur in Data Router:
 

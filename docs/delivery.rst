@@ -4,7 +4,7 @@
 Delivery
 ==============
 
-Data Router is comprised of a datarouter-provisioning container, a datarouter-node container and a mariadb container.
+Below is a diagram of the DMaaP Data Router project docker containers and the connections between them.
 
 .. blockdiag::
 
