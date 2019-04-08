@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9c1b7454_39c6f27c",
+        "filename": "docs/offered-apis.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-08T09:09:49Z",
+      "side": 1,
+      "message": "Not required",
+      "range": {
+        "startLine": 101,
+        "startChar": 121,
+        "endLine": 101,
+        "endChar": 122
+      },
+      "revId": "213f204db7b4f43c1d459d0244629748e0b5d049",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "69a442b1_fa7071a3",
+        "filename": "docs/offered-apis.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 831,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-08T09:09:49Z",
+      "side": 1,
+      "message": "Do we need to include the fileId and feedId like we do for the publish here?",
+      "range": {
+        "startLine": 831,
+        "startChar": 2,
+        "endLine": 831,
+        "endChar": 15
+      },
+      "revId": "213f204db7b4f43c1d459d0244629748e0b5d049",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d744fbbf_e5d24a95",
+        "filename": "docs/offered-apis.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 1228,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-08T09:09:49Z",
+      "side": 1,
+      "message": "Should we have a Field column here?",
+      "range": {
+        "startLine": 1228,
+        "startChar": 2,
+        "endLine": 1228,
+        "endChar": 6
+      },
+      "revId": "213f204db7b4f43c1d459d0244629748e0b5d049",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
