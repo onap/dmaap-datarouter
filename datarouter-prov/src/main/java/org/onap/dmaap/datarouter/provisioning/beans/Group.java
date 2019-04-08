@@ -31,10 +31,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
-import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 
 /**
  * The representation of a Subscription.  Subscriptions can be retrieved from the DB, or stored/updated in the DB.
@@ -44,7 +44,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
  */
 public class Group extends Syncable {
 
-    private static Logger intlogger = Logger.getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+    private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
     private static int next_groupid = getMaxGroupID() + 1;
 
     private int groupid;
@@ -237,7 +237,7 @@ public class Group extends Syncable {
         return groupid;
     }
 
-    public static Logger getIntlogger() {
+    public static EELFLogger getIntlogger() {
         return intlogger;
     }
 
@@ -245,7 +245,7 @@ public class Group extends Syncable {
         this.groupid = groupid;
     }
 
-    public static void setIntlogger(Logger intlogger) {
+    public static void setIntlogger(EELFLogger intlogger) {
         Group.intlogger = intlogger;
     }
 

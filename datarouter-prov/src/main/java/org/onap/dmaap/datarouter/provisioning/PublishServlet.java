@@ -59,7 +59,7 @@ public class PublishServlet extends BaseServlet {
     private String provstring;
     private List<IngressRoute> irt;
     //Adding EELF Logger Rally:US664892
-    private static EELFLogger eelflogger = EELFManager.getInstance()
+    private static EELFLogger eelfLogger = EELFManager.getInstance()
             .getLogger(PublishServlet.class);
     private static final Object lock = new Object();
 
@@ -76,48 +76,48 @@ public class PublishServlet extends BaseServlet {
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         setUpEelfForPublishServlet(req, "doDelete");
-        eelflogger.info(EelfMsgs.ENTRY);
+        eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             redirect(req, resp);
         } finally {
-            eelflogger.info(EelfMsgs.EXIT);
+            eelfLogger.info(EelfMsgs.EXIT);
         }
     }
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         setUpEelfForPublishServlet(req, "doGet");
-        eelflogger.info(EelfMsgs.ENTRY);
+        eelfLogger.info(EelfMsgs.ENTRY);
         try {
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+        eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         redirect(req, resp);
         } finally {
-            eelflogger.info(EelfMsgs.EXIT);
+            eelfLogger.info(EelfMsgs.EXIT);
         }
     }
 
     @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) {
         setUpEelfForPublishServlet(req, "doPut");
-        eelflogger.info(EelfMsgs.ENTRY);
+        eelfLogger.info(EelfMsgs.ENTRY);
         try {
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+        eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
         redirect(req, resp);
         } finally {
-            eelflogger.info(EelfMsgs.EXIT);
+            eelfLogger.info(EelfMsgs.EXIT);
         }
     }
 
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) {
         setUpEelfForPublishServlet(req, "doPost");
-        eelflogger.info(EelfMsgs.ENTRY);
+        eelfLogger.info(EelfMsgs.ENTRY);
         try {
-        eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
+        eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
         redirect(req, resp);
         } finally {
-            eelflogger.info(EelfMsgs.EXIT);
+            eelfLogger.info(EelfMsgs.EXIT);
         }
 
     }
@@ -145,7 +145,7 @@ public class PublishServlet extends BaseServlet {
                             : "Invalid request - Missing file ID.";
                     elr.setMessage(message);
                     elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-                    eventlogger.info(elr);
+                    eventlogger.error(elr.toString());
 
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND, message);
                 } else {
@@ -162,7 +162,7 @@ public class PublishServlet extends BaseServlet {
                     String message = "Redirected to: " + newurl;
                     elr.setMessage(message);
                     elr.setResult(HttpServletResponse.SC_MOVED_PERMANENTLY);
-                    eventlogger.info(elr);
+                    eventlogger.error(elr.toString());
 
                     resp.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
                     resp.setHeader("Location", newurl);

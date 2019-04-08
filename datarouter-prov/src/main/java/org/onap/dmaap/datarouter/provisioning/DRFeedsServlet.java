@@ -52,7 +52,7 @@ import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.send
 public class DRFeedsServlet extends ProxyServlet {
 
     //Adding EELF Logger Rally:US664892
-    private static EELFLogger eelflogger = EELFManager.getInstance()
+    private static EELFLogger eelfLogger = EELFManager.getInstance()
             .getLogger(DRFeedsServlet.class);
 
     /**
@@ -61,17 +61,17 @@ public class DRFeedsServlet extends ProxyServlet {
     @Override
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         setIpFqdnRequestIDandInvocationIDForEelf("doDelete", req);
-        eelflogger.info(EelfMsgs.ENTRY);
+        eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             String message = "DELETE not allowed for the drFeedsURL.";
             EventLogRecord elr = new EventLogRecord(req);
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-            eventlogger.info(elr);
+            eventlogger.error(elr.toString());
             sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
         } finally {
-            eelflogger.info(EelfMsgs.EXIT);
+            eelfLogger.info(EelfMsgs.EXIT);
         }
     }
 
@@ -82,15 +82,15 @@ public class DRFeedsServlet extends ProxyServlet {
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         setIpFqdnRequestIDandInvocationIDForEelf("doGet", req);
-        eelflogger.info(EelfMsgs.ENTRY);
+        eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             EventLogRecord elr = new EventLogRecord(req);
             String message = isAuthorizedForProvisioning(req);
             if (message != null) {
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
+                eventlogger.error(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                 return;
             }
@@ -103,7 +103,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 message = "Missing " + BEHALF_HEADER + " header.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.error(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -113,7 +113,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 message = "Bad URL.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-                eventlogger.info(elr);
+                eventlogger.error(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
                 return;
             }
@@ -123,7 +123,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 message = "Policy Engine disallows access.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
+                eventlogger.error(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                 return;
             }
@@ -139,12 +139,12 @@ public class DRFeedsServlet extends ProxyServlet {
                     message = "This feed does not exist in the database.";
                     elr.setMessage(message);
                     elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                    eventlogger.info(elr);
+                    eventlogger.error(elr.toString());
                     sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 } else {
                     // send response
                     elr.setResult(HttpServletResponse.SC_OK);
-                    eventlogger.info(elr);
+                    eventlogger.info(elr.toString());
                     resp.setStatus(HttpServletResponse.SC_OK);
                     resp.setContentType(FEEDFULL_CONTENT_TYPE);
                     try {
@@ -168,7 +168,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 String t = JSONUtilities.createJSONArray(list);
                 // send response
                 elr.setResult(HttpServletResponse.SC_OK);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 resp.setStatus(HttpServletResponse.SC_OK);
                 resp.setContentType(FEEDLIST_CONTENT_TYPE);
                 try {
@@ -178,7 +178,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 }
             }
         } finally {
-            eelflogger.info(EelfMsgs.EXIT);
+            eelfLogger.info(EelfMsgs.EXIT);
         }
     }
 
@@ -188,17 +188,17 @@ public class DRFeedsServlet extends ProxyServlet {
     @Override
     public void doPut(HttpServletRequest req, HttpServletResponse resp) {
         setIpFqdnRequestIDandInvocationIDForEelf("doPut", req);
-        eelflogger.info(EelfMsgs.ENTRY);
+        eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             String message = "PUT not allowed for the drFeedsURL.";
             EventLogRecord elr = new EventLogRecord(req);
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-            eventlogger.info(elr);
+            eventlogger.error(elr.toString());
             sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
         } finally {
-            eelflogger.info(EelfMsgs.EXIT);
+            eelfLogger.info(EelfMsgs.EXIT);
         }
     }
 
@@ -209,15 +209,15 @@ public class DRFeedsServlet extends ProxyServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) {
         setIpFqdnRequestIDandInvocationIDForEelf("doPost", req);
-        eelflogger.info(EelfMsgs.ENTRY);
+        eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelflogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
             EventLogRecord elr = new EventLogRecord(req);
             String message = isAuthorizedForProvisioning(req);
             if (message != null) {
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                eventlogger.info(elr);
+                eventlogger.error(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                 return;
             }
@@ -230,7 +230,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 message = "Missing " + BEHALF_HEADER + " header.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.error(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -240,7 +240,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 message = "Bad URL.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-                eventlogger.info(elr);
+                eventlogger.error(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
                 return;
             }
@@ -251,7 +251,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 message = "Incorrect content-type";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-                eventlogger.info(elr);
+                eventlogger.error(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message, eventlogger);
                 return;
             }
@@ -260,7 +260,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 message = "Badly formed JSON";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.error(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -272,7 +272,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 message = "Cannot create feed; the maximum number of feeds has been configured.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_CONFLICT);
-                eventlogger.info(elr);
+                eventlogger.error(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_CONFLICT, message, eventlogger);
                 return;
             }
@@ -283,7 +283,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 message = e.getMessage();
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.error(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -302,7 +302,7 @@ public class DRFeedsServlet extends ProxyServlet {
                         message = "Policy Engine disallows access.";
                         elr.setMessage(message);
                         elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                        eventlogger.info(elr);
+                        eventlogger.error(elr.toString());
                         sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                         return;
                     }
@@ -311,7 +311,7 @@ public class DRFeedsServlet extends ProxyServlet {
                         message = "DRFeedsServlet.doPost() -Invalid request exclude_AAF should not be true if passing AAF_Instance value= " + aafInstance;
                         elr.setMessage(message);
                         elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                        eventlogger.info(elr);
+                        eventlogger.error(elr.toString());
                         sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                         return;
                     }
@@ -321,7 +321,7 @@ public class DRFeedsServlet extends ProxyServlet {
                         message = "AAF disallows access to permission - " + permission;
                         elr.setMessage(message);
                         elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                        eventlogger.info(elr);
+                        eventlogger.error(elr.toString());
                         sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                         return;
                     }
@@ -332,7 +332,7 @@ public class DRFeedsServlet extends ProxyServlet {
                     message = "Policy Engine disallows access.";
                     elr.setMessage(message);
                     elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                    eventlogger.info(elr);
+                    eventlogger.error(elr.toString());
                     sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
                     return;
                 }
@@ -349,7 +349,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 message = "This feed already exists in the database.";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.info(elr);
+                eventlogger.error(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -358,7 +358,7 @@ public class DRFeedsServlet extends ProxyServlet {
             if (doInsert(feed)) {
                 // send response
                 elr.setResult(HttpServletResponse.SC_CREATED);
-                eventlogger.info(elr);
+                eventlogger.info(elr.toString());
                 resp.setStatus(HttpServletResponse.SC_CREATED);
                 resp.setContentType(FEEDFULL_CONTENT_TYPE);
                 resp.setHeader("Location", feed.getLinks().getSelf());
@@ -371,11 +371,11 @@ public class DRFeedsServlet extends ProxyServlet {
             } else {
                 // Something went wrong with the INSERT
                 elr.setResult(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                eventlogger.info(elr);
+                eventlogger.error(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, DB_PROBLEM_MSG, eventlogger);
             }
         } finally {
-            eelflogger.info(EelfMsgs.EXIT);
+            eelfLogger.info(EelfMsgs.EXIT);
         }
     }
 }

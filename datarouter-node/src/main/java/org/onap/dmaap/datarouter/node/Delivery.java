@@ -26,7 +26,8 @@ package org.onap.dmaap.datarouter.node;
 import java.util.*;
 import java.io.*;
 
-import org.apache.log4j.Logger;
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 
 /**
  * Main control point for delivering files to destinations.
@@ -41,7 +42,7 @@ import org.apache.log4j.Logger;
  * that queue has more files to deliver.
  */
 public class Delivery {
-    private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.Delivery");
+    private static EELFLogger logger = EELFManager.getInstance().getLogger(Delivery.class);
 
     private static class DelItem implements Comparable<DelItem> {
         private String pubid;
