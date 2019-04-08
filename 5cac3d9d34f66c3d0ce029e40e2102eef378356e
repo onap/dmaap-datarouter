@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "46e7b031_96fe91f8",
+        "filename": "docs/offered-apis.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 4439
+      },
+      "writtenOn": "2019-04-08T13:26:20Z",
+      "side": 1,
+      "message": "this isn\u0027t rendering correctly, just getting all of this as text on the page rather than as a code block.",
+      "range": {
+        "startLine": 424,
+        "startChar": 1,
+        "endLine": 426,
+        "endChar": 94
+      },
+      "revId": "5cac3d9d34f66c3d0ce029e40e2102eef378356e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
