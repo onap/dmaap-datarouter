@@ -29,7 +29,6 @@ import java.util.*;
 
 import org.json.*;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
-import org.apache.log4j.Logger;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
@@ -41,8 +40,7 @@ import com.att.eelf.configuration.EELFManager;
  * provisioning server to construct arrays of raw configuration entries.
  */
 public class ProvData {
-    private static EELFLogger eelflogger = EELFManager.getInstance().getLogger(ProvData.class);
-    private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.node.ProvData");
+    private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(ProvData.class);
     private NodeConfig.ProvNode[] pn;
     private NodeConfig.ProvParam[] pp;
     private NodeConfig.ProvFeed[] pf;
@@ -253,8 +251,8 @@ public class ProvData {
             }
         } catch (JSONException jse) {
             NodeUtils.setIpAndFqdnForEelf("ProvData");
-            eelflogger.error(EelfMsgs.MESSAGE_PARSING_ERROR, jse.toString());
-            logger.error("NODE0201 Error parsing configuration data from provisioning server " + jse.toString(), jse);
+            eelfLogger.error(EelfMsgs.MESSAGE_PARSING_ERROR, jse.toString());
+            eelfLogger.error("NODE0201 Error parsing configuration data from provisioning server " + jse.toString(), jse);
             throw new IOException(jse.toString(), jse);
         }
         pn = pnv.toArray(new NodeConfig.ProvNode[pnv.size()]);

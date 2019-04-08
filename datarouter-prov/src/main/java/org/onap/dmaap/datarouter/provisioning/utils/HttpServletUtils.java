@@ -25,10 +25,10 @@ package org.onap.dmaap.datarouter.provisioning.utils;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
+import com.att.eelf.configuration.EELFLogger;
 
 public class HttpServletUtils {
-    public static void sendResponseError(HttpServletResponse response, int errorCode, String message, Logger intlogger) {
+    public static void sendResponseError(HttpServletResponse response, int errorCode, String message, EELFLogger intlogger) {
         try {
             response.sendError(errorCode, message);
         } catch (IOException ioe) {
