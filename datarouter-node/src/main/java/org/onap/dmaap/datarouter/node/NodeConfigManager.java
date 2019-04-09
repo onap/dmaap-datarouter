@@ -298,7 +298,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * seconds), wait a while before fetching again.
      */
     public synchronized void gofetch(String remoteAddr) {
-        if (provcheck.isFrom(remoteAddr)) {
+        if (provcheck.isReachable(remoteAddr)) {
             eelfLogger.info("NODE0307 Received configuration fetch request from provisioning server " + remoteAddr);
             pfetcher.request();
         } else {

@@ -162,7 +162,7 @@ public class PublishServlet extends BaseServlet {
                     String message = "Redirected to: " + newurl;
                     elr.setMessage(message);
                     elr.setResult(HttpServletResponse.SC_MOVED_PERMANENTLY);
-                    eventlogger.error(elr.toString());
+                    eventlogger.info(elr.toString());
 
                     resp.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
                     resp.setHeader("Location", newurl);
