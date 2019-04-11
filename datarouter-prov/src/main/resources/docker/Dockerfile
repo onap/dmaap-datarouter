@@ -34,7 +34,7 @@ RUN chmod 0700 startup.sh
 ENTRYPOINT ["sh", "startup.sh"]
 
 RUN addgroup -S onap \
-    && adduser -S datarouter -G onap \
-    && chown -R datarouter:onap /opt/
+    && adduser -S -g 1001 datarouter -G onap \
+    && chown -R -u 1000 datarouter:onap /opt/
 
 USER datarouter
