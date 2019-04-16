@@ -25,6 +25,52 @@
     },
     {
       "key": {
+        "uuid": "1fafc92f_3ed90195",
+        "filename": "docs/drAPI1.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-04-16T14:30:18Z",
+      "side": 1,
+      "message": "Might be worth giving example of the response body as the links object is relevant to the client.",
+      "range": {
+        "startLine": 24,
+        "startChar": 10,
+        "endLine": 24,
+        "endChar": 28
+      },
+      "revId": "e7b57e986f4d5fb87c70c0023f785d22e734db65",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4d688aba_7c7baa72",
+        "filename": "docs/drAPI1.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-04-16T14:30:18Z",
+      "side": 1,
+      "message": "Could we make use of reusing the responses like here - https://swagger.io/docs/specification/2-0/describing-responses/",
+      "range": {
+        "startLine": 148,
+        "startChar": 10,
+        "endLine": 149,
+        "endChar": 45
+      },
+      "revId": "e7b57e986f4d5fb87c70c0023f785d22e734db65",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c6fc7b5b_795a254e",
         "filename": "docs/drAPI1.json",
         "patchSetId": 1
