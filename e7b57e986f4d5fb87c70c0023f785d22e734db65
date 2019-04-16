@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4316e2bd_cc0774c9",
+        "filename": "docs/api.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-04-16T12:24:50Z",
+      "side": 1,
+      "message": "have a feeling this is going to cause confusion as we already have the api documented.\n\nCould we nest both under the \"Offered API\" section and label one with \"Swagger\".\n\nAlso, see the note added by other projects re the swagger.io render.\nhttps://gerrit.onap.org/r/gitweb?p\u003doptf/osdf.git;a\u003dblob;f\u003ddocs/sections/offeredapis.rst;h\u003d515143140d74b37de25d46c3437e23851141d1bb;hb\u003de1f6d80752920a7ef990134f02abb3db9b5a6232",
+      "range": {
+        "startLine": 4,
+        "startChar": 6,
+        "endLine": 4,
+        "endChar": 21
+      },
+      "revId": "e7b57e986f4d5fb87c70c0023f785d22e734db65",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
