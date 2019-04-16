@@ -6,8 +6,8 @@
 .. toctree::
    :maxdepth: 2
 
-Offered APIs
-============
+DMaaP Data Router API
+=====================
 
 **The API Provisioning Model**
 
