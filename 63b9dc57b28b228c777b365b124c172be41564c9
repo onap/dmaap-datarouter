@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "ae06b7ac_b1a6ecc5",
+        "filename": "docs/apis/api.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-04-17T09:40:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "71c74a1d_d2bef40a",
+      "range": {
+        "startLine": 5,
+        "startChar": 19,
+        "endLine": 5,
+        "endChar": 22
+      },
+      "revId": "63b9dc57b28b228c777b365b124c172be41564c9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4e54e0eb_27f6e406",
         "filename": "docs/apis/offered-apis.rst",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2019-04-16T14:30:18Z",
       "side": 1,
       "message": "I think this can be moved up to docs/offeredapi.rst",
+      "range": {
+        "startLine": 4,
+        "startChar": 1,
+        "endLine": 4,
+        "endChar": 26
+      },
+      "revId": "63b9dc57b28b228c777b365b124c172be41564c9",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "017e9718_27d25666",
+        "filename": "docs/apis/offered-apis.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-04-17T09:40:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4e54e0eb_27f6e406",
       "range": {
         "startLine": 4,
         "startChar": 1,
