@@ -1,0 +1,1046 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "The DMaaP Data Router (DR) provisioning API defines two resource types - the feed and the subscription, each with JSON representations. The API models the provisioning data as a collection of feeds that are known to the DR (the feeds collection), with each feed containing a collection of the subscriptions to the feed. The standard HTTP operations (POST, GET, PUT, and DELETE), used in conjunction with these resource representations, allow an API user to create, get information about, modify, and delete feeds and subscriptions.",
+    "version": "2.1.0",
+    "title": "DMaaP DR Offered APIs"
+  },
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/": {
+      "post": {
+        "tags": [
+          "/"
+        ],
+        "summary": "Create a feed",
+        "description": "curl -k -X POST -H \"Content-Type:application/vnd.dmaap-dr.feed\" -H \"X-DMAAP-DR-ON-BEHALF-OF:{user}\"--data-ascii @createFeed.json https://{host}:{port}",
+        "operationId": "",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "Sample Body",
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Feed"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/FeedResponse"
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "406": {
+            "$ref": "#/responses/406"
+          },
+          "415": {
+            "$ref": "#/responses/415"
+          },
+          "500": {
+            "$ref": "#/responses/500"
+          },
+          "503": {
+            "$ref": "#/responses/503"
+          }
+        }
+      }
+    },
+    "/feed/{feedId}": {
+      "put": {
+        "tags": [
+          "/feed/{feedId}"
+        ],
+        "summary": "Update a feed",
+        "description": "curl -k -X PUT -H \"Content-Type: application/vnd.dmaap-dr.feed\" -H \"X-DMAAP-DR-ON-BEHALF-OF: {user}\" --data-ascii @updateFeed.json --location-trusted https://{host}:{port}/feed/{feedId}",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "feedId",
+            "in": "path",
+            "description": "ID of feed",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "in": "body",
+            "name": "Sample Body",
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/UpdateFeed"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/200"
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "406": {
+            "$ref": "#/responses/406"
+          },
+          "415": {
+            "$ref": "#/responses/415"
+          },
+          "500": {
+            "$ref": "#/responses/500"
+          },
+          "503": {
+            "$ref": "#/responses/503"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "/feed/{feedId}"
+        ],
+        "summary": "Get a feed",
+        "description": "curl -k -H \"X-DMAAP-DR-ON-BEHALF-OF: {user}\" https://{host}:{port}/feed/{feedId}",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "feedId",
+            "in": "path",
+            "description": "ID of feed",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/200"
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "406": {
+            "$ref": "#/responses/406"
+          },
+          "415": {
+            "$ref": "#/responses/415"
+          },
+          "500": {
+            "$ref": "#/responses/500"
+          },
+          "503": {
+            "$ref": "#/responses/503"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "/feed/{feedId}"
+        ],
+        "summary": "Delete a feed",
+        "description": "curl -k -X DELETE -H \"X-DMAAP-DR-ON-BEHALF-OF: {user}\" https://{host}:{port}/feed/{feedId}",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "feedId",
+            "in": "path",
+            "description": "ID of feed",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/200"
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "406": {
+            "$ref": "#/responses/406"
+          },
+          "415": {
+            "$ref": "#/responses/415"
+          },
+          "500": {
+            "$ref": "#/responses/500"
+          },
+          "503": {
+            "$ref": "#/responses/503"
+          }
+        }
+      }
+    },
+    "/subscribe/{feedId}": {
+      "post": {
+        "tags": [
+          "/subscribe/{feedId}"
+        ],
+        "summary": "Subscribe to feed",
+        "description": "curl -k -X POST -H \"Content-Type:application/vnd.dmaap-dr.subscription\" -H \"X-DMAAP-DR-ON-BEHALF-OF:{user}\" --data-ascii @addSubscriber.json https://{host}:{port}/subscribe/{feedId}",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "feedId",
+            "in": "path",
+            "description": "ID of feed",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "in": "body",
+            "name": "Sample Body",
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Subscribe"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/200"
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "406": {
+            "$ref": "#/responses/406"
+          },
+          "415": {
+            "$ref": "#/responses/415"
+          },
+          "500": {
+            "$ref": "#/responses/500"
+          },
+          "503": {
+            "$ref": "#/responses/503"
+          }
+        }
+      }
+    },
+    "/subs/{subId}": {
+      "put": {
+        "tags": [
+          "/subs/{subId}"
+        ],
+        "summary": "Update a subscription to a feed",
+        "description": "curl -k -X PUT -H \"Content-Type:application/vnd.dmaap-dr.subscription\" -H \"X-DMAAP-DR-ON-BEHALF-OF:{user}\" --data-ascii @updateSubscriber.json https://{host}:{port}/subs/{subId}",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "subId",
+            "in": "path",
+            "description": "ID of subscription",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "in": "body",
+            "name": "Sample Body",
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/Subs"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/200"
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "406": {
+            "$ref": "#/responses/406"
+          },
+          "415": {
+            "$ref": "#/responses/415"
+          },
+          "500": {
+            "$ref": "#/responses/500"
+          },
+          "503": {
+            "$ref": "#/responses/503"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "/subs/{subId}"
+        ],
+        "summary": "Retrieve a representation of the specified subscription",
+        "description": "curl -k -H \"X-DMAAP-DR-ON-BEHALF-OF:{user}\" https://{host}:{port}/subs/{subId}",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "subId",
+            "in": "path",
+            "description": "ID of subscription",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/200"
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "406": {
+            "$ref": "#/responses/406"
+          },
+          "415": {
+            "$ref": "#/responses/415"
+          },
+          "500": {
+            "$ref": "#/responses/500"
+          },
+          "503": {
+            "$ref": "#/responses/503"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "/subs/{subId}"
+        ],
+        "summary": "Delete a specified subscription",
+        "description": "curl -k -X DELETE -H \"X-DMAAP-DR-ON-BEHALF-OF:{user}\" https://{host}:{port}/subs/{subId}",
+        "parameters": [
+          {
+            "name": "subId",
+            "in": "path",
+            "description": "ID of subscription",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/200"
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "406": {
+            "$ref": "#/responses/406"
+          },
+          "415": {
+            "$ref": "#/responses/415"
+          },
+          "500": {
+            "$ref": "#/responses/500"
+          },
+          "503": {
+            "$ref": "#/responses/503"
+          }
+        }
+      }
+    },
+    "/publish/{feedId}/{fileId}": {
+      "put": {
+        "tags": [
+          "/publish/{feedId}/{fileId}"
+        ],
+        "summary": "Publish data to a given feed",
+        "description": "curl -k -X PUT --user {user}:{password} -H \"Content-Type:application/octet-stream\"  -H \"X-DMAAP-DR-META:{\"filetype\":\"txt\"}\" --data-binary @sampleFile.txt --post301 --location-trusted https://{host}:{port}/publish/{feedId}/{fileId}",
+        "parameters": [
+          {
+            "name": "feedId",
+            "in": "path",
+            "description": "ID of feed",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "fileId",
+            "in": "path",
+            "description": "ID of file",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/200"
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "406": {
+            "$ref": "#/responses/406"
+          },
+          "415": {
+            "$ref": "#/responses/415"
+          },
+          "500": {
+            "$ref": "#/responses/500"
+          },
+          "503": {
+            "$ref": "#/responses/503"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "/publish/{feedId}/{fileId}"
+        ],
+        "summary": "Deletes/retracts a specified published file",
+        "description": "curl -k -X DELETE --user {user}:{password} --location-trusted https://{host}:{port}/publish/{feedId}/{fileId}",
+        "parameters": [
+          {
+            "name": "feedId",
+            "in": "path",
+            "description": "ID of feed",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "fileId",
+            "in": "path",
+            "description": "ID of file",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/200"
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "406": {
+            "$ref": "#/responses/406"
+          },
+          "415": {
+            "$ref": "#/responses/415"
+          },
+          "500": {
+            "$ref": "#/responses/500"
+          },
+          "503": {
+            "$ref": "#/responses/503"
+          }
+        }
+      }
+    },
+    "/feedlog/{feedId}": {
+      "get": {
+        "tags": [
+          "/feedlog/{feedId}?{queryParam}"
+        ],
+        "summary": "View logging information for specified feeds, which can be narrowed down with further parameters",
+        "description": "curl -k https://{host}:{port}/feedlog/{feedId}?statusCode=204``",
+        "parameters": [
+          {
+            "name": "feedId",
+            "in": "path",
+            "description": "ID of feed",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "queryParam",
+            "in": "query",
+            "description": "Query for feedlog",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/200"
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "406": {
+            "$ref": "#/responses/406"
+          },
+          "415": {
+            "$ref": "#/responses/415"
+          },
+          "500": {
+            "$ref": "#/responses/500"
+          },
+          "503": {
+            "$ref": "#/responses/503"
+          }
+        }
+      }
+    },
+    "/sublog/{subId}": {
+      "get": {
+        "tags": [
+          "/sublog/{subId}?{queryParam}"
+        ],
+        "summary": "View logging information for specified subscriptions, which can be narrowed down with further parameters",
+        "description": "curl -k https://{host}:{port}/sublog/{subId}?statusCode=204",
+        "parameters": [
+          {
+            "name": "subId",
+            "in": "path",
+            "description": "ID of subscription",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "queryParam",
+            "in": "query",
+            "description": "Query for sublog",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/responses/200"
+          },
+          "400": {
+            "$ref": "#/responses/400"
+          },
+          "401": {
+            "$ref": "#/responses/401"
+          },
+          "403": {
+            "$ref": "#/responses/403"
+          },
+          "404": {
+            "$ref": "#/responses/404"
+          },
+          "406": {
+            "$ref": "#/responses/406"
+          },
+          "415": {
+            "$ref": "#/responses/415"
+          },
+          "500": {
+            "$ref": "#/responses/500"
+          },
+          "503": {
+            "$ref": "#/responses/503"
+          }
+        }
+      }
+    }
+  },
+  "responses": {
+    "200": {
+      "description": "Success Response"
+    },
+    "400": {
+      "description": "Bad request - The request is defective in some way. \nPossible causes: \n * JSON object in request body does not conform to the spec. \n* Invalid parameter value in query string"
+    },
+    "401": {
+      "description": "Indicates that the request was missing the Authorization header or, if the header was presented, the credentials were not acceptable"
+    },
+    "403": {
+      "description": "Forbidden - The request failed  authorization. \nPossible causes: \n* Request originated from an unauthorized IP address \n* Client certificate subject is not on the API’s authorized list. \n* X-DMAAP-DR-ON-BEHALF-OF identity is not authorized to perform"
+    },
+    "404": {
+      "description": "Not Found - The Request-URI does not point to a resource that is known to the API. "
+    },
+    "406": {
+      "description": "Not Acceptable - The request has an Accept header indicating that the requester will not accept a response with application/vnd.dmaap-dr.log-list content."
+    },
+    "415": {
+      "description": "Unsupported Media Type - The media type in the requests Content-Type header is not appropriate for the request."
+    },
+    "500": {
+      "description": "Internal Server Error - The DR API server encountered an internal error and could not complete the request."
+    },
+    "503": {
+      "description": "Service Unavailable - The DR API service is currently unavailable"
+    },
+    "FeedResponse": {
+      "description": "Success Response",
+      "schema": {
+        "$ref": "#/definitions/FeedResponse"
+      }
+    }
+  },
+  "definitions": {
+    "FeedResponse": {
+      "type": "object",
+      "properties": {
+        "suspend": {
+          "type": "boolean",
+          "example": false
+        },
+        "groupid": {
+          "type": "integer",
+          "example": 0
+        },
+        "description": {
+          "type": "string",
+          "example": ""
+        },
+        "version": {
+          "type": "string",
+          "example": "v1.0"
+        },
+        "authorization": {
+          "type": "object",
+          "properties": {
+            "classification": {
+              "type": "string",
+              "example": "unclassified"
+            },
+            "endpoint_addrs": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "endpoint_ids": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": [
+                {
+                  "password": "dradmin",
+                  "id": "dradmin"
+                },
+                {
+                  "password": "demo123456!",
+                  "id": "onap"
+                }
+              ]
+            }
+          }
+        },
+        "name": {
+          "type": "string",
+          "example": "ONAP Data Feed"
+        },
+        "business_description": {
+          "type": "string",
+          "example": ""
+        },
+        "aaf_instance": {
+          "type": "string",
+          "example": "legacy"
+        },
+        "publisher": {
+          "type": "string",
+          "example": "dradmin"
+        },
+        "links": {
+          "type": "object",
+          "properties": {
+            "subscribe": {
+              "type": "string",
+              "example": "https://dmaap-dr-prov/subscribe/1"
+            },
+            "log": {
+              "type": "string",
+              "example": "https://dmaap-dr-prov/feedlog/1"
+            },
+            "publish": {
+              "type": "string",
+              "example": "https://dmaap-dr-prov/publish/1"
+            },
+            "self": {
+              "type": "string",
+              "example": "https://dmaap-dr-prov/feed/1"
+            }
+          }
+        }
+      }
+    },
+    "Subs": {
+      "type": "object",
+      "required": [
+        "delivery",
+        "metadataOnly",
+        "groupid"
+      ],
+      "properties": {
+        "delivery": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string",
+              "example": "http://dmaap-dr-subscriber:7070/"
+            },
+            "user": {
+              "type": "string",
+              "example": "NEW_LOGIN"
+            },
+            "password": {
+              "type": "string",
+              "example": "NEW_PASSWORD"
+            },
+            "use100": {
+              "type": "boolean",
+              "example": false
+            }
+          }
+        },
+        "metadataOnly": {
+          "type": "boolean",
+          "example": true
+        },
+        "groupid": {
+          "type": "integer",
+          "example": 67
+        },
+        "follow_redirect": {
+          "type": "boolean",
+          "example": false
+        },
+        "decompress": {
+          "type": "boolean",
+          "example": false
+        }
+      },
+      "xml": {
+        "name": "Subs"
+      }
+    },
+    "Subscribe": {
+      "type": "object",
+      "required": [
+        "delivery",
+        "metadataOnly",
+        "groupid"
+      ],
+      "properties": {
+        "delivery": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string",
+              "example": "http://dmaap-dr-subscriber:7070/"
+            },
+            "user": {
+              "type": "string",
+              "example": "LOGIN"
+            },
+            "password": {
+              "type": "string",
+              "example": "PASSWORD"
+            },
+            "use100": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        },
+        "metadataOnly": {
+          "type": "boolean",
+          "example": false
+        },
+        "groupid": {
+          "type": "integer",
+          "example": 22
+        },
+        "follow_redirect": {
+          "type": "boolean",
+          "example": false
+        },
+        "suspend": {
+          "type": "boolean",
+          "example": false
+        },
+        "decompress": {
+          "type": "boolean",
+          "example": true
+        }
+      },
+      "xml": {
+        "name": "Subscribe"
+      }
+    },
+    "Feed": {
+      "type": "object",
+      "required": [
+        "name",
+        "version",
+        "authorization"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "feed1"
+        },
+        "version": {
+          "type": "string",
+          "example": "v1.0.0"
+        },
+        "description": {
+          "type": "string",
+          "example": "Feed Description"
+        },
+        "business description": {
+          "type": "string",
+          "example": "Feed Description"
+        },
+        "suspend": {
+          "type": "boolean",
+          "example": false
+        },
+        "deleted": {
+          "type": "boolean",
+          "example": false
+        },
+        "changeowner": {
+          "type": "boolean",
+          "example": true
+        },
+        "authorization": {
+          "type": "object",
+          "properties": {
+            "classification": {
+              "type": "string",
+              "example": "unclassified"
+            },
+            "endpoint_addrs": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            },
+            "endpoint_ids": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string",
+                    "example": "dradmin"
+                  },
+                  "id": {
+                    "type": "string",
+                    "example": "dradmin"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "xml": {
+        "name": "Feed"
+      }
+    },
+    "UpdateFeed": {
+      "type": "object",
+      "required": [
+        "name",
+        "authorization"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "feed1"
+        },
+        "description": {
+          "type": "string",
+          "example": "Feed Description"
+        },
+        "business description": {
+          "type": "string",
+          "example": "Feed Description"
+        },
+        "suspend": {
+          "type": "boolean",
+          "example": false
+        },
+        "groupid": {
+          "type": "integer",
+          "example": 33
+        },
+        "authorization": {
+          "type": "object",
+          "properties": {
+            "classification": {
+              "type": "string",
+              "example": "unclassified"
+            },
+            "endpoint_addrs": {
+              "type": "string",
+              "example": "[ 10.1.2.3 ]"
+            },
+            "endpoint_ids": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": [
+                {
+                  "password": "dradmin",
+                  "id": "dradmin"
+                },
+                {
+                  "password": "demo123456!",
+                  "id": "onap"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "xml": {
+        "name": "UpdateFeed"
+      }
+    }
+  }
+}

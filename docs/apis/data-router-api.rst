@@ -1,13 +1,12 @@
 .. This work is licensed under a Creative Commons Attribution 4.0 International License.
 .. http://creativecommons.org/licenses/by/4.0
 
-.. _data_router_api_guide:
 
 .. toctree::
    :maxdepth: 2
 
-Offered APIs
-============
+DMaaP Data Router API
+=====================
 
 **The API Provisioning Model**
 

@@ -2,19 +2,17 @@
 .. http://creativecommons.org/licenses/by/4.0
 .. Copyright © 2017 AT&T Intellectual Property. All rights reserved.
 
-DMaaP Data Router
-============================================
+.. _data_router_api_guide:
 
+
+Offered APIs
+============
 .. toctree::
    :maxdepth: 1
 
-   architecture.rst
-   offeredapis.rst
-   delivery.rst
-   logging.rst
-   installation.rst
-   configuration.rst
-   release-notes.rst
+   apis/data-router-swagger-api.rst
+   apis/data-router-api.rst
+
 
 
 
