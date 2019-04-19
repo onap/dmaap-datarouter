@@ -104,7 +104,10 @@ public class LogManager extends TimerTask {
 
         public Uploader() {
             dq = new DeliveryQueue(this,
-                new DestInfo("LogUpload", uploaddir, null, null, null, config.getMyName(), config.getMyAuth(), false, false, false, false, false));
+                new DestInfo.DestInfoBuilder().setName("LogUpload").setSpool(uploaddir).setSubid(null).setLogdata(null)
+                    .setUrl(null).setAuthuser(config.getMyName()).setAuthentication(config.getMyAuth())
+                    .setMetaonly(false).setUse100(false).setPrivilegedSubscriber(false).setFollowRedirects(false)
+                    .setDecompress(false).createDestInfo());
             setDaemon(true);
             setName("Log Uploader");
             start();

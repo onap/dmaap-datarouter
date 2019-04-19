@@ -72,8 +72,13 @@ public class NodeConfigTest {
     }
 
     @Test
-    public void Given_SubId_Then_Get_Feed_Id_Returns_Correct_Id() {
-        String feedId = nodeConfig.getFeedId("1");
+    public void Given_SubId_Then_Get_Feed_Id_Returns_Correct_Id() throws IOException {
+    	
+    	ProvData provData1 = setUpProvData();
+    	NodeConfig nodeConfig1 = new NodeConfig(provData1, "Name", "spool/dir", 80, "Key");
+    	
+    	
+        String feedId = nodeConfig1.getFeedId("1");
         Assert.assertEquals("1", feedId);
     }
 
