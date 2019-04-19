@@ -41,35 +41,105 @@ public class DestInfo {
     private boolean decompress;
     private boolean followRedirects;
     private String aafInstance;
-    /**
-     * Create a destination information object.
-     *
-     * @param    name    n:fqdn or s:subid
-     * @param    spool    The directory where files are spooled.
-     * @param    subid    The subscription ID (if applicable).
-     * @param    logdata    Text to be included in log messages
-     * @param    url    The URL to deliver to.
-     * @param    authuser    The auth user for logging.
-     * @param    authentication    The credentials.
-     * @param    metaonly    Is this a metadata only delivery?
-     * @param    use100    Should I use expect 100-continue?
-     * @param    privilegedSubscriber   Can we wait to receive a file processed acknowledgement before deleting file
-     * @param    followRedirects Is follow redirect of destination enabled?
-     * @param    decompress     To see if the they want there information compressed or decompressed
-     */
-    public DestInfo(String name, String spool, String subid, String logdata, String url, String authuser, String authentication, boolean metaonly, boolean use100, boolean privilegedSubscriber, boolean followRedirects, boolean decompress) {
-        this.name = name;
-        this.spool = spool;
-        this.subid = subid;
-        this.logdata = logdata;
-        this.url = url;
-        this.authuser = authuser;
-        this.authentication = authentication;
-        this.metaonly = metaonly;
-        this.use100 = use100;
-        this.privilegedSubscriber = privilegedSubscriber;
-        this.followRedirects = followRedirects;
-        this.decompress = decompress;
+
+    public static class DestInfoBuilder {
+        private String name;
+        private String spool;
+        private String subid;
+        private String logdata;
+        private String url;
+        private String authuser;
+        private String authentication;
+        private boolean metaonly;
+        private boolean use100;
+        private boolean privilegedSubscriber;
+        private boolean followRedirects;
+        private boolean decompress;
+        private NodeConfig.ProvSubscription subscription;
+
+        public DestInfoBuilder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public DestInfoBuilder setSpool(String spool) {
+            this.spool = spool;
+            return this;
+        }
+
+        public DestInfoBuilder setSubid(String subid) {
+            this.subid = subid;
+            return this;
+        }
+
+        public DestInfoBuilder setLogdata(String logdata) {
+            this.logdata = logdata;
+            return this;
+        }
+
+        public DestInfoBuilder setUrl(String url) {
+            this.url = url;
+            return this;
+        }
+
+        public DestInfoBuilder setAuthuser(String authuser) {
+            this.authuser = authuser;
+            return this;
+        }
+
+        public DestInfoBuilder setAuthentication(String authentication) {
+            this.authentication = authentication;
+            return this;
+        }
+
+        public DestInfoBuilder setMetaonly(boolean metaonly) {
+            this.metaonly = metaonly;
+            return this;
+        }
+
+        public DestInfoBuilder setUse100(boolean use100) {
+            this.use100 = use100;
+            return this;
+        }
+
+        public DestInfoBuilder setPrivilegedSubscriber(boolean privilegedSubscriber) {
+            this.privilegedSubscriber = privilegedSubscriber;
+            return this;
+        }
+
+        public DestInfoBuilder setFollowRedirects(boolean followRedirects) {
+            this.followRedirects = followRedirects;
+            return this;
+        }
+
+        public DestInfoBuilder setDecompress(boolean decompress) {
+            this.decompress = decompress;
+            return this;
+        }
+
+        public DestInfoBuilder setSubscription(NodeConfig.ProvSubscription subscription) {
+            this.subscription = subscription;
+            return this;
+        }
+
+        public DestInfo createDestInfo() {
+            return new DestInfo(this);
+        }
+    }
+
+    public DestInfo(DestInfoBuilder destInfoBuilder) {
+        this.name = destInfoBuilder.name;
+        this.spool = destInfoBuilder.spool;
+        this.subid = destInfoBuilder.subid;
+        this.logdata = destInfoBuilder.logdata;
+        this.url = destInfoBuilder.url;
+        this.authuser = destInfoBuilder.authuser;
+        this.authentication = destInfoBuilder.authentication;
+        this.metaonly = destInfoBuilder.metaonly;
+        this.use100 = destInfoBuilder.use100;
+        this.privilegedSubscriber = destInfoBuilder.privilegedSubscriber;
+        this.followRedirects = destInfoBuilder.followRedirects;
+        this.decompress = destInfoBuilder.decompress;
     }
 
     /**

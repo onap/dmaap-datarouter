@@ -36,7 +36,8 @@ import java.io.Reader;
 import java.io.StringReader;
 
 @RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.node.ProvData", "org.onap.dmaap.datarouter.node.NodeUtils"})
+@SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.node.ProvData",
+        "org.onap.dmaap.datarouter.node.NodeUtils"})
 public class NodeConfigTest {
 
     private static NodeConfig nodeConfig;
@@ -72,7 +73,7 @@ public class NodeConfigTest {
     }
 
     @Test
-    public void Given_SubId_Then_Get_Feed_Id_Returns_Correct_Id() {
+    public void Given_SubId_Then_Get_Feed_Id_Returns_Correct_Id(){
         String feedId = nodeConfig.getFeedId("1");
         Assert.assertEquals("1", feedId);
     }
@@ -134,13 +135,15 @@ public class NodeConfigTest {
 
     @Test
     public void Given_Same_Ip_Then_Is_Another_Node_Returns_False() {
-        Boolean isAnotherNode = nodeConfig.isAnotherNode("Basic MTcyLjAuMC40OmtCTmhkWVFvbzhXNUphZ2g4T1N4Zmp6Mzl1ND0=", "172.0.0.1");
+        Boolean isAnotherNode =
+                nodeConfig.isAnotherNode("Basic MTcyLjAuMC40OmtCTmhkWVFvbzhXNUphZ2g4T1N4Zmp6Mzl1ND0=", "172.0.0.1");
         Assert.assertFalse(isAnotherNode);
     }
 
     @Test
     public void Given_Different_Ip_Then_Is_Another_Node_Returns_True() {
-        Boolean isAnotherNode = nodeConfig.isAnotherNode("Basic MTcyLjAuMC40OmtCTmhkWVFvbzhXNUphZ2g4T1N4Zmp6Mzl1ND0=", "172.0.0.4");
+        Boolean isAnotherNode =
+                nodeConfig.isAnotherNode("Basic MTcyLjAuMC40OmtCTmhkWVFvbzhXNUphZ2g4T1N4Zmp6Mzl1ND0=", "172.0.0.4");
         Assert.assertTrue(isAnotherNode);
     }
 
