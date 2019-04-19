@@ -559,8 +559,10 @@ public class NodeConfig {
                 continue;
             }
             String auth = NodeUtils.getNodeAuthHdr(cName, nodeauthkey);
-            DestInfo di = new DestInfo("n:" + cName, spooldir + "/n/" + cName, null, "n2n-" + cName,
-                    "https://" + cName + ":" + port + "/internal/publish", cName, myauth, false, true, false, false, false);
+            DestInfo di = new DestInfo.DestInfoBuilder().setName("n:" + cName).setSpool(spooldir + "/n/" + cName).setSubid(null)
+                .setLogdata("n2n-" + cName).setUrl("https://" + cName + ":" + port + "/internal/publish")
+                .setAuthuser(cName).setAuthentication(myauth).setMetaonly(false).setUse100(true)
+                .setPrivilegedSubscriber(false).setFollowRedirects(false).setDecompress(false).createDestInfo();
             (new File(di.getSpool())).mkdirs();
             destInfos.add(di);
             nodeinfo.put(cName, di);
