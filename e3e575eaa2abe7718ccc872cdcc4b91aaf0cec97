@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d033ff7a_07aa01ea",
+        "filename": "datarouter-node/src/test/java/org/onap/dmaap/datarouter/node/NodeConfigTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-23T10:58:08Z",
+      "side": 1,
+      "message": "I don\u0027t think these changes are necessary as these two statements are run in the setUp() method",
+      "range": {
+        "startLine": 75,
+        "startChar": 66,
+        "endLine": 80,
+        "endChar": 5
+      },
+      "revId": "e3e575eaa2abe7718ccc872cdcc4b91aaf0cec97",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
