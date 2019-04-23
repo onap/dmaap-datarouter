@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b05989b8_1dcf6ce8",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DestInfo.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-23T09:37:01Z",
+      "side": 1,
+      "message": "Remove unnecessary spaces here and elsewhere in file",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 4
+      },
+      "revId": "243124db281000370fd99f471107ac380d8d3ca1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a51e7fea_3a307318",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DestInfo.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-23T09:37:01Z",
+      "side": 1,
+      "message": "This JavaDoc was describing the DestInfo constructor so these params are not relevant here",
+      "range": {
+        "startLine": 47,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 7
+      },
+      "revId": "243124db281000370fd99f471107ac380d8d3ca1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ec23b3aa_830b81a9",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DestInfo.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-23T09:37:01Z",
+      "side": 1,
+      "message": "Remove tab character",
+      "range": {
+        "startLine": 151,
+        "startChar": 0,
+        "endLine": 151,
+        "endChar": 5
+      },
+      "revId": "243124db281000370fd99f471107ac380d8d3ca1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "85c41896_b75fe11e",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DestInfo.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-23T09:37:01Z",
+      "side": 1,
+      "message": "Should be 4 spaces",
+      "range": {
+        "startLine": 163,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 1
+      },
+      "revId": "243124db281000370fd99f471107ac380d8d3ca1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "87ec8eb5_4aefbb47",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DestInfo.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-23T09:37:01Z",
+      "side": 1,
+      "message": "Should be 4 spaces",
+      "range": {
+        "startLine": 189,
+        "startChar": 0,
+        "endLine": 189,
+        "endChar": 1
+      },
+      "revId": "243124db281000370fd99f471107ac380d8d3ca1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e243a0c_be8ae166",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfig.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 638,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-23T09:37:01Z",
+      "side": 1,
+      "message": "I think this is why the tests are failing, you must use the DestInfo constructor with 3 parameters here",
+      "range": {
+        "startLine": 637,
+        "startChar": 29,
+        "endLine": 638,
+        "endChar": 72
+      },
+      "revId": "243124db281000370fd99f471107ac380d8d3ca1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
