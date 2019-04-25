@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f5f24d7e_443d1e28",
+        "filename": "ci_scripts/suppressTestFiles.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-04-25T14:06:57Z",
+      "side": 1,
+      "message": "Should we be excluding *Test files from the check?\nAlso, maybe leave the name of the file more generic (to allow add other suppressions later), if possible.",
+      "range": {
+        "startLine": 26,
+        "startChar": 12,
+        "endLine": 26,
+        "endChar": 32
+      },
+      "revId": "b8b4366e371ad15e954a5ca58007f9350e48ea7c",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
