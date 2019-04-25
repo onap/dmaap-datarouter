@@ -46,6 +46,30 @@
       "revId": "cd2c2c728bf2db016d62fa6fd5fa3b08c8627044",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6a21b645_3c6aeea1",
+        "filename": "datarouter-prov/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-04-25T14:35:58Z",
+      "side": 1,
+      "message": "Do you know which dep is using it? Could we not add it as an exclusion there also?",
+      "parentUuid": "e66bfbf2_8b0989fc",
+      "range": {
+        "startLine": 193,
+        "startChar": 21,
+        "endLine": 193,
+        "endChar": 30
+      },
+      "revId": "cd2c2c728bf2db016d62fa6fd5fa3b08c8627044",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
