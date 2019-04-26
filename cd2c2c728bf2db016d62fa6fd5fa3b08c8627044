@@ -70,6 +70,30 @@
       "revId": "cd2c2c728bf2db016d62fa6fd5fa3b08c8627044",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "421240ba_a0c94c22",
+        "filename": "datarouter-prov/pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-04-26T13:35:32Z",
+      "side": 1,
+      "message": "Yeah added xstream as an exclusion in parent pom so it can be removed from sub poms. Unfortunately need to keep dom4j dependency in as they are two different dom4j artifacts.",
+      "parentUuid": "6a21b645_3c6aeea1",
+      "range": {
+        "startLine": 193,
+        "startChar": 21,
+        "endLine": 193,
+        "endChar": 30
+      },
+      "revId": "cd2c2c728bf2db016d62fa6fd5fa3b08c8627044",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
