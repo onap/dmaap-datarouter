@@ -7,34 +7,40 @@
 Release-notes
 ==============
 
-Version: 2.0.1 (Dublin)
+Version: 2.1.0 (Dublin)
 ---------------------------
 
-:Release Date: 2019-02-28
+:Release Date: 2019-05-30
 
 The DataRouter(DR) provisioning API is a HTTPS-based, REST-like API for creating and managing DR feeds and
 subscriptions.
 
 New Features:
 
-+--------------+------------------------------------------------------------------+
-| JIRA ID      | Description                                                      |
-+==============+==================================================================+
-| DMAAP-988    | Update to new oparent                                            |
-+--------------+------------------------------------------------------------------+
++--------------+-------------------------------------------------------------------------------+
+| JIRA ID      | Description                                                                   |
++==============+===============================================================================+
+| DMAAP-978    | [DR] Query of publication history (new API) for use by Data File Collector)   |
++--------------+-------------------------------------------------------------------------------+
+| DMAAP-980    | [DR] Optional consumer compression feed handling                              |
++--------------+-------------------------------------------------------------------------------+
+| DMAAP-1016   | DR provisioning AAF integration                                               |
++--------------+-------------------------------------------------------------------------------+
 
 Bug Fixes:
 
 +----------------+--------------------------------------------------------------------------------------------------+
 | JIRA ID        | Description                                                                                      |
 +================+==================================================================================================+
-| DMAAP-964      | DMAAP deployment failures starting 20190115 on casablanca branch                                 |
+| DMAAP-964      | [DMAAP] DMAAP deployment failures starting 20190115 on casablanca branch                         |
 +----------------+--------------------------------------------------------------------------------------------------+
-| DMAAP-1047     | Data Router docker version missing explicit version number                                       |
+| DMAAP-1010     | [DR] DMaaP Data Router fails healthcheck                                                         |
++----------------+--------------------------------------------------------------------------------------------------+
+| DMAAP-1047     | [DR] Data Router docker version missing explicit version number                                  |
 +----------------+--------------------------------------------------------------------------------------------------+
 | DMAAP-1048     | [DR] AAF certs expired on dmaap-dr-prov and dmaap-dr-node                                        |
 +----------------+--------------------------------------------------------------------------------------------------+
-| DMAAP-1064     | [DR] Update datarouter POM version following AAF cert updates                                    |
+| DMAAP-1161     | [DR] filebeat container on DR-Node and DR-Prov are unable to publish to kibana                   |
 +----------------+--------------------------------------------------------------------------------------------------+
 
 Known Issues
