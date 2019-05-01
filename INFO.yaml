@@ -3,9 +3,9 @@ project: 'dmaap-datarouter'
 project_creation_date: '2017-06-30'
 lifecycle_state: 'Incubation'
 project_lead: &onap_releng_ptl
-    name: 'Ram Koya'
-    email: 'rk541m@att.com'
-    id: 'rampi_k'
+    name: 'Mandar Sawant'
+    email: 'ms5838@att.com'
+    id: 'sawantmandar'
     company: 'ATT'
     timezone: 'America/Dallas'
 primary_contact: *onap_releng_ptl
@@ -69,7 +69,13 @@ committers:
       email: 'conor.ward@ericsson.com'
       company: 'ericsson'
       id: 'econwar'
-      timezone: 'America/Dallas'
+      timezone: 'Europe/Dublin'
+    - name: 'Fiachra Corcoran'
+      email: 'fiachra.corcoran@est.tech'
+      company: 'ericsson'
+      id: 'efiacor'
+      timezone: 'Europe/Dublin'
+      
 tsc:
     approval: 'https://lists.onap.org/pipermail/onap-tsc'
     changes:
