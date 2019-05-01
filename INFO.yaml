@@ -69,7 +69,13 @@ committers:
       email: 'conor.ward@ericsson.com'
       company: 'ericsson'
       id: 'econwar'
-      timezone: 'America/Dallas'
+      timezone: 'Europe/Dublin'
+    - name: 'Fiachra Corcoran'
+      email: 'fiachra.corcoran@est.tech'
+      company: 'ericsson'
+      id: 'efiacor'
+      timezone: 'Europe/Dublin'
+      
 tsc:
     approval: 'https://lists.onap.org/pipermail/onap-tsc'
     changes:
