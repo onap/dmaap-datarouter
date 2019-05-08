@@ -126,7 +126,7 @@ public class NodeUtils {
             }
         } catch (Exception e) {
             setIpAndFqdnForEelf("getCanonicalName");
-            eelfLogger.error(EelfMsgs.MESSAGE_KEYSTORE_LOAD_ERROR, ksfile, e.toString());
+            eelfLogger.error(EelfMsgs.MESSAGE_KEYSTORE_LOAD_ERROR, e, ksfile);
             return (null);
         }
         return (getCanonicalName(ks));
@@ -161,7 +161,7 @@ public class NodeUtils {
                 }
             }
         } catch (Exception e) {
-            eelfLogger.error("NODE0402 Error extracting my name from my keystore file " + e.toString(), e.getMessage());
+            eelfLogger.error("NODE0402 Error extracting my name from my keystore file " + e.toString(), e);
         }
         return (null);
     }
@@ -283,7 +283,7 @@ public class NodeUtils {
         try {
             response.sendError(errorCode);
         } catch (IOException ioe) {
-            intlogger.error("IOException" + ioe.getMessage());
+            intlogger.error("IOException", ioe);
         }
     }
 

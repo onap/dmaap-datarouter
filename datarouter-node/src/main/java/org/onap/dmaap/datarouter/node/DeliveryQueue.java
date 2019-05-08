@@ -24,6 +24,8 @@
 
 package org.onap.dmaap.datarouter.node;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.io.*;
 import java.util.*;
 
@@ -64,6 +66,7 @@ import java.util.*;
  * failure timer is active or if no files are found in a directory scan.
  */
 public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
+    private static EELFLogger logger = EELFManager.getInstance().getLogger(DeliveryQueue.class);
     private DeliveryQueueHelper deliveryQueueHelper;
     private DestInfo destinationInfo;
     private Hashtable<String, DeliveryTask> working = new Hashtable<>();
@@ -214,7 +217,8 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
                     }
                     try {
                         pidtime = Long.parseLong(fname2.substring(0, dot));
-                    } catch (Exception e) {
+                    } catch (NumberFormatException e) {
+                        logger.error("NumberFormatException", e);
                     }
                     if (pidtime < 1000000000000L) {
                         continue;

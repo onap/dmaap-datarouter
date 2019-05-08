@@ -23,6 +23,8 @@
 
 package org.onap.dmaap.datarouter.node;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.util.regex.*;
 import java.util.*;
 import java.io.*;
@@ -33,6 +35,7 @@ import java.text.*;
  * Logging for data router delivery events (PUB/DEL/EXP)
  */
 public class StatusLog {
+    private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(StatusLog.class);
     private static StatusLog instance = new StatusLog();
     private HashSet<String> toship = new HashSet<String>();
     private SimpleDateFormat filedate;
@@ -49,6 +52,7 @@ public class StatusLog {
         try {
             filedate = new SimpleDateFormat("-yyyyMMddHHmm");
         } catch (Exception e) {
+            eelfLogger.error("Exception", e);
         }
     }
 
@@ -104,6 +108,7 @@ public class StatusLog {
                 def = best * 1000;
             }
         } catch (Exception e) {
+            eelfLogger.error("Exception", e);
         }
         return (def);
     }
@@ -133,6 +138,7 @@ public class StatusLog {
         try {
             instance.checkRoll(System.currentTimeMillis());
         } catch (Exception e) {
+            eelfLogger.error("Exception", e);
         }
         return (instance.curfile);
     }
@@ -149,6 +155,7 @@ public class StatusLog {
             os.write((NodeUtils.logts(new Date(now)) + '|' + s + '\n').getBytes());
             os.flush();
         } catch (IOException ioe) {
+            eelfLogger.error("IOException", ioe);
         }
     }
 
