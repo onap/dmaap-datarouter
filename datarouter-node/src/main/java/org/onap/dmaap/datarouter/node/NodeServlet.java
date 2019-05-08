@@ -117,7 +117,7 @@ public class NodeServlet extends HttpServlet {
                 }
 
             } catch (IOException ioe) {
-                eelfLogger.error("IOException" + ioe.getMessage());
+                eelfLogger.error("IOException", ioe);
             }
             String path = req.getPathInfo();
             String qs = req.getQueryString();
@@ -158,7 +158,7 @@ public class NodeServlet extends HttpServlet {
         try {
             common(req, resp, true);
         } catch (IOException ioe) {
-            eelfLogger.error("IOException" + ioe.getMessage());
+            eelfLogger.error("IOException", ioe);
             eelfLogger.info(EelfMsgs.EXIT);
         }
     }
@@ -176,7 +176,7 @@ public class NodeServlet extends HttpServlet {
         try {
             common(req, resp, false);
         } catch (IOException ioe) {
-            eelfLogger.error("IOException " + ioe.getMessage());
+            eelfLogger.error("IOException", ioe);
             eelfLogger.info(EelfMsgs.EXIT);
         }
     }
@@ -437,7 +437,7 @@ public class NodeServlet extends HttpServlet {
                 try {
                     exlen = Long.parseLong(req.getHeader("Content-Length"));
                 } catch (Exception e) {
-                    eelfLogger.error("NODE00000 Exception common: " + e.getMessage());
+                    eelfLogger.error("NODE00000 Exception common", e);
                 }
                 StatusLog.logPubFail(pubid, feedid, logurl, req.getMethod(), ctype, exlen, data.length(), ip, user, ioe.getMessage());
                 //Fortify scan fixes - log forging
@@ -520,7 +520,7 @@ public class NodeServlet extends HttpServlet {
             }
         } catch (IOException ioe) {
             eelfLogger.error("NODE0117 Unable to delete files (" + pubid + ", " + pubid + ".M) from DR Node: "
-                    + config.getMyName() + ". Error: " + ioe.getMessage());
+                    + config.getMyName(), ioe);
             eelfLogger.info(EelfMsgs.EXIT);
         }
     }
@@ -562,7 +562,8 @@ public class NodeServlet extends HttpServlet {
                 return false;
             }
         } catch (NullPointerException npe) {
-            eelfLogger.error("NODE0114 " + errorMessage + " Error: Subscription " + subscriptionId + " does not exist");
+            eelfLogger.error("NODE0114 " + errorMessage + " Error: Subscription " + subscriptionId +
+                    " does not exist", npe);
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             eelfLogger.info(EelfMsgs.EXIT);
             return false;

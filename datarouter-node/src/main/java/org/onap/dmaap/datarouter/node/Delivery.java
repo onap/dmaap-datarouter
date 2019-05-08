@@ -68,6 +68,24 @@ public class Delivery {
             this.pubid = pubid;
             this.spool = spool;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            DelItem delItem = (DelItem) o;
+            return Objects.equals(pubid, delItem.pubid) &&
+                    Objects.equals(getSpool(), delItem.getSpool());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(pubid, getSpool());
+        }
     }
 
     private double fdstart;
@@ -246,6 +264,7 @@ public class Delivery {
                 try {
                     wait(nextcheck + 500 - now);
                 } catch (Exception e) {
+                    logger.error("InterruptedException", e);
                 }
                 now = System.currentTimeMillis();
             }

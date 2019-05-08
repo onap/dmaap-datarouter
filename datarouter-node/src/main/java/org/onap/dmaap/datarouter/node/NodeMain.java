@@ -56,7 +56,7 @@ public class NodeMain {
             try {
                 in = getClass().getClassLoader().getResourceAsStream("drNodeCadi.properties");
             } catch (Exception e) {
-                nodeMainLogger.error("Exception in Inner.getCadiProps() method " + e.getMessage());
+                nodeMainLogger.error("Exception in Inner.getCadiProps() method ", e);
             }
             return in;
         }
@@ -181,7 +181,7 @@ public class NodeMain {
                         InputStream in = obj.getCadiProps();
                         cadiProperties.load(in);
                     } catch (IOException e1) {
-                        nodeMainLogger.error("NODE00005 Exception in NodeMain.Main() loading CADI properties " + e1.getMessage());
+                        nodeMainLogger.error("NODE00005 Exception in NodeMain.Main() loading CADI properties ", e1);
                     }
                     cadiProperties.setProperty("aaf_locate_url", nodeConfigManager.getAafURL());
                     nodeMainLogger.info("NODE00005  aaf_url set to - " + cadiProperties.getProperty("aaf_url"));
@@ -199,7 +199,7 @@ public class NodeMain {
             server.start();
             nodeMainLogger.info("NODE00006 Node Server started-" + server.getState());
         } catch (Exception e) {
-            nodeMainLogger.info("NODE00006 Jetty failed to start. Reporting will we unavailable", e.getMessage());
+            nodeMainLogger.info("NODE00006 Jetty failed to start. Reporting will we unavailable", e);
         }
         server.join();
         nodeMainLogger.info("NODE00007 Node Server joined - " + server.getState());
