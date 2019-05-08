@@ -74,7 +74,7 @@ public class DRNodeCadiFilter extends CadiFilter {
             try {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.");
             } catch (IOException e) {
-                logger.error("NODE0541 DRNodeCadiFilter.getFeedId: ", e.getMessage());
+                logger.error("NODE0541 DRNodeCadiFilter.getFeedId: ", e);
             }
             return null;
         }
@@ -88,7 +88,7 @@ public class DRNodeCadiFilter extends CadiFilter {
                 try {
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.  Possible missing fileid.");
                 } catch (IOException e) {
-                    logger.error("NODE0542 DRNodeCadiFilter.getFeedId: ", e.getMessage());
+                    logger.error("NODE0542 DRNodeCadiFilter.getFeedId: ", e);
                 }
                 return null;
             }

@@ -22,6 +22,8 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.node;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -43,7 +45,7 @@ import java.util.regex.Pattern;
  */
 
 public class LogManager extends TimerTask {
-
+    private EELFLogger logger = EELFManager.getInstance().getLogger(LogManager.class);
     private NodeConfigManager config;
     private Matcher isnodelog;
     private Matcher iseventlog;
@@ -52,6 +54,7 @@ public class LogManager extends TimerTask {
     private String logdir;
 
     private class Uploader extends Thread implements DeliveryQueueHelper {
+        private EELFLogger logger = EELFManager.getInstance().getLogger(Uploader.class);
 
         public long getInitFailureTimer() {
             return (10000L);
@@ -117,6 +120,7 @@ public class LogManager extends TimerTask {
             try {
                 wait(10000);
             } catch (Exception e) {
+                logger.error("InterruptedException", e);
             }
         }
 
@@ -148,6 +152,7 @@ public class LogManager extends TimerTask {
                 lastqueued = br.readLine();
                 br.close();
             } catch (Exception e) {
+                logger.error("Exception", e);
             }
             for (String fn : fns) {
                 if (!isnodelog.reset(fn).matches()) {
@@ -161,6 +166,7 @@ public class LogManager extends TimerTask {
                             Files.createLink(Paths.get(uploaddir + "/" + pid), Paths.get(logdir + "/" + fn));
                             Files.createLink(Paths.get(uploaddir + "/" + pid + ".M"), Paths.get(uploaddir + "/.meta"));
                         } catch (Exception e) {
+                            logger.error("Exception", e);
                         }
                     }
                 }
@@ -173,6 +179,7 @@ public class LogManager extends TimerTask {
                 (new File(uploaddir + "/.meta")).delete();
                 w.write(lastqueued + "\n");
             } catch (Exception e) {
+                logger.error("Exception", e);
             }
         }
     }
@@ -189,6 +196,7 @@ public class LogManager extends TimerTask {
             isnodelog = Pattern.compile("node\\.log\\.\\d{8}").matcher("");
             iseventlog = Pattern.compile("events-\\d{12}\\.log").matcher("");
         } catch (Exception e) {
+            logger.error("Exception", e);
         }
         logdir = config.getLogDir();
         uploaddir = logdir + "/.spool";

@@ -24,9 +24,12 @@
 
 package org.onap.dmaap.datarouter.node;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Hashtable;
 import java.util.Timer;
@@ -35,7 +38,7 @@ import java.util.Timer;
  * Track redirections of subscriptions
  */
 public class RedirManager {
-
+    private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(RedirManager.class);
     private Hashtable<String, String> sid2primary = new Hashtable<String, String>();
     private Hashtable<String, String> sid2secondary = new Hashtable<String, String>();
     private String redirfile;
@@ -63,6 +66,7 @@ public class RedirManager {
                         os.write(sb.toString().getBytes());
                     }
                 } catch (Exception e) {
+                    eelfLogger.error("Exception", e);
                 }
             }
         };
@@ -80,7 +84,7 @@ public class RedirManager {
                 }
             }
         } catch (Exception e) {
-            // missing file is normal
+            eelfLogger.error("Missing file is normal", e);
         }
     }
 

@@ -44,18 +44,17 @@ public class DeliveryQueueTest {
     @Mock
     DeliveryQueueHelper deliveryQueueHelper;
 
-    private String dirPath = "/tmp/dir001/";
+    private String dirPath = "tmp/dir001/";
     private String FileName1 = "10000000000004.fileName.M";
 
     @Before
     public void setUp() {
-        when(destInfo.getSpool()).thenReturn("tmp");
+        when(destInfo.getSpool()).thenReturn(dirPath);
         deliveryQueue = new DeliveryQueue(deliveryQueueHelper, destInfo);
     }
 
     @Test
     public void Given_New_DeliveryQueue_Directory_Is_Created_As_Defined_By_DestInfo() {
-        when(destInfo.getSpool()).thenReturn("tmp");
         File file = new File("tmp");
         assertTrue(file.exists());
         deleteFile("tmp");
@@ -88,8 +87,6 @@ public class DeliveryQueueTest {
     private void prepareFiles() throws Exception {
         createFolder(dirPath);
         createFile(FileName1, dirPath);
-        String[] files = new String[2];
-        files[0] = dirPath + FileName1;
     }
 
     private void createFolder(String dirName) {

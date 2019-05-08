@@ -127,7 +127,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 hdrv.add(new String[]{h, v});
             }
         } catch (Exception e) {
-            eelfLogger.error("Exception "+ Arrays.toString(e.getStackTrace()), e.getMessage());
+            eelfLogger.error("Exception", e);
         }
         hdrs = hdrv.toArray(new String[hdrv.size()][]);
         url = deliveryTaskHelper.getDestURL(fileid);
@@ -272,7 +272,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 outputStream.close();
             } catch (IOException e) {
                 httpURLConnection.setRequestProperty("Decompression_Status", "FAILURE");
-                eelfLogger.info("Could not decompress file");
+                eelfLogger.info("Could not decompress file", e);
                 sendFile(httpURLConnection);
             }
 
