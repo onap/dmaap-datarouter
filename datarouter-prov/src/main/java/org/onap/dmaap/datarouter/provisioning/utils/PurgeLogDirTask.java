@@ -51,7 +51,7 @@ public class PurgeLogDirTask extends TimerTask {
         logdir = p.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
         String s = p.getProperty("org.onap.dmaap.datarouter.provserver.logretention", "30");
 
-        this.utilsLogger = EELFManager.getInstance().getLogger("UtilsLog");;
+        this.utilsLogger = EELFManager.getInstance().getLogger("UtilsLog");
 
         long n = 30;
         try {
@@ -75,7 +75,7 @@ public class PurgeLogDirTask extends TimerTask {
                 }
             }
         } catch (Exception e) {
-            utilsLogger.error("Exception: " + e.getMessage());
+            utilsLogger.error("Exception: " + e.getMessage(), e);
         }
     }
 }

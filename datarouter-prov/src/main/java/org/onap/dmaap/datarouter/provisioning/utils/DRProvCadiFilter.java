@@ -211,7 +211,7 @@ public class DRProvCadiFilter extends CadiFilter {
             }
 
         } catch (Exception e) {
-            intlogger.error("PROV0073 DRProvCadiFilter.isAAFFeed: ", e.getMessage());
+            intlogger.error("PROV0073 DRProvCadiFilter.isAAFFeed: " + e.getMessage(), e);
             return false;
         }
         return false;
@@ -241,7 +241,7 @@ public class DRProvCadiFilter extends CadiFilter {
                 intlogger.debug(message);
             }
         } catch (Exception e) {
-            intlogger.error("PROV0073 DRProvCadiFilter.isAAFSubscriber: ", e.getMessage());
+            intlogger.error("PROV0073 DRProvCadiFilter.isAAFSubscriber: " + e.getMessage(), e);
             return false;
         }
         return false;

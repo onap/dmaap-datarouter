@@ -24,6 +24,8 @@
 
 package org.onap.dmaap.datarouter.provisioning.utils;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
@@ -35,6 +37,8 @@ import java.util.Collection;
  * @version $Id: JSONUtilities.java,v 1.1 2013/04/26 21:00:26 eby Exp $
  */
 public class JSONUtilities {
+
+    private static final EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
     /**
      * Does the String <i>v</i> represent a valid Internet address (with or without a
      * mask length appended).
@@ -56,6 +60,7 @@ public class JSONUtilities {
             }
             return true;
         } catch (UnknownHostException e) {
+            intlogger.error("PROV0001: " + e.getMessage(), e);
             return false;
         }
     }

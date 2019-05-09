@@ -416,7 +416,7 @@ public class LogfileLoader extends Thread {
                         }
                     } catch (SQLException e) {
                         logger.warn("PROV8003 Invalid value in record: " + line);
-                        logger.debug(e.toString());
+                        logger.debug(e.toString(), e);
                     } catch (NumberFormatException e) {
                         logger.warn("PROV8004 Invalid number in record: " + line);
                         logger.debug(e.toString());
@@ -425,7 +425,7 @@ public class LogfileLoader extends Thread {
                         logger.debug(e.toString());
                     } catch (Exception e) {
                         logger.warn("PROV8006 Invalid pattern in record: " + line);
-                        logger.debug(e.toString());
+                        logger.debug(e.toString(), e);
                     }
                     total++;
                 }

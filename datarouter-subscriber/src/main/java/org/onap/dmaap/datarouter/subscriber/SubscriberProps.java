@@ -45,7 +45,7 @@ public class SubscriberProps {
             try {
                 instance = new SubscriberProps(propsPath);
             } catch (IOException ioe) {
-                subLogger.error("IO Exception: " + ioe.getMessage());
+                subLogger.error("IO Exception: " + ioe.getMessage(), ioe);
             }
         }
         return instance;

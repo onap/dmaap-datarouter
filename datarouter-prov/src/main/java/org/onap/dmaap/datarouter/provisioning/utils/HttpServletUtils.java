@@ -32,7 +32,7 @@ public class HttpServletUtils {
         try {
             response.sendError(errorCode, message);
         } catch (IOException ioe) {
-            intlogger.error("IOException" + ioe.getMessage());
+            intlogger.error("IOException" + ioe.getMessage(), ioe);
         }
     }
 }
