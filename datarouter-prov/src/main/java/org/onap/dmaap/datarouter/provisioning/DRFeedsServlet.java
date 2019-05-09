@@ -150,7 +150,7 @@ public class DRFeedsServlet extends ProxyServlet {
                     try {
                         resp.getOutputStream().print(feed.asJSONObject(true).toString());
                     } catch (IOException ioe) {
-                        eventlogger.error("IOException" + ioe.getMessage());
+                        eventlogger.error("PROV0111 DRFeedServlet.doGet " + ioe.getMessage(), ioe);
                     }
                 }
             } else {
@@ -174,7 +174,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 try {
                     resp.getOutputStream().print(t);
                 } catch (IOException ioe) {
-                    eventlogger.error("IOException" + ioe.getMessage());
+                    eventlogger.error("PROV0112 DRFeedServlet.doGet " + ioe.getMessage(), ioe);
                 }
             }
         } finally {
@@ -283,7 +283,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 message = e.getMessage();
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.error(elr.toString());
+                eventlogger.error(elr.toString(), e);
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -365,7 +365,7 @@ public class DRFeedsServlet extends ProxyServlet {
                 try {
                     resp.getOutputStream().print(feed.asLimitedJSONObject().toString());
                 } catch (IOException ioe) {
-                    eventlogger.error("IOException" + ioe.getMessage());
+                    eventlogger.error("PROV0113 DRFeedServlet.doPost " + ioe.getMessage(), ioe);
                 }
                 provisioningDataChanged();
             } else {

@@ -312,7 +312,7 @@ public class SynchronizerTask extends TimerTask {
                 logger.warn("PROV5003: My name (" + thisPod + ") is missing from the list of provisioning servers.");
             }
         } catch (UnknownHostException e) {
-            logger.warn("PROV5002: Cannot determine the name of this provisioning server.");
+            logger.warn("PROV5002: Cannot determine the name of this provisioning server.", e);
         }
 
         if (newstate != state) {
@@ -334,7 +334,7 @@ public class SynchronizerTask extends TimerTask {
                 Feed f = new Feed(ja.getJSONObject(n));
                 coll.add(f);
             } catch (Exception e) {
-                logger.warn("PROV5004: Invalid object in feed: " + ja.optJSONObject(n));
+                logger.warn("PROV5004: Invalid object in feed: " + ja.optJSONObject(n), e);
             }
         }
         if (sync(coll, Feed.getAllFeeds())) {
@@ -355,7 +355,7 @@ public class SynchronizerTask extends TimerTask {
                 Subscription s = new Subscription(j);
                 coll.add(s);
             } catch (Exception e) {
-                logger.warn("PROV5004: Invalid object in subscription: " + ja.optJSONObject(n));
+                logger.warn("PROV5004: Invalid object in subscription: " + ja.optJSONObject(n), e);
             }
         }
         if (sync(coll, Subscription.getAllSubscriptions())) {
@@ -373,7 +373,7 @@ public class SynchronizerTask extends TimerTask {
                 Group g = new Group(ja.getJSONObject(n));
                 coll.add(g);
             } catch (Exception e) {
-                logger.warn("PROV5004: Invalid object in subscription: " + ja.optJSONObject(n));
+                logger.warn("PROV5004: Invalid object in group: " + ja.optJSONObject(n), e);
             }
         }
         if (sync(coll, Group.getAllgroups())) {
@@ -392,9 +392,11 @@ public class SynchronizerTask extends TimerTask {
             try {
                 v = jo.getString(k);
             } catch (JSONException e) {
+                logger.warn("PROV5004: Invalid object in parameters: " + jo.optJSONObject(k), e);
                 try {
                     v = "" + jo.getInt(k);
                 } catch (JSONException e1) {
+                    logger.warn("PROV5004: Invalid object in parameters: " + jo.optInt(k), e);
                     JSONArray ja = jo.getJSONArray(k);
                     for (int i = 0; i < ja.length(); i++) {
                         if (i > 0) {
@@ -436,9 +438,9 @@ public class SynchronizerTask extends TimerTask {
                 EgressRoute er = new EgressRoute(sub, node);
                 coll.add(er);
             } catch (NumberFormatException e) {
-                logger.warn("PROV5004: Invalid subid in egress routes: " + key);
+                logger.warn("PROV5004: Invalid subid in egress routes: " + key, e);
             } catch (IllegalArgumentException e) {
-                logger.warn("PROV5004: Invalid node name in egress routes: " + key);
+                logger.warn("PROV5004: Invalid node name in egress routes: " + key, e);
             }
         }
         if (sync(coll, EgressRoute.getAllEgressRoutes())) {

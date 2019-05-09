@@ -169,7 +169,7 @@ public class PublishServlet extends BaseServlet {
                 }
             }
         } catch (IOException ioe) {
-            intlogger.error("IOException" + ioe.getMessage());
+            intlogger.error("PROV0151 PublishServlet.redirect: " + ioe.getMessage(), ioe);
         }
     }
 
@@ -235,6 +235,7 @@ public class PublishServlet extends BaseServlet {
             }
             return -1;
         } catch (NumberFormatException | JSONException e) {
+            intlogger.debug("Incorrect path format: " + e.getMessage(), e);
             return -1;
         }
     }

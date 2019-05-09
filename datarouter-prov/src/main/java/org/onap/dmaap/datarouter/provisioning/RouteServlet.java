@@ -208,7 +208,9 @@ public class RouteServlet extends ProxyServlet {
                     );
                     d = new Deleteable[] { nr };
                 } catch (IllegalArgumentException e) {
-                    sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "The specified network route does not exist.", eventlogger);
+                    String message = "The specified network route does not exist.";
+                    eventlogger.error(message, e);
+                    sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
                     return;
                 }
             } else {
@@ -289,7 +291,7 @@ public class RouteServlet extends ProxyServlet {
                     try {
                         sb.append("\"").append(jx.getString(key)).append("\"");
                     } catch (JSONException je) {
-                        eventlogger.error("JSONException" + je.getMessage());
+                        eventlogger.error("PROV0161 RouteServlet.doGet: " + je.getMessage(), je);
                     }
                     pfx = ",\n";
                 }
@@ -315,7 +317,7 @@ public class RouteServlet extends ProxyServlet {
         try {
             resp.getOutputStream().print(sb.toString());
         } catch (IOException ioe) {
-            eventlogger.error("IOException" + ioe.getMessage());
+            eventlogger.error("PROV0162 RouteServlet.doGet: " + ioe.getMessage(), ioe);
         }
     }
     /**
@@ -368,7 +370,7 @@ public class RouteServlet extends ProxyServlet {
                 int seq = (t != null) ? Integer.parseInt(t) : (IngressRoute.getMaxSequence() + 100);
                 ins = new Insertable[] { new IngressRoute(seq, feedid, user, subnet, NodeClass.lookupNodeNames(nodepatt)) };
             } catch (Exception e) {
-                intlogger.info(e.toString());
+                intlogger.info(e.toString(), e);
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments in 'add ingress' command.", intlogger);
                 return;
             }
@@ -384,7 +386,7 @@ public class RouteServlet extends ProxyServlet {
                 String node = NodeClass.normalizeNodename(req.getParameter("node"));
                 ins = new Insertable[] { new EgressRoute(subid, node) };
             } catch (Exception e) {
-                intlogger.info(e.toString());
+                intlogger.info(e.toString(), e);
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments in 'add egress' command.", intlogger);
                 return;
             }
@@ -410,7 +412,7 @@ public class RouteServlet extends ProxyServlet {
                 }
                 ins = new Insertable[] { nr };
             } catch (IllegalArgumentException e) {
-                intlogger.info(e.toString());
+                intlogger.info(e.toString(), e);
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments in 'add network' command.", intlogger);
                 return;
             }

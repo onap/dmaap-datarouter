@@ -233,7 +233,7 @@ public class SubscriptionServlet extends ProxyServlet {
             try {
                 resp.getOutputStream().print(sub.asJSONObject(true).toString());
             } catch (IOException ioe) {
-                eventlogger.error("IOException: " + ioe.getMessage());
+                eventlogger.error("PROV0191 SubscriptionServlet.doGet: " + ioe.getMessage(), ioe);
             }
         } finally {
             eelfLogger.info(EelfMsgs.EXIT);
@@ -320,7 +320,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = e.getMessage();
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.error(elr.toString());
+                eventlogger.error(elr.toString(), e);
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -380,7 +380,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 try {
                     resp.getOutputStream().print(sub.asLimitedJSONObject().toString());
                 } catch (IOException ioe) {
-                    eventlogger.error("IOException: " + ioe.getMessage());
+                    eventlogger.error("PROV0192 SubscriptionServlet.doPut: " + ioe.getMessage(), ioe);
                 }
 
                 /**Change Owner ship of Subscriber     Adding for group feature:Rally US708115*/
@@ -392,7 +392,7 @@ public class SubscriptionServlet extends ProxyServlet {
                             sub.changeOwnerShip();
                         }
                     } catch (JSONException je) {
-                        eventlogger.error("JSONException: " + je.getMessage());
+                        eventlogger.error("PROV0193 SubscriptionServlet.doPut: " + je.getMessage(), je);
                     }
                 }
                 /***End of change ownership*/
@@ -499,7 +499,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 message = "Badly formed JSON";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.error(elr.toString());
+                eventlogger.error(elr.toString(), e);
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
             }
         } finally {
@@ -538,11 +538,11 @@ public class SubscriptionServlet extends ProxyServlet {
                         conn.getContentLength();    // Force the GET through
                         conn.disconnect();
                     } catch (IOException e) {
-                        intlogger.info("IOException Error accessing URL: " + u + ": " + e.getMessage());
+                        intlogger.info("PROV0194 Error accessing URL: " + u + ": " + e.getMessage(), e);
                     }
                 }
             } catch (Exception e) {
-                intlogger.warn("Caught exception in SubscriberNotifyThread: " + e.getMessage());
+                intlogger.warn("PROV0195 Caught exception in SubscriberNotifyThread: " + e.getMessage(), e);
             }
         }
     }

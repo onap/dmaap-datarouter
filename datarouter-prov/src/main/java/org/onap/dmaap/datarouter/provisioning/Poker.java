@@ -85,7 +85,7 @@ public class Poker extends TimerTask {
             thisPod = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
             thisPod = "*UNKNOWN*"; // not a major problem
-            logger.info("UnknownHostException: Setting thisPod to \"*UNKNOWN*\"");
+            logger.info("UnknownHostException: Setting thisPod to \"*UNKNOWN*\"", e);
         }
         provString = buildProvisioningString();
 
@@ -195,10 +195,10 @@ public class Poker extends TimerTask {
             } catch (MalformedURLException e) {
                 logger.warn(
                         "PROV0013 MalformedURLException Error poking node at " + nodeUrl + " : " + e
-                                .getMessage());
+                                .getMessage(), e);
             } catch (IOException e) {
                 logger.warn("PROV0013 IOException Error poking node at " + nodeUrl + " : " + e
-                        .getMessage());
+                        .getMessage(), e);
             }
         };
         r.run();
