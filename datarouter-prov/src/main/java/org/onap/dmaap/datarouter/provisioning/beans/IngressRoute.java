@@ -55,6 +55,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
 public class IngressRoute extends NodeClass implements Comparable<IngressRoute> {
 
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
+    private static final String SQLEXCEPTION = "SQLException: ";
     private final int seq;
     private final int feedid;
     private final String userid;
@@ -102,7 +103,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.error("PROV0001 getAllIngressRoutesForSQL: " + e.getMessage(), e);
         }
         return set;
     }
@@ -140,7 +141,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.error("PROV0002 getMax: " + e.getMessage(), e);
         }
         return rv;
     }
@@ -175,14 +176,14 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             ps.close();
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.error("PROV0003 getIngressRoute: " + e.getMessage(), e);
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error("SQLException " + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return v;
@@ -215,7 +216,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.error("PROV0004 getIngressRoute: " + e.getMessage(), e);
         }
         return rv;
     }
@@ -307,6 +308,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
                 SubnetMatcher sm = new SubnetMatcher(subnet);
                 return sm.matches(inet.getAddress());
             } catch (UnknownHostException e) {
+                intlogger.error("PROV0008 matches: " + e.getMessage(), e);
                 return false;
             }
         }
@@ -337,6 +339,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
                     len = sn.length;
                     valid = true;
                 } catch (UnknownHostException e) {
+                    intlogger.error("PROV0008 SubnetMatcher: " + e.getMessage(), e);
                     len = 0;
                     valid = false;
                 }
@@ -347,6 +350,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
                     sn = InetAddress.getByName(subnet.substring(0, i)).getAddress();
                     valid = true;
                 } catch (UnknownHostException e) {
+                    intlogger.error("PROV0008 SubnetMatcher: " + e.getMessage(), e);
                     valid = false;
                 }
                 len = n / 8;
@@ -390,7 +394,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
     }
 
     private Collection<String> readNodes() {
-        Collection<String> set = new TreeSet<String>();
+        Collection<String> set = new TreeSet<>();
         try {
             DB db = new DB();
             @SuppressWarnings("resource")
@@ -407,7 +411,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.error(SQLEXCEPTION + e.getMessage(), e);
         }
         return set;
     }
@@ -434,14 +438,14 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             ps.execute();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0007 doDelete: " + e.getMessage());
+            intlogger.warn("PROV0007 doDelete: " + e.getMessage(), e);
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error("SQLException " + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return rv;
@@ -477,14 +481,14 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             ps.close();
             rv = true;
         } catch (SQLException e) {
-            intlogger.warn("PROV0005 doInsert: " + e.getMessage());
+            intlogger.warn("PROV0005 doInsert: " + e.getMessage(), e);
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error("SQLException " + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return rv;
@@ -524,14 +528,10 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
 
     @Override
     public boolean equals(Object obj) {
-        try {
-            if (!(obj instanceof IngressRoute)) {
-                return false;
-            }
-            return this.compareTo((IngressRoute) obj) == 0;
-        } catch (NullPointerException e) {
+        if (!(obj instanceof IngressRoute)) {
             return false;
         }
+        return this.compareTo((IngressRoute) obj) == 0;
     }
 
     @Override

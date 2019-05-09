@@ -117,7 +117,7 @@ public class Subscription extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error(e.toString());
+            intlogger.error("PROV0001 getSubscriptionsForSQL: " + e.toString(), e);
         }
         return list;
     }
@@ -137,7 +137,7 @@ public class Subscription extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.info("getMaxSubID: " + e.getMessage());
+            intlogger.info("getMaxSubID: " + e.getMessage(), e);
         }
         return max;
     }
@@ -161,7 +161,7 @@ public class Subscription extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error(SQLEXCEPTION + e.getMessage());
+            intlogger.error(SQLEXCEPTION + e.getMessage(), e);
         }
         return list;
     }
@@ -186,7 +186,7 @@ public class Subscription extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.warn("PROV0008 countActiveSubscriptions: " + e.getMessage());
+            intlogger.warn("PROV0008 countActiveSubscriptions: " + e.getMessage(), e);
         }
         return count;
     }
@@ -274,7 +274,8 @@ public class Subscription extends Syncable {
         } catch (InvalidObjectException e) {
             throw e;
         } catch (Exception e) {
-            throw new InvalidObjectException("invalid JSON: " + e.getMessage());
+            intlogger.warn("Invalid JSON: " + e.getMessage(), e);
+            throw new InvalidObjectException("Invalid JSON: " + e.getMessage());
         }
     }
 
@@ -474,14 +475,14 @@ public class Subscription extends Syncable {
             ps.close();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0005 doInsert: " + e.getMessage());
+            intlogger.warn("PROV0005 doInsert: " + e.getMessage(), e);
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return rv;
@@ -508,14 +509,14 @@ public class Subscription extends Syncable {
             ps.executeUpdate();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
+            intlogger.warn("PROV0006 doUpdate: " + e.getMessage(), e);
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return rv;
@@ -541,14 +542,14 @@ public class Subscription extends Syncable {
             ps.close();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
+            intlogger.warn("PROV0006 doUpdate: " + e.getMessage(), e);
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return rv;
@@ -566,14 +567,14 @@ public class Subscription extends Syncable {
             ps.execute();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0007 doDelete: " + e.getMessage());
+            intlogger.warn("PROV0007 doDelete: " + e.getMessage(), e);
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return rv;

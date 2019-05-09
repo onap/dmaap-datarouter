@@ -69,6 +69,7 @@ public class Parameters extends Syncable {
     public static final String STATIC_ROUTING_NODES = "STATIC_ROUTING_NODES"; //Adding new param for static Routing - Rally:US664862-1610
 
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
+    private static final String SQLEXCEPTION = "SQLException: ";
 
     private String keyname;
     private String value;
@@ -103,7 +104,7 @@ public class Parameters extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.error(SQLEXCEPTION + e.getMessage());
         }
         return coll;
     }
@@ -131,7 +132,7 @@ public class Parameters extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.error(SQLEXCEPTION + e.getMessage());
         }
         return v;
     }
@@ -187,14 +188,14 @@ public class Parameters extends Syncable {
             ps.execute();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0005 doInsert: " + e.getMessage());
+            intlogger.warn("PROV0005 doInsert: " + e.getMessage(), e);
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error("SQLException " + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage());
             }
         }
         return rv;
@@ -213,14 +214,14 @@ public class Parameters extends Syncable {
             ps.executeUpdate();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
+            intlogger.warn("PROV0006 doUpdate: " + e.getMessage(),e);
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error("SQLException " + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return rv;
@@ -238,14 +239,14 @@ public class Parameters extends Syncable {
             ps.execute();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0007 doDelete: " + e.getMessage());
+            intlogger.warn("PROV0007 doDelete: " + e.getMessage(), e);
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error("SQLException " + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return rv;
