@@ -227,7 +227,7 @@ public class FeedServlet extends ProxyServlet {
             try {
                 resp.getOutputStream().print(feed.asJSONObject(true).toString());
             } catch (IOException ioe) {
-                eventlogger.error("IOException" + ioe.getMessage());
+                eventlogger.error("PROV0101 FeedServlet.doGet: " + ioe.getMessage(), ioe);
             }
         } finally {
             eelfLogger.info(EelfMsgs.EXIT);
@@ -313,7 +313,7 @@ public class FeedServlet extends ProxyServlet {
                 message = e.getMessage();
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.error(elr.toString());
+                eventlogger.error(elr.toString(), e);
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -392,7 +392,7 @@ public class FeedServlet extends ProxyServlet {
                 try {
                     resp.getOutputStream().print(feed.asLimitedJSONObject().toString());
                 } catch (IOException ioe) {
-                    eventlogger.error("IOException" + ioe.getMessage());
+                    eventlogger.error("PROV0102 FeedServlet.doPut: " + ioe.getMessage(), ioe);
                 }
 
 
@@ -405,7 +405,7 @@ public class FeedServlet extends ProxyServlet {
                             feed.changeOwnerShip();
                         }
                     } catch (JSONException je) {
-                        eventlogger.error("JSONException" + je.getMessage());
+                        eventlogger.error("PROV0103 FeedServlet.doPut: " + je.getMessage(), je);
                     }
                 }
                 /***End of change ownership*/

@@ -268,7 +268,7 @@ public class InternalServlet extends ProxyServlet {
                 try {
                     resp.getOutputStream().print(p.getProvisioningString());
                 } catch (IOException ioe) {
-                    intlogger.error("IOException" + ioe.getMessage());
+                    intlogger.error("PROV0131 InternalServlet.doGet: " + ioe.getMessage(), ioe);
                 }
                 return;
             }
@@ -278,7 +278,7 @@ public class InternalServlet extends ProxyServlet {
                 try {
                     resp.getOutputStream().print(generateLogfileList().toString());
                 } catch (IOException ioe) {
-                    intlogger.error("IOException" + ioe.getMessage());
+                    intlogger.error("PROV0132 InternalServlet.doGet: " + ioe.getMessage(), ioe);
                 }
                 return;
             }
@@ -294,7 +294,7 @@ public class InternalServlet extends ProxyServlet {
                         try {
                             Files.copy(logpath, resp.getOutputStream());
                         } catch (IOException ioe) {
-                            intlogger.error("IOException" + ioe.getMessage());
+                            intlogger.error("PROV0133 InternalServlet.doGet: " + ioe.getMessage(), ioe);
                         }
                         return;
                     }
@@ -316,7 +316,7 @@ public class InternalServlet extends ProxyServlet {
                         try {
                             resp.getOutputStream().print(param.getValue() + "\n");
                         } catch (IOException ioe) {
-                            intlogger.error("IOException" + ioe.getMessage());
+                            intlogger.error("PROV0134 InternalServlet.doGet: " + ioe.getMessage(), ioe);
                         }
                         return;
                     }
@@ -330,7 +330,7 @@ public class InternalServlet extends ProxyServlet {
                 try {
                     resp.getOutputStream().print(lfl.getBitSet().toString());
                 } catch (IOException ioe) {
-                    intlogger.error("IOException" + ioe.getMessage());
+                    intlogger.error("PROV0135 InternalServlet.doGet: " + ioe.getMessage(), ioe);
                 }
                 return;
             }
@@ -477,12 +477,13 @@ public class InternalServlet extends ProxyServlet {
                         total += store.getTotalSpace();
                         avail += store.getUsableSpace();
                     } catch (IOException ioe) {
-                        intlogger.error("IOException" + ioe.getMessage());
+                        intlogger.error("PROV0136 InternalServlet.doPost: " + ioe.getMessage(), ioe);
                     }
                 }
                 try {
                     fs.close();
                 } catch (Exception e) {
+                    intlogger.error("PROV0137 InternalServlet.doPost: " + e.getMessage(), e);
                 }
                 if (((avail * 100) / total) < 5) {
                     elr.setResult(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
@@ -500,7 +501,7 @@ public class InternalServlet extends ProxyServlet {
                     eventlogger.info(elr.toString());
                     LogfileLoader.getLoader();    // This starts the logfile loader "task"
                 } catch (IOException ioe) {
-                    intlogger.error("IOException" + ioe.getMessage());
+                    intlogger.error("PROV0138 InternalServlet.doPost: " + ioe.getMessage(), ioe);
                 }
                 return;
             }
@@ -529,7 +530,7 @@ public class InternalServlet extends ProxyServlet {
                     LogRecord.printLogRecords(resp.getOutputStream(), bs);
                     eventlogger.info(elr.toString());
                 } catch (IOException ioe) {
-                    intlogger.error("IOException" + ioe.getMessage());
+                    intlogger.error("PROV0139 InternalServlet.doPost: " + ioe.getMessage(), ioe);
                 }
                 return;
             }

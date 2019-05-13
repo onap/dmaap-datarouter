@@ -101,7 +101,7 @@ public class ProxyServlet extends BaseServlet {
             sch = new Scheme("https", 443, socketFactory);
             inited = true;
         } catch (Exception e) {
-            intlogger.error("ProxyServlet: " + e.getMessage());
+            intlogger.error("ProxyServlet.init: " + e.getMessage(), e);
         }
         intlogger.info("ProxyServlet: inited = " + inited);
     }
@@ -111,7 +111,7 @@ public class ProxyServlet extends BaseServlet {
         try (FileInputStream instream = new FileInputStream(new File(store))) {
             ks.load(instream, pass.toCharArray());
         } catch (FileNotFoundException fileNotFoundException) {
-            intlogger.error("ProxyServlet: " + fileNotFoundException.getMessage());
+            intlogger.error("ProxyServlet.readStore: " + fileNotFoundException.getMessage(), fileNotFoundException);
         } catch (Exception x) {
             intlogger.error("READING TRUSTSTORE: " + x);
         }
@@ -211,7 +211,7 @@ public class ProxyServlet extends BaseServlet {
                     rv = true;
 
                 } catch (IOException e) {
-                    intlogger.error("ProxyServlet: " + e.getMessage());
+                    intlogger.error("ProxyServlet.doGetWithFallback: " + e.getMessage(), e);
                 } finally {
                     proxy.releaseConnection();
                     httpclient.getConnectionManager().shutdown();
@@ -250,7 +250,7 @@ public class ProxyServlet extends BaseServlet {
                     copyResponseHeaders(pxyResponse, resp);
                     copyEntityContent(pxyResponse, resp);
                 } catch (IOException e) {
-                    intlogger.warn("ProxyServlet: " + e.getMessage());
+                    intlogger.warn("ProxyServlet.doProxy: " + e.getMessage(), e);
                     sendResponseError(resp, HttpServletResponse.SC_SERVICE_UNAVAILABLE, "", intlogger);
                 } finally {
                     proxy.releaseConnection();
@@ -300,7 +300,7 @@ public class ProxyServlet extends BaseServlet {
             try (InputStream in = entity.getContent()) {
                 IOUtils.copy(in, resp.getOutputStream());
             } catch (Exception e) {
-                intlogger.error("Exception: " + e.getMessage());
+                intlogger.error("ProxyServlet.copyEntity: " + e.getMessage(), e);
             }
         }
     }
