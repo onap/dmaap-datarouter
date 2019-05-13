@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "0fe0df07_05b354ac",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/ProxyServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-05-13T13:12:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dbbb1731_10120d87",
+      "range": {
+        "startLine": 303,
+        "startChar": 33,
+        "endLine": 303,
+        "endChar": 42
+      },
+      "revId": "122b66a91b953bceffadac64d84cab116a35877d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2344b526_e12bf216",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2019-05-13T12:36:10Z",
       "side": 1,
       "message": "Is it worth keeping the same convention for all logs? ie.\nPublishServlet.checkpath",
+      "range": {
+        "startLine": 238,
+        "startChar": 29,
+        "endLine": 238,
+        "endChar": 50
+      },
+      "revId": "122b66a91b953bceffadac64d84cab116a35877d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "304991c4_8a258e79",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-05-13T13:12:59Z",
+      "side": 1,
+      "message": "Yeah probably is, done",
+      "parentUuid": "2344b526_e12bf216",
       "range": {
         "startLine": 238,
         "startChar": 29,
