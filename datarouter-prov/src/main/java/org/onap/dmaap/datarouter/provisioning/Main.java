@@ -102,7 +102,7 @@ public class Main {
             try {
                 in = getClass().getClassLoader().getResourceAsStream("drProvCadi.properties");
             } catch (Exception e) {
-                intlogger.error("Exception in Main.getCadiProps() method ", e.getMessage());
+                intlogger.error("Exception in Main.getCadiProps(): " + e.getMessage(), e);
             }
             return in;
         }
@@ -247,8 +247,8 @@ public class Main {
                         Inner obj = new Main().new Inner();
                         InputStream in = obj.getCadiProps();
                         cadiProperties.load(in);
-                    } catch (IOException e1) {
-                        intlogger.error("PROV0001 Exception loading CADI properties", e1.getMessage());
+                    } catch (IOException ioe) {
+                        intlogger.error("PROV0001 Exception loading CADI properties: " + ioe.getMessage(), ioe);
                     }
                     cadiProperties.setProperty("aaf_locate_url", provProperties.getProperty("org.onap.dmaap.datarouter.provserver.cadi.aaf.url", "https://aaf-onap-test.osaaf.org:8095"));
                     intlogger.info("PROV0001  aaf_url set to - " + cadiProperties.getProperty("aaf_url"));
@@ -281,7 +281,7 @@ public class Main {
             server.start();
             intlogger.info("Prov Server started-" + server.getState());
         } catch (Exception e) {
-            intlogger.info("Jetty failed to start. Reporting will we unavailable", e.getMessage());
+            intlogger.info("Jetty failed to start. Reporting will we unavailable: " + e.getMessage(), e);
         }
         server.join();
         intlogger.info("PROV0001 **** AT&T Data Router Provisioning Server halted.");
@@ -302,7 +302,7 @@ public class Main {
                 Thread.sleep(5000L);
                 System.exit(0);
             } catch (Exception e) {
-                intlogger.error("Exception in Main.shutdown() method " + e.getMessage());
+                intlogger.error("Exception in Main.shutdown(): " + e.getMessage(), e);
             }
         });
     }

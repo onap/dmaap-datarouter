@@ -140,7 +140,7 @@ public class SubscribeServlet extends ProxyServlet {
             try {
                 resp.getOutputStream().print(t);
             } catch (IOException ioe) {
-                eventlogger.error("IOException: " + ioe.getMessage());
+                eventlogger.error("PROV0181 SubscribeServlet.doGet: " + ioe.getMessage(), ioe);
             }
         } finally {
             eelfLogger.info(EelfMsgs.EXIT);
@@ -258,7 +258,7 @@ public class SubscribeServlet extends ProxyServlet {
                 message = e.getMessage();
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-                eventlogger.error(elr.toString());
+                eventlogger.error(elr.toString(), e);
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
@@ -341,7 +341,7 @@ public class SubscribeServlet extends ProxyServlet {
                 try {
                     resp.getOutputStream().print(sub.asLimitedJSONObject().toString());
                 } catch (IOException ioe) {
-                    eventlogger.error("IOException: " + ioe.getMessage());
+                    eventlogger.error("PROV0182 SubscribeServlet.doPost: " + ioe.getMessage(), ioe);
                 }
 
                 provisioningDataChanged();

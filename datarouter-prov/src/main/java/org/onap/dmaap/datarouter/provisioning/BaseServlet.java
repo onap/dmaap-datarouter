@@ -287,7 +287,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             loopback = InetAddress.getLoopbackAddress();
             //checkHttpsRelaxation(); //Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
         } catch (UnknownHostException e) {
-            // ignore
+            intlogger.error("BaseServlet.init: " + e.getMessage(), e);
         }
     }
 
@@ -380,7 +380,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 return "Unauthorized address: " + remote;
             }
         } catch (UnknownHostException e) {
-            intlogger.error("PROV0051 BaseServlet.isAuthorizedForProvisioning: ", e.getMessage());
+            intlogger.error("PROV0051 BaseServlet.isAuthorizedForProvisioning: " + e.getMessage(), e);
             return "Unauthorized address: " + remote;
         }
         // Does remote have a valid certificate?
@@ -429,7 +429,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 return true;
             }
         } catch (UnknownHostException e) {
-            intlogger.error("PROV0052 BaseServlet.isAuthorizedForInternal: ", e.getMessage());
+            intlogger.error("PROV0052 BaseServlet.isAuthorizedForInternal: " + e.getMessage(), e);
         }
         return false;
     }
@@ -473,7 +473,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 }
             }
         } catch (UnknownHostException e) {
-            intlogger.error("PROV0053 BaseServlet.addressMatchesNetwork: ", e.getMessage());
+            intlogger.error("PROV0053 BaseServlet.addressMatchesNetwork: " + e.getMessage(), e);
             return false;
         }
         return true;
@@ -519,7 +519,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             thisPod = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
             thisPod = "";
-            intlogger.warn("PROV0014 Cannot determine the name of this provisioning server.");
+            intlogger.warn("PROV0014 Cannot determine the name of this provisioning server.", e);
         }
 
         // Normalize the nodes, and fill in nodeAddresses
@@ -530,7 +530,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 intlogger.debug("PROV0003 DNS lookup: " + nodes[i] + " => " + na[i].toString());
             } catch (UnknownHostException e) {
                 na[i] = null;
-                intlogger.warn("PROV0004 Cannot lookup " + nodes[i] + ": " + e.getMessage());
+                intlogger.warn("PROV0004 Cannot lookup " + nodes[i] + ": " + e.getMessage(), e);
             }
         }
 
@@ -558,7 +558,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 intlogger.debug("PROV0003 DNS lookup: " + pods[i] + " => " + na[i].toString());
             } catch (UnknownHostException e) {
                 na[i] = null;
-                intlogger.warn("PROV0004 Cannot lookup " + pods[i] + ": " + e.getMessage());
+                intlogger.warn("PROV0004 Cannot lookup " + pods[i] + ": " + e.getMessage(), e);
             }
         }
         podAddresses = na;
@@ -584,7 +584,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             try (InputStream inStream = getClass().getClassLoader().getResourceAsStream(MAILCONFIG_FILE)) {
                 mailprops.load(inStream);
             } catch (IOException e) {
-                intlogger.error("PROV9003 Opening properties: " + e.getMessage());
+                intlogger.error("PROV9003 Opening properties: " + e.getMessage(), e);
                 System.exit(1);
             }
         }
@@ -604,7 +604,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 try {
                     notifyPSTeam(p.get("org.onap.dmaap.datarouter.provserver.https.relax.notify").toString());
                 } catch (Exception e) {
-                    intlogger.warn("Exception: " + e.getMessage());
+                    intlogger.warn("Exception: " + e.getMessage(), e);
                 }
             }
             mailSendFlag = true;
@@ -617,7 +617,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * @param email - list of email ids to notify if HTTP relexcation is enabled.
      * @author vs215k
      **/
-    private void notifyPSTeam(String email) throws Exception {
+    private void notifyPSTeam(String email) {
         loadMailProperties(); //Load HTTPS Relex mail properties.
         String[] emails = email.split(Pattern.quote("|"));
 
@@ -653,7 +653,9 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             intlogger.info("HTTPS relaxation mail is sent to - : " + email);
 
         } catch (MessagingException e) {
-            intlogger.error("Invalid email address, unable to send https relaxation mail to - : " + email);
+            intlogger.error("Invalid email address, unable to send https relaxation mail to - : " + email, e);
+        } catch (UnknownHostException uhe) {
+            intlogger.error("UnknownHostException", uhe);
         }
     }
 
@@ -748,7 +750,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             rv = bean.doInsert(conn);
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0005 doInsert: " + e.getMessage());
+            intlogger.warn("PROV0005 doInsert: " + e.getMessage(), e);
         } finally {
             if (conn != null) {
                 db.release(conn);
@@ -772,7 +774,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             rv = bean.doUpdate(conn);
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
+            intlogger.warn("PROV0006 doUpdate: " + e.getMessage(), e);
         } finally {
             if (conn != null) {
                 db.release(conn);
@@ -796,7 +798,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             rv = bean.doDelete(conn);
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0007 doDelete: " + e.getMessage());
+            intlogger.warn("PROV0007 doDelete: " + e.getMessage(), e);
         } finally {
             if (conn != null) {
                 db.release(conn);
@@ -959,7 +961,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                     return true;
                 }
             } catch (JSONException e) {
-                intlogger.error("JSONException: " + e.getMessage());
+                intlogger.error("JSONException: " + e.getMessage(), e);
             }
         }
         return false;
@@ -1048,7 +1050,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             MDC.put(MDC_SERVER_FQDN, InetAddress.getLocalHost().getHostName());
             MDC.put(MDC_SERVER_IP_ADDRESS, InetAddress.getLocalHost().getHostAddress());
         } catch (Exception e) {
-            intlogger.error("Exception: " + e.getMessage());
+            intlogger.error("Exception: " + e.getMessage(), e);
         }
 
     }
@@ -1091,7 +1093,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             }
             return type + "|" + aafInstance + "|" + action;
         } catch (Exception e) {
-            intlogger.error("PROV7005 BaseServlet.getFeedPermission: ", e.getMessage());
+            intlogger.error("PROV7005 BaseServlet.getFeedPermission: " + e.getMessage(), e);
         }
         return null;
     }
@@ -1139,7 +1141,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             }
             return type + "|" + aafInstance + "|" + action;
         } catch (Exception e) {
-            intlogger.error("PROV7005 BaseServlet.getSubscriberPermission: ", e.getMessage());
+            intlogger.error("PROV7005 BaseServlet.getSubscriberPermission: " + e.getMessage(), e);
         }
         return null;
     }
