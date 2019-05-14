@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c421bb1e_b035d194",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 5061
+      },
+      "writtenOn": "2019-05-14T15:02:36Z",
+      "side": 1,
+      "message": "Should this be logged as intlogger.info as opposed to intlogger.error? It was previously being ignored, which still is the case but will show up as error in the log and may cause confusion. What do you think?",
+      "revId": "b76b36522fd1581cb1726a7a2e2a3cbfab656478",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
