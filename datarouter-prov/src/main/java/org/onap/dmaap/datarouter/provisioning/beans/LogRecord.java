@@ -77,7 +77,7 @@ public class LogRecord extends BaseLogRecord {
                 }
             }
         } catch (SQLException e) {
-            intlogger.error("SQLException: " + e.getMessage());
+            intlogger.error("PROV0001 printLogRecords: " + e.getMessage(), e);
         }
     }
 

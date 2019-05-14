@@ -47,6 +47,7 @@ import java.util.*;
 public class Feed extends Syncable {
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
     private static int next_feedid = getMaxFeedID() + 1;
+    private static final String SQLEXCEPTION = "SQLException: ";
 
     private int feedid;
     private int groupid; //New field is added - Groups feature Rally:US708115 - 1610
@@ -85,7 +86,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.warn("PROV0024 Feed.isFeedValid: ", e.getMessage());
+            intlogger.warn("PROV0024 Feed.isFeedValid: " + e.getMessage(), e);
         }
         return count != 0;
     }
@@ -135,7 +136,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.warn("PROV0025 Feed.countActiveFeeds: ", e.getMessage());
+            intlogger.warn("PROV0025 Feed.countActiveFeeds: " + e.getMessage(), e);
         }
         return count;
     }
@@ -155,7 +156,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.warn("PROV0026 Feed.getMaxFeedID: ", e.getMessage());
+            intlogger.warn("PROV0026 Feed.getMaxFeedID: " + e.getMessage(), e);
         }
         return max;
     }
@@ -201,7 +202,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.warn("PROV0027 Feed.getAllFeeds: ", e.getMessage());
+            intlogger.warn("PROV0027 Feed.getAllFeeds: " + e.getMessage(), e);
         }
         return map.values();
     }
@@ -235,7 +236,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.warn("PROV0028 Feed.getFilteredFeedUrlList: ", e.getMessage());
+            intlogger.warn("PROV0028 Feed.getFilteredFeedUrlList: " + e.getMessage(), e);
         }
         return list;
     }
@@ -272,7 +273,7 @@ public class Feed extends Syncable {
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.warn("PROV0029 Feed.getFeedBySQL: ", e.getMessage());
+            intlogger.warn("PROV0029 Feed.getFeedBySQL: " + e.getMessage(), e);
         }
         return feed;
     }
@@ -338,6 +339,7 @@ public class Feed extends Syncable {
             try {
                 this.version = jo.getString("version");
             } catch (JSONException e) {
+                intlogger.warn("PROV0023 Feed.Feed: " + e.getMessage(), e);
                 this.version = null;
             }
             if(version != null && version.length() > 20)
@@ -379,11 +381,10 @@ public class Feed extends Syncable {
             JSONObject jol = jo.optJSONObject("links");
             this.links = (jol == null) ? (new FeedLinks()) : (new FeedLinks(jol));
         } catch (InvalidObjectException e) {
-            intlogger.warn("PROV0030 Feed.Feed: ", e.getMessage());
             throw e;
         } catch (Exception e) {
-            intlogger.error("PROV0031 Feed.Feed: invalid JSON: "+e);
-            throw new InvalidObjectException("invalid JSON: " + e.getMessage());
+            intlogger.warn("Invalid JSON: " + e.getMessage(), e);
+            throw new InvalidObjectException("Invalid JSON: " + e.getMessage());
         }
     }
 
@@ -555,15 +556,14 @@ public class Feed extends Syncable {
             ps.execute();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0007 doDelete: " + e.getMessage());
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.error("PROV0007 doDelete: " + e.getMessage(), e);
         } finally {
             try {
                 if(ps!=null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error("SQLException " + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return rv;
@@ -624,8 +624,7 @@ public class Feed extends Syncable {
             }
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0005 doInsert: " + e.getMessage());
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.error("PROV0005 doInsert: " + e.getMessage(), e);
         }
         return rv;
     }
@@ -705,13 +704,13 @@ public class Feed extends Syncable {
             ps.close();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
+            intlogger.warn("PROV0006 doUpdate: " + e.getMessage(), e);
         } finally {
             try {
                 if (ps != null)
                     ps.close();
             } catch (SQLException e) {
-                intlogger.error("SQLException " + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return rv;
@@ -737,14 +736,14 @@ public class Feed extends Syncable {
             ps.close();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
+            intlogger.warn("PROV0008 changeOwnerShip: " + e.getMessage(), e);
         } finally {
             try {
                 if(ps!=null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error("SQLException " + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return rv;

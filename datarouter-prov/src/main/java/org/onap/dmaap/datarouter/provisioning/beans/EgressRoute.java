@@ -47,6 +47,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
 public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
 
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
+    private static final String SQLEXCEPTION = "SQLException: ";
     private final int subid;
     private final int nodeid;
 
@@ -57,7 +58,7 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
      * @return the sorted set
      */
     public static SortedSet<EgressRoute> getAllEgressRoutes() {
-        SortedSet<EgressRoute> set = new TreeSet<EgressRoute>();
+        SortedSet<EgressRoute> set = new TreeSet<>();
         try {
             DB db = new DB();
             @SuppressWarnings("resource")
@@ -74,7 +75,7 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
 
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.error("PROV0008 EgressRoute.getAllEgressRoutes: " + e.getMessage(), e);
         }
         return set;
     }
@@ -104,20 +105,20 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             ps.close();
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.error("PROV0009 EgressRoute.getEgressRoute: " + e.getMessage(), e);
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error("SQLException " + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return v;
     }
 
-    public EgressRoute(int subid, int nodeid) throws IllegalArgumentException {
+    public EgressRoute(int subid, int nodeid) {
         this.subid = subid;
         this.nodeid = nodeid;
 // Note: unlike for Feeds, it subscriptions can be removed from the tables, so it is
@@ -126,7 +127,7 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
 //            throw new IllegalArgumentException("No such subscription: "+subid);
     }
 
-    public EgressRoute(int subid, String node) throws IllegalArgumentException {
+    public EgressRoute(int subid, String node) {
         this(subid, lookupNodeName(node));
     }
 
@@ -141,15 +142,14 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             ps.execute();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0007 doDelete: " + e.getMessage());
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.error("PROV0007 doDelete: " + e.getMessage(), e);
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error("SQLException " + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return rv;
@@ -169,14 +169,14 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             ps.close();
             rv = true;
         } catch (SQLException e) {
-            intlogger.warn("PROV0005 doInsert: " + e.getMessage());
+            intlogger.warn("PROV0005 doInsert: " + e.getMessage(), e);
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error("SQLException " + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return rv;
@@ -194,14 +194,14 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             ps.executeUpdate();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
+            intlogger.warn("PROV0006 doUpdate: " + e.getMessage(), e);
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error("SQLException " + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return rv;

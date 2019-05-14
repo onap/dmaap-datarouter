@@ -47,6 +47,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
 public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> {
 
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
+    private static final String SQLEXCEPTION = "SQLException: ";
     private final int fromnode;
     private final int tonode;
     private final int vianode;
@@ -58,7 +59,7 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
      * @return the sorted set
      */
     public static SortedSet<NetworkRoute> getAllNetworkRoutes() {
-        SortedSet<NetworkRoute> set = new TreeSet<NetworkRoute>();
+        SortedSet<NetworkRoute> set = new TreeSet<>();
         try {
             DB db = new DB();
             @SuppressWarnings("resource")
@@ -75,30 +76,30 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error("SQLException " + e.getMessage());
+            intlogger.error(SQLEXCEPTION + e.getMessage(), e);
         }
         return set;
     }
 
-    public NetworkRoute(String fromnode, String tonode) throws IllegalArgumentException {
+    public NetworkRoute(String fromnode, String tonode) {
         this.fromnode = lookupNodeName(fromnode);
         this.tonode = lookupNodeName(tonode);
         this.vianode = -1;
     }
 
-    public NetworkRoute(String fromnode, String tonode, String vianode) throws IllegalArgumentException {
+    public NetworkRoute(String fromnode, String tonode, String vianode) {
         this.fromnode = lookupNodeName(fromnode);
         this.tonode = lookupNodeName(tonode);
         this.vianode = lookupNodeName(vianode);
     }
 
-    public NetworkRoute(JSONObject jo) throws IllegalArgumentException {
+    public NetworkRoute(JSONObject jo) {
         this.fromnode = lookupNodeName(jo.getString("from"));
         this.tonode = lookupNodeName(jo.getString("to"));
         this.vianode = lookupNodeName(jo.getString("via"));
     }
 
-    public NetworkRoute(int fromnode, int tonode, int vianode) throws IllegalArgumentException {
+    public NetworkRoute(int fromnode, int tonode, int vianode) {
         this.fromnode = fromnode;
         this.tonode = tonode;
         this.vianode = vianode;
@@ -128,14 +129,14 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
             ps.execute();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0007 doDelete: " + e.getMessage());
+            intlogger.warn("PROV0007 doDelete: " + e.getMessage(), e);
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error("SQLException " + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return rv;
@@ -157,14 +158,14 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
                 ps.close();
                 rv = true;
             } catch (SQLException e) {
-                intlogger.warn("PROV0005 doInsert: " + e.getMessage());
+                intlogger.warn("PROV0005 doInsert: " + e.getMessage(), e);
             } finally {
                 try {
                     if (ps != null) {
                         ps.close();
                     }
                 } catch (SQLException e) {
-                    intlogger.error("SQLException " + e.getMessage());
+                    intlogger.error(SQLEXCEPTION + e.getMessage(), e);
                 }
             }
         }
@@ -184,14 +185,14 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
             ps.executeUpdate();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0006 doUpdate: " + e.getMessage());
+            intlogger.warn("PROV0006 doUpdate: " + e.getMessage(), e);
         } finally {
             try {
                 if (ps != null) {
                     ps.close();
                 }
             } catch (SQLException e) {
-                intlogger.error("SQLException " + e.getMessage());
+                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
             }
         }
         return rv;
