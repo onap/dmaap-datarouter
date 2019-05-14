@@ -24,6 +24,8 @@
 
 package org.onap.dmaap.datarouter.provisioning.utils;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -97,6 +99,7 @@ public class DRRouteCLI {
     public static final String ENV_VAR = "PROVSRVR";
     public static final String PROMPT = "dr-route> ";
     public static final String DEFAULT_TRUSTSTORE_PATH = /* $JAVA_HOME + */ "/jre/lib/security/cacerts";
+    private static final EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
 
     private final String server;
     private int width = 120;        // screen width (for list)
@@ -130,12 +133,13 @@ public class DRRouteCLI {
             try {
                 trustStore.load(instream, truststore_pw.toCharArray());
             } catch (Exception x) {
-                System.err.println("Problem reading truststore: " + x);
+                intlogger.error("Problem reading truststore: " + x.getMessage(), x);
                 throw x;
             } finally {
                 try {
                     instream.close();
                 } catch (Exception ignore) {
+                    intlogger.error("Ignore error closing input stream: " + ignore.getMessage(), ignore);
                 }
             }
         }
@@ -397,6 +401,7 @@ public class DRRouteCLI {
                 printErrorText(entity);
             }
         } catch (Exception e) {
+            intlogger.error("PROV0006 doDelete: " + e.getMessage(), e);
         } finally {
             meth.releaseConnection();
         }
@@ -416,7 +421,7 @@ public class DRRouteCLI {
                 printErrorText(entity);
             }
         } catch (Exception e) {
-            System.err.println(e);
+            intlogger.error("PROV0005 doGet: " + e.getMessage(), e);
         } finally {
             meth.releaseConnection();
         }
@@ -438,6 +443,7 @@ public class DRRouteCLI {
                 printErrorText(entity);
             }
         } catch (Exception e) {
+            intlogger.error("PROV0009 doPost: " + e.getMessage(), e);
         } finally {
             meth.releaseConnection();
         }

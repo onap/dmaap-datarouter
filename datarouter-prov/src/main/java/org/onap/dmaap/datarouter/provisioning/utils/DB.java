@@ -84,7 +84,7 @@ public class DB {
                 HTTP_PORT = (String) props.get("org.onap.dmaap.datarouter.provserver.http.port");
                 Class.forName(DB_DRIVER);
             } catch (IOException e) {
-                intlogger.error("PROV9003 Opening properties: " + e.getMessage());
+                intlogger.error("PROV9003 Opening properties: " + e.getMessage(), e);
                 System.exit(1);
             } catch (ClassNotFoundException e) {
                 intlogger.error("PROV9004 cannot find the DB driver: " + e);
@@ -115,6 +115,7 @@ public class DB {
                 try {
                     connection = queue.remove();
                 } catch (NoSuchElementException nseEx) {
+                    intlogger.error("PROV9006 No connection on queue: " + nseEx.getMessage(), nseEx);
                     int n = 0;
                     do {
                         // Try up to 3 times to get a connection
@@ -194,8 +195,7 @@ public class DB {
                 runInitScript(connection, 1);
             }
         } catch (SQLException e) {
-            intlogger
-                .error("PROV9000: The database credentials are not working: " + e.getMessage());
+            intlogger.error("PROV9000: The database credentials are not working: " + e.getMessage(), e);
             return false;
         } finally {
             if (connection != null) {
@@ -223,7 +223,7 @@ public class DB {
                 rs.close();
             }
         } catch (SQLException e) {
-            intlogger.error("PROV9010: Failed to get TABLE data from DB: " + e.getMessage());
+            intlogger.error("PROV9010: Failed to get TABLE data from DB: " + e.getMessage(), e);
         }
         return tables;
     }
@@ -264,7 +264,7 @@ public class DB {
             lineReader.close();
             strBuilder.setLength(0);
         } catch (Exception e) {
-            intlogger.error("PROV9002 Error when initializing table: " + e.getMessage());
+            intlogger.error("PROV9002 Error when initializing table: " + e.getMessage(), e);
             System.exit(1);
         }
     }

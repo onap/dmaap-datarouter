@@ -23,6 +23,8 @@ package org.onap.dmaap.datarouter.provisioning.utils;
  * *
  ******************************************************************************/
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -103,6 +105,8 @@ public class LOGJSONObject {
      * string objects. This is used by JSONObject.put(string, object).
      */
     private static Map<String, Object> keyPool = new LinkedHashMap<String, Object>(keyPoolSize);
+
+    private static final EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
 
     /**
      * JSONObject.NULL is equivalent to the value that JavaScript calls null,
@@ -202,7 +206,7 @@ public class LOGJSONObject {
      * Construct an empty JSONObject.
      */
     public LOGJSONObject() {
-        this.map = new LinkedHashMap<String, Object>();
+        this.map = new LinkedHashMap<>();
     }
 
 
@@ -213,8 +217,6 @@ public class LOGJSONObject {
      *
      * @param jo    A JSONObject.
      * @param names An array of strings.
-     * @throws JSONException
-     * @throws JSONException If a value is a non-finite number or if a name is duplicated.
      */
     public LOGJSONObject(LOGJSONObject jo, String[] names) {
         this();
@@ -222,6 +224,7 @@ public class LOGJSONObject {
             try {
                 this.putOnce(names[i], jo.opt(names[i]));
             } catch (Exception ignore) {
+                intlogger.error("PROV0001 LOGJSONObject: " + ignore.getMessage(), ignore);
             }
         }
     }
@@ -234,7 +237,7 @@ public class LOGJSONObject {
      * @throws JSONException If there is a syntax error in the source string
      *                       or a duplicated key.
      */
-    public LOGJSONObject(JSONTokener x) throws JSONException {
+    public LOGJSONObject(JSONTokener x) {
         this();
         char c;
         String key;
@@ -555,15 +558,15 @@ public class LOGJSONObject {
      * @throws JSONException if the key is not found or
      *                       if the value is not a Number object and cannot be converted to a number.
      */
-    public double getDouble(String key) throws JSONException {
+    public double getDouble(String key) {
         Object object = this.get(key);
         try {
             return object instanceof Number
                     ? ((Number) object).doubleValue()
                     : Double.parseDouble((String) object);
         } catch (Exception e) {
-            throw new JSONException("JSONObject[" + quote(key) +
-                    "] is not a number.");
+            intlogger.error("JSONObject[" + quote(key) + "] is not a number.", e);
+            throw new JSONException("JSONObject[" + quote(key) + "] is not a number.");
         }
     }
 
@@ -576,15 +579,15 @@ public class LOGJSONObject {
      * @throws JSONException if the key is not found or if the value cannot
      *                       be converted to an integer.
      */
-    public int getInt(String key) throws JSONException {
+    public int getInt(String key) {
         Object object = this.get(key);
         try {
             return object instanceof Number
                     ? ((Number) object).intValue()
                     : Integer.parseInt((String) object);
         } catch (Exception e) {
-            throw new JSONException("JSONObject[" + quote(key) +
-                    "] is not an int.");
+            intlogger.error("JSONObject[" + quote(key) + "] is not an int.", e);
+            throw new JSONException("JSONObject[" + quote(key) + "] is not an int.");
         }
     }
 
@@ -640,8 +643,8 @@ public class LOGJSONObject {
                     ? ((Number) object).longValue()
                     : Long.parseLong((String) object);
         } catch (Exception e) {
-            throw new JSONException("JSONObject[" + quote(key) +
-                    "] is not a long.");
+            intlogger.error("JSONObject[" + quote(key) + "] is not a long.", e);
+            throw new JSONException("JSONObject[" + quote(key) + "] is not a long.");
         }
     }
 
@@ -697,7 +700,7 @@ public class LOGJSONObject {
      * @return A string which is the value.
      * @throws JSONException if there is no string value for the key.
      */
-    public String getString(String key) throws JSONException {
+    public String getString(String key) {
         Object object = this.get(key);
         if (object instanceof String) {
             return (String) object;
@@ -728,7 +731,7 @@ public class LOGJSONObject {
      * @throws JSONException If there is already a property with this name
      *                       that is not an Integer, Long, Double, or Float.
      */
-    public LOGJSONObject increment(String key) throws JSONException {
+    public LOGJSONObject increment(String key) {
         Object value = this.opt(key);
         if (value == null) {
             this.put(key, 1);
@@ -873,6 +876,7 @@ public class LOGJSONObject {
         try {
             return this.getBoolean(key);
         } catch (Exception e) {
+            intlogger.trace("Using defaultValue: " + defaultValue, e);
             return defaultValue;
         }
     }
@@ -906,6 +910,7 @@ public class LOGJSONObject {
         try {
             return this.getDouble(key);
         } catch (Exception e) {
+            intlogger.trace("Using defaultValue: " + defaultValue, e);
             return defaultValue;
         }
     }
@@ -939,6 +944,7 @@ public class LOGJSONObject {
         try {
             return this.getInt(key);
         } catch (Exception e) {
+            intlogger.trace("Using defaultValue: " + defaultValue, e);
             return defaultValue;
         }
     }
@@ -1075,6 +1081,7 @@ public class LOGJSONObject {
                     }
                 }
             } catch (Exception ignore) {
+                intlogger.trace("populateMap: " + ignore.getMessage(), ignore);
             }
         }
     }
@@ -1256,8 +1263,8 @@ public class LOGJSONObject {
         synchronized (sw.getBuffer()) {
             try {
                 return quote(string, sw).toString();
-            } catch (IOException ignored) {
-                // will never happen - we are writing to a string writer
+            } catch (IOException e) {
+                intlogger.trace("Ignore Exception message: ", e);
                 return "";
             }
         }
@@ -1380,7 +1387,8 @@ public class LOGJSONObject {
                         return myLong;
                     }
                 }
-            } catch (Exception ignore) {
+            } catch (Exception e) {
+                intlogger.trace("Ignore Exception message: ", e);
             }
         }
         return string;
@@ -1393,7 +1401,7 @@ public class LOGJSONObject {
      * @param o The object to test.
      * @throws JSONException If o is a non-finite number.
      */
-    public static void testValidity(Object o) throws JSONException {
+    public static void testValidity(Object o) {
         if (o != null) {
             if (o instanceof Double) {
                 if (((Double) o).isInfinite() || ((Double) o).isNaN()) {
@@ -1446,6 +1454,7 @@ public class LOGJSONObject {
         try {
             return this.toString(0);
         } catch (Exception e) {
+            intlogger.trace("Exception: ", e);
             return "";
         }
     }
@@ -1579,6 +1588,7 @@ public class LOGJSONObject {
             }
             return new LOGJSONObject(object);
         } catch (Exception exception) {
+            intlogger.trace("Exception: ", exception);
             return null;
         }
     }

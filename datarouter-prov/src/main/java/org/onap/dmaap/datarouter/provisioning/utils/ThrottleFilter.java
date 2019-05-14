@@ -138,7 +138,7 @@ public class ThrottleFilter extends TimerTask implements Filter {
                     }
                 }
             } catch (ClassNotFoundException e) {
-                logger.warn("Class " + JETTY_REQUEST + " is not available; this filter requires Jetty.");
+                logger.warn("Class " + JETTY_REQUEST + " is not available; this filter requires Jetty.", e);
             }
         }
         logger.info("ThrottleFilter is DISABLED for /publish requests.");
@@ -275,7 +275,7 @@ public class ThrottleFilter extends TimerTask implements Filter {
                     t = times.get(0);
                 }
             } catch (IndexOutOfBoundsException e) {
-                // ignore
+                logger.trace("Exception: " + e.getMessage(), e);
             }
             return times.size();
         }

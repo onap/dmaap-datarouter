@@ -63,7 +63,7 @@ public class SampleSubscriberServlet extends HttpServlet {
     try {
       Files.createDirectory(Paths.get(outputDirectory));
     } catch (IOException e) {
-      logger.info("SubServlet: Failed to create delivery dir: " + e.getMessage());
+      logger.info("SubServlet: Failed to create delivery dir: " + e.getMessage(), e);
     }
     basicAuth = "Basic " + Base64.encodeBase64String((login + ":" + password).getBytes());
   }

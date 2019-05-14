@@ -24,6 +24,8 @@
 
 package org.onap.dmaap.datarouter.provisioning.utils;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -37,7 +39,7 @@ import org.onap.dmaap.datarouter.provisioning.BaseServlet;
  * @version $Id: URLUtilities.java,v 1.2 2014/03/12 19:45:41 eby Exp $
  */
 public class URLUtilities {
-
+    private static final EELFLogger utilsLogger = EELFManager.getInstance().getLogger("UtilsLog");
     /**
      * Generate the URL used to access a feed.
      *
@@ -134,6 +136,7 @@ public class URLUtilities {
                 this_pod = InetAddress.getLocalHost().getHostName();
                 System.out.println("this_pod: " + this_pod);
             } catch (UnknownHostException e) {
+                utilsLogger.trace("UnkownHostException: " + e.getMessage(), e);
                 this_pod = "";
             }
             System.out.println("ALL PODS: " + Arrays.asList(BaseServlet.getPods()));
