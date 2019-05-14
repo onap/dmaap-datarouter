@@ -98,7 +98,7 @@ public class StatisticsServlet extends BaseServlet {
       try {
         resp.getOutputStream().print("Invalid request, Feedid or Group ID is required.");
       } catch (IOException ioe) {
-        eventlogger.error("IOException: " + ioe.getMessage());
+        eventlogger.error("PROV0171 StatisticsServlet.doGet: " + ioe.getMessage(), ioe);
       }
     }
 
@@ -110,35 +110,22 @@ public class StatisticsServlet extends BaseServlet {
       StringBuffer groupid1 = new StringBuffer();
 
       try {
-        System.out.println("feeedidsssssssss");
         groupid1 = this.getFeedIdsByGroupId(Integer.parseInt(req.getParameter("groupid")));
-        System.out.println("feeedids" + req.getParameter("groupid"));
-
         map.put("feedids", groupid1.toString());
-        System.out.println("groupid1" + groupid1.toString());
-
-
       } catch (NumberFormatException | SQLException e) {
-        eventlogger.error(e.getMessage());
+        eventlogger.error("PROV0172 StatisticsServlet.doGet: " + e.getMessage(), e);
       }
     }
     if (req.getParameter("groupid") != null && req.getParameter("feedid") != null) {
       StringBuffer groupid1 = new StringBuffer();
 
       try {
-        System.out.println("both r not null");
         groupid1 = this.getFeedIdsByGroupId(Integer.parseInt(req.getParameter("groupid")));
-        System.out.println("feeedids" + req.getParameter("groupid"));
         groupid1.append(",");
         groupid1.append(req.getParameter("feedid").replace("|", ",").toString());
-
         map.put("feedids", groupid1.toString());
-
-        System.out.println("groupid1" + groupid1.toString());
-
-
       } catch (NumberFormatException | SQLException e) {
-        eventlogger.error(e.getMessage());
+        eventlogger.error("PROV0173 StatisticsServlet.doGet: " + e.getMessage(), e);
       }
     }
 
@@ -182,7 +169,7 @@ public class StatisticsServlet extends BaseServlet {
     try {
       this.getRecordsForSQL(map, outputType, resp.getOutputStream(), resp);
     } catch (IOException ioe) {
-      eventlogger.error("IOException: " + ioe.getMessage());
+      eventlogger.error("PROV0174 StatisticsServlet.doGet: " +  ioe.getMessage(), ioe);
     }
 
   }
@@ -291,7 +278,7 @@ public class StatisticsServlet extends BaseServlet {
           System.out.println("feedIds" + feedIds.toString());
       }
     } catch (SQLException e) {
-      eventlogger.error(e.getMessage());
+      eventlogger.error("PROV0175 StatisticsServlet.getFeedIdsByGroupId: " + e.getMessage(), e);
     } finally {
       try {
         if (resultSet != null) {
@@ -302,7 +289,7 @@ public class StatisticsServlet extends BaseServlet {
           db.release(conn);
         }
       } catch (Exception e) {
-        eventlogger.error(e.getMessage());
+        eventlogger.error("PROV0176 StatisticsServlet.getFeedIdsByGroupId: " + e.getMessage(), e);
       }
     }
     return feedIds;

@@ -226,7 +226,7 @@ public class LogServlet extends BaseServlet {
                 }
                 out.print("]");
             } catch (IOException ioe) {
-                eventlogger.error("IOException: " + ioe.getMessage());
+                eventlogger.error("PROV0141 LogServlet.doGet: " + ioe.getMessage(), ioe);
             }
         } finally {
             eelfLogger.info(EelfMsgs.EXIT);

@@ -132,7 +132,7 @@ public class GroupServlet extends ProxyServlet {
         try {
             resp.getOutputStream().print(gup.asJSONObject().toString());
         } catch (IOException ioe) {
-            eventlogger.error("IOException" + ioe.getMessage());
+            eventlogger.error("PROV0121 GroupServlet.doGet: " + ioe.getMessage(), ioe);
         }
 
         // Display a list of Groups
@@ -230,7 +230,7 @@ public class GroupServlet extends ProxyServlet {
             message = e.getMessage();
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.error(elr.toString());
+            eventlogger.error(elr.toString(), e);
             sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
             return;
         }
@@ -253,7 +253,7 @@ public class GroupServlet extends ProxyServlet {
             try {
                 resp.getOutputStream().print(gup.asJSONObject().toString());
             } catch (IOException ioe) {
-                eventlogger.error("IOException" + ioe.getMessage());
+                eventlogger.error("PROV0122 GroupServlet.doPut: " + ioe.getMessage(), ioe);
             }
             provisioningDataChanged();
         } else {
@@ -352,7 +352,7 @@ public class GroupServlet extends ProxyServlet {
             message = e.getMessage();
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.error(elr.toString());
+            eventlogger.error(elr.toString(), e);
             sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
             return;
         }
@@ -379,7 +379,7 @@ public class GroupServlet extends ProxyServlet {
             try {
                 resp.getOutputStream().print(gup.asJSONObject().toString());
             } catch (IOException ioe) {
-                eventlogger.error("IOException" + ioe.getMessage());
+                eventlogger.error("PROV0122 GroupServlet.doPost: " + ioe.getMessage(), ioe);
             }
             provisioningDataChanged();
         } else {
