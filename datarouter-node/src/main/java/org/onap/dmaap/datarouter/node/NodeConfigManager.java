@@ -121,7 +121,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
                     .getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties")));
         } catch (Exception e) {
             NodeUtils.setIpAndFqdnForEelf("NodeConfigManager");
-            eelfLogger.error(EelfMsgs.MESSAGE_PROPERTIES_LOAD_ERROR, System.getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties"));
+            eelfLogger.error(EelfMsgs.MESSAGE_PROPERTIES_LOAD_ERROR, e, System.getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties"));
         }
         provurl = drNodeProperties.getProperty("ProvisioningURL", "https://dmaap-dr-prov:8443/internal/prov");
         /*
@@ -144,7 +144,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
             provhost = (new URL(provurl)).getHost();
         } catch (Exception e) {
             NodeUtils.setIpAndFqdnForEelf("NodeConfigManager");
-            eelfLogger.error(EelfMsgs.MESSAGE_BAD_PROV_URL, provurl);
+            eelfLogger.error(EelfMsgs.MESSAGE_BAD_PROV_URL, e, provurl);
             System.exit(1);
         }
         eelfLogger.info("NODE0303 Provisioning server is " + provhost);
@@ -218,42 +218,52 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         try {
             initfailuretimer = (long) (Double.parseDouble(getProvParam("DELIVERY_INIT_RETRY_INTERVAL")) * 1000);
         } catch (Exception e) {
+            eelfLogger.error("Error parsing DELIVERY_INIT_RETRY_INTERVAL", e);
         }
         try {
             waitForFileProcessFailureTimer = (long) (Double.parseDouble(getProvParam("DELIVERY_FILE_PROCESS_INTERVAL")) * 1000);
         } catch (Exception e) {
+            eelfLogger.error("Error parsing DELIVERY_FILE_PROCESS_INTERVAL", e);
         }
         try {
             maxfailuretimer = (long) (Double.parseDouble(getProvParam("DELIVERY_MAX_RETRY_INTERVAL")) * 1000);
         } catch (Exception e) {
+            eelfLogger.error("Error parsing DELIVERY_MAX_RETRY_INTERVAL", e);
         }
         try {
             expirationtimer = (long) (Double.parseDouble(getProvParam("DELIVERY_MAX_AGE")) * 1000);
         } catch (Exception e) {
+            eelfLogger.error("Error parsing DELIVERY_MAX_AGE", e);
         }
         try {
             failurebackoff = Double.parseDouble(getProvParam("DELIVERY_RETRY_RATIO"));
         } catch (Exception e) {
+            eelfLogger.error("Error parsing DELIVERY_RETRY_RATIO", e);
         }
         try {
             deliverythreads = Integer.parseInt(getProvParam("DELIVERY_THREADS"));
         } catch (Exception e) {
+            eelfLogger.error("Error parsing DELIVERY_THREADS", e);
         }
         try {
             fairfilelimit = Integer.parseInt(getProvParam("FAIR_FILE_LIMIT"));
         } catch (Exception e) {
+            eelfLogger.error("Error parsing FAIR_FILE_LIMIT", e);
         }
         try {
             fairtimelimit = (long) (Double.parseDouble(getProvParam("FAIR_TIME_LIMIT")) * 1000);
         } catch (Exception e) {
+            eelfLogger.error("Error parsing FAIR_TIME_LIMIT", e);
         }
         try {
             fdpstart = Double.parseDouble(getProvParam("FREE_DISK_RED_PERCENT")) / 100.0;
         } catch (Exception e) {
+            eelfLogger.error("Error parsing FREE_DISK_RED_PERCENT", e);
         }
         try {
             fdpstop = Double.parseDouble(getProvParam("FREE_DISK_YELLOW_PERCENT")) / 100.0;
         } catch (Exception e) {
+            eelfLogger.error("Error parsing FREE_DISK_YELLOW_PERCENT", e);
         }
         if (fdpstart < 0.01) {
             fdpstart = 0.01;
@@ -287,7 +297,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         } catch (Exception e) {
             NodeUtils.setIpAndFqdnForEelf("fetchconfigs");
             eelfLogger.error(EelfMsgs.MESSAGE_CONF_FAILED, e.toString());
-            eelfLogger.error("NODE0306 Configuration failed " + e.toString() + " - try again later", e.getMessage());
+            eelfLogger.error("NODE0306 Configuration failed " + e.toString() + " - try again later", e);
             pfetcher.request();
         }
     }
@@ -842,7 +852,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
             }
             return type + "|" + aafInstance + "|" + action;
         } catch (Exception e) {
-            eelfLogger.error("NODE0543 NodeConfigManager.getPermission: ", e.getMessage());
+            eelfLogger.error("NODE0543 NodeConfigManager.getPermission: ", e);
         }
         return null;
     }

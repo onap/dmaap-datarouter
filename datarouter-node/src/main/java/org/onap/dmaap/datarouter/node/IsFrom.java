@@ -71,7 +71,7 @@ public class IsFrom {
                     hostAddrArray.add(addr.getHostAddress());
                 }
             } catch (UnknownHostException e) {
-                logger.error("IsFrom: UnknownHostEx: " + e.toString(), e.getMessage());
+                logger.error("IsFrom: UnknownHostEx: " + e.toString(), e);
             }
             ips = hostAddrArray.toArray(new String[0]);
             logger.info("IsFrom: DNS ENTRIES FOR FQDN " + fqdn + " : " + Arrays.toString(ips));
@@ -90,9 +90,9 @@ public class IsFrom {
                 return true;
             }
         } catch (UnknownHostException e) {
-            logger.error("IsFrom: UnknownHostEx: " + e.toString(), e.getMessage());
+            logger.error("IsFrom: UnknownHostEx: " + e.toString(), e);
         } catch (IOException e) {
-            logger.error("IsFrom: Failed to parse IP : " + ip + " : " + e.toString(), e.getMessage());
+            logger.error("IsFrom: Failed to parse IP : " + ip + " : " + e.toString(), e);
         }
         return false;
     }
