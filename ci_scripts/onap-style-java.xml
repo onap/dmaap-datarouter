@@ -52,7 +52,7 @@
         <property name="eachLine" value="true"/>
     </module>
     <module name="SuppressionFilter">
-        <property name="file" value="ci_scripts/suppressTestFiles.xml" />
+        <property name="file" value="ci_scripts/suppressedFilesForStyleCheck.xml" />
     </module>
     <module name="TreeWalker">
         <module name="OuterTypeFilename"/>
@@ -169,7 +169,7 @@
         </module>
         <module name="AbbreviationAsWordInName">
             <property name="ignoreFinal" value="false"/>
-            <property name="allowedAbbreviationLength" value="1"/>
+            <property name="allowedAbbreviationLength" value="3"/>
         </module>
         <module name="OverloadMethodsDeclarationOrder"/>
         <module name="VariableDeclarationUsageDistance"/>

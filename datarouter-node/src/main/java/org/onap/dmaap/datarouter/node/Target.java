@@ -28,6 +28,7 @@ package org.onap.dmaap.datarouter.node;
  * A destination to deliver a message
  */
 public class Target {
+
     private DestInfo destinfo;
     private String routing;
 
@@ -35,7 +36,7 @@ public class Target {
      * A destination to deliver a message
      *
      * @param destinfo Either info for a subscription ID or info for a node-to-node transfer
-     * @param routing  For a node-to-node transfer, what to do when it gets there.
+     * @param routing For a node-to-node transfer, what to do when it gets there.
      */
     public Target(DestInfo destinfo, String routing) {
         this.destinfo = destinfo;

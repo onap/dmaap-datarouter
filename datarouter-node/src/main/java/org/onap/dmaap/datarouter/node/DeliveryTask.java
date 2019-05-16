@@ -24,29 +24,39 @@
 
 package org.onap.dmaap.datarouter.node;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.zip.GZIPInputStream;
+import static com.att.eelf.configuration.Configuration.MDC_KEY_REQUEST_ID;
+import static org.onap.dmaap.datarouter.node.NodeUtils.isFiletypeGzip;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.UUID;
+import java.util.zip.GZIPInputStream;
+import org.jetbrains.annotations.Nullable;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 import org.slf4j.MDC;
 
-import static com.att.eelf.configuration.Configuration.*;
-import static org.onap.dmaap.datarouter.node.NodeUtils.isFiletypeGzip;
-
 /**
  * A file to be delivered to a destination.
- * <p>
- * A Delivery task represents a work item for the data router - a file that
- * needs to be delivered and provides mechanisms to get information about
- * the file and its delivery data as well as to attempt delivery.
+ *
+ * <p>A Delivery task represents a work item for the data router - a file that needs to be delivered and provides
+ * mechanisms to get information about the file and its delivery data as well as to attempt delivery.
  */
 public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
-    private static EELFLogger eelfLogger = EELFManager.getInstance()
-            .getLogger(DeliveryTask.class);
+
+    private static final String DECOMPRESSION_STATUS = "Decompression_Status";
+    private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(DeliveryTask.class);
     private DeliveryTaskHelper deliveryTaskHelper;
     private String pubid;
     private DestInfo destInfo;
@@ -72,9 +82,8 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
      * Create a delivery task for a given delivery queue and pub ID
      *
      * @param deliveryTaskHelper The delivery task helper for the queue this task is in.
-     * @param pubid              The publish ID for this file.  This is used as
-     *                           the base for the file name in the spool directory and is of
-     *                           the form <milliseconds since 1970>.<fqdn of initial data router node>
+     * @param pubid The publish ID for this file.  This is used as the base for the file name in the spool directory and
+     * is of the form <milliseconds since 1970>.<fqdn of initial data router node>
      */
     DeliveryTask(DeliveryTaskHelper deliveryTaskHelper, String pubid) {
         this.deliveryTaskHelper = deliveryTaskHelper;
@@ -91,40 +100,40 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
         boolean monly = destInfo.isMetaDataOnly();
         date = Long.parseLong(pubid.substring(0, pubid.indexOf('.')));
         resumeTime = System.currentTimeMillis();
-        Vector<String[]> hdrv = new Vector<>();
+        ArrayList<String[]> hdrv = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(metafile))) {
-            String s = br.readLine();
-            int i = s.indexOf('\t');
-            method = s.substring(0, i);
+            String line = br.readLine();
+            int index = line.indexOf('\t');
+            method = line.substring(0, index);
             NodeUtils.setIpAndFqdnForEelf(method);
             if (!"DELETE".equals(method) && !monly) {
                 length = datafile.length();
             }
-            fileid = s.substring(i + 1);
-            while ((s = br.readLine()) != null) {
-                i = s.indexOf('\t');
-                String h = s.substring(0, i);
-                String v = s.substring(i + 1);
-                if ("x-dmaap-dr-routing".equalsIgnoreCase(h)) {
-                    subid = v.replaceAll("[^ ]*/", "");
+            fileid = line.substring(index + 1);
+            while ((line = br.readLine()) != null) {
+                index = line.indexOf('\t');
+                String header = line.substring(0, index);
+                String headerValue = line.substring(index + 1);
+                if ("x-dmaap-dr-routing".equalsIgnoreCase(header)) {
+                    subid = headerValue.replaceAll("[^ ]*/", "");
                     feedid = deliveryTaskHelper.getFeedId(subid.replaceAll(" .*", ""));
                 }
-                if (length == 0 && h.toLowerCase().startsWith("content-")) {
+                if (length == 0 && header.toLowerCase().startsWith("content-")) {
                     continue;
                 }
-                if (h.equalsIgnoreCase("content-type")) {
-                    ctype = v;
+                if ("content-type".equalsIgnoreCase(header)) {
+                    ctype = headerValue;
                 }
-                if (h.equalsIgnoreCase("x-onap-requestid")) {
-                    MDC.put(MDC_KEY_REQUEST_ID, v);
+                if ("x-onap-requestid".equalsIgnoreCase(header)) {
+                    MDC.put(MDC_KEY_REQUEST_ID, headerValue);
                 }
-                if (h.equalsIgnoreCase("x-invocationid")) {
-                    MDC.put("InvocationId", v);
-                    v = UUID.randomUUID().toString();
-                    newInvocationId = v;
+                if ("x-invocationid".equalsIgnoreCase(header)) {
+                    MDC.put("InvocationId", headerValue);
+                    headerValue = UUID.randomUUID().toString();
+                    newInvocationId = headerValue;
                 }
-                hdrv.add(new String[]{h, v});
+                hdrv.add(new String[]{header, headerValue});
             }
         } catch (Exception e) {
             eelfLogger.error("Exception", e);
@@ -134,20 +143,20 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     }
 
     /**
-     * Is the object a DeliveryTask with the same publication ID?
+     * Is the object a DeliveryTask with the same publication ID.
      */
-    public boolean equals(Object o) {
-        if (!(o instanceof DeliveryTask)) {
+    public boolean equals(Object object) {
+        if (!(object instanceof DeliveryTask)) {
             return (false);
         }
-        return (pubid.equals(((DeliveryTask) o).pubid));
+        return (pubid.equals(((DeliveryTask) object).pubid));
     }
 
     /**
      * Compare the publication IDs.
      */
-    public int compareTo(DeliveryTask o) {
-        return (pubid.compareTo(o.pubid));
+    public int compareTo(DeliveryTask other) {
+        return (pubid.compareTo(other.pubid));
     }
 
     /**
@@ -165,79 +174,49 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     }
 
     /**
-     * Get the publish ID
+     * Get the publish ID.
      */
     String getPublishId() {
         return (pubid);
     }
 
     /**
-     * Attempt delivery
+     * Attempt delivery.
      */
     public void run() {
         attempts++;
         try {
             destInfo = deliveryTaskHelper.getDestinationInfo();
-            boolean expect100 = destInfo.isUsing100();
             boolean monly = destInfo.isMetaDataOnly();
             length = 0;
             if (!"DELETE".equals(method) && !monly) {
                 length = datafile.length();
             }
-            if (destInfo.isDecompress() && isFiletypeGzip(datafile) && fileid.endsWith(".gz")){
-                    fileid = fileid.replace(".gz", "");
-            }
+            stripSuffixIfIsDecompress();
             url = deliveryTaskHelper.getDestURL(fileid);
-            URL u = new URL(url);
-            HttpURLConnection uc = (HttpURLConnection) u.openConnection();
-            uc.setConnectTimeout(60000);
-            uc.setReadTimeout(60000);
-            uc.setInstanceFollowRedirects(false);
-            uc.setRequestMethod(method);
-            uc.setRequestProperty("Content-Length", Long.toString(length));
-            uc.setRequestProperty("Authorization", destInfo.getAuth());
-            uc.setRequestProperty("X-DMAAP-DR-PUBLISH-ID", pubid);
-            for (String[] nv : hdrs) {
-                uc.addRequestProperty(nv[0], nv[1]);
-            }
-            if (length > 0) {
-                if (expect100) {
-                    uc.setRequestProperty("Expect", "100-continue");
-                }
-                uc.setDoOutput(true);
-                if (destInfo.isDecompress()) {
-                    if (isFiletypeGzip(datafile)) {
-                        sendDecompressedFile(uc);
-                    } else {
-                        uc.setRequestProperty("Decompression_Status", "UNSUPPORTED_FORMAT");
-                        sendFile(uc);
-                    }
-                } else {
-                    sendFile(uc);
-                }
-            }
-            int rc = uc.getResponseCode();
-            String rmsg = uc.getResponseMessage();
-            if (rmsg == null) {
-                String h0 = uc.getHeaderField(0);
-                if (h0 != null) {
-                    int i = h0.indexOf(' ');
-                    int j = h0.indexOf(' ', i + 1);
-                    if (i != -1 && j != -1) {
-                        rmsg = h0.substring(j + 1);
-                    }
-                }
-            }
+            URL urlObj = new URL(url);
+            HttpURLConnection urlConnection = (HttpURLConnection) urlObj.openConnection();
+            urlConnection.setConnectTimeout(60000);
+            urlConnection.setReadTimeout(60000);
+            urlConnection.setInstanceFollowRedirects(false);
+            urlConnection.setRequestMethod(method);
+            urlConnection.setRequestProperty("Content-Length", Long.toString(length));
+            urlConnection.setRequestProperty("Authorization", destInfo.getAuth());
+            urlConnection.setRequestProperty("X-DMAAP-DR-PUBLISH-ID", pubid);
+            boolean expect100 = destInfo.isUsing100();
+            int rc = deliverFileToSubscriber(expect100, urlConnection);
+            String rmsg = urlConnection.getResponseMessage();
+            rmsg = getResponseMessage(urlConnection, rmsg);
             String xpubid = null;
             InputStream is;
             if (rc >= 200 && rc <= 299) {
-                is = uc.getInputStream();
-                xpubid = uc.getHeaderField("X-DMAAP-DR-PUBLISH-ID");
+                is = urlConnection.getInputStream();
+                xpubid = urlConnection.getHeaderField("X-DMAAP-DR-PUBLISH-ID");
             } else {
                 if (rc >= 300 && rc <= 399) {
-                    rmsg = uc.getHeaderField("Location");
+                    rmsg = urlConnection.getHeaderField("Location");
                 }
-                is = uc.getErrorStream();
+                is = urlConnection.getErrorStream();
             }
             byte[] buf = new byte[4096];
             if (is != null) {
@@ -247,20 +226,19 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
             }
             deliveryTaskHelper.reportStatus(this, rc, xpubid, rmsg);
         } catch (Exception e) {
-            eelfLogger.error("Exception "+ Arrays.toString(e.getStackTrace()),e);
+            eelfLogger.error("Exception " + Arrays.toString(e.getStackTrace()), e);
             deliveryTaskHelper.reportException(this, e);
         }
     }
 
     /**
-     * To send decompressed gzip to the subscribers
+     * To send decompressed gzip to the subscribers.
      *
      * @param httpURLConnection connection used to make request
-     * @throws IOException
      */
     private void sendDecompressedFile(HttpURLConnection httpURLConnection) throws IOException {
         byte[] buffer = new byte[8164];
-        httpURLConnection.setRequestProperty("Decompression_Status", "SUCCESS");
+        httpURLConnection.setRequestProperty(DECOMPRESSION_STATUS, "SUCCESS");
         OutputStream outputStream = getOutputStream(httpURLConnection);
         if (outputStream != null) {
             int bytesRead = 0;
@@ -271,7 +249,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 }
                 outputStream.close();
             } catch (IOException e) {
-                httpURLConnection.setRequestProperty("Decompression_Status", "FAILURE");
+                httpURLConnection.setRequestProperty(DECOMPRESSION_STATUS, "FAILURE");
                 eelfLogger.info("Could not decompress file", e);
                 sendFile(httpURLConnection);
             }
@@ -283,44 +261,42 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
      * To send any file to the subscriber.
      *
      * @param httpURLConnection connection used to make request
-     * @throws IOException
      */
     private void sendFile(HttpURLConnection httpURLConnection) throws IOException {
         OutputStream os = getOutputStream(httpURLConnection);
-        if (os != null) {
-            long sofar = 0;
-            try (InputStream is = new FileInputStream(datafile)) {
-                byte[] buf = new byte[1024 * 1024];
-                while (sofar < length) {
-                    int i = buf.length;
-                    if (sofar + i > length) {
-                        i = (int) (length - sofar);
-                    }
-                    i = is.read(buf, 0, i);
-                    if (i <= 0) {
-                        throw new IOException("Unexpected problem reading data file " + datafile);
-                    }
-                    sofar += i;
-                    os.write(buf, 0, i);
+        if (os == null) {
+            return;
+        }
+        long sofar = 0;
+        try (InputStream is = new FileInputStream(datafile)) {
+            byte[] buf = new byte[1024 * 1024];
+            while (sofar < length) {
+                int len = buf.length;
+                if (sofar + len > length) {
+                    len = (int) (length - sofar);
                 }
-                os.close();
-            } catch (IOException ioe) {
-                deliveryTaskHelper.reportDeliveryExtra(this, sofar);
-                throw ioe;
+                len = is.read(buf, 0, len);
+                if (len <= 0) {
+                    throw new IOException("Unexpected problem reading data file " + datafile);
+                }
+                sofar += len;
+                os.write(buf, 0, len);
             }
+            os.close();
+        } catch (IOException ioe) {
+            deliveryTaskHelper.reportDeliveryExtra(this, sofar);
+            throw ioe;
         }
     }
 
     /**
-     * Get the outputstream that will be used to send data
+     * Get the outputstream that will be used to send data.
      *
      * @param httpURLConnection connection used to make request
      * @return AN Outpustream that can be used to send your data.
-     * @throws IOException
      */
     private OutputStream getOutputStream(HttpURLConnection httpURLConnection) throws IOException {
         OutputStream outputStream = null;
-
         try {
             outputStream = httpURLConnection.getOutputStream();
         } catch (ProtocolException pe) {
@@ -331,8 +307,52 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
         return outputStream;
     }
 
+    private void stripSuffixIfIsDecompress() {
+        if (destInfo.isDecompress() && isFiletypeGzip(datafile) && fileid.endsWith(".gz")) {
+            fileid = fileid.replace(".gz", "");
+        }
+    }
+
+    private int deliverFileToSubscriber(boolean expect100, HttpURLConnection uc) throws IOException {
+        for (String[] nv : hdrs) {
+            uc.addRequestProperty(nv[0], nv[1]);
+        }
+        if (length > 0) {
+            if (expect100) {
+                uc.setRequestProperty("Expect", "100-continue");
+            }
+            uc.setDoOutput(true);
+            if (destInfo.isDecompress()) {
+                if (isFiletypeGzip(datafile)) {
+                    sendDecompressedFile(uc);
+                } else {
+                    uc.setRequestProperty(DECOMPRESSION_STATUS, "UNSUPPORTED_FORMAT");
+                    sendFile(uc);
+                }
+            } else {
+                sendFile(uc);
+            }
+        }
+        return uc.getResponseCode();
+    }
+
+    @Nullable
+    private String getResponseMessage(HttpURLConnection uc, String rmsg) {
+        if (rmsg == null) {
+            String h0 = uc.getHeaderField(0);
+            if (h0 != null) {
+                int indexOfSpace1 = h0.indexOf(' ');
+                int indexOfSpace2 = h0.indexOf(' ', indexOfSpace1 + 1);
+                if (indexOfSpace1 != -1 && indexOfSpace2 != -1) {
+                    rmsg = h0.substring(indexOfSpace2 + 1);
+                }
+            }
+        }
+        return rmsg;
+    }
+
     /**
-     * Remove meta and data files
+     * Remove meta and data files.
      */
     void clean() {
         datafile.delete();
@@ -343,13 +363,6 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     }
 
     /**
-     * Set the resume time for a delivery task.
-     */
-    void setResumeTime(long resumeTime) {
-        this.resumeTime = resumeTime;
-    }
-
-    /**
      * Get the resume time for a delivery task.
      */
     long getResumeTime() {
@@ -357,14 +370,21 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     }
 
     /**
-     * Has this delivery task been cleaned?
+     * Set the resume time for a delivery task.
+     */
+    void setResumeTime(long resumeTime) {
+        this.resumeTime = resumeTime;
+    }
+
+    /**
+     * Has this delivery task been cleaned.
      */
     boolean isCleaned() {
         return (hdrs == null);
     }
 
     /**
-     * Get length of body
+     * Get length of body.
      */
     public long getLength() {
         return (length);
@@ -378,58 +398,58 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     }
 
     /**
-     * Get the most recent delivery attempt URL
+     * Get the most recent delivery attempt URL.
      */
     public String getURL() {
         return (url);
     }
 
     /**
-     * Get the content type
+     * Get the content type.
      */
     String getCType() {
         return (ctype);
     }
 
     /**
-     * Get the method
+     * Get the method.
      */
     String getMethod() {
         return (method);
     }
 
     /**
-     * Get the file ID
+     * Get the file ID.
      */
     String getFileId() {
         return (fileid);
     }
 
     /**
-     * Get the number of delivery attempts
+     * Get the number of delivery attempts.
      */
     int getAttempts() {
         return (attempts);
     }
 
     /**
-     * Get the (space delimited list of) subscription ID for this delivery task
+     * Get the (space delimited list of) subscription ID for this delivery task.
      */
     String getSubId() {
         return (subid);
     }
 
     /**
-     * Get the feed ID for this delivery task
+     * Get the feed ID for this delivery task.
      */
     String getFeedId() {
         return (feedid);
     }
 
     /**
-     * Get the followRedirects for this delivery task
+     * Get the followRedirects for this delivery task.
      */
     public boolean getFollowRedirects() {
-        return(followRedirects);
+        return (followRedirects);
     }
 }
