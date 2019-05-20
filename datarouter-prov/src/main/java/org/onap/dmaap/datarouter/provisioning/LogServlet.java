@@ -275,7 +275,7 @@ public class LogServlet extends BaseServlet {
         Map<String, String> map = new HashMap<>();
         String s = req.getParameter("type");
         if (s != null) {
-            if (s.equals("pub") || s.equals("del") || s.equals("exp")) {
+            if ("pub".equals(s) || "del".equals(s) || "exp".equals(s)) {
                 map.put("type", s);
             } else {
                 map.put("err", "bad type");
@@ -307,11 +307,11 @@ public class LogServlet extends BaseServlet {
         s = req.getParameter("statusCode");
         if (s != null) {
             String sql = null;
-            if (s.equals("success")) {
+            if ("success".equals(s)) {
                 sql = " AND STATUS >= 200 AND STATUS < 300";
-            } else if (s.equals("redirect")) {
+            } else if ("redirect".equals(s)) {
                 sql = " AND STATUS >= 300 AND STATUS < 400";
-            } else if (s.equals("failure")) {
+            } else if ("failure".equals(s)) {
                 sql = " AND STATUS >= 400";
             } else {
                 try {
@@ -332,13 +332,13 @@ public class LogServlet extends BaseServlet {
         s = req.getParameter("expiryReason");
         if (s != null) {
             map.put("type", "exp");
-            if (s.equals("notRetryable")) {
+            if ("notRetryable".equals(s)) {
                 map.put("reasonSQL", " AND REASON = 'notRetryable'");
-            } else if (s.equals("retriesExhausted")) {
+            } else if ("retriesExhausted".equals(s)) {
                 map.put("reasonSQL", " AND REASON = 'retriesExhausted'");
-            } else if (s.equals("diskFull")) {
+            } else if ("diskFull".equals(s)) {
                 map.put("reasonSQL", " AND REASON = 'diskFull'");
-            } else if (s.equals("other")) {
+            } else if ("other".equals(s)) {
                 map.put("reasonSQL", " AND REASON = 'other'");
             } else {
                 map.put("err", "bad expiryReason");
@@ -392,7 +392,7 @@ public class LogServlet extends BaseServlet {
 
     private void getPublishRecordsForFeed(int feedid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
-        if (type.equals("all") || type.equals("pub")) {
+        if ("all".equals(type) || "pub".equals(type)) {
             String sql = "select * from LOG_RECORDS where FEEDID = "+feedid
                 + " AND TYPE = 'pub'"
                 + map.get("timeSQL") + map.get("publishSQL") + map.get("statusSQL") + map.get("filenameSQL");
@@ -401,7 +401,7 @@ public class LogServlet extends BaseServlet {
     }
     private void getDeliveryRecordsForFeed(int feedid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
-        if (type.equals("all") || type.equals("del")) {
+        if ("all".equals(type) || "del".equals(type)) {
             String sql = "select * from LOG_RECORDS where FEEDID = "+feedid
                 + " AND TYPE = 'del'"
                 + map.get("timeSQL") + map.get("publishSQL") + map.get("resultSQL");
@@ -410,7 +410,7 @@ public class LogServlet extends BaseServlet {
     }
     private void getDeliveryRecordsForSubscription(int subid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
-        if (type.equals("all") || type.equals("del")) {
+        if ("all".equals(type) || "del".equals(type)) {
             String sql = "select * from LOG_RECORDS where DELIVERY_SUBID = "+subid
                 + " AND TYPE = 'del'"
                 + map.get("timeSQL") + map.get("publishSQL") + map.get("resultSQL");
@@ -419,7 +419,7 @@ public class LogServlet extends BaseServlet {
     }
     private void getExpiryRecordsForFeed(int feedid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
-        if (type.equals("all") || type.equals("exp")) {
+        if ("all".equals(type) || "exp".equals(type)) {
             String st = map.get("statusSQL");
             if (st == null || st.length() == 0) {
                 String sql = "select * from LOG_RECORDS where FEEDID = "+feedid
@@ -431,7 +431,7 @@ public class LogServlet extends BaseServlet {
     }
     private void getExpiryRecordsForSubscription(int subid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
-        if (type.equals("all") || type.equals("exp")) {
+        if ("all".equals(type) || "exp".equals(type)) {
             String st = map.get("statusSQL");
             if (st == null || st.length() == 0) {
                 String sql = "select * from LOG_RECORDS where DELIVERY_SUBID = "+subid

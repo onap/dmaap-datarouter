@@ -150,7 +150,7 @@ public class RouteServlet extends ProxyServlet {
         String path = req.getPathInfo();
         String[] parts = path.substring(1).split("/");
         Deleteable[] d = null;
-        if (parts[0].equals("ingress")) {
+        if ("ingress".equals(parts[0])) {
             if (parts.length == 4) {
                 // /internal/route/ingress/<feed>/<user>/<subnet>
                 try {
@@ -179,7 +179,7 @@ public class RouteServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Invalid number of arguments in 'delete ingress' command.", eventlogger);
                 return;
             }
-        } else if (parts[0].equals("egress")) {
+        } else if ("egress".equals(parts[0])) {
             if (parts.length == 2) {
                 // /internal/route/egress/<sub>
                 try {
@@ -198,7 +198,7 @@ public class RouteServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Invalid number of arguments in 'delete egress' command.", eventlogger);
                 return;
             }
-        } else if (parts[0].equals("network")) {
+        } else if ("network".equals(parts[0])) {
             if (parts.length == 3) {
                 // /internal/route/network/<from>/<to>
                 try {//
@@ -260,14 +260,14 @@ public class RouteServlet extends ProxyServlet {
         String path = req.getPathInfo();
         if (!path.endsWith("/"))
             path += "/";
-        if (!path.equals("/") && !path.equals("/ingress/") && !path.equals("/egress/") && !path.equals("/network/")) {
+        if (!"/".equals(path) && !"/ingress/".equals(path) && !"/egress/".equals(path) && !"/network/".equals(path)) {
             sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", eventlogger);
             return;
         }
 
         StringBuilder sb = new StringBuilder("{\n");
         String px2 = "";
-        if (path.equals("/") || path.equals("/ingress/")) {
+        if ("/".equals(path) || "/ingress/".equals(path)) {
             String pfx = "\n";
             sb.append("\"ingress\": [");
             for (IngressRoute in : IngressRoute.getAllIngressRoutes()) {
@@ -279,7 +279,7 @@ public class RouteServlet extends ProxyServlet {
             px2 = ",\n";
         }
 
-        if (path.equals("/") || path.equals("/egress/")) {
+        if ("/".equals(path) || "/egress/".equals(path)) {
             String pfx = "\n";
             sb.append(px2);
             sb.append("\"egress\": {");
@@ -300,7 +300,7 @@ public class RouteServlet extends ProxyServlet {
             px2 = ",\n";
         }
 
-        if (path.equals("/") || path.equals("/network/")) {
+        if ("/".equals(path) || "/network/".equals(path)) {
             String pfx = "\n";
             sb.append(px2);
             sb.append("\"routing\": [");

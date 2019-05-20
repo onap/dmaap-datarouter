@@ -220,7 +220,7 @@ public class SubscribeServlet extends ProxyServlet {
             // check content type is SUB_CONTENT_TYPE, version 1.0
             ContentHeader ch = getContentHeader(req);
             String ver = ch.getAttribute("version");
-            if (!ch.getType().equals(SUB_BASECONTENT_TYPE) || !(ver.equals("1.0") || ver.equals("2.0"))) {
+            if (!ch.getType().equals(SUB_BASECONTENT_TYPE) || !("1.0".equals(ver) || "2.0".equals(ver))) {
                 intlogger.debug("Content-type is: " + req.getHeader("Content-Type"));
                 message = "Incorrect content-type";
                 elr.setMessage(message);
@@ -271,10 +271,10 @@ public class SubscribeServlet extends ProxyServlet {
              */
             String feedAafInstance = feed.getAafInstance();
             String subAafInstance = sub.getAafInstance();
-            boolean subAafLegacyEmptyOrNull = (subAafInstance == null || subAafInstance.equals("") || subAafInstance.equalsIgnoreCase("legacy"));
+            boolean subAafLegacyEmptyOrNull = (subAafInstance == null || "".equals(subAafInstance) || "legacy".equalsIgnoreCase(subAafInstance));
 
             // This extra check added to verify AAF feed with AAF subscriber having empty aaf instance check
-            if (feedAafInstance == null || feedAafInstance.equals("") || feedAafInstance.equalsIgnoreCase("legacy")) {
+            if (feedAafInstance == null || "".equals(feedAafInstance) || "legacy".equalsIgnoreCase(feedAafInstance)) {
                 if (subAafLegacyEmptyOrNull) {
                     AuthorizationResponse aresp = authz.decide(req);
                     if (!aresp.isAuthorized()) {

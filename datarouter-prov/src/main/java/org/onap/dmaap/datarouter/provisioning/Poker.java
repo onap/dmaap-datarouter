@@ -243,7 +243,7 @@ public class Poker extends TimerTask {
         pfx = "\n";
         sb.append("\"parameters\": {");
         Map<String, String> props = Parameters.getParameters();
-        Set<String> ivals = new HashSet<String>();
+        Set<String> ivals = new HashSet<>();
         String intv = props.get("_INT_VALUES");
         if (intv != null) {
             ivals.addAll(Arrays.asList(intv.split("\\|")));
