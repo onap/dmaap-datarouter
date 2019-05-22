@@ -55,7 +55,10 @@ public class FeedServlet extends ProxyServlet {
 
     //Adding EELF Logger Rally:US664892
     private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(FeedServlet.class);
-
+    public static final String MISSING = "Missing ";
+    public static final String HEADER = " header.";
+    public static final String MISSING_FEED = "Missing or bad feed number.";
+    public static final String POLICY_ENGINE = "Policy Engine disallows access.";
     /**
      * Delete the Feed at the address /feed/&lt;feednumber&gt;.
      * See the <i>Deleting a Feed</i> section in the <b>Provisioning API</b>
@@ -82,7 +85,7 @@ public class FeedServlet extends ProxyServlet {
             }
             String bhdr = req.getHeader(BEHALF_HEADER);
             if (bhdr == null) {
-                message = "Missing "+BEHALF_HEADER+" header.";
+                message = MISSING +BEHALF_HEADER+HEADER;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -91,7 +94,7 @@ public class FeedServlet extends ProxyServlet {
             }
             int feedid = getIdFromPath(req);
             if (feedid < 0) {
-                message = "Missing or bad feed number.";
+                message = MISSING_FEED;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -100,7 +103,7 @@ public class FeedServlet extends ProxyServlet {
             }
             Feed feed = Feed.getFeedById(feedid);
             if (feed == null || feed.isDeleted()) {
-                message = "Missing or bad feed number.";
+                message = MISSING_FEED;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_NOT_FOUND);
                 eventlogger.error(elr.toString());
@@ -113,10 +116,10 @@ public class FeedServlet extends ProxyServlet {
              * CADI code - check on permissions based on Legacy/AAF users to allow to delete/remove feed
              */
             String aafInstance = feed.getAafInstance();
-            if (aafInstance == null || aafInstance.equals("") || aafInstance.equalsIgnoreCase("legacy")) {
+            if (aafInstance == null || "".equals(aafInstance) || "legacy".equalsIgnoreCase(aafInstance)) {
                 AuthorizationResponse aresp = authz.decide(req);
                 if (! aresp.isAuthorized()) {
-                    message = "Policy Engine disallows access.";
+                    message = POLICY_ENGINE;
                     elr.setMessage(message);
                     elr.setResult(HttpServletResponse.SC_FORBIDDEN);
                     eventlogger.error(elr.toString());
@@ -183,7 +186,7 @@ public class FeedServlet extends ProxyServlet {
             }
             String bhdr = req.getHeader(BEHALF_HEADER);
             if (bhdr == null) {
-                message = "Missing "+BEHALF_HEADER+" header.";
+                message = MISSING+BEHALF_HEADER+HEADER;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -192,7 +195,7 @@ public class FeedServlet extends ProxyServlet {
             }
             int feedid = getIdFromPath(req);
             if (feedid < 0) {
-                message = "Missing or bad feed number.";
+                message = MISSING_FEED;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -201,7 +204,7 @@ public class FeedServlet extends ProxyServlet {
             }
             Feed feed = Feed.getFeedById(feedid);
             if (feed == null || feed.isDeleted()) {
-                message = "Missing or bad feed number.";
+                message = MISSING_FEED;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_NOT_FOUND);
                 eventlogger.error(elr.toString());
@@ -211,7 +214,7 @@ public class FeedServlet extends ProxyServlet {
             // Check with the Authorizer
             AuthorizationResponse aresp = authz.decide(req);
             if (! aresp.isAuthorized()) {
-                message = "Policy Engine disallows access.";
+                message = POLICY_ENGINE;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
                 eventlogger.error(elr.toString());
@@ -259,7 +262,7 @@ public class FeedServlet extends ProxyServlet {
             }
             String bhdr = req.getHeader(BEHALF_HEADER);
             if (bhdr == null) {
-                message = "Missing "+BEHALF_HEADER+" header.";
+                message = MISSING+BEHALF_HEADER+HEADER;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -268,7 +271,7 @@ public class FeedServlet extends ProxyServlet {
             }
             int feedid = getIdFromPath(req);
             if (feedid < 0) {
-                message = "Missing or bad feed number.";
+                message = MISSING_FEED;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -277,7 +280,7 @@ public class FeedServlet extends ProxyServlet {
             }
             Feed oldFeed = Feed.getFeedById(feedid);
             if (oldFeed == null || oldFeed.isDeleted()) {
-                message = "Missing or bad feed number.";
+                message = MISSING_FEED;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_NOT_FOUND);
                 eventlogger.error(elr.toString());
@@ -287,7 +290,7 @@ public class FeedServlet extends ProxyServlet {
             // check content type is FEED_CONTENT_TYPE, version 1.0
             ContentHeader ch = getContentHeader(req);
             String ver = ch.getAttribute("version");
-            if (!ch.getType().equals(FEED_BASECONTENT_TYPE) || !(ver.equals("1.0") || ver.equals("2.0"))) {
+            if (!ch.getType().equals(FEED_BASECONTENT_TYPE) || !("1.0".equals(ver) || "2.0".equals(ver))) {
                 message = "Incorrect content-type";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -355,11 +358,11 @@ public class FeedServlet extends ProxyServlet {
              * CADI code - check on permissions based on Legacy/AAF users to allow feed edit/update/modify
              */
             String aafInstance = feed.getAafInstance();
-            if (aafInstance == null || aafInstance.equals("") || aafInstance.equalsIgnoreCase("legacy")) {
+            if (aafInstance == null || "".equals(aafInstance) || "legacy".equalsIgnoreCase(aafInstance)) {
                 // Check with the Authorizer
                 AuthorizationResponse aresp = authz.decide(req);
                 if (!aresp.isAuthorized()) {
-                    message = "Policy Engine disallows access.";
+                    message = POLICY_ENGINE;
                     elr.setMessage(message);
                     elr.setResult(HttpServletResponse.SC_FORBIDDEN);
                     eventlogger.error(elr.toString());

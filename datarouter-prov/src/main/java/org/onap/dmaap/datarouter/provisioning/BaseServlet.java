@@ -590,26 +590,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         }
     }
 
-    /**
-     * Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047. Check if HTTPS Relexaction is enabled
-     *
-     * @author vs215k
-     **/
-    private void checkHttpsRelaxation() {
-        if (!mailSendFlag) {
-            Properties p = (new DB()).getProperties();
-            intlogger.info("HTTPS relaxation: " + p.get("org.onap.dmaap.datarouter.provserver.https.relaxation"));
-
-            if (p.get("org.onap.dmaap.datarouter.provserver.https.relaxation").equals("true")) {
-                try {
-                    notifyPSTeam(p.get("org.onap.dmaap.datarouter.provserver.https.relax.notify").toString());
-                } catch (Exception e) {
-                    intlogger.warn("Exception: " + e.getMessage(), e);
-                }
-            }
-            mailSendFlag = true;
-        }
-    }
 
     /**
      * Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
@@ -646,7 +626,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             mp.addBodyPart(htmlPart);
             msg.setContent(mp);
 
-            System.out.println(mailprops.get("com.att.dmaap.datarouter.mail.body").toString()
+            intlogger.info(mailprops.get("com.att.dmaap.datarouter.mail.body").toString()
                     .replace("[SERVER]", InetAddress.getLocalHost().getHostName()));
 
             Transport.send(msg);
@@ -809,7 +789,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
 
     private static boolean getBoolean(Map<String, String> map, String name) {
         String s = map.get(name);
-        return (s != null) && s.equalsIgnoreCase("true");
+        return (s != null) && "true".equalsIgnoreCase(s);
     }
 
     private static String getString(Map<String, String> map, String name, String dflt) {
@@ -1088,7 +1068,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 default:
                     action = "*";
             }
-            if (aafInstance == null || aafInstance.equals("")) {
+            if (aafInstance == null || "".equals(aafInstance)) {
                 aafInstance = props.getProperty(AAF_INSTANCE, "org.onap.dmaap-dr.NoInstanceDefined");
             }
             return type + "|" + aafInstance + "|" + action;
@@ -1136,7 +1116,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 default:
                     action = "*";
             }
-            if (aafInstance == null || aafInstance.equals("")) {
+            if (aafInstance == null || "".equals(aafInstance)) {
                 aafInstance = props.getProperty(AAF_INSTANCE, "org.onap.dmaap-dr.NoInstanceDefined");
             }
             return type + "|" + aafInstance + "|" + action;

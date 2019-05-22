@@ -88,30 +88,6 @@ public class GroupServlet extends ProxyServlet {
             return;
         }
 
-        // Check with the Authorizer
-        /*AuthorizationResponse aresp = authz.decide(req);
-        if (! aresp.isAuthorized()) {
-            message = "Policy Engine disallows access.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.error(elr.toString());
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
-            return;
-        }*/
-
-
-        /*ContentHeader ch = getContentHeader(req);
-        String ver = ch.getAttribute("version");
-        if (!ch.getType().equals(GROUPLIST_CONTENT_TYPE) || !(ver.equals("1.0") || ver.equals("2.0"))) {
-            intlogger.debug("Content-type is: "+req.getHeader("Content-Type"));
-            message = "Incorrect content-type";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-            eventlogger.error(elr.toString());
-            resp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message);
-            return;
-        }*/
-
 
         int groupid = getIdFromPath(req);
         if (groupid < 0) {
@@ -135,16 +111,6 @@ public class GroupServlet extends ProxyServlet {
             eventlogger.error("PROV0121 GroupServlet.doGet: " + ioe.getMessage(), ioe);
         }
 
-        // Display a list of Groups
-        /*Collection<Group> list = Group.getGroupById(groupid);
-        String t = JSONUtilities.createJSONArray(list);
-
-        // send response
-        elr.setResult(HttpServletResponse.SC_OK);
-        eventlogger.info(elr.toString());
-        resp.setStatus(HttpServletResponse.SC_OK);
-        resp.setContentType(GROUPLIST_CONTENT_TYPE);
-        resp.getOutputStream().print(t);*/
     }
     /**
      * PUT on the &lt;GROUPS&gt; -- not supported.
@@ -191,20 +157,11 @@ public class GroupServlet extends ProxyServlet {
             sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
             return;
         }
-        // Check with the Authorizer
-        /*AuthorizationResponse aresp = authz.decide(req);
-        if (! aresp.isAuthorized()) {
-            message = "Policy Engine disallows access.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.error(elr.toString());
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
-            return;
-        }*/
+
         // check content type is SUB_CONTENT_TYPE, version 1.0
         ContentHeader ch = getContentHeader(req);
         String ver = ch.getAttribute("version");
-        if (!ch.getType().equals(GROUP_BASECONTENT_TYPE) || !(ver.equals("1.0") || ver.equals("2.0"))) {
+        if (!ch.getType().equals(GROUP_BASECONTENT_TYPE) || !("1.0".equals(ver) || "2.0".equals(ver))) {
             message = "Incorrect content-type";
             elr.setMessage(message);
             elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -292,34 +249,6 @@ public class GroupServlet extends ProxyServlet {
             sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
             return;
         }
-        /*int feedid = getIdFromPath(req);
-        if (feedid < 0) {
-            message = "Missing or bad feed number.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
-            eventlogger.info(elr.toString());
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
-            return;
-        }
-        Feed feed = Feed.getFeedById(feedid);
-        if (feed == null || feed.isDeleted()) {
-            message = "Missing or bad feed number.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_NOT_FOUND);
-            eventlogger.info(elr.toString());
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, message);
-            return;
-        }*/
-        // Check with the Authorizer
-        /*AuthorizationResponse aresp = authz.decide(req);
-        if (! aresp.isAuthorized()) {
-            message = "Policy Engine disallows access.";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.info(elr.toString());
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
-            return;
-        }*/
 
         // check content type is SUB_CONTENT_TYPE, version 1.0
         ContentHeader ch = getContentHeader(req);

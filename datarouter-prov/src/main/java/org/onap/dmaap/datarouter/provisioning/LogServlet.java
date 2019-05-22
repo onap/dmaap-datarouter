@@ -68,6 +68,13 @@ public class LogServlet extends BaseServlet {
     private static final long TWENTYFOUR_HOURS = (24 * 60 * 60 * 1000L);
     private static final String FMT_1 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
     private static final String FMT_2 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    private static final String PUBLISHSQL = "publishSQL";
+    private static final String STATUSSQL = "statusSQL";
+    private static final String RESULTSQL = "resultSQL";
+    private static final String REASONSQL = "reasonSQL";
+    private static final String FILENAMESQL = "filenameSQL";
+    private static final String TIMESQL = "timeSQL";
+    private static final String LOG_RECORDSSQL = "select * from LOG_RECORDS where FEEDID = ";
 
     private final boolean isfeedlog;
 
@@ -275,7 +282,7 @@ public class LogServlet extends BaseServlet {
         Map<String, String> map = new HashMap<>();
         String s = req.getParameter("type");
         if (s != null) {
-            if (s.equals("pub") || s.equals("del") || s.equals("exp")) {
+            if ("pub".equals(s) || "del".equals(s) || "exp".equals(s)) {
                 map.put("type", s);
             } else {
                 map.put("err", "bad type");
@@ -284,11 +291,11 @@ public class LogServlet extends BaseServlet {
         } else {
             map.put("type", "all");
         }
-        map.put("publishSQL", "");
-        map.put("statusSQL", "");
-        map.put("resultSQL", "");
-        map.put("reasonSQL", "");
-        map.put("filenameSQL", "");
+        map.put(PUBLISHSQL, "");
+        map.put(STATUSSQL, "");
+        map.put(RESULTSQL, "");
+        map.put(REASONSQL, "");
+        map.put(FILENAMESQL, "");
 
         s = req.getParameter("publishId");
         if (s != null) {
@@ -296,22 +303,22 @@ public class LogServlet extends BaseServlet {
                 map.put("err", "bad publishId");
                 return map;
             }
-            map.put("publishSQL", " AND PUBLISH_ID = '"+s+"'");
+            map.put(PUBLISHSQL, " AND PUBLISH_ID = '"+s+"'");
         }
 
         s = req.getParameter("filename");
         if (s != null) {
-            map.put("filenameSQL", " AND FILENAME = '"+s+"'");
+            map.put(FILENAMESQL, " AND FILENAME = '"+s+"'");
         }
 
         s = req.getParameter("statusCode");
         if (s != null) {
             String sql = null;
-            if (s.equals("success")) {
+            if ("success".equals(s)) {
                 sql = " AND STATUS >= 200 AND STATUS < 300";
-            } else if (s.equals("redirect")) {
+            } else if ("redirect".equals(s)) {
                 sql = " AND STATUS >= 300 AND STATUS < 400";
-            } else if (s.equals("failure")) {
+            } else if ("failure".equals(s)) {
                 sql = " AND STATUS >= 400";
             } else {
                 try {
@@ -325,21 +332,21 @@ public class LogServlet extends BaseServlet {
                 map.put("err", "bad statusCode");
                 return map;
             }
-            map.put("statusSQL", sql);
-            map.put("resultSQL", sql.replaceAll("STATUS", "RESULT"));
+            map.put(STATUSSQL, sql);
+            map.put(RESULTSQL, sql.replaceAll("STATUS", "RESULT"));
         }
 
         s = req.getParameter("expiryReason");
         if (s != null) {
             map.put("type", "exp");
-            if (s.equals("notRetryable")) {
-                map.put("reasonSQL", " AND REASON = 'notRetryable'");
-            } else if (s.equals("retriesExhausted")) {
-                map.put("reasonSQL", " AND REASON = 'retriesExhausted'");
-            } else if (s.equals("diskFull")) {
-                map.put("reasonSQL", " AND REASON = 'diskFull'");
-            } else if (s.equals("other")) {
-                map.put("reasonSQL", " AND REASON = 'other'");
+            if ("notRetryable".equals(s)) {
+                map.put(REASONSQL, " AND REASON = 'notRetryable'");
+            } else if ("retriesExhausted".equals(s)) {
+                map.put(REASONSQL, " AND REASON = 'retriesExhausted'");
+            } else if ("diskFull".equals(s)) {
+                map.put(REASONSQL, " AND REASON = 'diskFull'");
+            } else if ("other".equals(s)) {
+                map.put(REASONSQL, " AND REASON = 'other'");
             } else {
                 map.put("err", "bad expiryReason");
                 return map;
@@ -364,7 +371,7 @@ public class LogServlet extends BaseServlet {
         } else if (etime == 0) {
             etime = stime + TWENTYFOUR_HOURS;
         }
-        map.put("timeSQL", String.format(" AND EVENT_TIME >= %d AND EVENT_TIME <= %d", stime, etime));
+        map.put(TIMESQL, String.format(" AND EVENT_TIME >= %d AND EVENT_TIME <= %d", stime, etime));
         return map;
     }
     private long getTimeFromParam(final String s) {
@@ -381,8 +388,7 @@ public class LogServlet extends BaseServlet {
         }
         try {
             // Also allow a long (in ms); useful for testing
-            long n = Long.parseLong(s);
-            return n;
+            return Long.parseLong(s);
         } catch (NumberFormatException numberFormatException) {
             intlogger.error("Exception in getting Time :- "+numberFormatException.getMessage(),numberFormatException);
         }
@@ -392,51 +398,51 @@ public class LogServlet extends BaseServlet {
 
     private void getPublishRecordsForFeed(int feedid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
-        if (type.equals("all") || type.equals("pub")) {
-            String sql = "select * from LOG_RECORDS where FEEDID = "+feedid
+        if ("all".equals(type) || "pub".equals(type)) {
+            String sql = LOG_RECORDSSQL+feedid
                 + " AND TYPE = 'pub'"
-                + map.get("timeSQL") + map.get("publishSQL") + map.get("statusSQL") + map.get("filenameSQL");
+                + map.get(TIMESQL) + map.get(PUBLISHSQL) + map.get(STATUSSQL) + map.get(FILENAMESQL);
             getRecordsForSQL(sql, rh);
         }
     }
     private void getDeliveryRecordsForFeed(int feedid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
-        if (type.equals("all") || type.equals("del")) {
-            String sql = "select * from LOG_RECORDS where FEEDID = "+feedid
+        if ("all".equals(type) || "del".equals(type)) {
+            String sql = LOG_RECORDSSQL+feedid
                 + " AND TYPE = 'del'"
-                + map.get("timeSQL") + map.get("publishSQL") + map.get("resultSQL");
+                + map.get(TIMESQL) + map.get(PUBLISHSQL) + map.get(RESULTSQL);
             getRecordsForSQL(sql, rh);
         }
     }
     private void getDeliveryRecordsForSubscription(int subid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
-        if (type.equals("all") || type.equals("del")) {
+        if ("all".equals(type) || "del".equals(type)) {
             String sql = "select * from LOG_RECORDS where DELIVERY_SUBID = "+subid
                 + " AND TYPE = 'del'"
-                + map.get("timeSQL") + map.get("publishSQL") + map.get("resultSQL");
+                + map.get(TIMESQL) + map.get(PUBLISHSQL) + map.get(RESULTSQL);
             getRecordsForSQL(sql, rh);
         }
     }
     private void getExpiryRecordsForFeed(int feedid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
-        if (type.equals("all") || type.equals("exp")) {
-            String st = map.get("statusSQL");
+        if ("all".equals(type) || "exp".equals(type)) {
+            String st = map.get(STATUSSQL);
             if (st == null || st.length() == 0) {
-                String sql = "select * from LOG_RECORDS where FEEDID = "+feedid
+                String sql = LOG_RECORDSSQL+feedid
                     + " AND TYPE = 'exp'"
-                    + map.get("timeSQL") + map.get("publishSQL") + map.get("reasonSQL");
+                    + map.get(TIMESQL) + map.get(PUBLISHSQL) + map.get(REASONSQL);
                 getRecordsForSQL(sql, rh);
             }
         }
     }
     private void getExpiryRecordsForSubscription(int subid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
-        if (type.equals("all") || type.equals("exp")) {
-            String st = map.get("statusSQL");
+        if ("all".equals(type) || "exp".equals(type)) {
+            String st = map.get(STATUSSQL);
             if (st == null || st.length() == 0) {
                 String sql = "select * from LOG_RECORDS where DELIVERY_SUBID = "+subid
                     + " AND TYPE = 'exp'"
-                    + map.get("timeSQL") + map.get("publishSQL") + map.get("reasonSQL");
+                    + map.get(TIMESQL) + map.get(PUBLISHSQL) + map.get(REASONSQL);
                 getRecordsForSQL(sql, rh);
             }
         }
