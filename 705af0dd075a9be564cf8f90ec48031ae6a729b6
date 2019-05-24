@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "15303ef2_b4bb2133",
+        "filename": "datarouter-node/src/test/java/org/onap/dmaap/datarouter/node/DeliveryTaskTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-05-24T11:55:59Z",
+      "side": 1,
+      "message": "This is the problem with the tests, can\u0027t do this on the Jenkins servers",
+      "range": {
+        "startLine": 103,
+        "startChar": 29,
+        "endLine": 103,
+        "endChar": 92
+      },
+      "revId": "705af0dd075a9be564cf8f90ec48031ae6a729b6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
