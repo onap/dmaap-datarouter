@@ -26,46 +26,41 @@ package org.onap.dmaap.datarouter.node;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Mechanism for monitoring and controlling delivery of files to a destination.
- * <p>
- * The DeliveryQueue class maintains lists of DeliveryTasks for a single
- * destination (a subscription or another data router node) and assigns
- * delivery threads to try to deliver them.  It also maintains a delivery
- * status that causes it to back off on delivery attempts after a failure.
- * <p>
- * If the most recent delivery result was a failure, then no more attempts
- * will be made for a period of time.  Initially, and on the first failure
- * following a success, this delay will be DeliveryQueueHelper.getInitFailureTimer() (milliseconds).
- * If, after this delay, additional failures occur, each failure will
- * multiply the delay by DeliveryQueueHelper.getFailureBackoff() up to a
- * maximum delay specified by DeliveryQueueHelper.getMaxFailureTimer().
- * Note that this behavior applies to the delivery queue as a whole and not
- * to individual files in the queue.  If multiple files are being
- * delivered and one fails, the delay will be started.  If a second
- * delivery fails while the delay was active, it will not change the delay
- * or change the duration of any subsequent delay.
- * If, however, it succeeds, it will cancel the delay.
- * <p>
- * The queue maintains 3 collections of files to deliver: A todo list of
- * files that will be attempted, a working set of files that are being
- * attempted, and a retry set of files that were attempted and failed.
- * Whenever the todo list is empty and needs to be refilled, a scan of the
- * spool directory is made and the file names sorted.  Any files in the working set are ignored.
- * If a DeliveryTask for the file is in the retry set, then that delivery
- * task is placed on the todo list.  Otherwise, a new DeliveryTask for the
- * file is created and placed on the todo list.
- * If, when a DeliveryTask is about to be removed from the todo list, its
- * age exceeds DeliveryQueueHelper.getExpirationTimer(), then it is instead
- * marked as expired.
- * <p>
- * A delivery queue also maintains a skip flag.  This flag is true if the
- * failure timer is active or if no files are found in a directory scan.
+ *
+ * <p>The DeliveryQueue class maintains lists of DeliveryTasks for a single destination (a subscription or another data
+ * router node) and assigns delivery threads to try to deliver them.  It also maintains a delivery status that causes it
+ * to back off on delivery attempts after a failure.
+ *
+ * <p>If the most recent delivery result was a failure, then no more attempts will be made for a period of time.
+ * Initially, and on the first failure following a success, this delay will be DeliveryQueueHelper.getInitFailureTimer()
+ * (milliseconds). If, after this delay, additional failures occur, each failure will multiply the delay by
+ * DeliveryQueueHelper.getFailureBackoff() up to a maximum delay specified by DeliveryQueueHelper.getMaxFailureTimer().
+ * Note that this behavior applies to the delivery queue as a whole and not to individual files in the queue.  If
+ * multiple files are being delivered and one fails, the delay will be started.  If a second delivery fails while the
+ * delay was active, it will not change the delay or change the duration of any subsequent delay. If, however, it
+ * succeeds, it will cancel the delay.
+ *
+ * <p>The queue maintains 3 collections of files to deliver: A to do list of files that will be attempted, a working
+ * set of files that are being attempted, and a retry set of files that were attempted and failed. Whenever the to do
+ * list is empty and needs to be refilled, a scan of the spool directory is made and the file names sorted.  Any files
+ * in the working set are ignored. If a DeliveryTask for the file is in the retry set, then that delivery task is placed
+ * on the to do list.  Otherwise, a new DeliveryTask for the file is created and placed on the to do list. If, when a
+ * DeliveryTask is about to be removed from the to do list, its age exceeds DeliveryQueueHelper.getExpirationTimer(),
+ * then it is instead marked as expired.
+ *
+ * <p>A delivery queue also maintains a skip flag.  This flag is true if the failure timer is active or if no files are
+ * found in a directory scan.
  */
 public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
+
     private static EELFLogger logger = EELFManager.getInstance().getLogger(DeliveryQueue.class);
     private DeliveryQueueHelper deliveryQueueHelper;
     private DestInfo destinationInfo;
@@ -77,6 +72,16 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     private long resumetime;
     private File dir;
     private Vector<DeliveryTask> todo = new Vector<>();
+
+    /**
+     * Create a delivery queue for a given destination info.
+     */
+    DeliveryQueue(DeliveryQueueHelper deliveryQueueHelper, DestInfo destinationInfo) {
+        this.deliveryQueueHelper = deliveryQueueHelper;
+        this.destinationInfo = destinationInfo;
+        dir = new File(destinationInfo.getSpool());
+        dir.mkdirs();
+    }
 
     /**
      * Try to cancel a delivery task.
@@ -106,7 +111,8 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
         if (dt.isCleaned()) {
             return (0);
         }
-        StatusLog.logExp(dt.getPublishId(), dt.getFeedId(), dt.getSubId(), dt.getURL(), dt.getMethod(), dt.getCType(), dt.getLength(), "diskFull", dt.getAttempts());
+        StatusLog.logExp(dt.getPublishId(), dt.getFeedId(), dt.getSubId(), dt.getURL(), dt.getMethod(), dt.getCType(),
+                dt.getLength(), "diskFull", dt.getAttempts());
         dt.clean();
         return (dt.getLength());
     }
@@ -144,7 +150,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
             if (failduration == 0) {
                 if (destinationInfo.isPrivilegedSubscriber()) {
                     failduration = deliveryQueueHelper.getWaitForFileProcessFailureTimer();
-                } else{
+                } else {
                     failduration = deliveryQueueHelper.getInitFailureTimer();
                 }
             }
@@ -205,144 +211,106 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
                 todo = new Vector<>();
                 String[] files = dir.list();
                 Arrays.sort(files);
-                for (String fname : files) {
-                    if (!fname.endsWith(".M")) {
-                        continue;
-                    }
-                    String fname2 = fname.substring(0, fname.length() - 2);
-                    long pidtime = 0;
-                    int dot = fname2.indexOf('.');
-                    if (dot < 1) {
-                        continue;
-                    }
-                    try {
-                        pidtime = Long.parseLong(fname2.substring(0, dot));
-                    } catch (Exception e) {
-                        logger.error("Exception", e);
-                    }
-                    if (pidtime < 1000000000000L) {
-                        continue;
-                    }
-                    if (working.get(fname2) != null) {
-                        continue;
-                    }
-                    DeliveryTask dt = retry.get(fname2);
-                    if (dt == null) {
-                        dt = new DeliveryTask(this, fname2);
-                    }
-                    todo.add(dt);
-                }
+                scanForNextTask(files);
                 retry = new Hashtable<>();
             }
-            if (todoindex < todo.size()) {
-                DeliveryTask dt = todo.get(todoindex);
-                if (dt.isCleaned()) {
-                    todoindex++;
-                    continue;
-                }
-                if (destinationInfo.isPrivilegedSubscriber() && dt.getResumeTime() > System.currentTimeMillis()) {
-                    retry.put(dt.getPublishId(), dt);
-                    todoindex++;
-                    continue;
-                }
-                if (dt.getDate() >= mindate) {
-                    return (dt);
-                }
-                todoindex++;
-                reportExpiry(dt);
-                continue;
+            DeliveryTask dt = getDeliveryTask(mindate);
+            if (dt != null) {
+                return dt;
             }
-            return (null);
+            return null;
         }
     }
 
     /**
-     * Create a delivery queue for a given destination info
-     */
-    DeliveryQueue(DeliveryQueueHelper deliveryQueueHelper, DestInfo destinationInfo) {
-        this.deliveryQueueHelper = deliveryQueueHelper;
-        this.destinationInfo = destinationInfo;
-        dir = new File(destinationInfo.getSpool());
-        dir.mkdirs();
-    }
-
-    /**
-     * Update the destination info for this delivery queue
+     * Update the destination info for this delivery queue.
      */
     public void config(DestInfo destinationInfo) {
         this.destinationInfo = destinationInfo;
     }
 
     /**
-     * Get the dest info
+     * Get the dest info.
      */
     public DestInfo getDestinationInfo() {
         return (destinationInfo);
     }
 
     /**
-     * Get the config manager
+     * Get the config manager.
      */
     public DeliveryQueueHelper getConfig() {
         return (deliveryQueueHelper);
     }
 
     /**
-     * Exceptional condition occurred during delivery
+     * Exceptional condition occurred during delivery.
      */
     public void reportDeliveryExtra(DeliveryTask task, long sent) {
         StatusLog.logDelExtra(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getLength(), sent);
     }
 
     /**
-     * Message too old to deliver
+     * Message too old to deliver.
      */
     void reportExpiry(DeliveryTask task) {
-        StatusLog.logExp(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), "retriesExhausted", task.getAttempts());
+        StatusLog.logExp(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(),
+                task.getCType(), task.getLength(), "retriesExhausted", task.getAttempts());
         markExpired(task);
     }
 
     /**
-     * Completed a delivery attempt
+     * Completed a delivery attempt.
      */
     public void reportStatus(DeliveryTask task, int status, String xpubid, String location) {
         if (status < 300) {
-            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), destinationInfo.getAuthUser(), status, xpubid);
+            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(),
+                    task.getCType(), task.getLength(), destinationInfo.getAuthUser(), status, xpubid);
             if (destinationInfo.isPrivilegedSubscriber()) {
-                task.setResumeTime(System.currentTimeMillis() + deliveryQueueHelper.getWaitForFileProcessFailureTimer());
+                task.setResumeTime(
+                        System.currentTimeMillis() + deliveryQueueHelper.getWaitForFileProcessFailureTimer());
                 markFailWithRetry(task);
             } else {
                 markSuccess(task);
             }
         } else if (status < 400 && deliveryQueueHelper.isFollowRedirects()) {
-            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), destinationInfo.getAuthUser(), status, location);
+            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(),
+                    task.getCType(), task.getLength(), destinationInfo.getAuthUser(), status, location);
             if (deliveryQueueHelper.handleRedirection(destinationInfo, location, task.getFileId())) {
                 markRedirect(task);
             } else {
-                StatusLog.logExp(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), "notRetryable", task.getAttempts());
+                StatusLog
+                        .logExp(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(),
+                                task.getCType(), task.getLength(), "notRetryable", task.getAttempts());
                 markFailNoRetry(task);
             }
-        } else if (status < 500 && status != 429) {         // Status 429 is the standard response for Too Many Requests and indicates that a file needs to be delivered again at a later time.
-            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), destinationInfo.getAuthUser(), status, location);
-            StatusLog.logExp(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), "notRetryable", task.getAttempts());
+        } else if (status < 500 && status != 429) {
+            // Status 429 is the standard response for Too Many Requests and indicates
+            // that a file needs to be delivered again at a later time.
+            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(),
+                    task.getCType(), task.getLength(), destinationInfo.getAuthUser(), status, location);
+            StatusLog.logExp(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(),
+                    task.getCType(), task.getLength(), "notRetryable", task.getAttempts());
             markFailNoRetry(task);
         } else {
-            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), destinationInfo.getAuthUser(), status, location);
+            StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(),
+                    task.getCType(), task.getLength(), destinationInfo.getAuthUser(), status, location);
             markFailWithRetry(task);
         }
     }
 
     /**
-     * Delivery failed by reason of an exception
+     * Delivery failed by reason of an exception.
      */
     public void reportException(DeliveryTask task, Exception exception) {
-        StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(), task.getCType(), task.getLength(), destinationInfo.getAuthUser(), -1, exception.toString());
+        StatusLog.logDel(task.getPublishId(), task.getFeedId(), task.getSubId(), task.getURL(), task.getMethod(),
+                task.getCType(), task.getLength(), destinationInfo.getAuthUser(), -1, exception.toString());
         deliveryQueueHelper.handleUnreachable(destinationInfo);
         markFailWithRetry(task);
     }
 
     /**
-     * Get the feed ID for a subscription
+     * Get the feed ID for a subscription.
      *
      * @param subid The subscription ID
      * @return The feed ID
@@ -352,22 +320,21 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     }
 
     /**
-     * Get the URL to deliver a message to given the file ID
+     * Get the URL to deliver a message to given the file ID.
      */
     public String getDestURL(String fileid) {
         return (deliveryQueueHelper.getDestURL(destinationInfo, fileid));
     }
 
     /**
-     * Deliver files until there's a failure or there are no more
-     * files to deliver
+     * Deliver files until there's a failure or there are no more files to deliver.
      */
     public void run() {
-        DeliveryTask t;
+        DeliveryTask task;
         long endtime = System.currentTimeMillis() + deliveryQueueHelper.getFairTimeLimit();
         int filestogo = deliveryQueueHelper.getFairFileLimit();
-        while ((t = getNext()) != null) {
-            t.run();
+        while ((task = getNext()) != null) {
+            task.run();
             if (--filestogo <= 0 || System.currentTimeMillis() > endtime) {
                 break;
             }
@@ -375,21 +342,21 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     }
 
     /**
-     * Is there no work to do for this queue right now?
+     * Is there no work to do for this queue right now.
      */
     synchronized boolean isSkipSet() {
         return (peekNext() == null);
     }
 
     /**
-     * Reset the retry timer
+     * Reset the retry timer.
      */
     void resetQueue() {
         resumetime = System.currentTimeMillis();
     }
 
     /**
-     * Get task if in queue and mark as success
+     * Get task if in queue and mark as success.
      */
     boolean markTaskSuccess(String pubId) {
         DeliveryTask task = working.get(pubId);
@@ -406,5 +373,64 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
             return true;
         }
         return false;
+    }
+
+    private void scanForNextTask(String[] files) {
+        for (String fname : files) {
+            String pubId = getPubId(fname);
+            if (pubId == null) {
+                continue;
+            }
+            DeliveryTask dt = retry.get(pubId);
+            if (dt == null) {
+                dt = new DeliveryTask(this, pubId);
+            }
+            todo.add(dt);
+        }
+    }
+
+    @Nullable
+    private DeliveryTask getDeliveryTask(long mindate) {
+        if (todoindex < todo.size()) {
+            DeliveryTask dt = todo.get(todoindex);
+            if (dt.isCleaned()) {
+                todoindex++;
+            }
+            if (destinationInfo.isPrivilegedSubscriber() && dt.getResumeTime() > System.currentTimeMillis()) {
+                retry.put(dt.getPublishId(), dt);
+                todoindex++;
+            }
+            if (dt.getDate() >= mindate) {
+                return (dt);
+            }
+            todoindex++;
+            reportExpiry(dt);
+        }
+        return null;
+    }
+
+    @Nullable
+    private String getPubId(String fname) {
+        if (!fname.endsWith(".M")) {
+            return null;
+        }
+        String fname2 = fname.substring(0, fname.length() - 2);
+        long pidtime = 0;
+        int dot = fname2.indexOf('.');
+        if (dot < 1) {
+            return null;
+        }
+        try {
+            pidtime = Long.parseLong(fname2.substring(0, dot));
+        } catch (Exception e) {
+            logger.error("Exception", e);
+        }
+        if (pidtime < 1000000000000L) {
+            return null;
+        }
+        if (working.get(fname2) != null) {
+            return null;
+        }
+        return fname2;
     }
 }
