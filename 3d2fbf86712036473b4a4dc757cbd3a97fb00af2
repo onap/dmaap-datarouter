@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "630da359_76c9c8c5",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/Delivery.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-05-28T13:59:23Z",
+      "side": 1,
+      "message": "Can we just log how many threads are currently in use too, something like\nlogger.trace(\"Current Threads: \" + curthreads + \", Max Threads: \" + threads);",
+      "revId": "3d2fbf86712036473b4a4dc757cbd3a97fb00af2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
