@@ -221,7 +221,7 @@ public class Delivery {
         queues = nqs;
         dqs = ndqs;
         cleardirs();
-        while (curthreads < threads) {
+        while (curthreads <= threads) {
             curthreads++;
             (new Thread() {
                 {
@@ -240,6 +240,7 @@ public class Delivery {
     private void dodelivery() {
         DeliveryQueue dq;
         while ((dq = getNextQueue()) != null) {
+            logger.trace("Current file: " + dq.getDestinationInfo().getName());
             dq.run();
         }
     }
