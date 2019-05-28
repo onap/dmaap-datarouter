@@ -22,6 +22,15 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.node;
 
+import static com.att.eelf.configuration.Configuration.MDC_SERVER_FQDN;
+import static com.att.eelf.configuration.Configuration.MDC_SERVER_IP_ADDRESS;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,20 +40,9 @@ import org.powermock.core.classloader.annotations.SuppressStaticInitializationFo
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.MDC;
 
-import javax.servlet.http.HttpServletRequest;
-
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.UUID;
-
-import static com.att.eelf.configuration.Configuration.MDC_SERVER_FQDN;
-import static com.att.eelf.configuration.Configuration.MDC_SERVER_IP_ADDRESS;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.onap.dmaap.datarouter.node.NodeUtils")
-@PrepareForTest({ UUID.class, InetAddress.class })
+@PrepareForTest({UUID.class, InetAddress.class})
 public class NodeUtilsTest {
 
     @Mock
