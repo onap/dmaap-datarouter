@@ -26,8 +26,6 @@ package org.onap.dmaap.datarouter.node;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -35,6 +33,7 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.Properties;
 import java.util.Timer;
+import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 
 
 /**
@@ -49,8 +48,9 @@ import java.util.Timer;
  */
 public class NodeConfigManager implements DeliveryQueueHelper {
 
-    private static EELFLogger eelfLogger = EELFManager.getInstance()
-            .getLogger(NodeConfigManager.class);
+    private static final String CHANGE_ME = "changeme";
+    private static final String NODE_CONFIG_MANAGER = "NodeConfigManager";
+    private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(NodeConfigManager.class);
     private static NodeConfigManager base = new NodeConfigManager();
 
     private Timer timer = new Timer("Node Configuration Timer", true);
@@ -94,20 +94,13 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private String eventlogsuffix;
     private String eventloginterval;
     private boolean followredirects;
-    private String [] enabledprotocols;
+    private String[] enabledprotocols;
     private String aafType;
     private String aafInstance;
     private String aafAction;
     private String aafURL;
     private boolean cadiEnabled;
 
-
-    /**
-     * Get the default node configuration manager
-     */
-    public static NodeConfigManager getInstance() {
-        return base;
-    }
 
     /**
      * Initialize the configuration of a Data Router node
@@ -120,8 +113,10 @@ public class NodeConfigManager implements DeliveryQueueHelper {
             drNodeProperties.load(new FileInputStream(System
                     .getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties")));
         } catch (Exception e) {
-            NodeUtils.setIpAndFqdnForEelf("NodeConfigManager");
-            eelfLogger.error(EelfMsgs.MESSAGE_PROPERTIES_LOAD_ERROR, e, System.getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties"));
+            NodeUtils.setIpAndFqdnForEelf(NODE_CONFIG_MANAGER);
+            eelfLogger.error(EelfMsgs.MESSAGE_PROPERTIES_LOAD_ERROR, e,
+                    System.getProperty("org.onap.dmaap.datarouter.node.properties",
+                            "/opt/app/datartr/etc/node.properties"));
         }
         provurl = drNodeProperties.getProperty("ProvisioningURL", "https://dmaap-dr-prov:8443/internal/prov");
         /*
@@ -143,7 +138,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         try {
             provhost = (new URL(provurl)).getHost();
         } catch (Exception e) {
-            NodeUtils.setIpAndFqdnForEelf("NodeConfigManager");
+            NodeUtils.setIpAndFqdnForEelf(NODE_CONFIG_MANAGER);
             eelfLogger.error(EelfMsgs.MESSAGE_BAD_PROV_URL, e, provurl);
             System.exit(1);
         }
@@ -168,14 +163,14 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         logretention = Long.parseLong(drNodeProperties.getProperty("LogRetention", "30")) * 86400000L;
         eventlogprefix = logdir + "/events";
         eventlogsuffix = ".log";
-        String redirfile = drNodeProperties.getProperty("RedirectionFile", "etc/redirections.dat");
+        redirfile = drNodeProperties.getProperty("RedirectionFile", "etc/redirections.dat");
         kstype = drNodeProperties.getProperty("KeyStoreType", "jks");
         ksfile = drNodeProperties.getProperty("KeyStoreFile", "etc/keystore");
-        kspass = drNodeProperties.getProperty("KeyStorePassword", "changeme");
-        kpass = drNodeProperties.getProperty("KeyPassword", "changeme");
+        kspass = drNodeProperties.getProperty("KeyStorePassword", CHANGE_ME);
+        kpass = drNodeProperties.getProperty("KeyPassword", CHANGE_ME);
         tstype = drNodeProperties.getProperty("TrustStoreType", "jks");
         tsfile = drNodeProperties.getProperty("TrustStoreFile");
-        tspass = drNodeProperties.getProperty("TrustStorePassword", "changeme");
+        tspass = drNodeProperties.getProperty("TrustStorePassword", CHANGE_ME);
         if (tsfile != null && tsfile.length() > 0) {
             System.setProperty("javax.net.ssl.trustStoreType", tstype);
             System.setProperty("javax.net.ssl.trustStore", tsfile);
@@ -185,7 +180,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         quiesce = new File(drNodeProperties.getProperty("QuiesceFile", "etc/SHUTDOWN"));
         myname = NodeUtils.getCanonicalName(kstype, ksfile, kspass);
         if (myname == null) {
-            NodeUtils.setIpAndFqdnForEelf("NodeConfigManager");
+            NodeUtils.setIpAndFqdnForEelf(NODE_CONFIG_MANAGER);
             eelfLogger.error(EelfMsgs.MESSAGE_KEYSTORE_FETCH_ERROR, ksfile);
             eelfLogger.error("NODE0309 Unable to fetch canonical name from keystore file " + ksfile);
             System.exit(1);
@@ -200,6 +195,13 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         };
         eelfLogger.info("NODE0305 Attempting to fetch configuration at " + provurl);
         pfetcher.request();
+    }
+
+    /**
+     * Get the default node configuration manager
+     */
+    public static NodeConfigManager getInstance() {
+        return base;
     }
 
     private void localconfig() {
@@ -218,52 +220,53 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         try {
             initfailuretimer = (long) (Double.parseDouble(getProvParam("DELIVERY_INIT_RETRY_INTERVAL")) * 1000);
         } catch (Exception e) {
-            eelfLogger.error("Error parsing DELIVERY_INIT_RETRY_INTERVAL", e);
+            eelfLogger.trace("Error parsing DELIVERY_INIT_RETRY_INTERVAL", e);
         }
         try {
-            waitForFileProcessFailureTimer = (long) (Double.parseDouble(getProvParam("DELIVERY_FILE_PROCESS_INTERVAL")) * 1000);
+            waitForFileProcessFailureTimer = (long) (Double.parseDouble(getProvParam("DELIVERY_FILE_PROCESS_INTERVAL"))
+                    * 1000);
         } catch (Exception e) {
-            eelfLogger.error("Error parsing DELIVERY_FILE_PROCESS_INTERVAL", e);
+            eelfLogger.trace("Error parsing DELIVERY_FILE_PROCESS_INTERVAL", e);
         }
         try {
             maxfailuretimer = (long) (Double.parseDouble(getProvParam("DELIVERY_MAX_RETRY_INTERVAL")) * 1000);
         } catch (Exception e) {
-            eelfLogger.error("Error parsing DELIVERY_MAX_RETRY_INTERVAL", e);
+            eelfLogger.trace("Error parsing DELIVERY_MAX_RETRY_INTERVAL", e);
         }
         try {
             expirationtimer = (long) (Double.parseDouble(getProvParam("DELIVERY_MAX_AGE")) * 1000);
         } catch (Exception e) {
-            eelfLogger.error("Error parsing DELIVERY_MAX_AGE", e);
+            eelfLogger.trace("Error parsing DELIVERY_MAX_AGE", e);
         }
         try {
             failurebackoff = Double.parseDouble(getProvParam("DELIVERY_RETRY_RATIO"));
         } catch (Exception e) {
-            eelfLogger.error("Error parsing DELIVERY_RETRY_RATIO", e);
+            eelfLogger.trace("Error parsing DELIVERY_RETRY_RATIO", e);
         }
         try {
             deliverythreads = Integer.parseInt(getProvParam("DELIVERY_THREADS"));
         } catch (Exception e) {
-            eelfLogger.error("Error parsing DELIVERY_THREADS", e);
+            eelfLogger.trace("Error parsing DELIVERY_THREADS", e);
         }
         try {
             fairfilelimit = Integer.parseInt(getProvParam("FAIR_FILE_LIMIT"));
         } catch (Exception e) {
-            eelfLogger.error("Error parsing FAIR_FILE_LIMIT", e);
+            eelfLogger.trace("Error parsing FAIR_FILE_LIMIT", e);
         }
         try {
             fairtimelimit = (long) (Double.parseDouble(getProvParam("FAIR_TIME_LIMIT")) * 1000);
         } catch (Exception e) {
-            eelfLogger.error("Error parsing FAIR_TIME_LIMIT", e);
+            eelfLogger.trace("Error parsing FAIR_TIME_LIMIT", e);
         }
         try {
             fdpstart = Double.parseDouble(getProvParam("FREE_DISK_RED_PERCENT")) / 100.0;
         } catch (Exception e) {
-            eelfLogger.error("Error parsing FREE_DISK_RED_PERCENT", e);
+            eelfLogger.trace("Error parsing FREE_DISK_RED_PERCENT", e);
         }
         try {
             fdpstop = Double.parseDouble(getProvParam("FREE_DISK_YELLOW_PERCENT")) / 100.0;
         } catch (Exception e) {
-            eelfLogger.error("Error parsing FREE_DISK_YELLOW_PERCENT", e);
+            eelfLogger.trace("Error parsing FREE_DISK_YELLOW_PERCENT", e);
         }
         if (fdpstart < 0.01) {
             fdpstart = 0.01;
@@ -286,19 +289,23 @@ public class NodeConfigManager implements DeliveryQueueHelper {
             config = new NodeConfig(new ProvData(r), myname, spooldir, port, nak);
             localconfig();
             configtasks.startRun();
-            Runnable rr;
-            while ((rr = configtasks.next()) != null) {
-                try {
-                    rr.run();
-                } catch (Exception e) {
-                    eelfLogger.error("NODE0518 Exception fetchconfig: " + e);
-                }
-            }
+            runTasks();
         } catch (Exception e) {
             NodeUtils.setIpAndFqdnForEelf("fetchconfigs");
             eelfLogger.error(EelfMsgs.MESSAGE_CONF_FAILED, e.toString());
             eelfLogger.error("NODE0306 Configuration failed " + e.toString() + " - try again later", e);
             pfetcher.request();
+        }
+    }
+
+    private void runTasks() {
+        Runnable rr;
+        while ((rr = configtasks.next()) != null) {
+            try {
+                rr.run();
+            } catch (Exception e) {
+                eelfLogger.error("NODE0518 Exception fetchconfig: " + e);
+            }
         }
     }
 
@@ -381,7 +388,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @return True if the IP and credentials are valid for the specified feed.
      */
     public String isPublishPermitted(String feedid, String ip) {
-        return(config.isPublishPermitted(feedid, ip));
+        return (config.isPublishPermitted(feedid, ip));
     }
 
     /**
@@ -396,12 +403,12 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * AAF changes: TDP EPIC US# 307413
-     * Check AAF_instance for feed ID in NodeConfig
+     * AAF changes: TDP EPIC US# 307413 Check AAF_instance for feed ID in NodeConfig
+     *
      * @param feedid The ID of the feed specified
      */
     public String getAafInstance(String feedid) {
-        return(config.getAafInstance(feedid));
+        return (config.getAafInstance(feedid));
     }
 
     /**
@@ -597,11 +604,12 @@ public class NodeConfigManager implements DeliveryQueueHelper {
 
     /**
      * Get the creation date for a feed
+     *
      * @param feedid The feed ID
      * @return the timestamp of creation date of feed id passed
      */
     public String getCreatedDate(String feedid) {
-        return(config.getCreatedDate(feedid));
+        return (config.getCreatedDate(feedid));
     }
 
     /**
@@ -774,10 +782,11 @@ public class NodeConfigManager implements DeliveryQueueHelper {
 
     /**
      * Disable and enable protocols
-     * */
+     */
     public String[] getEnabledprotocols() {
         return enabledprotocols;
     }
+
     public void setEnabledprotocols(String[] enabledprotocols) {
         this.enabledprotocols = enabledprotocols.clone();
     }
@@ -805,34 +814,42 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     public String getAafType() {
         return aafType;
     }
+
     public void setAafType(String aafType) {
         this.aafType = aafType;
     }
+
     public String getAafInstance() {
         return aafInstance;
     }
+
     public void setAafInstance(String aafInstance) {
         this.aafInstance = aafInstance;
     }
+
     public String getAafAction() {
         return aafAction;
     }
+
     public void setAafAction(String aafAction) {
         this.aafAction = aafAction;
     }
+
     /*
      * Get aafURL from SWM variable
      * */
     public String getAafURL() {
         return aafURL;
     }
+
     public void setAafURL(String aafURL) {
         this.aafURL = aafURL;
     }
 
-    public boolean getCadiEnabeld() {
+    public boolean getCadiEnabled() {
         return cadiEnabled;
     }
+
     public void setCadiEnabled(boolean cadiEnabled) {
         this.cadiEnabled = cadiEnabled;
     }
@@ -847,7 +864,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         try {
             String type = getAafType();
             String action = getAafAction();
-            if (aafInstance == null || aafInstance.equals("")) {
+            if ("".equals(aafInstance)) {
                 aafInstance = getAafInstance();
             }
             return type + "|" + aafInstance + "|" + action;

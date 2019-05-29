@@ -26,22 +26,451 @@ package org.onap.dmaap.datarouter.node;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Vector;
 
 /**
  * Processed configuration for this node.
- * <p>
- * The NodeConfig represents a processed configuration from the Data Router provisioning server.  Each time
+ *
+ * <p>The NodeConfig represents a processed configuration from the Data Router provisioning server.  Each time
  * configuration data is received from the provisioning server, a new NodeConfig is created and the previous one
  * discarded.
  */
 public class NodeConfig {
+
+    private static final String PUBLISHER_NOT_PERMITTED = "Publisher not permitted for this feed";
     private static EELFLogger logger = EELFManager.getInstance().getLogger(NodeConfig.class);
+    private HashMap<String, String> params = new HashMap<>();
+    private HashMap<String, Feed> feeds = new HashMap<>();
+    private HashMap<String, DestInfo> nodeinfo = new HashMap<>();
+    private HashMap<String, DestInfo> subinfo = new HashMap<>();
+    private HashMap<String, IsFrom> nodes = new HashMap<>();
+    private HashMap<String, ProvSubscription> provSubscriptions = new HashMap<>();
+    private String myname;
+    private String myauth;
+    private DestInfo[] alldests;
+    private int rrcntr;
+
+    /**
+     * Process the raw provisioning data to configure this node.
+     *
+     * @param pd The parsed provisioning data
+     * @param myname My name as seen by external systems
+     * @param spooldir The directory where temporary files live
+     * @param port The port number for URLs
+     * @param nodeauthkey The keying string used to generate node authentication credentials
+     */
+    public NodeConfig(ProvData pd, String myname, String spooldir, int port, String nodeauthkey) {
+        this.myname = myname;
+        for (ProvParam p : pd.getParams()) {
+            params.put(p.getName(), p.getValue());
+        }
+        ArrayList<DestInfo> destInfos = new ArrayList<>();
+        myauth = NodeUtils.getNodeAuthHdr(myname, nodeauthkey);
+        for (ProvNode pn : pd.getNodes()) {
+            String commonName = pn.getCName();
+            if (nodeinfo.get(commonName) != null) {
+                continue;
+            }
+            DestInfo di = new DestInfoBuilder().setName("n:" + commonName).setSpool(spooldir + "/n/" + commonName)
+                    .setSubid(null)
+                    .setLogdata("n2n-" + commonName).setUrl("https://" + commonName + ":" + port + "/internal/publish")
+                    .setAuthuser(commonName).setAuthentication(myauth).setMetaonly(false).setUse100(true)
+                    .setPrivilegedSubscriber(false).setFollowRedirects(false).setDecompress(false).createDestInfo();
+            (new File(di.getSpool())).mkdirs();
+            String auth = NodeUtils.getNodeAuthHdr(commonName, nodeauthkey);
+            destInfos.add(di);
+            nodeinfo.put(commonName, di);
+            nodes.put(auth, new IsFrom(commonName));
+        }
+        PathFinder pf = new PathFinder(myname, nodeinfo.keySet().toArray(new String[0]), pd.getHops());
+        HashMap<String, ArrayList<Redirection>> rdtab = new HashMap<>();
+        for (ProvForceIngress pfi : pd.getForceIngress()) {
+            ArrayList<Redirection> v = rdtab.get(pfi.getFeedId());
+            if (v == null) {
+                v = new ArrayList<>();
+                rdtab.put(pfi.getFeedId(), v);
+            }
+            Redirection r = new Redirection();
+            if (pfi.getSubnet() != null) {
+                r.snm = new SubnetMatcher(pfi.getSubnet());
+            }
+            r.user = pfi.getUser();
+            r.nodes = pfi.getNodes();
+            v.add(r);
+        }
+        HashMap<String, HashMap<String, String>> pfutab = new HashMap<>();
+        for (ProvFeedUser pfu : pd.getFeedUsers()) {
+            HashMap<String, String> t = pfutab.get(pfu.getFeedId());
+            if (t == null) {
+                t = new HashMap<>();
+                pfutab.put(pfu.getFeedId(), t);
+            }
+            t.put(pfu.getCredentials(), pfu.getUser());
+        }
+        HashMap<String, String> egrtab = new HashMap<>();
+        for (ProvForceEgress pfe : pd.getForceEgress()) {
+            if (pfe.getNode().equals(myname) || nodeinfo.get(pfe.getNode()) == null) {
+                continue;
+            }
+            egrtab.put(pfe.getSubId(), pfe.getNode());
+        }
+        HashMap<String, ArrayList<SubnetMatcher>> pfstab = new HashMap<>();
+        for (ProvFeedSubnet pfs : pd.getFeedSubnets()) {
+            ArrayList<SubnetMatcher> v = pfstab.get(pfs.getFeedId());
+            if (v == null) {
+                v = new ArrayList<>();
+                pfstab.put(pfs.getFeedId(), v);
+            }
+            v.add(new SubnetMatcher(pfs.getCidr()));
+        }
+        HashMap<String, StringBuilder> feedTargets = new HashMap<>();
+        HashSet<String> allfeeds = new HashSet<>();
+        for (ProvFeed pfx : pd.getFeeds()) {
+            if (pfx.getStatus() == null) {
+                allfeeds.add(pfx.getId());
+            }
+        }
+        for (ProvSubscription provSubscription : pd.getSubscriptions()) {
+            String subId = provSubscription.getSubId();
+            String feedId = provSubscription.getFeedId();
+            if (isFeedOrSubKnown(allfeeds, subId, feedId)) {
+                continue;
+            }
+            int sididx = 999;
+            try {
+                sididx = Integer.parseInt(subId);
+                sididx -= sididx % 100;
+            } catch (Exception e) {
+                logger.error("NODE0517 Exception NodeConfig: " + e);
+            }
+            String subscriptionDirectory = sididx + "/" + subId;
+            DestInfo destinationInfo = new DestInfo("s:" + subId,
+                    spooldir + "/s/" + subscriptionDirectory, provSubscription);
+            (new File(destinationInfo.getSpool())).mkdirs();
+            destInfos.add(destinationInfo);
+            provSubscriptions.put(subId, provSubscription);
+            subinfo.put(subId, destinationInfo);
+            String egr = egrtab.get(subId);
+            if (egr != null) {
+                subId = pf.getPath(egr) + subId;
+            }
+            StringBuilder sb = feedTargets.get(feedId);
+            if (sb == null) {
+                sb = new StringBuilder();
+                feedTargets.put(feedId, sb);
+            }
+            sb.append(' ').append(subId);
+        }
+        alldests = destInfos.toArray(new DestInfo[0]);
+        for (ProvFeed pfx : pd.getFeeds()) {
+            String fid = pfx.getId();
+            Feed f = feeds.get(fid);
+            if (f != null) {
+                continue;
+            }
+            f = new Feed();
+            feeds.put(fid, f);
+            f.createdDate = pfx.getCreatedDate();
+            f.loginfo = pfx.getLogData();
+            f.status = pfx.getStatus();
+            /*
+             * AAF changes: TDP EPIC US# 307413
+             * Passing aafInstance from ProvFeed to identify legacy/AAF feeds
+             */
+            f.aafInstance = pfx.getAafInstance();
+            ArrayList<SubnetMatcher> v1 = pfstab.get(fid);
+            if (v1 == null) {
+                f.subnets = new SubnetMatcher[0];
+            } else {
+                f.subnets = v1.toArray(new SubnetMatcher[0]);
+            }
+            HashMap<String, String> h1 = pfutab.get(fid);
+            if (h1 == null) {
+                h1 = new HashMap();
+            }
+            f.authusers = h1;
+            ArrayList<Redirection> v2 = rdtab.get(fid);
+            if (v2 == null) {
+                f.redirections = new Redirection[0];
+            } else {
+                f.redirections = v2.toArray(new Redirection[0]);
+            }
+            StringBuilder sb = feedTargets.get(fid);
+            if (sb == null) {
+                f.targets = new Target[0];
+            } else {
+                f.targets = parseRouting(sb.toString());
+            }
+        }
+    }
+
+    /**
+     * Parse a target string into an array of targets
+     *
+     * @param routing Target string
+     * @return Array of targets.
+     */
+    public Target[] parseRouting(String routing) {
+        routing = routing.trim();
+        if ("".equals(routing)) {
+            return (new Target[0]);
+        }
+        String[] xx = routing.split("\\s+");
+        HashMap<String, Target> tmap = new HashMap<>();
+        HashSet<String> subset = new HashSet<>();
+        ArrayList<Target> tv = new ArrayList<>();
+        for (int i = 0; i < xx.length; i++) {
+            String t = xx[i];
+            int j = t.indexOf('/');
+            if (j == -1) {
+                addTarget(subset, tv, t);
+            } else {
+                addTargetWithRouting(tmap, tv, t, j);
+            }
+        }
+        return (tv.toArray(new Target[0]));
+    }
+
+    /**
+     * Check whether this is a valid node-to-node transfer
+     *
+     * @param credentials Credentials offered by the supposed node
+     * @param ip IP address the request came from
+     */
+    public boolean isAnotherNode(String credentials, String ip) {
+        IsFrom n = nodes.get(credentials);
+        return (n != null && n.isFrom(ip));
+    }
+
+    /**
+     * Check whether publication is allowed.
+     *
+     * @param feedid The ID of the feed being requested.
+     * @param credentials The offered credentials
+     * @param ip The requesting IP address
+     */
+    public String isPublishPermitted(String feedid, String credentials, String ip) {
+        Feed f = feeds.get(feedid);
+        String nf = "Feed does not exist";
+        if (f != null) {
+            nf = f.status;
+        }
+        if (nf != null) {
+            return (nf);
+        }
+        String user = f.authusers.get(credentials);
+        if (user == null) {
+            return (PUBLISHER_NOT_PERMITTED);
+        }
+        if (f.subnets.length == 0) {
+            return (null);
+        }
+        byte[] addr = NodeUtils.getInetAddress(ip);
+        for (SubnetMatcher snm : f.subnets) {
+            if (snm.matches(addr)) {
+                return (null);
+            }
+        }
+        return (PUBLISHER_NOT_PERMITTED);
+    }
+
+    /**
+     * Check whether delete file is allowed.
+     *
+     * @param subId The ID of the subscription being requested.
+     */
+    public boolean isDeletePermitted(String subId) {
+        ProvSubscription provSubscription = provSubscriptions.get(subId);
+        return provSubscription.isPrivilegedSubscriber();
+    }
+
+    /**
+     * Check whether publication is allowed for AAF Feed.
+     *
+     * @param feedid The ID of the feed being requested.
+     * @param ip The requesting IP address
+     */
+    public String isPublishPermitted(String feedid, String ip) {
+        Feed f = feeds.get(feedid);
+        String nf = "Feed does not exist";
+        if (f != null) {
+            nf = f.status;
+        }
+        if (nf != null) {
+            return nf;
+        }
+        if (f.subnets.length == 0) {
+            return null;
+        }
+        byte[] addr = NodeUtils.getInetAddress(ip);
+        for (SubnetMatcher snm : f.subnets) {
+            if (snm.matches(addr)) {
+                return null;
+            }
+        }
+        return PUBLISHER_NOT_PERMITTED;
+    }
+
+    /**
+     * Get authenticated user
+     */
+    public String getAuthUser(String feedid, String credentials) {
+        return (feeds.get(feedid).authusers.get(credentials));
+    }
+
+    /**
+     * AAF changes: TDP EPIC US# 307413 Check AAF_instance for feed ID
+     *
+     * @param feedid The ID of the feed specified
+     */
+    public String getAafInstance(String feedid) {
+        Feed f = feeds.get(feedid);
+        return f.aafInstance;
+    }
+
+    /**
+     * Check if the request should be redirected to a different ingress node
+     */
+    public String getIngressNode(String feedid, String user, String ip) {
+        Feed f = feeds.get(feedid);
+        if (f.redirections.length == 0) {
+            return (null);
+        }
+        byte[] addr = NodeUtils.getInetAddress(ip);
+        for (Redirection r : f.redirections) {
+            if ((r.user != null && !user.equals(r.user)) || (r.snm != null && !r.snm.matches(addr))) {
+                continue;
+            }
+            for (String n : r.nodes) {
+                if (myname.equals(n)) {
+                    return (null);
+                }
+            }
+            if (r.nodes.length == 0) {
+                return (null);
+            }
+            return (r.nodes[rrcntr++ % r.nodes.length]);
+        }
+        return (null);
+    }
+
+    /**
+     * Get a provisioned configuration parameter
+     */
+    public String getProvParam(String name) {
+        return (params.get(name));
+    }
+
+    /**
+     * Get all the DestInfos
+     */
+    public DestInfo[] getAllDests() {
+        return (alldests);
+    }
+
+    /**
+     * Get the targets for a feed
+     *
+     * @param feedid The feed ID
+     * @return The targets this feed should be delivered to
+     */
+    public Target[] getTargets(String feedid) {
+        if (feedid == null) {
+            return (new Target[0]);
+        }
+        Feed f = feeds.get(feedid);
+        if (f == null) {
+            return (new Target[0]);
+        }
+        return (f.targets);
+    }
+
+    /**
+     * Get the creation date for a feed
+     *
+     * @param feedid The feed ID
+     * @return the timestamp of creation date of feed id passed
+     */
+    public String getCreatedDate(String feedid) {
+        Feed f = feeds.get(feedid);
+        return (f.createdDate);
+    }
+
+    /**
+     * Get the feed ID for a subscription
+     *
+     * @param subid The subscription ID
+     * @return The feed ID
+     */
+    public String getFeedId(String subid) {
+        DestInfo di = subinfo.get(subid);
+        if (di == null) {
+            return (null);
+        }
+        return (di.getLogData());
+    }
+
+    /**
+     * Get the spool directory for a subscription
+     *
+     * @param subid The subscription ID
+     * @return The spool directory
+     */
+    public String getSpoolDir(String subid) {
+        DestInfo di = subinfo.get(subid);
+        if (di == null) {
+            return (null);
+        }
+        return (di.getSpool());
+    }
+
+    /**
+     * Get the Authorization value this node uses
+     *
+     * @return The Authorization header value for this node
+     */
+    public String getMyAuth() {
+        return (myauth);
+    }
+
+    private boolean isFeedOrSubKnown(HashSet<String> allfeeds, String subId, String feedId) {
+        return !allfeeds.contains(feedId) || subinfo.get(subId) != null;
+    }
+
+    private void addTargetWithRouting(HashMap<String, Target> tmap, ArrayList<Target> tv, String t, int j) {
+        String node = t.substring(0, j);
+        String rtg = t.substring(j + 1);
+        DestInfo di = nodeinfo.get(node);
+        if (di == null) {
+            tv.add(new Target(null, t));
+        } else {
+            Target tt = tmap.get(node);
+            if (tt == null) {
+                tt = new Target(di, rtg);
+                tmap.put(node, tt);
+                tv.add(tt);
+            } else {
+                tt.addRouting(rtg);
+            }
+        }
+    }
+
+    private void addTarget(HashSet<String> subset, ArrayList<Target> tv, String t) {
+        DestInfo di = subinfo.get(t);
+        if (di == null) {
+            tv.add(new Target(null, t));
+        } else {
+            if (!subset.contains(t)) {
+                subset.add(t);
+                tv.add(new Target(di, null));
+            }
+        }
+    }
+
     /**
      * Raw configuration entry for a data router node
      */
@@ -134,9 +563,8 @@ public class NodeConfig {
         /**
          * Get the created date of the data feed.
          */
-        public String getCreatedDate()
-        {
-            return(createdDate);
+        public String getCreatedDate() {
+            return (createdDate);
         }
 
         /**
@@ -277,7 +705,9 @@ public class NodeConfig {
          * @param followRedirect Is follow redirect of destination enabled?
          * @param decompress To see if they want their information compressed or decompressed
          */
-        public ProvSubscription(String subid, String feedid, String url, String authuser, String credentials, boolean metaonly, boolean use100, boolean privilegedSubscriber, boolean followRedirect, boolean decompress) {
+        public ProvSubscription(String subid, String feedid, String url, String authuser, String credentials,
+                boolean metaonly, boolean use100, boolean privilegedSubscriber, boolean followRedirect,
+                boolean decompress) {
             this.subid = subid;
             this.feedid = feedid;
             this.url = url;
@@ -348,17 +778,17 @@ public class NodeConfig {
 
         /**
          * Should i decompress the file before sending it on
-        */
+         */
         public boolean isDecompress() {
             return (decompress);
         }
 
         /**
-         *  New field is added - FOLLOW_REDIRECTS feature iTrack:DATARTR-17 - 1706
-         *	Get the followRedirect of this destination
+         * New field is added - FOLLOW_REDIRECTS feature iTrack:DATARTR-17 - 1706 Get the followRedirect of this
+         * destination
          */
         boolean getFollowRedirect() {
-            return(followRedirect);
+            return (followRedirect);
         }
     }
 
@@ -386,7 +816,7 @@ public class NodeConfig {
             this.subnet = subnet;
             this.user = user;
             //Sonar fix
-            if(nodes == null) {
+            if (nodes == null) {
                 this.nodes = new String[0];
             } else {
                 this.nodes = Arrays.copyOf(nodes, nodes.length);
@@ -466,13 +896,6 @@ public class NodeConfig {
         private String via;
 
         /**
-         * A human readable description of this entry
-         */
-        public String toString() {
-            return ("Hop " + from + "->" + to + " via " + via);
-        }
-
-        /**
          * Construct a hop entry
          *
          * @param from The FQDN of the node with the data to be delivered
@@ -483,6 +906,13 @@ public class NodeConfig {
             this.from = from;
             this.to = to;
             this.via = via;
+        }
+
+        /**
+         * A human readable description of this entry
+         */
+        public String toString() {
+            return ("Hop " + from + "->" + to + " via " + via);
         }
 
         /**
@@ -519,431 +949,10 @@ public class NodeConfig {
         String loginfo;
         String status;
         SubnetMatcher[] subnets;
-        Hashtable<String, String> authusers = new Hashtable<String, String>();
+        HashMap<String, String> authusers = new HashMap<>();
         Redirection[] redirections;
         Target[] targets;
         String createdDate;
         String aafInstance;
     }
-
-    private Hashtable<String, String> params = new Hashtable<>();
-    private Hashtable<String, Feed> feeds = new Hashtable<>();
-    private Hashtable<String, DestInfo> nodeinfo = new Hashtable<>();
-    private Hashtable<String, DestInfo> subinfo = new Hashtable<>();
-    private Hashtable<String, IsFrom> nodes = new Hashtable<>();
-    private Hashtable<String, ProvSubscription> provSubscriptions = new Hashtable<>();
-    private String myname;
-    private String myauth;
-    private DestInfo[] alldests;
-    private int rrcntr;
-
-    /**
-     * Process the raw provisioning data to configure this node
-     *
-     * @param pd The parsed provisioning data
-     * @param myname My name as seen by external systems
-     * @param spooldir The directory where temporary files live
-     * @param port The port number for URLs
-     * @param nodeauthkey The keying string used to generate node authentication credentials
-     */
-    public NodeConfig(ProvData pd, String myname, String spooldir, int port, String nodeauthkey) {
-        this.myname = myname;
-        for (ProvParam p : pd.getParams()) {
-            params.put(p.getName(), p.getValue());
-        }
-        Vector<DestInfo> destInfos = new Vector<>();
-        myauth = NodeUtils.getNodeAuthHdr(myname, nodeauthkey);
-        for (ProvNode pn : pd.getNodes()) {
-            String cName = pn.getCName();
-            if (nodeinfo.get(cName) != null) {
-                continue;
-            }
-            String auth = NodeUtils.getNodeAuthHdr(cName, nodeauthkey);
-            DestInfo di = new DestInfo.DestInfoBuilder().setName("n:" + cName).setSpool(spooldir + "/n/" + cName).setSubid(null)
-                .setLogdata("n2n-" + cName).setUrl("https://" + cName + ":" + port + "/internal/publish")
-                .setAuthuser(cName).setAuthentication(myauth).setMetaonly(false).setUse100(true)
-                .setPrivilegedSubscriber(false).setFollowRedirects(false).setDecompress(false).createDestInfo();
-            (new File(di.getSpool())).mkdirs();
-            destInfos.add(di);
-            nodeinfo.put(cName, di);
-            nodes.put(auth, new IsFrom(cName));
-        }
-        PathFinder pf = new PathFinder(myname, nodeinfo.keySet().toArray(new String[0]), pd.getHops());
-        Hashtable<String, Vector<Redirection>> rdtab = new Hashtable<>();
-        for (ProvForceIngress pfi : pd.getForceIngress()) {
-            Vector<Redirection> v = rdtab.get(pfi.getFeedId());
-            if (v == null) {
-                v = new Vector<>();
-                rdtab.put(pfi.getFeedId(), v);
-            }
-            Redirection r = new Redirection();
-            if (pfi.getSubnet() != null) {
-                r.snm = new SubnetMatcher(pfi.getSubnet());
-            }
-            r.user = pfi.getUser();
-            r.nodes = pfi.getNodes();
-            v.add(r);
-        }
-        Hashtable<String, Hashtable<String, String>> pfutab = new Hashtable<>();
-        for (ProvFeedUser pfu : pd.getFeedUsers()) {
-            Hashtable<String, String> t = pfutab.get(pfu.getFeedId());
-            if (t == null) {
-                t = new Hashtable<>();
-                pfutab.put(pfu.getFeedId(), t);
-            }
-            t.put(pfu.getCredentials(), pfu.getUser());
-        }
-        Hashtable<String, String> egrtab = new Hashtable<>();
-        for (ProvForceEgress pfe : pd.getForceEgress()) {
-            if (pfe.getNode().equals(myname) || nodeinfo.get(pfe.getNode()) == null) {
-                continue;
-            }
-            egrtab.put(pfe.getSubId(), pfe.getNode());
-        }
-        Hashtable<String, Vector<SubnetMatcher>> pfstab = new Hashtable<>();
-        for (ProvFeedSubnet pfs : pd.getFeedSubnets()) {
-            Vector<SubnetMatcher> v = pfstab.get(pfs.getFeedId());
-            if (v == null) {
-                v = new Vector<>();
-                pfstab.put(pfs.getFeedId(), v);
-            }
-            v.add(new SubnetMatcher(pfs.getCidr()));
-        }
-        Hashtable<String, StringBuffer> feedTargets = new Hashtable<>();
-        HashSet<String> allfeeds = new HashSet<>();
-        for (ProvFeed pfx : pd.getFeeds()) {
-            if (pfx.getStatus() == null) {
-                allfeeds.add(pfx.getId());
-            }
-        }
-        for (ProvSubscription provSubscription : pd.getSubscriptions()) {
-            String subId = provSubscription.getSubId();
-            String feedId = provSubscription.getFeedId();
-            if (!allfeeds.contains(feedId)) {
-                continue;
-            }
-            if (subinfo.get(subId) != null) {
-                continue;
-            }
-            int sididx = 999;
-            try {
-                sididx = Integer.parseInt(subId);
-                sididx -= sididx % 100;
-            } catch (Exception e) {
-                logger.error("NODE0517 Exception NodeConfig: "+e);
-            }
-            String subscriptionDirectory = sididx + "/" + subId;
-            DestInfo destinationInfo = new DestInfo("s:" + subId,
-                    spooldir + "/s/" + subscriptionDirectory, provSubscription);
-            (new File(destinationInfo.getSpool())).mkdirs();
-            destInfos.add(destinationInfo);
-            provSubscriptions.put(subId, provSubscription);
-            subinfo.put(subId, destinationInfo);
-            String egr = egrtab.get(subId);
-            if (egr != null) {
-                subId = pf.getPath(egr) + subId;
-            }
-            StringBuffer sb = feedTargets.get(feedId);
-            if (sb == null) {
-                sb = new StringBuffer();
-                feedTargets.put(feedId, sb);
-            }
-            sb.append(' ').append(subId);
-        }
-        alldests = destInfos.toArray(new DestInfo[0]);
-        for (ProvFeed pfx : pd.getFeeds()) {
-            String fid = pfx.getId();
-            Feed f = feeds.get(fid);
-            if (f != null) {
-                continue;
-            }
-            f = new Feed();
-            feeds.put(fid, f);
-            f.createdDate = pfx.getCreatedDate();
-            f.loginfo = pfx.getLogData();
-            f.status = pfx.getStatus();
-            /*
-             * AAF changes: TDP EPIC US# 307413
-             * Passing aafInstance from ProvFeed to identify legacy/AAF feeds
-             */
-            f.aafInstance = pfx.getAafInstance();
-            Vector<SubnetMatcher> v1 = pfstab.get(fid);
-            if (v1 == null) {
-                f.subnets = new SubnetMatcher[0];
-            } else {
-                f.subnets = v1.toArray(new SubnetMatcher[0]);
-            }
-            Hashtable<String, String> h1 = pfutab.get(fid);
-            if (h1 == null) {
-                h1 = new Hashtable<String, String>();
-            }
-            f.authusers = h1;
-            Vector<Redirection> v2 = rdtab.get(fid);
-            if (v2 == null) {
-                f.redirections = new Redirection[0];
-            } else {
-                f.redirections = v2.toArray(new Redirection[0]);
-            }
-            StringBuffer sb = feedTargets.get(fid);
-            if (sb == null) {
-                f.targets = new Target[0];
-            } else {
-                f.targets = parseRouting(sb.toString());
-            }
-        }
-    }
-
-    /**
-     * Parse a target string into an array of targets
-     *
-     * @param routing Target string
-     * @return Array of targets.
-     */
-    public Target[] parseRouting(String routing) {
-        routing = routing.trim();
-        if ("".equals(routing)) {
-            return (new Target[0]);
-        }
-        String[] xx = routing.split("\\s+");
-        Hashtable<String, Target> tmap = new Hashtable<String, Target>();
-        HashSet<String> subset = new HashSet<String>();
-        Vector<Target> tv = new Vector<Target>();
-        Target[] ret = new Target[xx.length];
-        for (int i = 0; i < xx.length; i++) {
-            String t = xx[i];
-            int j = t.indexOf('/');
-            if (j == -1) {
-                DestInfo di = subinfo.get(t);
-                if (di == null) {
-                    tv.add(new Target(null, t));
-                } else {
-                    if (!subset.contains(t)) {
-                        subset.add(t);
-                        tv.add(new Target(di, null));
-                    }
-                }
-            } else {
-                String node = t.substring(0, j);
-                String rtg = t.substring(j + 1);
-                DestInfo di = nodeinfo.get(node);
-                if (di == null) {
-                    tv.add(new Target(null, t));
-                } else {
-                    Target tt = tmap.get(node);
-                    if (tt == null) {
-                        tt = new Target(di, rtg);
-                        tmap.put(node, tt);
-                        tv.add(tt);
-                    } else {
-                        tt.addRouting(rtg);
-                    }
-                }
-            }
-        }
-        return (tv.toArray(new Target[0]));
-    }
-
-    /**
-     * Check whether this is a valid node-to-node transfer
-     *
-     * @param credentials Credentials offered by the supposed node
-     * @param ip IP address the request came from
-     */
-    public boolean isAnotherNode(String credentials, String ip) {
-        IsFrom n = nodes.get(credentials);
-        return (n != null && n.isFrom(ip));
-    }
-
-    /**
-     * Check whether publication is allowed.
-     *
-     * @param feedid The ID of the feed being requested.
-     * @param credentials The offered credentials
-     * @param ip The requesting IP address
-     */
-    public String isPublishPermitted(String feedid, String credentials, String ip) {
-        Feed f = feeds.get(feedid);
-        String nf = "Feed does not exist";
-        if (f != null) {
-            nf = f.status;
-        }
-        if (nf != null) {
-            return (nf);
-        }
-        String user = f.authusers.get(credentials);
-        if (user == null) {
-            return ("Publisher not permitted for this feed");
-        }
-        if (f.subnets.length == 0) {
-            return (null);
-        }
-        byte[] addr = NodeUtils.getInetAddress(ip);
-        for (SubnetMatcher snm : f.subnets) {
-            if (snm.matches(addr)) {
-                return (null);
-            }
-        }
-        return ("Publisher not permitted for this feed");
-    }
-
-    /**
-     * Check whether delete file is allowed.
-     *
-     * @param subId The ID of the subscription being requested.
-     */
-    public boolean isDeletePermitted(String subId) {
-        ProvSubscription provSubscription = provSubscriptions.get(subId);
-        return provSubscription.isPrivilegedSubscriber();
-    }
-
-    /**
-     * Check whether publication is allowed for AAF Feed.
-     * @param feedid The ID of the feed being requested.
-     * @param ip The requesting IP address
-     */
-    public String isPublishPermitted(String feedid, String ip) {
-        Feed f = feeds.get(feedid);
-        String nf = "Feed does not exist";
-        if (f != null) {
-            nf = f.status;
-        }
-        if (nf != null) {
-            return(nf);
-        }
-        if (f.subnets.length == 0) {
-            return(null);
-        }
-        byte[] addr = NodeUtils.getInetAddress(ip);
-        for (SubnetMatcher snm: f.subnets) {
-            if (snm.matches(addr)) {
-                return(null);
-            }
-        }
-        return("Publisher not permitted for this feed");
-    }
-
-    /**
-     * Get authenticated user
-     */
-    public String getAuthUser(String feedid, String credentials) {
-        return (feeds.get(feedid).authusers.get(credentials));
-    }
-
-    /**
-     * AAF changes: TDP EPIC US# 307413
-     * Check AAF_instance for feed ID
-     * @param feedid	The ID of the feed specified
-     */
-    public String getAafInstance(String feedid) {
-        Feed f = feeds.get(feedid);
-        return f.aafInstance;
-    }
-
-    /**
-     * Check if the request should be redirected to a different ingress node
-     */
-    public String getIngressNode(String feedid, String user, String ip) {
-        Feed f = feeds.get(feedid);
-        if (f.redirections.length == 0) {
-            return (null);
-        }
-        byte[] addr = NodeUtils.getInetAddress(ip);
-        for (Redirection r : f.redirections) {
-            if (r.user != null && !user.equals(r.user)) {
-                continue;
-            }
-            if (r.snm != null && !r.snm.matches(addr)) {
-                continue;
-            }
-            for (String n : r.nodes) {
-                if (myname.equals(n)) {
-                    return (null);
-                }
-            }
-            if (r.nodes.length == 0) {
-                return (null);
-            }
-            return (r.nodes[rrcntr++ % r.nodes.length]);
-        }
-        return (null);
-    }
-
-    /**
-     * Get a provisioned configuration parameter
-     */
-    public String getProvParam(String name) {
-        return (params.get(name));
-    }
-
-    /**
-     * Get all the DestInfos
-     */
-    public DestInfo[] getAllDests() {
-        return (alldests);
-    }
-
-    /**
-     * Get the targets for a feed
-     *
-     * @param feedid The feed ID
-     * @return The targets this feed should be delivered to
-     */
-    public Target[] getTargets(String feedid) {
-        if (feedid == null) {
-            return (new Target[0]);
-        }
-        Feed f = feeds.get(feedid);
-        if (f == null) {
-            return (new Target[0]);
-        }
-        return (f.targets);
-    }
-
-    /**
-     * Get the creation date for a feed
-     * @param feedid The feed ID
-     * @return the timestamp of creation date of feed id passed
-     */
-    public String getCreatedDate(String feedid) {
-        Feed f = feeds.get(feedid);
-        return(f.createdDate);
-    }
-
-    /**
-     * Get the feed ID for a subscription
-     *
-     * @param subid The subscription ID
-     * @return The feed ID
-     */
-    public String getFeedId(String subid) {
-        DestInfo di = subinfo.get(subid);
-        if (di == null) {
-            return (null);
-        }
-        return (di.getLogData());
-    }
-
-    /**
-     * Get the spool directory for a subscription
-     *
-     * @param subid The subscription ID
-     * @return The spool directory
-     */
-    public String getSpoolDir(String subid) {
-        DestInfo di = subinfo.get(subid);
-        if (di == null) {
-            return (null);
-        }
-        return (di.getSpool());
-    }
-
-    /**
-     * Get the Authorization value this node uses
-     *
-     * @return The Authorization header value for this node
-     */
-    public String getMyAuth() {
-        return (myauth);
-    }
-
 }

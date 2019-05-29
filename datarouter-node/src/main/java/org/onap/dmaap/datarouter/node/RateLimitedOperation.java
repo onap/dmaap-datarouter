@@ -24,13 +24,15 @@
 
 package org.onap.dmaap.datarouter.node;
 
-import java.util.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Execute an operation no more frequently than a specified interval
  */
 
 public abstract class RateLimitedOperation implements Runnable {
+
     private boolean marked;    // a timer task exists
     private boolean executing;    // the operation is currently in progress
     private boolean remark;    // a request was made while the operation was in progress
@@ -41,27 +43,13 @@ public abstract class RateLimitedOperation implements Runnable {
     /**
      * Create a rate limited operation
      *
-     * @param mininterval The minimum number of milliseconds after the last execution starts before a new execution can begin
-     * @param timer       The timer used to perform deferred executions
+     * @param mininterval The minimum number of milliseconds after the last execution starts before a new execution can
+     * begin
+     * @param timer The timer used to perform deferred executions
      */
     public RateLimitedOperation(long mininterval, Timer timer) {
         this.timer = timer;
         this.mininterval = mininterval;
-    }
-
-    private class deferred extends TimerTask {
-        public void run() {
-            execute();
-        }
-    }
-
-    private synchronized void unmark() {
-        marked = false;
-    }
-
-    private void execute() {
-        unmark();
-        request();
     }
 
     /**
@@ -90,7 +78,7 @@ public abstract class RateLimitedOperation implements Runnable {
         if (last + mininterval > now) {
             // too soon - schedule a timer
             marked = true;
-            timer.schedule(new deferred(), last + mininterval - now);
+            timer.schedule(new Deferred(), last + mininterval - now);
             return (true);
         }
         last = now;
@@ -106,5 +94,21 @@ public abstract class RateLimitedOperation implements Runnable {
             return (!premark());
         }
         return (false);
+    }
+
+    private class Deferred extends TimerTask {
+
+        public void run() {
+            execute();
+        }
+
+        private void execute() {
+            unmark();
+            request();
+        }
+
+        private synchronized void unmark() {
+            marked = false;
+        }
     }
 }

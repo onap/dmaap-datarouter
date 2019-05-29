@@ -26,26 +26,21 @@ package org.onap.dmaap.datarouter.node;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-
 import java.io.IOException;
-import java.util.*;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
- * Determine if an IP address is from a machine
+ * Determine if an IP address is from a machine.
  */
 public class IsFrom {
+
+    private static EELFLogger logger = EELFManager.getInstance().getLogger(IsFrom.class);
     private long nextcheck;
     private String[] ips;
     private String fqdn;
-    private static EELFLogger logger = EELFManager.getInstance().getLogger(IsFrom.class);
-
-    /**
-     * Configure the JVM DNS cache to have a 10 second TTL.  This needs to be called very very early or it won't have any effect.
-     */
-    public static void setDNSCache() {
-        java.security.Security.setProperty("networkaddress.cache.ttl", "10");
-    }
 
     /**
      * Create an IsFrom for the specified fully qualified domain name.
@@ -55,10 +50,16 @@ public class IsFrom {
     }
 
     /**
-     * Check if an IP address matches.  If it has been more than
-     * 10 seconds since DNS was last checked for changes to the
-     * IP address(es) of this FQDN, check again.  Then check
-     * if the specified IP address belongs to the FQDN.
+     * Configure the JVM DNS cache to have a 10 second TTL.  This needs to be called very very early or it won't have
+     * any effect.
+     */
+    public static void setDNSCache() {
+        java.security.Security.setProperty("networkaddress.cache.ttl", "10");
+    }
+
+    /**
+     * Check if an IP address matches.  If it has been more than 10 seconds since DNS was last checked for changes to
+     * the IP address(es) of this FQDN, check again.  Then check if the specified IP address belongs to the FQDN.
      */
     public synchronized boolean isFrom(String ip) {
         long now = System.currentTimeMillis();
@@ -98,7 +99,7 @@ public class IsFrom {
     }
 
     /**
-     * Return the fully qualified domain name
+     * Return the fully qualified domain name.
      */
     public String toString() {
         return (fqdn);

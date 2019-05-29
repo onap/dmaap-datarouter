@@ -29,27 +29,27 @@ import com.att.eelf.configuration.EELFManager;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 
 /**
  * Track redirections of subscriptions
  */
 public class RedirManager {
+
     private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(RedirManager.class);
-    private Hashtable<String, String> sid2primary = new Hashtable<String, String>();
-    private Hashtable<String, String> sid2secondary = new Hashtable<String, String>();
-    private String redirfile;
     RateLimitedOperation op;
+    private HashMap<String, String> sid2primary = new HashMap<>();
+    private HashMap<String, String> sid2secondary = new HashMap<>();
+    private String redirfile;
 
     /**
      * Create a mechanism for maintaining subscription redirections.
      *
      * @param redirfile The file to store the redirection information.
-     * @param mininterval The minimum number of milliseconds between writes to the redirection
-     * information file.
+     * @param mininterval The minimum number of milliseconds between writes to the redirection information file.
      * @param timer The timer thread used to run delayed file writes.
      */
     public RedirManager(String redirfile, long mininterval, Timer timer) {
@@ -57,10 +57,12 @@ public class RedirManager {
         op = new RateLimitedOperation(mininterval, timer) {
             public void run() {
                 try {
-                    StringBuffer sb = new StringBuffer();
-                    for (String s : sid2primary.keySet()) {
-                        sb.append(s).append(' ').append(sid2primary.get(s)).append(' ')
-                            .append(sid2secondary.get(s)).append('\n');
+                    StringBuilder sb = new StringBuilder();
+                    for (Map.Entry<String, String> entry : sid2primary.entrySet()) {
+                        String s = entry.getKey();
+                        String value = entry.getValue();
+                        sb.append(s).append(' ').append(value).append(' ')
+                                .append(sid2secondary.get(s)).append('\n');
                     }
                     try (OutputStream os = new FileOutputStream(RedirManager.this.redirfile)) {
                         os.write(sb.toString().getBytes());
@@ -74,23 +76,17 @@ public class RedirManager {
             String s;
             try (BufferedReader br = new BufferedReader(new FileReader(redirfile))) {
                 while ((s = br.readLine()) != null) {
-                    s = s.trim();
-                    String[] sx = s.split(" ");
-                    if (s.startsWith("#") || sx.length != 3) {
-                        continue;
-                    }
-                    sid2primary.put(sx[0], sx[1]);
-                    sid2secondary.put(sx[0], sx[2]);
+                    addSubRedirInfo(s);
                 }
             }
         } catch (Exception e) {
-            eelfLogger.error("Missing file is normal", e);
+            eelfLogger.debug("Missing file is normal", e);
         }
     }
 
     /**
-     * Set up redirection.  If a request is to be sent to subscription ID sid, and that is
-     * configured to go to URL primary, instead, go to secondary.
+     * Set up redirection.  If a request is to be sent to subscription ID sid, and that is configured to go to URL
+     * primary, instead, go to secondary.
      *
      * @param sid The subscription ID to be redirected
      * @param primary The URL associated with that subscription ID
@@ -103,8 +99,7 @@ public class RedirManager {
     }
 
     /**
-     * Cancel redirection.  If a request is to be sent to subscription ID sid, send it to its
-     * primary URL.
+     * Cancel redirection.  If a request is to be sent to subscription ID sid, send it to its primary URL.
      *
      * @param sid The subscription ID to remove from the table.
      */
@@ -115,8 +110,8 @@ public class RedirManager {
     }
 
     /**
-     * Look up where to send a subscription.  If the primary has changed or there is no redirection,
-     * use the primary.  Otherwise, redirect to the secondary URL.
+     * Look up where to send a subscription.  If the primary has changed or there is no redirection, use the primary.
+     * Otherwise, redirect to the secondary URL.
      *
      * @param sid The subscription ID to look up.
      * @param primary The configured primary URL.
@@ -137,5 +132,15 @@ public class RedirManager {
      */
     public synchronized boolean isRedirected(String sid) {
         return (sid != null && sid2secondary.get(sid) != null);
+    }
+
+    private void addSubRedirInfo(String s) {
+        s = s.trim();
+        String[] sx = s.split(" ");
+        if (s.startsWith("#") || sx.length != 3) {
+            return;
+        }
+        sid2primary.put(sx[0], sx[1]);
+        sid2secondary.put(sx[0], sx[2]);
     }
 }

@@ -26,40 +26,156 @@ package org.onap.dmaap.datarouter.node;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.EnumSet;
+import java.util.Properties;
+import javax.servlet.DispatcherType;
+import javax.servlet.ServletException;
 import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.onap.aaf.cadi.PropAccess;
 
-import javax.servlet.DispatcherType;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.EnumSet;
-import java.util.Properties;
-
 /**
  * The main starting point for the Data Router node
  */
 public class NodeMain {
 
+    private static EELFLogger nodeMainLogger = EELFManager.getInstance().getLogger(NodeMain.class);
+    private static Delivery delivery;
+    private static NodeConfigManager nodeConfigManager;
+
     private NodeMain() {
     }
 
-    private static EELFLogger nodeMainLogger = EELFManager.getInstance().getLogger(NodeMain.class);
+    /**
+     * Reset the retry timer for a subscription
+     */
+    static void resetQueue(String subid, String ip) {
+        delivery.resetQueue(nodeConfigManager.getSpoolDir(subid, ip));
+    }
 
-    class Inner {
-        InputStream getCadiProps() {
-            InputStream in = null;
-            try {
-                in = getClass().getClassLoader().getResourceAsStream("drNodeCadi.properties");
-            } catch (Exception e) {
-                nodeMainLogger.error("Exception in Inner.getCadiProps() method ", e);
+    /**
+     * Start the data router.
+     * <p>
+     * The location of the node configuration file can be set using the org.onap.dmaap.datarouter.node.properties system
+     * property.  By default, it is "/opt/app/datartr/etc/node.properties".
+     */
+    public static void main(String[] args) throws Exception {
+        nodeMainLogger.info("NODE0001 Data Router Node Starting");
+        IsFrom.setDNSCache();
+        nodeConfigManager = NodeConfigManager.getInstance();
+        nodeMainLogger.info("NODE0002 I am " + nodeConfigManager.getMyName());
+        (new WaitForConfig(nodeConfigManager)).waitForConfig();
+        delivery = new Delivery(nodeConfigManager);
+        new LogManager(nodeConfigManager);
+
+        Server server = new Server();
+
+        // HTTP configuration
+        HttpConfiguration httpConfiguration = new HttpConfiguration();
+        httpConfiguration.setRequestHeaderSize(2048);
+
+        // HTTP connector
+        try (ServerConnector httpServerConnector = new ServerConnector(server,
+                new HttpConnectionFactory(httpConfiguration))) {
+            httpServerConnector.setPort(nodeConfigManager.getHttpPort());
+            httpServerConnector.setIdleTimeout(2000);
+
+            // HTTPS configuration
+            SslContextFactory sslContextFactory = new SslContextFactory();
+            sslContextFactory.setKeyStoreType(nodeConfigManager.getKSType());
+            sslContextFactory.setKeyStorePath(nodeConfigManager.getKSFile());
+            sslContextFactory.setKeyStorePassword(nodeConfigManager.getKSPass());
+            sslContextFactory.setKeyManagerPassword(nodeConfigManager.getKPass());
+
+            //SP-6 : Fixes for SDV scan to exclude/remove DES/3DES ciphers are taken care by upgrading jdk in descriptor.xml
+            sslContextFactory.setExcludeCipherSuites(
+                    "SSL_RSA_WITH_DES_CBC_SHA",
+                    "SSL_DHE_RSA_WITH_DES_CBC_SHA",
+                    "SSL_DHE_DSS_WITH_DES_CBC_SHA",
+                    "SSL_RSA_EXPORT_WITH_RC4_40_MD5",
+                    "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
+                    "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
+                    "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA"
+            );
+
+            sslContextFactory.addExcludeProtocols("SSLv3");
+            sslContextFactory.setIncludeProtocols(nodeConfigManager.getEnabledprotocols());
+            nodeMainLogger.info("NODE00004 Unsupported protocols node server:-" +
+                    String.join(",", sslContextFactory.getExcludeProtocols()));
+            nodeMainLogger.info("NODE00004 Supported protocols node server:-" +
+                    String.join(",", sslContextFactory.getIncludeProtocols()));
+            nodeMainLogger.info("NODE00004 Unsupported ciphers node server:-" +
+                    String.join(",", sslContextFactory.getExcludeCipherSuites()));
+
+            HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
+            httpsConfiguration.setRequestHeaderSize(8192);
+
+            SecureRequestCustomizer secureRequestCustomizer = new SecureRequestCustomizer();
+            secureRequestCustomizer.setStsMaxAge(2000);
+            secureRequestCustomizer.setStsIncludeSubDomains(true);
+            httpsConfiguration.addCustomizer(secureRequestCustomizer);
+
+            // HTTPS connector
+            try (ServerConnector httpsServerConnector = new ServerConnector(server,
+                    new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
+                    new HttpConnectionFactory(httpsConfiguration))) {
+
+                httpsServerConnector.setPort(nodeConfigManager.getHttpsPort());
+                httpsServerConnector.setIdleTimeout(3600000);
+                httpsServerConnector.setAcceptQueueSize(2);
+
+                //Context Handler
+                ServletContextHandler servletContextHandler = new ServletContextHandler(0);
+                servletContextHandler.setContextPath("/");
+                servletContextHandler.addServlet(new ServletHolder(new NodeServlet(delivery)), "/*");
+
+                //CADI Filter activation check
+                if (nodeConfigManager.getCadiEnabled()) {
+                    enableCadi(servletContextHandler);
+                }
+
+                server.setHandler(servletContextHandler);
+                server.setConnectors(new Connector[]{httpServerConnector, httpsServerConnector});
             }
-            return in;
         }
+
+        try {
+            server.start();
+            nodeMainLogger.info("NODE00006 Node Server started-" + server.getState());
+        } catch (Exception e) {
+            nodeMainLogger.info("NODE00006 Jetty failed to start. Reporting will we unavailable", e.getMessage());
+        }
+        server.join();
+        nodeMainLogger.info("NODE00007 Node Server joined - " + server.getState());
+    }
+
+    private static void enableCadi(ServletContextHandler servletContextHandler) throws ServletException {
+        Properties cadiProperties = new Properties();
+        try {
+            Inner obj = new NodeMain().new Inner();
+            InputStream in = obj.getCadiProps();
+            cadiProperties.load(in);
+        } catch (IOException e1) {
+            nodeMainLogger.error("NODE00005 Exception in NodeMain.Main() loading CADI properties " + e1.getMessage());
+        }
+        cadiProperties.setProperty("aaf_locate_url", nodeConfigManager.getAafURL());
+        nodeMainLogger.info("NODE00005  aaf_url set to - " + cadiProperties.getProperty("aaf_url"));
+
+        PropAccess access = new PropAccess(cadiProperties);
+        servletContextHandler.addFilter(new FilterHolder(new DRNodeCadiFilter(true, access)), "/*", EnumSet
+                .of(DispatcherType.REQUEST));
     }
 
     private static class WaitForConfig implements Runnable {
@@ -91,117 +207,16 @@ public class NodeMain {
         }
     }
 
-    private static Delivery delivery;
-    private static NodeConfigManager nodeConfigManager;
+    class Inner {
 
-    /**
-     * Reset the retry timer for a subscription
-     */
-    static void resetQueue(String subid, String ip) {
-        delivery.resetQueue(nodeConfigManager.getSpoolDir(subid, ip));
-    }
-
-    /**
-     * Start the data router.
-     * <p>
-     * The location of the node configuration file can be set using the org.onap.dmaap.datarouter.node.properties system
-     * property.  By default, it is "/opt/app/datartr/etc/node.properties".
-     */
-    public static void main(String[] args) throws Exception {
-        nodeMainLogger.info("NODE0001 Data Router Node Starting");
-        IsFrom.setDNSCache();
-        nodeConfigManager = NodeConfigManager.getInstance();
-        nodeMainLogger.info("NODE0002 I am " + nodeConfigManager.getMyName());
-        (new WaitForConfig(nodeConfigManager)).waitForConfig();
-        delivery = new Delivery(nodeConfigManager);
-        new LogManager(nodeConfigManager);
-
-        Server server = new Server();
-
-        // HTTP configuration
-        HttpConfiguration httpConfiguration = new HttpConfiguration();
-        httpConfiguration.setRequestHeaderSize(2048);
-
-        // HTTP connector
-        try (ServerConnector httpServerConnector = new ServerConnector(server, new HttpConnectionFactory(httpConfiguration))) {
-            httpServerConnector.setPort(nodeConfigManager.getHttpPort());
-            httpServerConnector.setIdleTimeout(2000);
-
-            // HTTPS configuration
-            SslContextFactory sslContextFactory = new SslContextFactory();
-            sslContextFactory.setKeyStoreType(nodeConfigManager.getKSType());
-            sslContextFactory.setKeyStorePath(nodeConfigManager.getKSFile());
-            sslContextFactory.setKeyStorePassword(nodeConfigManager.getKSPass());
-            sslContextFactory.setKeyManagerPassword(nodeConfigManager.getKPass());
-
-            //SP-6 : Fixes for SDV scan to exclude/remove DES/3DES ciphers are taken care by upgrading jdk in descriptor.xml
-            sslContextFactory.setExcludeCipherSuites(
-                    "SSL_RSA_WITH_DES_CBC_SHA",
-                    "SSL_DHE_RSA_WITH_DES_CBC_SHA",
-                    "SSL_DHE_DSS_WITH_DES_CBC_SHA",
-                    "SSL_RSA_EXPORT_WITH_RC4_40_MD5",
-                    "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
-                    "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
-                    "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA"
-            );
-
-            sslContextFactory.addExcludeProtocols("SSLv3");
-            sslContextFactory.setIncludeProtocols(nodeConfigManager.getEnabledprotocols());
-            nodeMainLogger.info("NODE00004 Unsupported protocols node server:-" + String.join(",", sslContextFactory.getExcludeProtocols()));
-            nodeMainLogger.info("NODE00004 Supported protocols node server:-" + String.join(",", sslContextFactory.getIncludeProtocols()));
-            nodeMainLogger.info("NODE00004 Unsupported ciphers node server:-" + String.join(",", sslContextFactory.getExcludeCipherSuites()));
-
-            HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
-            httpsConfiguration.setRequestHeaderSize(8192);
-
-            SecureRequestCustomizer secureRequestCustomizer = new SecureRequestCustomizer();
-            secureRequestCustomizer.setStsMaxAge(2000);
-            secureRequestCustomizer.setStsIncludeSubDomains(true);
-            httpsConfiguration.addCustomizer(secureRequestCustomizer);
-
-            // HTTPS connector
-            try (ServerConnector httpsServerConnector = new ServerConnector(server,
-                    new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
-                    new HttpConnectionFactory(httpsConfiguration))) {
-
-                httpsServerConnector.setPort(nodeConfigManager.getHttpsPort());
-                httpsServerConnector.setIdleTimeout(3600000);
-                httpsServerConnector.setAcceptQueueSize(2);
-
-                //Context Handler
-                ServletContextHandler servletContextHandler = new ServletContextHandler(0);
-                servletContextHandler.setContextPath("/");
-                servletContextHandler.addServlet(new ServletHolder(new NodeServlet(delivery)), "/*");
-
-                //CADI Filter activation check
-                if (nodeConfigManager.getCadiEnabeld()) {
-                    Properties cadiProperties = new Properties();
-                    try {
-                        Inner obj = new NodeMain().new Inner();
-                        InputStream in = obj.getCadiProps();
-                        cadiProperties.load(in);
-                    } catch (IOException e1) {
-                        nodeMainLogger.error("NODE00005 Exception in NodeMain.Main() loading CADI properties ", e1);
-                    }
-                    cadiProperties.setProperty("aaf_locate_url", nodeConfigManager.getAafURL());
-                    nodeMainLogger.info("NODE00005  aaf_url set to - " + cadiProperties.getProperty("aaf_url"));
-
-                    PropAccess access = new PropAccess(cadiProperties);
-                    servletContextHandler.addFilter(new FilterHolder(new DRNodeCadiFilter(true, access)), "/*", EnumSet.of(DispatcherType.REQUEST));
-                }
-
-                server.setHandler(servletContextHandler);
-                server.setConnectors(new Connector[]{httpServerConnector, httpsServerConnector});
+        InputStream getCadiProps() {
+            InputStream in = null;
+            try {
+                in = getClass().getClassLoader().getResourceAsStream("drNodeCadi.properties");
+            } catch (Exception e) {
+                nodeMainLogger.error("Exception in Inner.getCadiProps() method ", e);
             }
+            return in;
         }
-
-        try {
-            server.start();
-            nodeMainLogger.info("NODE00006 Node Server started-" + server.getState());
-        } catch (Exception e) {
-            nodeMainLogger.info("NODE00006 Jetty failed to start. Reporting will we unavailable", e);
-        }
-        server.join();
-        nodeMainLogger.info("NODE00007 Node Server joined - " + server.getState());
     }
 }
