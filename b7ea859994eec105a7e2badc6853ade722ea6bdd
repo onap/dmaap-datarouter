@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "c3811c5a_38cec764",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-05-29T12:38:27Z",
+      "side": 1,
+      "message": "Haha, yeah definitely was a mistake",
+      "parentUuid": "544e179e_97cdc4ad",
+      "range": {
+        "startLine": 470,
+        "startChar": 19,
+        "endLine": 470,
+        "endChar": 34
+      },
+      "revId": "b7ea859994eec105a7e2badc6853ade722ea6bdd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "85fccac6_33c1a4ed",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/ProvData.java",
         "patchSetId": 2
