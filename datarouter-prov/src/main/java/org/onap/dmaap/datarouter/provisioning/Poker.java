@@ -66,6 +66,7 @@ public class Poker extends TimerTask {
     private static final String POKE_URL_TEMPLATE = "http://%s/internal/fetchProv";
 
     private static final Object lock = new Object();
+    private static final String CARRIAGERETURN = "\n],\n";
 
     /**
      * This is a singleton -- there is only one Poker object in the server
@@ -76,6 +77,7 @@ public class Poker extends TimerTask {
     private String thisPod;        // DNS name of this machine
     private EELFLogger logger;
     private String provString;
+
 
     private Poker() {
         timer1 = timer2 = 0;
@@ -215,7 +217,7 @@ public class Poker extends TimerTask {
             sb.append(f.asJSONObject().toString());
             pfx = ",\n";
         }
-        sb.append("\n],\n");
+        sb.append(CARRIAGERETURN);
 
         //Append groups to the string - Rally:US708115  - 1610
         pfx = "\n";
@@ -225,7 +227,7 @@ public class Poker extends TimerTask {
             sb.append(s.asJSONObject().toString());
             pfx = ",\n";
         }
-        sb.append("\n],\n");
+        sb.append(CARRIAGERETURN);
 
         // Append Subscriptions to the string
         pfx = "\n";
@@ -237,13 +239,13 @@ public class Poker extends TimerTask {
             }
             pfx = ",\n";
         }
-        sb.append("\n],\n");
+        sb.append(CARRIAGERETURN);
 
         // Append Parameters to the string
         pfx = "\n";
         sb.append("\"parameters\": {");
         Map<String, String> props = Parameters.getParameters();
-        Set<String> ivals = new HashSet<String>();
+        Set<String> ivals = new HashSet<>();
         String intv = props.get("_INT_VALUES");
         if (intv != null) {
             ivals.addAll(Arrays.asList(intv.split("\\|")));
@@ -280,7 +282,7 @@ public class Poker extends TimerTask {
             sb.append(in.asJSONObject().toString());
             pfx = ",\n";
         }
-        sb.append("\n],\n");
+        sb.append(CARRIAGERETURN);
 
         pfx = "\n";
         sb.append("\"egress\": {");
