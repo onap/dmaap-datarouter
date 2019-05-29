@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "b1b5de6e_8391e240",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-05-29T13:20:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3811c5a_38cec764",
+      "range": {
+        "startLine": 470,
+        "startChar": 19,
+        "endLine": 470,
+        "endChar": 34
+      },
+      "revId": "b7ea859994eec105a7e2badc6853ade722ea6bdd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "85fccac6_33c1a4ed",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/ProvData.java",
         "patchSetId": 2
@@ -60,6 +84,30 @@
       "writtenOn": "2019-05-29T12:28:36Z",
       "side": 1,
       "message": "Painful I know, but any chance you could expand the names here.\nAlso the ArrayLists in the constructor.",
+      "range": {
+        "startLine": 58,
+        "startChar": 34,
+        "endLine": 58,
+        "endChar": 36
+      },
+      "revId": "b7ea859994eec105a7e2badc6853ade722ea6bdd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3c084610_0b1212f3",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/ProvData.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-05-29T13:20:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "85fccac6_33c1a4ed",
       "range": {
         "startLine": 58,
         "startChar": 34,
@@ -95,6 +143,30 @@
     },
     {
       "key": {
+        "uuid": "1bb62c27_76ddf192",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/RedirManager.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-05-29T13:20:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1310acfe_db34ad56",
+      "range": {
+        "startLine": 83,
+        "startChar": 23,
+        "endLine": 83,
+        "endChar": 28
+      },
+      "revId": "b7ea859994eec105a7e2badc6853ade722ea6bdd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e1bc36d0_4f4289fb",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/StatusLog.java",
         "patchSetId": 2
@@ -106,6 +178,30 @@
       "writtenOn": "2019-05-29T12:28:36Z",
       "side": 1,
       "message": "Could be a case for a constants class for dr-node aswell.",
+      "range": {
+        "startLine": 44,
+        "startChar": 32,
+        "endLine": 44,
+        "endChar": 41
+      },
+      "revId": "b7ea859994eec105a7e2badc6853ade722ea6bdd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "76e3401e_80b0ec46",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/StatusLog.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4447
+      },
+      "writtenOn": "2019-05-29T13:20:26Z",
+      "side": 1,
+      "message": "Yeah I agree, probably require someone to go through all code in node module and extract all common ones. I don\u0027t have time to do that right now though.",
+      "parentUuid": "e1bc36d0_4f4289fb",
       "range": {
         "startLine": 44,
         "startChar": 32,
