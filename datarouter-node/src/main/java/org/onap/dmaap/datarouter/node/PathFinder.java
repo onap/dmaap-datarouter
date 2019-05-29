@@ -24,9 +24,11 @@
 
 package org.onap.dmaap.datarouter.node;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Vector;
+import org.jetbrains.annotations.Nullable;
+import org.onap.dmaap.datarouter.node.NodeConfig.ProvHop;
 
 /**
  * Given a set of node names and next hops, identify and ignore any cycles and figure out the sequence of next hops to
@@ -35,15 +37,40 @@ import java.util.Vector;
 
 public class PathFinder {
 
-    private static class Hop {
+    private ArrayList<String> errors = new ArrayList<>();
+    private HashMap<String, String> routes = new HashMap<>();
 
-        boolean mark;
-        boolean bad;
-        NodeConfig.ProvHop basis;
+    /**
+     * Find routes from a specified origin to all of the nodes given a set of specified next hops.
+     *
+     * @param origin where we start
+     * @param nodes where we can go
+     * @param hops detours along the way
+     */
+    public PathFinder(String origin, String[] nodes, NodeConfig.ProvHop[] hops) {
+        HashSet<String> known = new HashSet<>();
+        HashMap<String, HashMap<String, Hop>> ht = new HashMap<>();
+        for (String n : nodes) {
+            known.add(n);
+            ht.put(n, new HashMap<>());
+        }
+        for (NodeConfig.ProvHop ph : hops) {
+            Hop h = getHop(known, ht, ph);
+            if (h == null) {
+                continue;
+            }
+            if (ph.getVia().equals(ph.getTo())) {
+                errors.add(ph + " gives destination as via");
+                h.bad = true;
+            }
+        }
+        for (String n : known) {
+            if (n.equals(origin)) {
+                routes.put(n, "");
+            }
+            routes.put(n, plot(origin, n, ht.get(n)) + "/");
+        }
     }
-
-    private Vector<String> errors = new Vector<String>();
-    private Hashtable<String, String> routes = new Hashtable<String, String>();
 
     /**
      * Get list of errors encountered while finding paths
@@ -68,13 +95,12 @@ public class PathFinder {
         return (ret);
     }
 
-    private String plot(String from, String to, Hashtable<String, Hop> info) {
+    private String plot(String from, String to, HashMap<String, Hop> info) {
         Hop nh = info.get(from);
         if (nh == null || nh.bad) {
             return (to);
         }
         if (nh.mark) {
-            // loop detected;
             while (!nh.bad) {
                 nh.bad = true;
                 errors.add(nh.basis + " is part of a cycle");
@@ -91,55 +117,38 @@ public class PathFinder {
         return (nh.basis.getVia() + "/" + x);
     }
 
-    /**
-     * Find routes from a specified origin to all of the nodes given a set of specified next hops.
-     *
-     * @param origin where we start
-     * @param nodes where we can go
-     * @param hops detours along the way
-     */
-    public PathFinder(String origin, String[] nodes, NodeConfig.ProvHop[] hops) {
-        HashSet<String> known = new HashSet<String>();
-        Hashtable<String, Hashtable<String, Hop>> ht = new Hashtable<String, Hashtable<String, Hop>>();
-        for (String n : nodes) {
-            known.add(n);
-            ht.put(n, new Hashtable<String, Hop>());
+    @Nullable
+    private Hop getHop(HashSet<String> known, HashMap<String, HashMap<String, Hop>> ht, ProvHop ph) {
+        if (!known.contains(ph.getFrom())) {
+            errors.add(ph + " references unknown from node");
+            return null;
         }
-        for (NodeConfig.ProvHop ph : hops) {
-            if (!known.contains(ph.getFrom())) {
-                errors.add(ph + " references unknown from node");
-                continue;
-            }
-            if (!known.contains(ph.getTo())) {
-                errors.add(ph + " references unknown destination node");
-                continue;
-            }
-            Hashtable<String, Hop> ht2 = ht.get(ph.getTo());
-            Hop h = ht2.get(ph.getFrom());
-            if (h != null) {
-                h.bad = true;
-                errors.add(ph + " gives duplicate next hop - previous via was " + h.basis.getVia());
-                continue;
-            }
-            h = new Hop();
-            h.basis = ph;
-            ht2.put(ph.getFrom(), h);
-            if (!known.contains(ph.getVia())) {
-                errors.add(ph + " references unknown via node");
-                h.bad = true;
-                continue;
-            }
-            if (ph.getVia().equals(ph.getTo())) {
-                errors.add(ph + " gives destination as via");
-                h.bad = true;
-                continue;
-            }
+        if (!known.contains(ph.getTo())) {
+            errors.add(ph + " references unknown destination node");
+            return null;
         }
-        for (String n : known) {
-            if (n.equals(origin)) {
-                routes.put(n, "");
-            }
-            routes.put(n, plot(origin, n, ht.get(n)) + "/");
+        HashMap<String, Hop> ht2 = ht.get(ph.getTo());
+        Hop h = ht2.get(ph.getFrom());
+        if (h != null) {
+            h.bad = true;
+            errors.add(ph + " gives duplicate next hop - previous via was " + h.basis.getVia());
+            return null;
         }
+        h = new Hop();
+        h.basis = ph;
+        ht2.put(ph.getFrom(), h);
+        if (!known.contains(ph.getVia())) {
+            errors.add(ph + " references unknown via node");
+            h.bad = true;
+            return null;
+        }
+        return h;
+    }
+
+    private static class Hop {
+
+        boolean mark;
+        boolean bad;
+        NodeConfig.ProvHop basis;
     }
 }

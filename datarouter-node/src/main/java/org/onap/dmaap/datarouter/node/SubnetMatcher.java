@@ -28,6 +28,7 @@ package org.onap.dmaap.datarouter.node;
  * Compare IP addresses as byte arrays to a subnet specified as a CIDR
  */
 public class SubnetMatcher {
+
     private byte[] sn;
     private int len;
     private int mask;

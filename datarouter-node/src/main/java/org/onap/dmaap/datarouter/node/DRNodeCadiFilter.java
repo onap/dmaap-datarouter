@@ -17,23 +17,24 @@
  * SPDX-License-Identifier: Apache-2.0
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.dmaap.datarouter.node;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-import org.onap.aaf.cadi.PropAccess;
-import org.onap.aaf.cadi.filter.CadiFilter;
-
+import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import org.onap.aaf.cadi.PropAccess;
+import org.onap.aaf.cadi.filter.CadiFilter;
 
 
 public class DRNodeCadiFilter extends CadiFilter {
+
     private static EELFLogger logger = EELFManager.getInstance().getLogger(NodeServlet.class);
 
     DRNodeCadiFilter(boolean init, PropAccess access) throws ServletException {
@@ -41,23 +42,16 @@ public class DRNodeCadiFilter extends CadiFilter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String path = httpRequest.getPathInfo();
         if (!(path.startsWith("/internal"))) {
-            if (!(httpRequest.getMethod().equalsIgnoreCase("POST"))) {
-                if (httpRequest.getMethod().equalsIgnoreCase("DELETE") && path.startsWith("/delete")) {
+            if (!("POST".equalsIgnoreCase(httpRequest.getMethod()))) {
+                if ("DELETE".equalsIgnoreCase(httpRequest.getMethod()) && path.startsWith("/delete")) {
                     chain.doFilter(request, response);
                 } else {
-                    String feedId = getFeedId(request, response);
-                    String aafDbInstance = NodeConfigManager.getInstance().getAafInstance(feedId);
-                    if (aafDbInstance != null && !aafDbInstance.equals("") && !aafDbInstance.equalsIgnoreCase("legacy")) {
-                        logger.info("DRNodeCadiFilter - doFilter: FeedId - " + feedId + ":" + "AAF Instance -" + aafDbInstance);
-                        super.doFilter(request, response, chain);
-                    } else {
-                        logger.info("DRNodeCadiFilter - doFilter: FeedId - " + feedId + ":" + "Legacy Feed");
-                        chain.doFilter(request, response);
-                    }
+                    doFilterWithFeedId(request, response, chain);
                 }
             }
         } else {
@@ -72,7 +66,8 @@ public class DRNodeCadiFilter extends CadiFilter {
         if (fileid == null) {
             logger.error("NODE0105 Rejecting bad URI for PUT " + req.getPathInfo() + " from " + req.getRemoteAddr());
             try {
-                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.");
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND,
+                        "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.");
             } catch (IOException e) {
                 logger.error("NODE0541 DRNodeCadiFilter.getFeedId: ", e);
             }
@@ -82,19 +77,34 @@ public class DRNodeCadiFilter extends CadiFilter {
 
         if (fileid.startsWith("/publish/")) {
             fileid = fileid.substring(9);
-            int i = fileid.indexOf('/');
-            if (i == -1 || i == fileid.length() - 1) {
-                logger.error("NODE0105 Rejecting bad URI for PUT (publish) of " + req.getPathInfo() + " from " + req.getRemoteAddr());
+            int index = fileid.indexOf('/');
+            if (index == -1 || index == fileid.length() - 1) {
+                logger.error("NODE0105 Rejecting bad URI for PUT (publish) of " + req.getPathInfo() + " from " + req
+                        .getRemoteAddr());
                 try {
-                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.  Possible missing fileid.");
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND,
+                            "Invalid request URI.  Expecting <feed-publishing-url>/<fileid>.  "
+                                    + "Possible missing fileid.");
                 } catch (IOException e) {
                     logger.error("NODE0542 DRNodeCadiFilter.getFeedId: ", e);
                 }
                 return null;
             }
-            feedid = fileid.substring(0, i);
+            feedid = fileid.substring(0, index);
         }
         return feedid;
     }
 
+    private void doFilterWithFeedId(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+        String feedId = getFeedId(request, response);
+        String aafDbInstance = NodeConfigManager.getInstance().getAafInstance(feedId);
+        if (aafDbInstance != null && !"".equals(aafDbInstance) && !"legacy".equalsIgnoreCase(aafDbInstance)) {
+            logger.info("DRNodeCadiFilter - doFilter: FeedId - " + feedId + ":" + "AAF Instance -" + aafDbInstance);
+            super.doFilter(request, response, chain);
+        } else {
+            logger.info("DRNodeCadiFilter - doFilter: FeedId - " + feedId + ":" + "Legacy Feed");
+            chain.doFilter(request, response);
+        }
+    }
 }

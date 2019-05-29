@@ -24,15 +24,22 @@
 
 package org.onap.dmaap.datarouter.node;
 
+import static com.att.eelf.configuration.Configuration.MDC_KEY_REQUEST_ID;
+import static com.att.eelf.configuration.Configuration.MDC_SERVER_FQDN;
+import static com.att.eelf.configuration.Configuration.MDC_SERVER_IP_ADDRESS;
+import static com.att.eelf.configuration.Configuration.MDC_SERVICE_NAME;
+
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -46,8 +53,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 import org.slf4j.MDC;
-
-import static com.att.eelf.configuration.Configuration.*;
 
 /**
  * Utility functions for the data router node
@@ -63,7 +68,7 @@ public class NodeUtils {
     /**
      * Base64 encode a byte array
      *
-     * @param  raw The bytes to be encoded
+     * @param raw The bytes to be encoded
      * @return The encoded string
      */
     public static String base64Encode(byte[] raw) {
@@ -117,11 +122,7 @@ public class NodeUtils {
         KeyStore ks;
         try {
             ks = KeyStore.getInstance(kstype);
-            try (FileInputStream fileInputStream = new FileInputStream(ksfile)) {
-                ks.load(fileInputStream, kspass.toCharArray());
-            } catch (IOException ioException) {
-                eelfLogger.error("IOException occurred while opening FileInputStream: " + ioException.getMessage(),
-                        ioException);
+            if (loadKeyStore(ksfile, kspass, ks)) {
                 return (null);
             }
         } catch (Exception e) {
@@ -142,22 +143,9 @@ public class NodeUtils {
         try {
             Enumeration<String> aliases = ks.aliases();
             while (aliases.hasMoreElements()) {
-                String s = aliases.nextElement();
-                if (ks.entryInstanceOf(s, KeyStore.PrivateKeyEntry.class)) {
-                    X509Certificate c = (X509Certificate) ks.getCertificate(s);
-                    if (c != null) {
-                        String subject = c.getSubjectX500Principal().getName();
-                        String[] parts = subject.split(",");
-                        if (parts.length < 1) {
-                            return (null);
-                        }
-                        subject = parts[5].trim();
-                        if (!subject.startsWith("CN=")) {
-                            return (null);
-
-                        }
-                        return (subject.substring(3));
-                    }
+                String name = getNameFromSubject(ks, aliases);
+                if (name != null) {
+                    return name;
                 }
             }
         } catch (Exception e) {
@@ -290,19 +278,51 @@ public class NodeUtils {
     /**
      * Method to check to see if file is of type gzip
      *
-     * @param   file The name of the file to be checked
-     * @return  True if the file is of type gzip
+     * @param file The name of the file to be checked
+     * @return True if the file is of type gzip
      */
-    public static boolean isFiletypeGzip(File file){
-        try(FileInputStream fileInputStream = new FileInputStream(file);
-            GZIPInputStream gzip = new GZIPInputStream(fileInputStream)) {
+    public static boolean isFiletypeGzip(File file) {
+        try (FileInputStream fileInputStream = new FileInputStream(file);
+                GZIPInputStream gzip = new GZIPInputStream(fileInputStream)) {
 
             return true;
-        }catch (IOException e){
+        } catch (IOException e) {
             eelfLogger.error("NODE0403 " + file.toString() + " Not in gzip(gz) format: " + e.toString() + e);
             return false;
         }
     }
 
 
+    private static boolean loadKeyStore(String ksfile, String kspass, KeyStore ks)
+            throws NoSuchAlgorithmException, CertificateException {
+        try (FileInputStream fileInputStream = new FileInputStream(ksfile)) {
+            ks.load(fileInputStream, kspass.toCharArray());
+        } catch (IOException ioException) {
+            eelfLogger.error("IOException occurred while opening FileInputStream: " + ioException.getMessage(),
+                    ioException);
+            return true;
+        }
+        return false;
+    }
+
+
+    private static String getNameFromSubject(KeyStore ks, Enumeration<String> aliases) throws KeyStoreException {
+        String s = aliases.nextElement();
+        if (ks.entryInstanceOf(s, KeyStore.PrivateKeyEntry.class)) {
+            X509Certificate c = (X509Certificate) ks.getCertificate(s);
+            if (c != null) {
+                String subject = c.getSubjectX500Principal().getName();
+                String[] parts = subject.split(",");
+                if (parts.length < 1) {
+                    return null;
+                }
+                subject = parts[5].trim();
+                if (!subject.startsWith("CN=")) {
+                    return null;
+                }
+                return subject.substring(3);
+            }
+        }
+        return null;
+    }
 }

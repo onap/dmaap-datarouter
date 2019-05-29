@@ -25,9 +25,10 @@
 package org.onap.dmaap.datarouter.node;
 
 /**
- * Information for a delivery destination that doesn't change from message to message
+ * Information for a delivery destination that doesn't change from message to message.
  */
 public class DestInfo {
+
     private String name;
     private String spool;
     private String subid;
@@ -40,114 +41,33 @@ public class DestInfo {
     private boolean privilegedSubscriber;
     private boolean decompress;
     private boolean followRedirects;
-    private String aafInstance;
 
-    public static class DestInfoBuilder {
-        private String name;
-        private String spool;
-        private String subid;
-        private String logdata;
-        private String url;
-        private String authuser;
-        private String authentication;
-        private boolean metaonly;
-        private boolean use100;
-        private boolean privilegedSubscriber;
-        private boolean followRedirects;
-        private boolean decompress;
-        private NodeConfig.ProvSubscription subscription;
-
-        public DestInfoBuilder setName(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public DestInfoBuilder setSpool(String spool) {
-            this.spool = spool;
-            return this;
-        }
-
-        public DestInfoBuilder setSubid(String subid) {
-            this.subid = subid;
-            return this;
-        }
-
-        public DestInfoBuilder setLogdata(String logdata) {
-            this.logdata = logdata;
-            return this;
-        }
-
-        public DestInfoBuilder setUrl(String url) {
-            this.url = url;
-            return this;
-        }
-
-        public DestInfoBuilder setAuthuser(String authuser) {
-            this.authuser = authuser;
-            return this;
-        }
-
-        public DestInfoBuilder setAuthentication(String authentication) {
-            this.authentication = authentication;
-            return this;
-        }
-
-        public DestInfoBuilder setMetaonly(boolean metaonly) {
-            this.metaonly = metaonly;
-            return this;
-        }
-
-        public DestInfoBuilder setUse100(boolean use100) {
-            this.use100 = use100;
-            return this;
-        }
-
-        public DestInfoBuilder setPrivilegedSubscriber(boolean privilegedSubscriber) {
-            this.privilegedSubscriber = privilegedSubscriber;
-            return this;
-        }
-
-        public DestInfoBuilder setFollowRedirects(boolean followRedirects) {
-            this.followRedirects = followRedirects;
-            return this;
-        }
-
-        public DestInfoBuilder setDecompress(boolean decompress) {
-            this.decompress = decompress;
-            return this;
-        }
-
-        public DestInfoBuilder setSubscription(NodeConfig.ProvSubscription subscription) {
-            this.subscription = subscription;
-            return this;
-        }
-
-        public DestInfo createDestInfo() {
-            return new DestInfo(this);
-        }
-    }
-
+    /**
+     * Create a destination information object.
+     *
+     * @param destInfoBuilder DestInfo Object Builder
+     */
     public DestInfo(DestInfoBuilder destInfoBuilder) {
-        this.name = destInfoBuilder.name;
-        this.spool = destInfoBuilder.spool;
-        this.subid = destInfoBuilder.subid;
-        this.logdata = destInfoBuilder.logdata;
-        this.url = destInfoBuilder.url;
-        this.authuser = destInfoBuilder.authuser;
-        this.authentication = destInfoBuilder.authentication;
-        this.metaonly = destInfoBuilder.metaonly;
-        this.use100 = destInfoBuilder.use100;
-        this.privilegedSubscriber = destInfoBuilder.privilegedSubscriber;
-        this.followRedirects = destInfoBuilder.followRedirects;
-        this.decompress = destInfoBuilder.decompress;
+        this.name = destInfoBuilder.getName();
+        this.spool = destInfoBuilder.getSpool();
+        this.subid = destInfoBuilder.getSubid();
+        this.logdata = destInfoBuilder.getLogdata();
+        this.url = destInfoBuilder.getUrl();
+        this.authuser = destInfoBuilder.getAuthuser();
+        this.authentication = destInfoBuilder.getAuthentication();
+        this.metaonly = destInfoBuilder.isMetaonly();
+        this.use100 = destInfoBuilder.isUse100();
+        this.privilegedSubscriber = destInfoBuilder.isPrivilegedSubscriber();
+        this.followRedirects = destInfoBuilder.isFollowRedirects();
+        this.decompress = destInfoBuilder.isDecompress();
     }
 
     /**
      * Create a destination information object.
      *
-     * @param    name    n:fqdn or s:subid
-     * @param    spool    The directory where files are spooled.
-     * @param    subscription    The subscription.
+     * @param name n:fqdn or s:subid
+     * @param spool The directory where files are spooled.
+     * @param subscription The subscription.
      */
     public DestInfo(String name, String spool, NodeConfig.ProvSubscription subscription) {
         this.name = name;
@@ -164,8 +84,8 @@ public class DestInfo {
         this.decompress = subscription.isDecompress();
     }
 
-    public boolean equals(Object o) {
-        return ((o instanceof DestInfo) && ((DestInfo) o).spool.equals(spool));
+    public boolean equals(Object object) {
+        return ((object instanceof DestInfo) && ((DestInfo) object).spool.equals(spool));
     }
 
     public int hashCode() {
@@ -173,7 +93,7 @@ public class DestInfo {
     }
 
     /**
-     * Get the name of this destination
+     * Get the name of this destination.
      */
     public String getName() {
         return (name);
@@ -217,7 +137,7 @@ public class DestInfo {
     }
 
     /**
-     * Get the user for authentication
+     * Get the user for authentication.
      *
      * @return The name of the user for logging
      */
@@ -226,7 +146,7 @@ public class DestInfo {
     }
 
     /**
-     * Get the authentication header
+     * Get the authentication header.
      *
      * @return The string to use to authenticate to the recipient.
      */
@@ -235,7 +155,7 @@ public class DestInfo {
     }
 
     /**
-     * Is this a metadata only delivery?
+     * Is this a metadata only delivery.
      *
      * @return True if this is a metadata only delivery
      */
@@ -244,7 +164,7 @@ public class DestInfo {
     }
 
     /**
-     * Should I send expect 100-continue header?
+     * Should I send expect 100-continue header.
      *
      * @return True if I should.
      */
@@ -253,23 +173,23 @@ public class DestInfo {
     }
 
     /**
-     * Should we wait to receive a file processed acknowledgement before deleting file
+     * Should we wait to receive a file processed acknowledgement before deleting file.
      */
     public boolean isPrivilegedSubscriber() {
         return (privilegedSubscriber);
     }
 
     /**
-    * Should I follow redirects?
-    *
-    * @return True if I should.
-    */
+     * Should I follow redirects.
+     *
+     * @return True if I should.
+     */
     public boolean isFollowRedirects() {
         return (followRedirects);
     }
 
     /**
-     * Should i decompress the file before sending it on
+     * Should i decompress the file before sending it on.
      *
      * @return True if I should.
      */

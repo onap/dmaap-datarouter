@@ -219,7 +219,7 @@ public class NodeServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_On_Publish_On_AAF_Feed_And_Cadi_Enabled_And_No_Permissions_Then_Forbidden_Response_Is_Generated() throws Exception {
-        when(config.getCadiEnabeld()).thenReturn(true);
+        when(config.getCadiEnabled()).thenReturn(true);
         when(config.getAafInstance("1")).thenReturn("*");
         when(request.getPathInfo()).thenReturn("/publish/1/fileName");
         setHeadersForValidRequest(true);

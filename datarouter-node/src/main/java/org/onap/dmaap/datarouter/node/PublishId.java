@@ -28,6 +28,7 @@ package org.onap.dmaap.datarouter.node;
  * Generate publish IDs
  */
 public class PublishId {
+
     private long nextuid;
     private String myname;
 
@@ -41,7 +42,8 @@ public class PublishId {
     }
 
     /**
-     * Generate a Data Router Publish ID that uniquely identifies the particular invocation of the Publish API for log correlation purposes.
+     * Generate a Data Router Publish ID that uniquely identifies the particular invocation of the Publish API for log
+     * correlation purposes.
      */
     public synchronized String next() {
         long now = System.currentTimeMillis();

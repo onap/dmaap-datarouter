@@ -24,41 +24,37 @@
 
 package org.onap.dmaap.datarouter.node;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
- * Manage a list of tasks to be executed when an event occurs.
- * This makes the following guarantees:
+ * Manage a list of tasks to be executed when an event occurs. This makes the following guarantees:
  * <ul>
  * <li>Tasks can be safely added and removed in the middle of a run.</li>
  * <li>No task will be returned more than once during a run.</li>
  * <li>No task will be returned when it is not, at that moment, in the list of tasks.</li>
  * <li>At the moment when next() returns null, all tasks on the list have been returned during the run.</li>
- * <li>Initially and once next() returns null during a run, next() will continue to return null until startRun() is called.
+ * <li>Initially and once next() returns null during a run, next() will continue to return null until startRun() is
+ * called.
  * </ul>
  */
 public class TaskList {
+
     private Iterator<Runnable> runlist;
-    private HashSet<Runnable> tasks = new HashSet<Runnable>();
+    private HashSet<Runnable> tasks = new HashSet<>();
     private HashSet<Runnable> togo;
     private HashSet<Runnable> sofar;
     private HashSet<Runnable> added;
     private HashSet<Runnable> removed;
 
     /**
-     * Construct a new TaskList
-     */
-    public TaskList() {
-    }
-
-    /**
      * Start executing the sequence of tasks.
      */
     public synchronized void startRun() {
-        sofar = new HashSet<Runnable>();
-        added = new HashSet<Runnable>();
-        removed = new HashSet<Runnable>();
-        togo = new HashSet<Runnable>(tasks);
+        sofar = new HashSet<>();
+        added = new HashSet<>();
+        removed = new HashSet<>();
+        togo = new HashSet<>(tasks);
         runlist = togo.iterator();
     }
 
@@ -69,18 +65,13 @@ public class TaskList {
         while (runlist != null) {
             if (runlist.hasNext()) {
                 Runnable task = runlist.next();
-                if (removed.contains(task)) {
-                    continue;
+                if (addTaskToSoFar(task)) {
+                    return task;
                 }
-                if (sofar.contains(task)) {
-                    continue;
-                }
-                sofar.add(task);
-                return (task);
             }
-            if (added.size() != 0) {
+            if (!added.isEmpty()) {
                 togo = added;
-                added = new HashSet<Runnable>();
+                added = new HashSet<>();
                 removed.clear();
                 runlist = togo.iterator();
                 continue;
@@ -114,5 +105,16 @@ public class TaskList {
             added.remove(task);
         }
         tasks.remove(task);
+    }
+
+    private boolean addTaskToSoFar(Runnable task) {
+        if (removed.contains(task)) {
+            return false;
+        }
+        if (sofar.contains(task)) {
+            return false;
+        }
+        sofar.add(task);
+        return true;
     }
 }

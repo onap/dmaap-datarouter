@@ -97,7 +97,7 @@ public class DeliveryTest {
 
   private DestInfo[] createDestInfoObjects() {
     DestInfo[] destInfos = new DestInfo[1];
-    DestInfo destInfo = new DestInfo.DestInfoBuilder().setName("node.datarouternew.com").setSpool("spool/s/0/1").setSubid("1")
+    DestInfo destInfo = new DestInfoBuilder().setName("node.datarouternew.com").setSpool("spool/s/0/1").setSubid("1")
         .setLogdata("logs/").setUrl("/subs/1").setAuthuser("user1").setAuthentication("Basic dXNlcjE6cGFzc3dvcmQx")
         .setMetaonly(false).setUse100(true).setPrivilegedSubscriber(false).setFollowRedirects(false)
         .setDecompress(false).createDestInfo();
