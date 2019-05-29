@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1cd645f6_2006569d",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/Delivery.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T09:06:26Z",
+      "side": 1,
+      "message": "I\u0027d go with debug here instead.",
+      "range": {
+        "startLine": 243,
+        "startChar": 19,
+        "endLine": 243,
+        "endChar": 24
+      },
+      "revId": "62406d9443858ea6da5d74c6da1879dcf682ecdb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f7ef7ad5_c9a82e26",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/Delivery.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T09:06:26Z",
+      "side": 1,
+      "message": "Not sure this will get the name of the file.",
+      "range": {
+        "startLine": 243,
+        "startChar": 68,
+        "endLine": 243,
+        "endChar": 75
+      },
+      "revId": "62406d9443858ea6da5d74c6da1879dcf682ecdb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4abd61c8_e672d640",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryQueue.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T09:06:26Z",
+      "side": 1,
+      "message": "Debug here also.",
+      "range": {
+        "startLine": 370,
+        "startChar": 19,
+        "endLine": 370,
+        "endChar": 24
+      },
+      "revId": "62406d9443858ea6da5d74c6da1879dcf682ecdb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c2e66a62_7c22dd86",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryQueue.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T09:06:26Z",
+      "side": 1,
+      "message": "Again, I think for the file name you might need to use getFileId() or something else.",
+      "range": {
+        "startLine": 370,
+        "startChar": 49,
+        "endLine": 370,
+        "endChar": 55
+      },
+      "revId": "62406d9443858ea6da5d74c6da1879dcf682ecdb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
