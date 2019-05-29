@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "19ab549e_aa56a185",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/Delivery.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-05-29T09:15:43Z",
+      "side": 1,
+      "message": "I think you may be right. I think this is actually the node name",
+      "parentUuid": "f7ef7ad5_c9a82e26",
+      "range": {
+        "startLine": 243,
+        "startChar": 68,
+        "endLine": 243,
+        "endChar": 75
+      },
+      "revId": "62406d9443858ea6da5d74c6da1879dcf682ecdb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4abd61c8_e672d640",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryQueue.java",
         "patchSetId": 2
