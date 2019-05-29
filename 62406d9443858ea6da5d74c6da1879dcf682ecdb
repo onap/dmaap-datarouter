@@ -115,6 +115,30 @@
       "revId": "62406d9443858ea6da5d74c6da1879dcf682ecdb",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "09bd843c_56659c79",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryQueue.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-05-29T09:34:07Z",
+      "side": 1,
+      "message": "Again I think it could be the node name. If we get FileId here I don\u0027t think there is any need for anything in the Delivery class.",
+      "parentUuid": "c2e66a62_7c22dd86",
+      "range": {
+        "startLine": 370,
+        "startChar": 49,
+        "endLine": 370,
+        "endChar": 55
+      },
+      "revId": "62406d9443858ea6da5d74c6da1879dcf682ecdb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }
