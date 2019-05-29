@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "544e179e_97cdc4ad",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T12:28:36Z",
+      "side": 1,
+      "message": "Not sure about this method name.\nMaybe \"writeInputStreamToFile\", or the like..",
+      "range": {
+        "startLine": 470,
+        "startChar": 19,
+        "endLine": 470,
+        "endChar": 34
+      },
+      "revId": "b7ea859994eec105a7e2badc6853ade722ea6bdd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "85fccac6_33c1a4ed",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/ProvData.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T12:28:36Z",
+      "side": 1,
+      "message": "Painful I know, but any chance you could expand the names here.\nAlso the ArrayLists in the constructor.",
+      "range": {
+        "startLine": 58,
+        "startChar": 34,
+        "endLine": 58,
+        "endChar": 36
+      },
+      "revId": "b7ea859994eec105a7e2badc6853ade722ea6bdd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1310acfe_db34ad56",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/RedirManager.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T12:28:36Z",
+      "side": 1,
+      "message": "I\u0027d stick with error or debug here.\nTrace seems too high.",
+      "range": {
+        "startLine": 83,
+        "startChar": 23,
+        "endLine": 83,
+        "endChar": 28
+      },
+      "revId": "b7ea859994eec105a7e2badc6853ade722ea6bdd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e1bc36d0_4f4289fb",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/StatusLog.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T12:28:36Z",
+      "side": 1,
+      "message": "Could be a case for a constants class for dr-node aswell.",
+      "range": {
+        "startLine": 44,
+        "startChar": 32,
+        "endLine": 44,
+        "endChar": 41
+      },
+      "revId": "b7ea859994eec105a7e2badc6853ade722ea6bdd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
