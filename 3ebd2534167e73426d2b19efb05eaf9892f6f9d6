@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e61c969c_31c69980",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T10:50:37Z",
+      "side": 0,
+      "message": "I think there are still a lot of things that need tidying up here.\nMaybe install the sonarlint plugin for intellij and it should pick up more issues.",
+      "range": {
+        "startLine": 64,
+        "startChar": 15,
+        "endLine": 64,
+        "endChar": 20
+      },
+      "revId": "3ebd2534167e73426d2b19efb05eaf9892f6f9d6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1094fb0a_212b1019",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/BaseServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T10:50:37Z",
+      "side": 0,
+      "message": "If we are scrapping the method below, then you can remove this aswell",
+      "range": {
+        "startLine": 288,
+        "startChar": 12,
+        "endLine": 288,
+        "endChar": 37
+      },
+      "revId": "3ebd2534167e73426d2b19efb05eaf9892f6f9d6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1b886432_256f17c3",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/GroupServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T10:50:37Z",
+      "side": 0,
+      "message": "Little bit weary of scrapping all this stuff. Not familiar with the Groups servlet and it\u0027s functionality but not sure we should just remove it.",
+      "range": {
+        "startLine": 295,
+        "startChar": 8,
+        "endLine": 316,
+        "endChar": 56
+      },
+      "revId": "3ebd2534167e73426d2b19efb05eaf9892f6f9d6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

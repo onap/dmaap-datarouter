@@ -1,0 +1,280 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d1b56247_72ad0aa5",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/FeedServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T10:50:37Z",
+      "side": 1,
+      "message": "I suggest abstracting these up the the BaseServlet class and pulling them in from there.\nThey seem to be common across a lot of the Servlet classes too so would help there also.",
+      "range": {
+        "startLine": 58,
+        "startChar": 31,
+        "endLine": 61,
+        "endChar": 80
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "265fe17c_b9eeae4b",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/FeedServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T10:50:37Z",
+      "side": 1,
+      "message": "Try to keep a space around the \"+\" for convention.",
+      "range": {
+        "startLine": 88,
+        "startChar": 47,
+        "endLine": 88,
+        "endChar": 50
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8c04c01d_43b0fd36",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/InternalServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T10:50:37Z",
+      "side": 1,
+      "message": "Probably more candidates for static consts in the BaseServlet class.\nAt least for the err responses.",
+      "range": {
+        "startLine": 159,
+        "startChar": 24,
+        "endLine": 163,
+        "endChar": 39
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "70a5553e_c96480af",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/RouteServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T10:50:37Z",
+      "side": 1,
+      "message": "Prob more candidates for BaseServlet constatnts",
+      "range": {
+        "startLine": 132,
+        "startChar": 27,
+        "endLine": 133,
+        "endChar": 53
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "986408c1_377ec986",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T10:50:37Z",
+      "side": 1,
+      "message": "Just a comment on CONST naming convention.\nMore readable if you separate words with an underscore.",
+      "range": {
+        "startLine": 67,
+        "startChar": 30,
+        "endLine": 67,
+        "endChar": 40
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "74947bb5_89960f3f",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T10:50:37Z",
+      "side": 1,
+      "message": "Is this and the other sql mappings below common to other classes? LogServlet maybe?\nNot a fan of crowding the BaseServlet with a load of constants but if it makes sense..\nCould potentially setup a generic ServletConstants class and store them there.",
+      "range": {
+        "startLine": 70,
+        "startChar": 30,
+        "endLine": 70,
+        "endChar": 39
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b16aeffb_fe00ef2e",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/SubscribeServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T10:50:37Z",
+      "side": 1,
+      "message": "Can be pulled in as static variable from BaseServlet",
+      "range": {
+        "startLine": 60,
+        "startChar": 32,
+        "endLine": 60,
+        "endChar": 39
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7082c74a_093454b4",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/SubscribeServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T10:50:37Z",
+      "side": 1,
+      "message": "Same comment as for other servlet constants",
+      "range": {
+        "startLine": 196,
+        "startChar": 27,
+        "endLine": 196,
+        "endChar": 64
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c44c6dda_9aede3db",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/SubscribeServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T10:50:37Z",
+      "side": 1,
+      "message": "Could also go into BaseServlet. (or generic Const class)",
+      "range": {
+        "startLine": 225,
+        "startChar": 68,
+        "endLine": 225,
+        "endChar": 82
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8401836b_e64ea229",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/SubscribeServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T10:50:37Z",
+      "side": 1,
+      "message": "Same comment re shared constants",
+      "range": {
+        "startLine": 282,
+        "startChar": 35,
+        "endLine": 282,
+        "endChar": 65
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cddd3017_4e3db6b6",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/SubscriptionServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T10:50:37Z",
+      "side": 1,
+      "message": "Same comment re shared constants in BaseServlet",
+      "range": {
+        "startLine": 65,
+        "startChar": 28,
+        "endLine": 69,
+        "endChar": 61
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "31e937da_8ed2d6fc",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/SubscriptionServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T10:50:37Z",
+      "side": 1,
+      "message": "This seems to be common across a few Servlets also",
+      "range": {
+        "startLine": 302,
+        "startChar": 27,
+        "endLine": 302,
+        "endChar": 49
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
