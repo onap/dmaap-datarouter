@@ -53,7 +53,7 @@ public class LogManager extends TimerTask {
     private String uploaddir;
     private String logdir;
 
-    private class Uploader extends Thread implements DeliveryQueueHelper {
+    class Uploader extends Thread implements DeliveryQueueHelper {
         private EELFLogger logger = EELFManager.getInstance().getLogger(Uploader.class);
 
         public long getInitFailureTimer() {
@@ -214,4 +214,9 @@ public class LogManager extends TimerTask {
     public void run() {
         worker.poke();
     }
+
+    public Uploader getWorker() {
+        return worker;
+    }
+
 }

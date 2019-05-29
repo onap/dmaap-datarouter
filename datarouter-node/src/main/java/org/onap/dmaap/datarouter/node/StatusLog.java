@@ -37,6 +37,7 @@ import java.text.*;
 public class StatusLog {
     private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(StatusLog.class);
     private static StatusLog instance = new StatusLog();
+    private static NodeConfigManager config = NodeConfigManager.getInstance();
     private HashSet<String> toship = new HashSet<String>();
     private SimpleDateFormat filedate;
     private String prefix = "logs/events";
@@ -46,7 +47,6 @@ public class StatusLog {
     private long nexttime;
     private OutputStream os;
     private long intvl;
-    private NodeConfigManager config = NodeConfigManager.getInstance();
 
     {
         try {

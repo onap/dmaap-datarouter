@@ -22,29 +22,39 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.node;
 
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.anyObject;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import ch.qos.logback.classic.Logger;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.onap.dmaap.datarouter.node.NodeConfigManager")
@@ -63,6 +73,27 @@ public class NodeServletTest {
 
     private NodeConfigManager config = mock(NodeConfigManager.class);
 
+    @AfterClass
+    public static void tearDown() {
+        deleteCreatedDirectories();
+    }
+
+    private static void deleteCreatedDirectories() {
+        File spoolDir = new File("spool");
+        delete(spoolDir);
+    }
+
+    private static void delete(File file) {
+        if (file.isDirectory()) {
+            for (File f : file.listFiles()) {
+                delete(f);
+            }
+        }
+        if (!file.delete()) {
+            System.out.println("Failed to delete: " + file);
+        }
+    }
+
     @Before
     public void setUp() throws Exception {
         listAppender = setTestLogger();
@@ -79,13 +110,9 @@ public class NodeServletTest {
         when(request.getHeader("X-DMAAP-DR-PUBLISH-ID")).thenReturn("User1");
     }
 
-    @AfterClass
-    public static void tearDown() {
-        deleteCreatedDirectories();
-    }
-
     @Test
-    public void Given_Request_Is_HTTP_GET_And_Config_Is_Down_Then_Service_Unavailable_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_GET_And_Config_Is_Down_Then_Service_Unavailable_Response_Is_Generated()
+            throws Exception {
         setNodeConfigManagerIsConfiguredToReturnFalse();
         nodeServlet.doGet(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_SERVICE_UNAVAILABLE));
@@ -117,7 +144,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Config_Is_Down_Then_Service_Unavailable_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Config_Is_Down_Then_Service_Unavailable_Response_Is_Generated()
+            throws Exception {
         setNodeConfigManagerIsConfiguredToReturnFalse();
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_SERVICE_UNAVAILABLE));
@@ -125,7 +153,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Endpoint_Is_Incorrect_Then_Not_Found_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Endpoint_Is_Incorrect_Then_Not_Found_Response_Is_Generated()
+            throws Exception {
         when(request.getPathInfo()).thenReturn("/incorrect/");
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
@@ -133,7 +162,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Request_Is_Not_Secure_Then_Forbidden_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Request_Is_Not_Secure_Then_Forbidden_Response_Is_Generated()
+            throws Exception {
         when(request.isSecure()).thenReturn(false);
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
@@ -149,7 +179,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Authorization_Is_Null_Then_Forbidden_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Authorization_Is_Null_Then_Forbidden_Response_Is_Generated()
+            throws Exception {
         when(request.getHeader("Authorization")).thenReturn(null);
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
@@ -157,7 +188,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Publish_Does_Not_Include_File_Id_Then_Not_Found_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Publish_Does_Not_Include_File_Id_Then_Not_Found_Response_Is_Generated()
+            throws Exception {
         when(request.getPathInfo()).thenReturn("/publish/");
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
@@ -165,7 +197,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Publish_Not_Permitted_Then_Forbidden_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Publish_Not_Permitted_Then_Forbidden_Response_Is_Generated()
+            throws Exception {
         when(request.getPathInfo()).thenReturn("/publish/1/fileName");
         setNodeConfigManagerIsPublishPermittedToReturnAReason();
         nodeServlet.doPut(request, response);
@@ -174,7 +207,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Internal_Publish_On_Same_Node_Then_Forbidden_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Internal_Publish_On_Same_Node_Then_Forbidden_Response_Is_Generated()
+            throws Exception {
         when(request.getPathInfo()).thenReturn("/internal/publish/1/fileName");
         setNodeConfigManagerIsPublishPermittedToReturnAReason();
         nodeServlet.doPut(request, response);
@@ -183,7 +217,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Internal_Publish_But_Invalid_File_Id_Then_Not_Found_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Internal_Publish_But_Invalid_File_Id_Then_Not_Found_Response_Is_Generated()
+            throws Exception {
         when(request.getPathInfo()).thenReturn("/internal/publish/1/");
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
@@ -191,7 +226,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_On_Publish_And_Ingress_Node_Is_Provided_Then_Request_Is_Redirected() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_On_Publish_And_Ingress_Node_Is_Provided_Then_Request_Is_Redirected()
+            throws Exception {
         when(request.getPathInfo()).thenReturn("/publish/1/fileName");
         setNodeConfigManagerToAllowRedirectOnIngressNode();
         nodeServlet.doPut(request, response);
@@ -200,7 +236,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_On_Publish_With_Meta_Data_Too_Long_Then_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_On_Publish_With_Meta_Data_Too_Long_Then_Bad_Request_Response_Is_Generated()
+            throws Exception {
         when(request.getPathInfo()).thenReturn("/publish/1/fileName");
         setHeadersForValidRequest(true);
         nodeServlet.doPut(request, response);
@@ -209,7 +246,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_On_Publish_With_Meta_Data_Malformed_Then_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_On_Publish_With_Meta_Data_Malformed_Then_Bad_Request_Response_Is_Generated()
+            throws Exception {
         when(request.getPathInfo()).thenReturn("/publish/1/fileName");
         setHeadersForValidRequest(false);
         nodeServlet.doPut(request, response);
@@ -218,7 +256,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_On_Publish_On_AAF_Feed_And_Cadi_Enabled_And_No_Permissions_Then_Forbidden_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_On_Publish_On_AAF_Feed_And_Cadi_Enabled_And_No_Permissions_Then_Forbidden_Response_Is_Generated()
+            throws Exception {
         when(config.getCadiEnabeld()).thenReturn(true);
         when(config.getAafInstance("1")).thenReturn("*");
         when(request.getPathInfo()).thenReturn("/publish/1/fileName");
@@ -229,7 +268,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_DELETE_On_Publish_With_Meta_Data_Malformed_Then_Bad_Request_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_DELETE_On_Publish_With_Meta_Data_Malformed_Then_Bad_Request_Response_Is_Generated()
+            throws Exception {
         when(request.getPathInfo()).thenReturn("/publish/1/fileName");
         setHeadersForValidRequest(false);
         nodeServlet.doDelete(request, response);
@@ -238,7 +278,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_DELETE_File_With_Invalid_Endpoint_Then_Not_Found_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_DELETE_File_With_Invalid_Endpoint_Then_Not_Found_Response_Is_Generated()
+            throws Exception {
         when(request.getPathInfo()).thenReturn("/delete/1");
         nodeServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
@@ -246,7 +287,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_DELETE_File_And_Is_Not_Privileged_Subscription_Then_Not_Found_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_DELETE_File_And_Is_Not_Privileged_Subscription_Then_Not_Found_Response_Is_Generated()
+            throws Exception {
         when(request.getPathInfo()).thenReturn("/delete/1/dmaap-dr-node.1234567");
         setUpConfigToReturnUnprivilegedSubscriber();
         nodeServlet.doDelete(request, response);
@@ -255,7 +297,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_DELETE_File_And_Subscription_Does_Not_Exist_Then_Not_Found_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_DELETE_File_And_Subscription_Does_Not_Exist_Then_Not_Found_Response_Is_Generated()
+            throws Exception {
         when(request.getPathInfo()).thenReturn("/delete/1/dmaap-dr-node.1234567");
         setUpConfigToReturnNullOnIsDeletePermitted();
         nodeServlet.doDelete(request, response);
@@ -273,7 +316,8 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_DELETE_File_And_File_Does_Not_Exist_Then_Not_Found_Response_Is_Generated() throws IOException {
+    public void Given_Request_Is_HTTP_DELETE_File_And_File_Does_Not_Exist_Then_Not_Found_Response_Is_Generated()
+            throws IOException {
         when(request.getPathInfo()).thenReturn("/delete/1/nonExistingFile");
         nodeServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
@@ -293,8 +337,10 @@ public class NodeServletTest {
     }
 
     private void verifyEnteringExitCalled(ListAppender<ILoggingEvent> listAppender) {
-        assertEquals("EELF0004I  Entering data router node component with RequestId and InvocationId", listAppender.list.get(0).getMessage());
-        assertEquals("EELF0005I  Exiting data router node component with RequestId and InvocationId", listAppender.list.get(listAppender.list.size() -1).getMessage());
+        assertEquals("EELF0004I  Entering data router node component with RequestId and InvocationId",
+                listAppender.list.get(0).getMessage());
+        assertEquals("EELF0005I  Exiting data router node component with RequestId and InvocationId",
+                listAppender.list.get(listAppender.list.size() - 1).getMessage());
     }
 
     private void setUpConfig() throws IllegalAccessException {
@@ -336,19 +382,19 @@ public class NodeServletTest {
         PowerMockito.when(NodeConfigManager.getInstance()).thenReturn(config);
     }
 
-    private void setUpNodeMainDelivery() throws IllegalAccessException{
+    private void setUpNodeMainDelivery() throws IllegalAccessException {
         Delivery delivery = mock(Delivery.class);
         doNothing().when(delivery).resetQueue(anyObject());
         FieldUtils.writeDeclaredStaticField(NodeMain.class, "delivery", delivery, true);
     }
 
-    private void setNodeConfigManagerIsConfiguredToReturnFalse() throws IllegalAccessException{
+    private void setNodeConfigManagerIsConfiguredToReturnFalse() throws IllegalAccessException {
         NodeConfigManager config = mock(NodeConfigManager.class);
         when(config.isConfigured()).thenReturn(false);
         FieldUtils.writeDeclaredStaticField(NodeServlet.class, "config", config, true);
     }
 
-    private void setNodeConfigManagerIsPublishPermittedToReturnAReason() throws IllegalAccessException{
+    private void setNodeConfigManagerIsPublishPermittedToReturnAReason() throws IllegalAccessException {
         NodeConfigManager config = mock(NodeConfigManager.class);
         when(config.isShutdown()).thenReturn(false);
         when(config.isConfigured()).thenReturn(true);
@@ -359,7 +405,7 @@ public class NodeServletTest {
         FieldUtils.writeDeclaredStaticField(NodeServlet.class, "config", config, true);
     }
 
-    private void setNodeConfigManagerToAllowRedirectOnIngressNode() throws IllegalAccessException{
+    private void setNodeConfigManagerToAllowRedirectOnIngressNode() throws IllegalAccessException {
         NodeConfigManager config = mock(NodeConfigManager.class);
         when(config.isShutdown()).thenReturn(false);
         when(config.isConfigured()).thenReturn(true);
@@ -411,21 +457,5 @@ public class NodeServletTest {
         spoolDir.mkdirs();
         dataFile.createNewFile();
         metaDataFile.createNewFile();
-    }
-
-    private static void deleteCreatedDirectories() {
-        File spoolDir = new File("spool");
-        delete(spoolDir);
-    }
-
-    private static void delete(File file) {
-        if (file.isDirectory()) {
-            for (File f: file.listFiles()) {
-                delete(f);
-            }
-        }
-        if (!file.delete()) {
-            System.out.println("Failed to delete: " + file);
-        }
     }
 }

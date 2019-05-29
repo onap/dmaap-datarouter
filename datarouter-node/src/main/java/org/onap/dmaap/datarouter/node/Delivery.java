@@ -44,7 +44,7 @@ import com.att.eelf.configuration.EELFManager;
 public class Delivery {
     private static EELFLogger logger = EELFManager.getInstance().getLogger(Delivery.class);
 
-    private static class DelItem implements Comparable<DelItem> {
+    static class DelItem implements Comparable<DelItem> {
         private String pubid;
         private String spool;
 
