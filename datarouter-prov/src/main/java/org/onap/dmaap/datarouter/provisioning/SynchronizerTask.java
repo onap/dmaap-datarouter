@@ -588,7 +588,7 @@ public class SynchronizerTask extends TimerTask {
         String url = URLUtilities.generatePeerLogsURL();
 
         //Fixing if only one Prov is configured, not to give exception to fill logs, return empty bitset.
-        if (url.equals("")) {
+        if ("".equals(url)) {
             return bs;
         }
         //End of fix.
@@ -603,7 +603,7 @@ public class SynchronizerTask extends TimerTask {
             }
             HttpEntity entity = response.getEntity();
             String ctype = entity.getContentType().getValue().trim();
-            if (!ctype.equals("text/plain")) {
+            if (!"text/plain".equals(ctype)) {
                 logger.warn("PROV5011: readRemoteLoglist failed, bad content type: " + ctype);
                 return bs;
             }
@@ -649,7 +649,7 @@ public class SynchronizerTask extends TimerTask {
             }
             HttpEntity entity = response.getEntity();
             String ctype = entity.getContentType().getValue().trim();
-            if (!ctype.equals("text/plain")) {
+            if (!"text/plain".equals(ctype)) {
                 logger.warn("PROV5011: replicateDRLogs failed, bad content type: " + ctype);
                 return;
             }

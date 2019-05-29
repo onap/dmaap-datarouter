@@ -57,8 +57,9 @@ import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.send
 public class StatisticsServlet extends BaseServlet {
 
   private static final long TWENTYFOUR_HOURS = (24 * 60 * 60 * 1000L);
-  private static final String fmt1 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-  private static final String fmt2 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+  private static final String FMT1 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+  private static final String FMT2 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+
 
 
   /**
@@ -92,9 +93,8 @@ public class StatisticsServlet extends BaseServlet {
     resp.setContentType(LOGLIST_CONTENT_TYPE);
 
     String outputType = "json";
-    String feedids = null;
 
-    if (req.getParameter("feedid") == null && req.getParameter("groupid") == null) {
+    if (req.getParameter(FEEDID) == null && req.getParameter(GROUPID) == null) {
       try {
         resp.getOutputStream().print("Invalid request, Feedid or Group ID is required.");
       } catch (IOException ioe) {
@@ -102,69 +102,69 @@ public class StatisticsServlet extends BaseServlet {
       }
     }
 
-    if (req.getParameter("feedid") != null && req.getParameter("groupid") == null) {
-      map.put("feedids", req.getParameter("feedid").replace("|", ",").toString());
+    if (req.getParameter(FEEDID) != null && req.getParameter(GROUPID) == null) {
+      map.put(FEEDIDS, req.getParameter(FEEDID).replace("|", ","));
     }
 
-    if (req.getParameter("groupid") != null && req.getParameter("feedid") == null) {
+    if (req.getParameter(GROUPID) != null && req.getParameter(FEEDID) == null) {
       StringBuffer groupid1 = new StringBuffer();
 
       try {
-        groupid1 = this.getFeedIdsByGroupId(Integer.parseInt(req.getParameter("groupid")));
-        map.put("feedids", groupid1.toString());
+        groupid1 = this.getFeedIdsByGroupId(Integer.parseInt(req.getParameter(GROUPID)));
+        map.put(FEEDIDS, groupid1.toString());
       } catch (NumberFormatException | SQLException e) {
         eventlogger.error("PROV0172 StatisticsServlet.doGet: " + e.getMessage(), e);
       }
     }
-    if (req.getParameter("groupid") != null && req.getParameter("feedid") != null) {
+    if (req.getParameter(GROUPID) != null && req.getParameter(FEEDID) != null) {
       StringBuffer groupid1 = new StringBuffer();
 
       try {
-        groupid1 = this.getFeedIdsByGroupId(Integer.parseInt(req.getParameter("groupid")));
+        groupid1 = this.getFeedIdsByGroupId(Integer.parseInt(req.getParameter(GROUPID)));
         groupid1.append(",");
-        groupid1.append(req.getParameter("feedid").replace("|", ",").toString());
-        map.put("feedids", groupid1.toString());
+        groupid1.append(req.getParameter(FEEDID).replace("|", ","));
+        map.put(FEEDIDS, groupid1.toString());
       } catch (NumberFormatException | SQLException e) {
         eventlogger.error("PROV0173 StatisticsServlet.doGet: " + e.getMessage(), e);
       }
     }
 
-    if (req.getParameter("subid") != null && req.getParameter("feedid") != null) {
+    if (req.getParameter(SUBID) != null && req.getParameter(FEEDID) != null) {
       StringBuffer subidstr = new StringBuffer();
       subidstr.append("and e.DELIVERY_SUBID in(");
 
-      subidstr.append(req.getParameter("subid").replace("|", ",").toString());
+      subidstr.append(req.getParameter(SUBID).replace("|", ","));
       subidstr.append(")");
-      map.put("subid", subidstr.toString());
+      map.put(SUBID, subidstr.toString());
     }
-    if (req.getParameter("subid") != null && req.getParameter("groupid") != null) {
+    if (req.getParameter(SUBID) != null && req.getParameter(GROUPID) != null) {
       StringBuffer subidstr = new StringBuffer();
       subidstr.append("and e.DELIVERY_SUBID in(");
 
-      subidstr.append(req.getParameter("subid").replace("|", ",").toString());
+      subidstr.append(req.getParameter(SUBID).replace("|", ","));
       subidstr.append(")");
-      map.put("subid", subidstr.toString());
+      map.put(SUBID, subidstr.toString());
     }
     if (req.getParameter("type") != null) {
-      map.put("eventType", req.getParameter("type").replace("|", ",").toString());
+      map.put(EVENT_TYPE, req.getParameter("type").replace("|", ","));
     }
-    if (req.getParameter("output_type") != null) {
-      map.put("output_type", req.getParameter("output_type").toString());
+    if (req.getParameter(OUTPUT_TYPE) != null) {
+      map.put(OUTPUT_TYPE, req.getParameter(OUTPUT_TYPE));
     }
-    if (req.getParameter("start_time") != null) {
-      map.put("start_time", req.getParameter("start_time").toString());
+    if (req.getParameter(START_TIME) != null) {
+      map.put(START_TIME, req.getParameter(START_TIME));
     }
-    if (req.getParameter("end_time") != null) {
-      map.put("end_time", req.getParameter("end_time").toString());
+    if (req.getParameter(END_TIME) != null) {
+      map.put(END_TIME, req.getParameter(END_TIME));
     }
 
     if (req.getParameter("time") != null) {
-      map.put("start_time", req.getParameter("time").toString());
-      map.put("end_time", null);
+      map.put(START_TIME, req.getParameter("time"));
+      map.put(END_TIME, null);
     }
 
-    if (req.getParameter("output_type") != null) {
-      outputType = req.getParameter("output_type");
+    if (req.getParameter(OUTPUT_TYPE) != null) {
+      outputType = req.getParameter(OUTPUT_TYPE);
     }
     try {
       this.getRecordsForSQL(map, outputType, resp.getOutputStream(), resp);
@@ -225,7 +225,7 @@ public class StatisticsServlet extends BaseServlet {
    */
   public void rsToJson(ResultSet rs, ServletOutputStream out) throws IOException, SQLException {
 
-    String fields[] = {"FEEDNAME", "FEEDID", "FILES_PUBLISHED", "PUBLISH_LENGTH", "FILES_DELIVERED",
+    String[] fields = {"FEEDNAME", "FEEDID", "FILES_PUBLISHED", "PUBLISH_LENGTH", "FILES_DELIVERED",
         "DELIVERED_LENGTH", "SUBSCRIBER_URL", "SUBID", "PUBLISH_TIME", "DELIVERY_TIME",
         "AverageDelay"};
     StringBuffer line = new StringBuffer();
@@ -258,7 +258,6 @@ public class StatisticsServlet extends BaseServlet {
 
     DB db = null;
     Connection conn = null;
-    //PreparedStatement prepareStatement = null;
     ResultSet resultSet = null;
     String sqlGoupid = null;
     StringBuffer feedIds = new StringBuffer();
@@ -309,23 +308,23 @@ public class StatisticsServlet extends BaseServlet {
     String start_time = null;
     String end_time = null;
     String subid = " ";
-    if (map.get("eventType") != null) {
-      eventType = (String) map.get("eventType");
+    if (map.get(EVENT_TYPE) != null) {
+      eventType =  map.get(EVENT_TYPE);
     }
-    if (map.get("feedids") != null) {
-      feedids = (String) map.get("feedids");
+    if (map.get(FEEDIDS) != null) {
+      feedids = map.get(FEEDIDS);
     }
-    if (map.get("start_time") != null) {
-      start_time = (String) map.get("start_time");
+    if (map.get(START_TIME) != null) {
+      start_time = map.get(START_TIME);
     }
-    if (map.get("end_time") != null) {
-      end_time = (String) map.get("end_time");
+    if (map.get(END_TIME) != null) {
+      end_time =  map.get(END_TIME);
     }
     if ("all".equalsIgnoreCase(eventType)) {
       eventType = "PUB','DEL, EXP, PBF";
     }
-    if (map.get("subid") != null) {
-      subid = (String) map.get("subid");
+    if (map.get(SUBID) != null) {
+      subid = map.get(SUBID);
     }
 
     eventlogger.info("Generating sql query to get Statistics resultset. ");
@@ -412,10 +411,10 @@ public class StatisticsServlet extends BaseServlet {
   }
 
   private Map<String, String> buildMapFromRequest(HttpServletRequest req) {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     String s = req.getParameter("type");
     if (s != null) {
-      if (s.equals("pub") || s.equals("del") || s.equals("exp")) {
+      if ("pub".equals(s) || "del".equals(s) || "exp".equals(s)) {
         map.put("type", s);
       } else {
         map.put("err", "bad type");
@@ -427,7 +426,7 @@ public class StatisticsServlet extends BaseServlet {
     map.put("publishSQL", "");
     map.put("statusSQL", "");
     map.put("resultSQL", "");
-    map.put("reasonSQL", "");
+    map.put(REASON_SQL, "");
 
     s = req.getParameter("publishId");
     if (s != null) {
@@ -441,11 +440,11 @@ public class StatisticsServlet extends BaseServlet {
     s = req.getParameter("statusCode");
     if (s != null) {
       String sql = null;
-      if (s.equals("success")) {
+      if ("success".equals(s)) {
         sql = " AND STATUS >= 200 AND STATUS < 300";
-      } else if (s.equals("redirect")) {
+      } else if ("redirect".equals(s)) {
         sql = " AND STATUS >= 300 AND STATUS < 400";
-      } else if (s.equals("failure")) {
+      } else if ("failure".equals(s)) {
         sql = " AND STATUS >= 400";
       } else {
         try {
@@ -467,14 +466,14 @@ public class StatisticsServlet extends BaseServlet {
     s = req.getParameter("expiryReason");
     if (s != null) {
       map.put("type", "exp");
-      if (s.equals("notRetryable")) {
-        map.put("reasonSQL", " AND REASON = 'notRetryable'");
-      } else if (s.equals("retriesExhausted")) {
-        map.put("reasonSQL", " AND REASON = 'retriesExhausted'");
-      } else if (s.equals("diskFull")) {
-        map.put("reasonSQL", " AND REASON = 'diskFull'");
-      } else if (s.equals("other")) {
-        map.put("reasonSQL", " AND REASON = 'other'");
+      if ("notRetryable".equals(s)) {
+        map.put(REASON_SQL, " AND REASON = 'notRetryable'");
+      } else if ("retriesExhausted".equals(s)) {
+        map.put(REASON_SQL, " AND REASON = 'retriesExhausted'");
+      } else if ("diskFull".equals(s)) {
+        map.put(REASON_SQL, " AND REASON = 'diskFull'");
+      } else if ("other".equals("other")) {
+        map.put(REASON_SQL, " AND REASON = 'other'");
       } else {
         map.put("err", "bad expiryReason");
         return map;
@@ -509,7 +508,7 @@ public class StatisticsServlet extends BaseServlet {
     }
     try {
       // First, look for an RFC 3339 date
-      String fmt = (s.indexOf('.') > 0) ? fmt2 : fmt1;
+      String fmt = (s.indexOf('.') > 0) ? FMT2 : FMT1;
       SimpleDateFormat sdf = new SimpleDateFormat(fmt);
       Date d = sdf.parse(s);
       return d.getTime();
@@ -517,8 +516,7 @@ public class StatisticsServlet extends BaseServlet {
     }
     try {
       // Also allow a long (in ms); useful for testing
-      long n = Long.parseLong(s);
-      return n;
+      return Long.parseLong(s);
     } catch (NumberFormatException e) {
     }
     intlogger.info("Error parsing time=" + s);
@@ -535,7 +533,7 @@ public class StatisticsServlet extends BaseServlet {
       DB db = new DB();
       try (Connection conn = db.getConnection()) {
         try (ResultSet rs = conn.prepareStatement(filterQuery).executeQuery()) {
-          if (outputType.equals("csv")) {
+          if ("csv".equals(outputType)) {
             resp.setContentType("application/octet-stream");
             Date date = new Date();
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY HH:mm:ss");

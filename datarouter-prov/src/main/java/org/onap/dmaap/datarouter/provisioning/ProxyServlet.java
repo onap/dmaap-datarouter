@@ -130,7 +130,7 @@ public class ProxyServlet extends BaseServlet {
         if (t != null) {
             t = t.replaceAll("&amp;", "&");
             for (String s : t.split("&")) {
-                if (s.equals("noproxy") || s.startsWith("noproxy=")) {
+                if ("noproxy".equals(s) || s.startsWith("noproxy=")) {
                     return false;
                 }
             }
@@ -234,7 +234,7 @@ public class ProxyServlet extends BaseServlet {
 
                     // Copy request headers and request body
                     copyRequestHeaders(req, proxy);
-                    if (method.equals("POST") || method.equals("PUT")) {
+                    if ("POST".equals(method) || "PUT".equals(method)) {
                         BasicHttpEntity body = new BasicHttpEntity();
                         body.setContent(req.getInputStream());
                         body.setContentLength(-1);    // -1 = unknown
@@ -279,7 +279,7 @@ public class ProxyServlet extends BaseServlet {
         List<String> list = Collections.list(from.getHeaderNames());
         for (String name : list) {
             // Proxy code will add this one
-            if (!name.equalsIgnoreCase("Content-Length")) {
+            if (!"Content-Length".equalsIgnoreCase(name)) {
                 to.addHeader(name, from.getHeader(name));
             }
         }
@@ -288,7 +288,7 @@ public class ProxyServlet extends BaseServlet {
     private void copyResponseHeaders(HttpResponse from, HttpServletResponse to) {
         for (Header hdr : from.getAllHeaders()) {
             // Don't copy Date: our Jetty will add another Date header
-            if (!hdr.getName().equals("Date")) {
+            if (!"Date".equals(hdr.getName())) {
                 to.addHeader(hdr.getName(), hdr.getValue());
             }
         }

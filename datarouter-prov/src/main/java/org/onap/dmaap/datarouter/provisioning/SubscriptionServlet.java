@@ -63,6 +63,10 @@ public class SubscriptionServlet extends ProxyServlet {
     private static EELFLogger eelfLogger = EELFManager.getInstance()
         .getLogger(SubscriptionServlet.class);
 
+
+
+
+
     /**
      * DELETE on the &lt;subscriptionUrl&gt; -- delete a subscription. See the <i>Deleting a Subscription</i> section in
      * the <b>Provisioning API</b> document for details on how this method should be invoked.
@@ -88,7 +92,7 @@ public class SubscriptionServlet extends ProxyServlet {
             }
             String bhdr = req.getHeader(BEHALF_HEADER);
             if (bhdr == null) {
-                message = "Missing " + BEHALF_HEADER + " header.";
+                message = MISSING_ON_BEHALF;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -97,7 +101,7 @@ public class SubscriptionServlet extends ProxyServlet {
             }
             int subid = getIdFromPath(req);
             if (subid < 0) {
-                message = "Missing or bad subscription number.";
+                message = BAD_SUB;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -106,7 +110,7 @@ public class SubscriptionServlet extends ProxyServlet {
             }
             Subscription sub = Subscription.getSubscriptionById(subid);
             if (sub == null) {
-                message = "Missing or bad subscription number.";
+                message = BAD_SUB;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_NOT_FOUND);
                 eventlogger.error(elr.toString());
@@ -119,10 +123,10 @@ public class SubscriptionServlet extends ProxyServlet {
              * CADI code - check on permissions based on Legacy/AAF users to allow to delete/remove subscription
              */
             String aafInstance = sub.getAafInstance();
-            if (aafInstance == null || aafInstance.equals("") || aafInstance.equalsIgnoreCase("legacy")) {
+            if (aafInstance == null || "".equals(aafInstance) || "legacy".equalsIgnoreCase(aafInstance)) {
                 AuthorizationResponse aresp = authz.decide(req);
                 if (!aresp.isAuthorized()) {
-                    message = "Policy Engine disallows access.";
+                    message = POLICY;
                     elr.setMessage(message);
                     elr.setResult(HttpServletResponse.SC_FORBIDDEN);
                     eventlogger.error(elr.toString());
@@ -189,7 +193,7 @@ public class SubscriptionServlet extends ProxyServlet {
             }
             String bhdr = req.getHeader(BEHALF_HEADER);
             if (bhdr == null) {
-                message = "Missing " + BEHALF_HEADER + " header.";
+                message = MISSING_ON_BEHALF;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -198,7 +202,7 @@ public class SubscriptionServlet extends ProxyServlet {
             }
             int subid = getIdFromPath(req);
             if (subid < 0) {
-                message = "Missing or bad subscription number.";
+                message = BAD_SUB;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -207,7 +211,7 @@ public class SubscriptionServlet extends ProxyServlet {
             }
             Subscription sub = Subscription.getSubscriptionById(subid);
             if (sub == null) {
-                message = "Missing or bad subscription number.";
+                message = BAD_SUB;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_NOT_FOUND);
                 eventlogger.error(elr.toString());
@@ -217,7 +221,7 @@ public class SubscriptionServlet extends ProxyServlet {
             // Check with the Authorizer
             AuthorizationResponse aresp = authz.decide(req);
             if (!aresp.isAuthorized()) {
-                message = "Policy Engine disallows access.";
+                message = POLICY;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
                 eventlogger.error(elr.toString());
@@ -265,7 +269,7 @@ public class SubscriptionServlet extends ProxyServlet {
             }
             String bhdr = req.getHeader(BEHALF_HEADER);
             if (bhdr == null) {
-                message = "Missing " + BEHALF_HEADER + " header.";
+                message = MISSING_ON_BEHALF;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -274,7 +278,7 @@ public class SubscriptionServlet extends ProxyServlet {
             }
             int subid = getIdFromPath(req);
             if (subid < 0) {
-                message = "Missing or bad subscription number.";
+                message = BAD_SUB;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -283,7 +287,7 @@ public class SubscriptionServlet extends ProxyServlet {
             }
             Subscription oldsub = Subscription.getSubscriptionById(subid);
             if (oldsub == null) {
-                message = "Missing or bad subscription number.";
+                message = BAD_SUB;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_NOT_FOUND);
                 eventlogger.error(elr.toString());
@@ -293,7 +297,7 @@ public class SubscriptionServlet extends ProxyServlet {
             // check content type is SUB_CONTENT_TYPE, version 1.0
             ContentHeader ch = getContentHeader(req);
             String ver = ch.getAttribute("version");
-            if (!ch.getType().equals(SUB_BASECONTENT_TYPE) || !(ver.equals("1.0") || ver.equals("2.0"))) {
+            if (!ch.getType().equals(SUB_BASECONTENT_TYPE) || !("1.0".equals(ver) || "2.0".equals(ver))) {
                 message = "Incorrect content-type";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -303,7 +307,7 @@ public class SubscriptionServlet extends ProxyServlet {
             }
             JSONObject jo = getJSONfromInput(req);
             if (jo == null) {
-                message = "Badly formed JSON";
+                message = BAD_JSON;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -331,10 +335,10 @@ public class SubscriptionServlet extends ProxyServlet {
              * CADI code - check on permissions based on Legacy/AAF users to allow to delete/remove subscription
              */
             String aafInstance = sub.getAafInstance();
-            if (aafInstance == null || aafInstance.equals("") || aafInstance.equalsIgnoreCase("legacy")) {
+            if (aafInstance == null || "".equals(aafInstance) || "legacy".equalsIgnoreCase(aafInstance)) {
                 AuthorizationResponse aresp = authz.decide(req);
                 if (!aresp.isAuthorized()) {
-                    message = "Policy Engine disallows access.";
+                    message = POLICY;
                     elr.setMessage(message);
                     elr.setResult(HttpServletResponse.SC_FORBIDDEN);
                     eventlogger.error(elr.toString());
@@ -435,7 +439,7 @@ public class SubscriptionServlet extends ProxyServlet {
             }
             String bhdr = req.getHeader(BEHALF_HEADER);
             if (bhdr == null) {
-                message = "Missing " + BEHALF_HEADER + " header.";
+                message = MISSING_ON_BEHALF;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -444,7 +448,7 @@ public class SubscriptionServlet extends ProxyServlet {
             }
             final int subid = getIdFromPath(req);
             if (subid < 0 || Subscription.getSubscriptionById(subid) == null) {
-                message = "Missing or bad subscription number.";
+                message = BAD_SUB;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -454,7 +458,7 @@ public class SubscriptionServlet extends ProxyServlet {
             // check content type is SUBCNTRL_CONTENT_TYPE, version 1.0
             ContentHeader ch = getContentHeader(req);
             String ver = ch.getAttribute("version");
-            if (!ch.getType().equals(SUBCNTRL_CONTENT_TYPE) || !ver.equals("1.0")) {
+            if (!ch.getType().equals(SUBCNTRL_CONTENT_TYPE) || !"1.0".equals(ver)) {
                 message = "Incorrect content-type";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -465,7 +469,7 @@ public class SubscriptionServlet extends ProxyServlet {
             // Check with the Authorizer
             AuthorizationResponse aresp = authz.decide(req);
             if (!aresp.isAuthorized()) {
-                message = "Policy Engine disallows access.";
+                message = POLICY;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
                 eventlogger.error(elr.toString());
@@ -474,7 +478,7 @@ public class SubscriptionServlet extends ProxyServlet {
             }
             JSONObject jo = getJSONfromInput(req);
             if (jo == null) {
-                message = "Badly formed JSON";
+                message = BAD_JSON;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -496,7 +500,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 eventlogger.info(elr.toString());
                 resp.setStatus(HttpServletResponse.SC_ACCEPTED);
             } catch (JSONException e) {
-                message = "Badly formed JSON";
+                message = BAD_JSON;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString(), e);
@@ -514,7 +518,7 @@ public class SubscriptionServlet extends ProxyServlet {
     public class SubscriberNotifyThread extends Thread {
 
         public static final String URL_TEMPLATE = "http://%s/internal/resetSubscription/%d";
-        private List<String> urls = new Vector<String>();
+        private List<String> urls = new Vector<>();
 
         public SubscriberNotifyThread() {
             setName("SubscriberNotifyThread");
@@ -527,7 +531,9 @@ public class SubscriptionServlet extends ProxyServlet {
             }
         }
 
+        @Override
         public void run() {
+
             try {
                 while (!urls.isEmpty()) {
                     String u = urls.remove(0);
