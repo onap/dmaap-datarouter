@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "73540bbe_22985ca3",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/FeedServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-05-29T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1b56247_72ad0aa5",
+      "range": {
+        "startLine": 58,
+        "startChar": 31,
+        "endLine": 61,
+        "endChar": 80
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "265fe17c_b9eeae4b",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/FeedServlet.java",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2019-05-29T10:50:37Z",
       "side": 1,
       "message": "Try to keep a space around the \"+\" for convention.",
+      "range": {
+        "startLine": 88,
+        "startChar": 47,
+        "endLine": 88,
+        "endChar": 50
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1424b604_a2a60dfd",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/FeedServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-05-29T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "265fe17c_b9eeae4b",
       "range": {
         "startLine": 88,
         "startChar": 47,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "beb6c77e_82ed9502",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/InternalServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-05-29T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c04c01d_43b0fd36",
+      "range": {
+        "startLine": 159,
+        "startChar": 24,
+        "endLine": 163,
+        "endChar": 39
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "70a5553e_c96480af",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/RouteServlet.java",
         "patchSetId": 2
@@ -82,6 +154,30 @@
       "writtenOn": "2019-05-29T10:50:37Z",
       "side": 1,
       "message": "Prob more candidates for BaseServlet constatnts",
+      "range": {
+        "startLine": 132,
+        "startChar": 27,
+        "endLine": 133,
+        "endChar": 53
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "161dfbd8_a07464a3",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/RouteServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-05-29T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70a5553e_c96480af",
       "range": {
         "startLine": 132,
         "startChar": 27,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "25186faf_d6d009bf",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-05-29T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "986408c1_377ec986",
+      "range": {
+        "startLine": 67,
+        "startChar": 30,
+        "endLine": 67,
+        "endChar": 40
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "74947bb5_89960f3f",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
         "patchSetId": 2
@@ -128,6 +248,30 @@
       "writtenOn": "2019-05-29T10:50:37Z",
       "side": 1,
       "message": "Is this and the other sql mappings below common to other classes? LogServlet maybe?\nNot a fan of crowding the BaseServlet with a load of constants but if it makes sense..\nCould potentially setup a generic ServletConstants class and store them there.",
+      "range": {
+        "startLine": 70,
+        "startChar": 30,
+        "endLine": 70,
+        "endChar": 39
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "df69f056_34071f91",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-05-29T15:32:10Z",
+      "side": 1,
+      "message": "This is used in one other class",
+      "parentUuid": "74947bb5_89960f3f",
       "range": {
         "startLine": 70,
         "startChar": 30,
@@ -163,6 +307,30 @@
     },
     {
       "key": {
+        "uuid": "bdef3e2e_30b6b2e0",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/SubscribeServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-05-29T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b16aeffb_fe00ef2e",
+      "range": {
+        "startLine": 60,
+        "startChar": 32,
+        "endLine": 60,
+        "endChar": 39
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7082c74a_093454b4",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/SubscribeServlet.java",
         "patchSetId": 2
@@ -174,6 +342,30 @@
       "writtenOn": "2019-05-29T10:50:37Z",
       "side": 1,
       "message": "Same comment as for other servlet constants",
+      "range": {
+        "startLine": 196,
+        "startChar": 27,
+        "endLine": 196,
+        "endChar": 64
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a9688a48_f593536f",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/SubscribeServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-05-29T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7082c74a_093454b4",
       "range": {
         "startLine": 196,
         "startChar": 27,
@@ -243,6 +435,30 @@
       "writtenOn": "2019-05-29T10:50:37Z",
       "side": 1,
       "message": "Same comment re shared constants in BaseServlet",
+      "range": {
+        "startLine": 65,
+        "startChar": 28,
+        "endLine": 69,
+        "endChar": 61
+      },
+      "revId": "c3f8f52a0663347a20d5fa7f127b97cb3b569eb4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3e9e55c6_a0ea5b78",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/SubscriptionServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-05-29T15:32:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cddd3017_4e3db6b6",
       "range": {
         "startLine": 65,
         "startChar": 28,
