@@ -109,8 +109,8 @@ public class DRFeedsServlet extends ProxyServlet {
             }
             // Note: I think this should be getPathInfo(), but that doesn't work (Jetty bug?)
             String path = req.getRequestURI();
-            if (path != null && !path.equals("/")) {
-                message = "Bad URL.";
+            if (path != null && !"/".equals(path)) {
+                message = BAD_URL;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_NOT_FOUND);
                 eventlogger.error(elr.toString());
@@ -120,7 +120,7 @@ public class DRFeedsServlet extends ProxyServlet {
             // Check with the Authorizer
             AuthorizationResponse aresp = authz.decide(req);
             if (!aresp.isAuthorized()) {
-                message = "Policy Engine disallows access.";
+                message = POLICY_ENGINE;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_FORBIDDEN);
                 eventlogger.error(elr.toString());
@@ -236,8 +236,8 @@ public class DRFeedsServlet extends ProxyServlet {
             }
             // Note: I think this should be getPathInfo(), but that doesn't work (Jetty bug?)
             String path = req.getRequestURI();
-            if (path != null && !path.equals("/")) {
-                message = "Bad URL.";
+            if (path != null && !"/".equals(path)) {
+                message = BAD_URL;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_NOT_FOUND);
                 eventlogger.error(elr.toString());
@@ -247,7 +247,7 @@ public class DRFeedsServlet extends ProxyServlet {
             // check content type is FEED_CONTENT_TYPE, version 1.0
             ContentHeader ch = getContentHeader(req);
             String ver = ch.getAttribute("version");
-            if (!ch.getType().equals(FEED_BASECONTENT_TYPE) || !(ver.equals("1.0") || ver.equals("2.0"))) {
+            if (!ch.getType().equals(FEED_BASECONTENT_TYPE) || !("1.0".equals(ver) || "2.0".equals(ver))) {
                 message = "Incorrect content-type";
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -257,7 +257,7 @@ public class DRFeedsServlet extends ProxyServlet {
             }
             JSONObject jo = getJSONfromInput(req);
             if (jo == null) {
-                message = "Badly formed JSON";
+                message = BAD_JSON;
                 elr.setMessage(message);
                 elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                 eventlogger.error(elr.toString());
@@ -295,11 +295,11 @@ public class DRFeedsServlet extends ProxyServlet {
              */
             String aafInstance = feed.getAafInstance();
             if (Boolean.parseBoolean(isCadiEnabled)) {
-                if ((aafInstance == null || aafInstance.equals("") || (aafInstance.equalsIgnoreCase("legacy")) && req.getHeader(EXCLUDE_AAF_HEADER).equalsIgnoreCase("true"))) {
+                if ((aafInstance == null || "".equals(aafInstance) || ("legacy".equalsIgnoreCase(aafInstance)) && "true".equalsIgnoreCase(req.getHeader(EXCLUDE_AAF_HEADER)))) {
                     // Check with the Authorizer
                     AuthorizationResponse aresp = authz.decide(req);
                     if (!aresp.isAuthorized()) {
-                        message = "Policy Engine disallows access.";
+                        message = POLICY_ENGINE;
                         elr.setMessage(message);
                         elr.setResult(HttpServletResponse.SC_FORBIDDEN);
                         eventlogger.error(elr.toString());
@@ -307,7 +307,7 @@ public class DRFeedsServlet extends ProxyServlet {
                         return;
                     }
                 } else {
-                    if (req.getHeader(EXCLUDE_AAF_HEADER).equalsIgnoreCase("true")) {
+                    if ("true".equalsIgnoreCase(req.getHeader(EXCLUDE_AAF_HEADER))) {
                         message = "DRFeedsServlet.doPost() -Invalid request exclude_AAF should not be true if passing AAF_Instance value= " + aafInstance;
                         elr.setMessage(message);
                         elr.setResult(HttpServletResponse.SC_FORBIDDEN);
@@ -329,7 +329,7 @@ public class DRFeedsServlet extends ProxyServlet {
             } else {
                 AuthorizationResponse aresp = authz.decide(req);
                 if (!aresp.isAuthorized()) {
-                    message = "Policy Engine disallows access.";
+                    message = POLICY_ENGINE;
                     elr.setMessage(message);
                     elr.setResult(HttpServletResponse.SC_FORBIDDEN);
                     eventlogger.error(elr.toString());

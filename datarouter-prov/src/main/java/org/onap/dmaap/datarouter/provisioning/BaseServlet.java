@@ -132,6 +132,32 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     private static final String DEFAULT_PROVSRVR_NAME = "dmaap-dr-prov";
     private static final String STATIC_ROUTING_NODES = ""; //Adding new param for static Routing - Rally:US664862-1610
 
+    //Common Errors
+    public static final String MISSING_ON_BEHALF = "Missing X-DMAAP-DR-ON-BEHALF-OF header.";
+    public static final String MISSING_FEED = "Missing or bad feed number.";
+    public static final String POLICY_ENGINE = "Policy Engine disallows access.";
+    public static final String UNAUTHORIZED = "Unauthorized.";
+    public static final String BAD_SUB = "Missing or bad subscription number.";
+    public static final String BAD_JSON = "Badly formed JSON";
+    public static final String BAD_URL = "Bad URL.";
+
+    public static final String API = "/api/";
+    public static final String LOGS = "/logs/";
+    public static final String TEXT_CT = "text/plain";
+    public static final String INGRESS = "/ingress/";
+    public static final String EGRESS = "/egress/";
+    public static final String NETWORK = "/network/";
+    public static final String GROUPID = "groupid";
+    public static final String FEEDID = "feedid";
+    public static final String FEEDIDS = "feedids";
+    public static final String SUBID = "subid";
+    public static final String EVENT_TYPE = "eventType";
+    public static final String OUTPUT_TYPE = "output_type";
+    public static final String START_TIME = "start_time";
+    public static final String END_TIME = "end_time";
+    public static final String REASON_SQL = "reasonSQL";
+
+
     /**
      * A boolean to trigger one time "provisioning changed" event on startup
      */
@@ -285,7 +311,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         try {
             thishost = InetAddress.getLocalHost();
             loopback = InetAddress.getLoopbackAddress();
-            //checkHttpsRelaxation(); //Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
         } catch (UnknownHostException e) {
             intlogger.info("BaseServlet.init: " + e.getMessage(), e);
         }
@@ -590,26 +615,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         }
     }
 
-    /**
-     * Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047. Check if HTTPS Relexaction is enabled
-     *
-     * @author vs215k
-     **/
-    private void checkHttpsRelaxation() {
-        if (!mailSendFlag) {
-            Properties p = (new DB()).getProperties();
-            intlogger.info("HTTPS relaxation: " + p.get("org.onap.dmaap.datarouter.provserver.https.relaxation"));
-
-            if (p.get("org.onap.dmaap.datarouter.provserver.https.relaxation").equals("true")) {
-                try {
-                    notifyPSTeam(p.get("org.onap.dmaap.datarouter.provserver.https.relax.notify").toString());
-                } catch (Exception e) {
-                    intlogger.warn("Exception: " + e.getMessage(), e);
-                }
-            }
-            mailSendFlag = true;
-        }
-    }
 
     /**
      * Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
@@ -646,7 +651,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             mp.addBodyPart(htmlPart);
             msg.setContent(mp);
 
-            System.out.println(mailprops.get("com.att.dmaap.datarouter.mail.body").toString()
+            intlogger.info(mailprops.get("com.att.dmaap.datarouter.mail.body").toString()
                     .replace("[SERVER]", InetAddress.getLocalHost().getHostName()));
 
             Transport.send(msg);
@@ -809,7 +814,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
 
     private static boolean getBoolean(Map<String, String> map, String name) {
         String s = map.get(name);
-        return (s != null) && s.equalsIgnoreCase("true");
+        return (s != null) && "true".equalsIgnoreCase(s);
     }
 
     private static String getString(Map<String, String> map, String name, String dflt) {
@@ -1088,7 +1093,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 default:
                     action = "*";
             }
-            if (aafInstance == null || aafInstance.equals("")) {
+            if (aafInstance == null || "".equals(aafInstance)) {
                 aafInstance = props.getProperty(AAF_INSTANCE, "org.onap.dmaap-dr.NoInstanceDefined");
             }
             return type + "|" + aafInstance + "|" + action;
@@ -1136,7 +1141,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 default:
                     action = "*";
             }
-            if (aafInstance == null || aafInstance.equals("")) {
+            if (aafInstance == null || "".equals(aafInstance)) {
                 aafInstance = props.getProperty(AAF_INSTANCE, "org.onap.dmaap-dr.NoInstanceDefined");
             }
             return type + "|" + aafInstance + "|" + action;

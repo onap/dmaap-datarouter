@@ -129,6 +129,7 @@ import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.send
  */
 @SuppressWarnings("serial")
 public class RouteServlet extends ProxyServlet {
+
     /**
      * DELETE route table entries by deleting part of the route table tree.
      */
@@ -136,10 +137,10 @@ public class RouteServlet extends ProxyServlet {
     public void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         EventLogRecord elr = new EventLogRecord(req);
         if (!isAuthorizedForInternal(req)) {
-            elr.setMessage("Unauthorized.");
+            elr.setMessage(UNAUTHORIZED);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.error(elr.toString());
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, UNAUTHORIZED, eventlogger);
             return;
         }
         if (isProxyOK(req) && isProxyServer()) {
@@ -150,7 +151,7 @@ public class RouteServlet extends ProxyServlet {
         String path = req.getPathInfo();
         String[] parts = path.substring(1).split("/");
         Deleteable[] d = null;
-        if (parts[0].equals("ingress")) {
+        if ("ingress".equals(parts[0])) {
             if (parts.length == 4) {
                 // /internal/route/ingress/<feed>/<user>/<subnet>
                 try {
@@ -179,7 +180,7 @@ public class RouteServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Invalid number of arguments in 'delete ingress' command.", eventlogger);
                 return;
             }
-        } else if (parts[0].equals("egress")) {
+        } else if ("egress".equals(parts[0])) {
             if (parts.length == 2) {
                 // /internal/route/egress/<sub>
                 try {
@@ -198,7 +199,7 @@ public class RouteServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Invalid number of arguments in 'delete egress' command.", eventlogger);
                 return;
             }
-        } else if (parts[0].equals("network")) {
+        } else if ("network".equals(parts[0])) {
             if (parts.length == 3) {
                 // /internal/route/network/<from>/<to>
                 try {//
@@ -219,7 +220,7 @@ public class RouteServlet extends ProxyServlet {
             }
         }
         if (d == null) {
-            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", eventlogger);
+            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, BAD_URL, eventlogger);
             return;
         }
         boolean rv = true;
@@ -246,10 +247,10 @@ public class RouteServlet extends ProxyServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         EventLogRecord elr = new EventLogRecord(req);
         if (!isAuthorizedForInternal(req)) {
-            elr.setMessage("Unauthorized.");
+            elr.setMessage(UNAUTHORIZED);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.error(elr.toString());
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, UNAUTHORIZED, eventlogger);
             return;
         }
         if (isProxyOK(req) && isProxyServer()) {
@@ -260,14 +261,14 @@ public class RouteServlet extends ProxyServlet {
         String path = req.getPathInfo();
         if (!path.endsWith("/"))
             path += "/";
-        if (!path.equals("/") && !path.equals("/ingress/") && !path.equals("/egress/") && !path.equals("/network/")) {
-            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", eventlogger);
+        if (!"/".equals(path) && !INGRESS.equals(path) && !EGRESS.equals(path) && !NETWORK.equals(path)) {
+            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, BAD_URL, eventlogger);
             return;
         }
 
         StringBuilder sb = new StringBuilder("{\n");
         String px2 = "";
-        if (path.equals("/") || path.equals("/ingress/")) {
+        if ("/".equals(path) || INGRESS.equals(path)) {
             String pfx = "\n";
             sb.append("\"ingress\": [");
             for (IngressRoute in : IngressRoute.getAllIngressRoutes()) {
@@ -279,7 +280,7 @@ public class RouteServlet extends ProxyServlet {
             px2 = ",\n";
         }
 
-        if (path.equals("/") || path.equals("/egress/")) {
+        if ("/".equals(path) || EGRESS.equals(path)) {
             String pfx = "\n";
             sb.append(px2);
             sb.append("\"egress\": {");
@@ -300,7 +301,7 @@ public class RouteServlet extends ProxyServlet {
             px2 = ",\n";
         }
 
-        if (path.equals("/") || path.equals("/network/")) {
+        if ("/".equals(path) || NETWORK.equals(path)) {
             String pfx = "\n";
             sb.append(px2);
             sb.append("\"routing\": [");
@@ -327,13 +328,13 @@ public class RouteServlet extends ProxyServlet {
     public void doPut(HttpServletRequest req, HttpServletResponse resp) {
         EventLogRecord elr = new EventLogRecord(req);
         if (!isAuthorizedForInternal(req)) {
-            elr.setMessage("Unauthorized.");
+            elr.setMessage(UNAUTHORIZED);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.error(elr.toString());
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, UNAUTHORIZED, eventlogger);
             return;
         }
-        sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", eventlogger);
+        sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, BAD_URL, eventlogger);
     }
     /**
      * POST - modify existing route table entries in the route table tree specified by the URL path.
@@ -342,10 +343,10 @@ public class RouteServlet extends ProxyServlet {
     public void doPost(HttpServletRequest req, HttpServletResponse resp) {
         EventLogRecord elr = new EventLogRecord(req);
         if (!isAuthorizedForInternal(req)) {
-            elr.setMessage("Unauthorized.");
+            elr.setMessage(UNAUTHORIZED);
             elr.setResult(HttpServletResponse.SC_FORBIDDEN);
             eventlogger.error(elr.toString());
-            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, "Unauthorized.", eventlogger);
+            sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, UNAUTHORIZED, eventlogger);
             return;
         }
         if (isProxyOK(req) && isProxyServer()) {
@@ -354,7 +355,7 @@ public class RouteServlet extends ProxyServlet {
         }
         String path = req.getPathInfo();
         Insertable[] ins = null;
-        if (path.startsWith("/ingress/")) {
+        if (path.startsWith(INGRESS)) {
             // /internal/route/ingress/?feed=%s&amp;user=%s&amp;subnet=%s&amp;nodepatt=%s
             try {
                 // Although it probably doesn't make sense, you can install two identical routes in the IRT
@@ -374,7 +375,7 @@ public class RouteServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments in 'add ingress' command.", intlogger);
                 return;
             }
-        } else if (path.startsWith("/egress/")) {
+        } else if (path.startsWith(EGRESS)) {
             // /internal/route/egress/?sub=%s&amp;node=%s
             try {
                 int subid = Integer.parseInt(req.getParameter("sub"));
@@ -390,7 +391,7 @@ public class RouteServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments in 'add egress' command.", intlogger);
                 return;
             }
-        } else if (path.startsWith("/network/")) {
+        } else if (path.startsWith(NETWORK)) {
             // /internal/route/network/?from=%s&amp;to=%s&amp;via=%s
             try {
                 String nfrom = req.getParameter("from");
@@ -418,7 +419,7 @@ public class RouteServlet extends ProxyServlet {
             }
         }
         if (ins == null) {
-            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, "Bad URL.", intlogger);
+            sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, BAD_URL, intlogger);
             return;
         }
         boolean rv = true;
