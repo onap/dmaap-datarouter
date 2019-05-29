@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7e58b77e_70afc821",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/Poker.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T15:49:58Z",
+      "side": 1,
+      "message": "Maybe an underscore needed",
+      "range": {
+        "startLine": 69,
+        "startChar": 32,
+        "endLine": 69,
+        "endChar": 46
+      },
+      "revId": "b27041d3ac1c6697bbc946bd11fa3b1347333fc8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
