@@ -365,7 +365,7 @@
 
 
 
-  <root level="TRACE">
+  <root level="INFO">
     <appender-ref ref="asyncEELF" />
     <appender-ref ref="asyncEELFError" />
     <appender-ref ref="asyncEELFjettyAndNodelog" />

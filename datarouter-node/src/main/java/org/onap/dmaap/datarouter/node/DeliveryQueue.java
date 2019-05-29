@@ -367,6 +367,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
         long endtime = System.currentTimeMillis() + deliveryQueueHelper.getFairTimeLimit();
         int filestogo = deliveryQueueHelper.getFairFileLimit();
         while ((t = getNext()) != null) {
+            logger.debug("Processing file: " + t.getFileId());
             t.run();
             if (--filestogo <= 0 || System.currentTimeMillis() > endtime) {
                 break;
