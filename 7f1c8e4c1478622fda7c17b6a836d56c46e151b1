@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "41fa3435_8a6db2a2",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/Delivery.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-05-29T11:03:56Z",
+      "side": 1,
+      "message": "I\u0027m pretty sure we want to exit the loop when both are equal.",
+      "range": {
+        "startLine": 224,
+        "startChar": 26,
+        "endLine": 224,
+        "endChar": 28
+      },
+      "revId": "7f1c8e4c1478622fda7c17b6a836d56c46e151b1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
