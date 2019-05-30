@@ -23,7 +23,6 @@
 
 package org.onap.dmaap.datarouter.node;
 
-
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.io.IOException;
@@ -47,7 +46,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.onap.aaf.cadi.PropAccess;
 
 /**
- * The main starting point for the Data Router node
+ * The main starting point for the Data Router node.
  */
 public class NodeMain {
 
@@ -59,7 +58,7 @@ public class NodeMain {
     }
 
     /**
-     * Reset the retry timer for a subscription
+     * Reset the retry timer for a subscription.
      */
     static void resetQueue(String subid, String ip) {
         delivery.resetQueue(nodeConfigManager.getSpoolDir(subid, ip));
@@ -67,9 +66,9 @@ public class NodeMain {
 
     /**
      * Start the data router.
-     * <p>
-     * The location of the node configuration file can be set using the org.onap.dmaap.datarouter.node.properties system
-     * property.  By default, it is "/opt/app/datartr/etc/node.properties".
+     *
+     * <p>The location of the node configuration file can be set using the org.onap.dmaap.datarouter.node.properties
+     * system property. By default, it is "/opt/app/datartr/etc/node.properties".
      */
     public static void main(String[] args) throws Exception {
         nodeMainLogger.info("NODE0001 Data Router Node Starting");
@@ -99,7 +98,8 @@ public class NodeMain {
             sslContextFactory.setKeyStorePassword(nodeConfigManager.getKSPass());
             sslContextFactory.setKeyManagerPassword(nodeConfigManager.getKPass());
 
-            //SP-6 : Fixes for SDV scan to exclude/remove DES/3DES ciphers are taken care by upgrading jdk in descriptor.xml
+            //SP-6: Fixes for SDV scan to exclude/remove DES/3DES
+            // ciphers are taken care by upgrading jdk in descriptor.xml
             sslContextFactory.setExcludeCipherSuites(
                     "SSL_RSA_WITH_DES_CBC_SHA",
                     "SSL_DHE_RSA_WITH_DES_CBC_SHA",
@@ -112,12 +112,12 @@ public class NodeMain {
 
             sslContextFactory.addExcludeProtocols("SSLv3");
             sslContextFactory.setIncludeProtocols(nodeConfigManager.getEnabledprotocols());
-            nodeMainLogger.info("NODE00004 Unsupported protocols node server:-" +
-                    String.join(",", sslContextFactory.getExcludeProtocols()));
-            nodeMainLogger.info("NODE00004 Supported protocols node server:-" +
-                    String.join(",", sslContextFactory.getIncludeProtocols()));
-            nodeMainLogger.info("NODE00004 Unsupported ciphers node server:-" +
-                    String.join(",", sslContextFactory.getExcludeCipherSuites()));
+            nodeMainLogger.info("NODE00004 Unsupported protocols node server:-"
+                    + String.join(",", sslContextFactory.getExcludeProtocols()));
+            nodeMainLogger.info("NODE00004 Supported protocols node server:-"
+                    + String.join(",", sslContextFactory.getIncludeProtocols()));
+            nodeMainLogger.info("NODE00004 Unsupported ciphers node server:-"
+                    + String.join(",", sslContextFactory.getExcludeCipherSuites()));
 
             HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
             httpsConfiguration.setRequestHeaderSize(8192);
@@ -155,7 +155,7 @@ public class NodeMain {
             server.start();
             nodeMainLogger.info("NODE00006 Node Server started-" + server.getState());
         } catch (Exception e) {
-            nodeMainLogger.info("NODE00006 Jetty failed to start. Reporting will we unavailable", e.getMessage());
+            nodeMainLogger.info("NODE00006 Jetty failed to start. Reporting will we unavailable: " + e.getMessage(), e);
         }
         server.join();
         nodeMainLogger.info("NODE00007 Node Server joined - " + server.getState());
@@ -168,7 +168,8 @@ public class NodeMain {
             InputStream in = obj.getCadiProps();
             cadiProperties.load(in);
         } catch (IOException e1) {
-            nodeMainLogger.error("NODE00005 Exception in NodeMain.Main() loading CADI properties " + e1.getMessage());
+            nodeMainLogger
+                    .error("NODE00005 Exception in NodeMain.Main() loading CADI properties " + e1.getMessage(), e1);
         }
         cadiProperties.setProperty("aaf_locate_url", nodeConfigManager.getAafURL());
         nodeMainLogger.info("NODE00005  aaf_url set to - " + cadiProperties.getProperty("aaf_url"));

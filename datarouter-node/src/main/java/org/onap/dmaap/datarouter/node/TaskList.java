@@ -59,7 +59,7 @@ public class TaskList {
     }
 
     /**
-     * Get the next task to execute
+     * Get the next task to execute.
      */
     public synchronized Runnable next() {
         while (runlist != null) {

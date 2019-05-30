@@ -28,7 +28,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Execute an operation no more frequently than a specified interval
+ * Execute an operation no more frequently than a specified interval.
  */
 
 public abstract class RateLimitedOperation implements Runnable {
@@ -41,10 +41,10 @@ public abstract class RateLimitedOperation implements Runnable {
     private long mininterval;
 
     /**
-     * Create a rate limited operation
+     * Create a rate limited operation.
      *
      * @param mininterval The minimum number of milliseconds after the last execution starts before a new execution can
-     * begin
+     *      begin
      * @param timer The timer used to perform deferred executions
      */
     public RateLimitedOperation(long mininterval, Timer timer) {
@@ -53,7 +53,7 @@ public abstract class RateLimitedOperation implements Runnable {
     }
 
     /**
-     * Request that the operation be performed by this thread or at a later time by the timer
+     * Request that the operation be performed by this thread or at a later time by the timer.
      */
     public void request() {
         if (premark()) {
@@ -61,7 +61,8 @@ public abstract class RateLimitedOperation implements Runnable {
         }
         do {
             run();
-        } while (demark());
+        }
+        while (demark());
     }
 
     private synchronized boolean premark() {

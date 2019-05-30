@@ -25,7 +25,7 @@
 package org.onap.dmaap.datarouter.node;
 
 /**
- * Compare IP addresses as byte arrays to a subnet specified as a CIDR
+ * Compare IP addresses as byte arrays to a subnet specified as a CIDR.
  */
 public class SubnetMatcher {
 
@@ -34,25 +34,25 @@ public class SubnetMatcher {
     private int mask;
 
     /**
-     * Construct a subnet matcher given a CIDR
+     * Construct a subnet matcher given a CIDR.
      *
      * @param subnet The CIDR to match
      */
     public SubnetMatcher(String subnet) {
-        int i = subnet.lastIndexOf('/');
-        if (i == -1) {
+        int index = subnet.lastIndexOf('/');
+        if (index == -1) {
             sn = NodeUtils.getInetAddress(subnet);
             len = sn.length;
         } else {
-            len = Integer.parseInt(subnet.substring(i + 1));
-            sn = NodeUtils.getInetAddress(subnet.substring(0, i));
+            len = Integer.parseInt(subnet.substring(index + 1));
+            sn = NodeUtils.getInetAddress(subnet.substring(0, index));
             mask = ((0xff00) >> (len % 8)) & 0xff;
             len /= 8;
         }
     }
 
     /**
-     * Is the IP address in the CIDR?
+     * Is the IP address in the CIDR.
      *
      * @param addr the IP address as bytes in network byte order
      * @return true if the IP address matches.

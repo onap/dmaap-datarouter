@@ -55,7 +55,7 @@ import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 import org.slf4j.MDC;
 
 /**
- * Utility functions for the data router node
+ * Utility functions for the data router node.
  */
 public class NodeUtils {
 
@@ -66,7 +66,7 @@ public class NodeUtils {
     }
 
     /**
-     * Base64 encode a byte array
+     * Base64 encode a byte array.
      *
      * @param raw The bytes to be encoded
      * @return The encoded string
@@ -76,7 +76,7 @@ public class NodeUtils {
     }
 
     /**
-     * Given a user and password, generate the credentials
+     * Given a user and password, generate the credentials.
      *
      * @param user User name
      * @param password User password
@@ -90,7 +90,7 @@ public class NodeUtils {
     }
 
     /**
-     * Given a node name, generate the credentials
+     * Given a node name, generate the credentials.
      *
      * @param node Node name
      */
@@ -155,7 +155,7 @@ public class NodeUtils {
     }
 
     /**
-     * Given a string representation of an IP address, get the corresponding byte array
+     * Given a string representation of an IP address, get the corresponding byte array.
      *
      * @param ip The IP address as a string
      * @return The IP address as a byte array or null if the address is invalid
@@ -172,48 +172,48 @@ public class NodeUtils {
     }
 
     /**
-     * Given a uri with parameters, split out the feed ID and file ID
+     * Given a uri with parameters, split out the feed ID and file ID.
      */
     public static String[] getFeedAndFileID(String uriandparams) {
         int end = uriandparams.length();
-        int i = uriandparams.indexOf('#');
-        if (i != -1 && i < end) {
-            end = i;
+        int index = uriandparams.indexOf('#');
+        if (index != -1 && index < end) {
+            end = index;
         }
-        i = uriandparams.indexOf('?');
-        if (i != -1 && i < end) {
-            end = i;
+        index = uriandparams.indexOf('?');
+        if (index != -1 && index < end) {
+            end = index;
         }
         end = uriandparams.lastIndexOf('/', end);
         if (end < 2) {
             return (null);
         }
-        i = uriandparams.lastIndexOf('/', end - 1);
-        if (i == -1) {
+        index = uriandparams.lastIndexOf('/', end - 1);
+        if (index == -1) {
             return (null);
         }
-        return (new String[]{uriandparams.substring(i + 1, end), uriandparams.substring(end + 1)});
+        return (new String[]{uriandparams.substring(index + 1, end), uriandparams.substring(end + 1)});
     }
 
     /**
      * Escape fields that might contain vertical bar, backslash, or newline by replacing them with backslash p,
      * backslash e and backslash n.
      */
-    public static String loge(String s) {
-        if (s == null) {
-            return (s);
+    public static String loge(String string) {
+        if (string == null) {
+            return (string);
         }
-        return (s.replaceAll("\\\\", "\\\\e").replaceAll("\\|", "\\\\p").replaceAll("\n", "\\\\n"));
+        return (string.replaceAll("\\\\", "\\\\e").replaceAll("\\|", "\\\\p").replaceAll("\n", "\\\\n"));
     }
 
     /**
      * Undo what loge does.
      */
-    public static String unloge(String s) {
-        if (s == null) {
-            return (s);
+    public static String unloge(String string) {
+        if (string == null) {
+            return (string);
         }
-        return (s.replaceAll("\\\\p", "\\|").replaceAll("\\\\n", "\n").replaceAll("\\\\e", "\\\\"));
+        return (string.replaceAll("\\\\p", "\\|").replaceAll("\\\\n", "\n").replaceAll("\\\\e", "\\\\"));
     }
 
     /**
@@ -232,9 +232,9 @@ public class NodeUtils {
         return (logDate.format(when));
     }
 
-    /* Method prints method name, server FQDN and IP Address of the machine in EELF logs
-     * @Method - setIpAndFqdnForEelf - Rally:US664892
-     * @Params - method, prints method name in EELF log.
+    /** Method prints method name, server FQDN and IP Address of the machine in EELF logs.
+     *
+     * @param method Prints method name in EELF log.
      */
     public static void setIpAndFqdnForEelf(String method) {
         MDC.clear();
@@ -250,9 +250,9 @@ public class NodeUtils {
 
     }
 
-    /* Method sets RequestIs and InvocationId for se in EELF logs
-     * @Method - setIpAndFqdnForEelf
-     * @Params - Req, Request used to get RequestId and InvocationId
+    /** Method sets RequestIs and InvocationId for se in EELF logs.
+     *
+     * @param req Request used to get RequestId and InvocationId.
      */
     public static void setRequestIdAndInvocationId(HttpServletRequest req) {
         String reqId = req.getHeader("X-ONAP-RequestID");
@@ -267,6 +267,9 @@ public class NodeUtils {
         MDC.put("InvocationId", invId);
     }
 
+    /**
+     * Sends error as response with error code input.
+     */
     public static void sendResponseError(HttpServletResponse response, int errorCode, EELFLogger intlogger) {
         try {
             response.sendError(errorCode);
@@ -276,7 +279,7 @@ public class NodeUtils {
     }
 
     /**
-     * Method to check to see if file is of type gzip
+     * Method to check to see if file is of type gzip.
      *
      * @param file The name of the file to be checked
      * @return True if the file is of type gzip
@@ -307,11 +310,11 @@ public class NodeUtils {
 
 
     private static String getNameFromSubject(KeyStore ks, Enumeration<String> aliases) throws KeyStoreException {
-        String s = aliases.nextElement();
-        if (ks.entryInstanceOf(s, KeyStore.PrivateKeyEntry.class)) {
-            X509Certificate c = (X509Certificate) ks.getCertificate(s);
-            if (c != null) {
-                String subject = c.getSubjectX500Principal().getName();
+        String alias = aliases.nextElement();
+        if (ks.entryInstanceOf(alias, KeyStore.PrivateKeyEntry.class)) {
+            X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
+            if (cert != null) {
+                String subject = cert.getSubjectX500Principal().getName();
                 String[] parts = subject.split(",");
                 if (parts.length < 1) {
                     return null;

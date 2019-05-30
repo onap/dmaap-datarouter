@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Timer;
 
 /**
- * Track redirections of subscriptions
+ * Track redirections of subscriptions.
  */
 public class RedirManager {
 
@@ -59,10 +59,10 @@ public class RedirManager {
                 try {
                     StringBuilder sb = new StringBuilder();
                     for (Map.Entry<String, String> entry : sid2primary.entrySet()) {
-                        String s = entry.getKey();
+                        String key = entry.getKey();
                         String value = entry.getValue();
-                        sb.append(s).append(' ').append(value).append(' ')
-                                .append(sid2secondary.get(s)).append('\n');
+                        sb.append(key).append(' ').append(value).append(' ')
+                                .append(sid2secondary.get(key)).append('\n');
                     }
                     try (OutputStream os = new FileOutputStream(RedirManager.this.redirfile)) {
                         os.write(sb.toString().getBytes());
@@ -73,10 +73,10 @@ public class RedirManager {
             }
         };
         try {
-            String s;
+            String line;
             try (BufferedReader br = new BufferedReader(new FileReader(redirfile))) {
-                while ((s = br.readLine()) != null) {
-                    addSubRedirInfo(s);
+                while ((line = br.readLine()) != null) {
+                    addSubRedirInfo(line);
                 }
             }
         } catch (Exception e) {
@@ -128,16 +128,16 @@ public class RedirManager {
     }
 
     /**
-     * Is a subscription redirected?
+     * Is a subscription redirected.
      */
     public synchronized boolean isRedirected(String sid) {
         return (sid != null && sid2secondary.get(sid) != null);
     }
 
-    private void addSubRedirInfo(String s) {
-        s = s.trim();
-        String[] sx = s.split(" ");
-        if (s.startsWith("#") || sx.length != 3) {
+    private void addSubRedirInfo(String subRedirInfo) {
+        subRedirInfo = subRedirInfo.trim();
+        String[] sx = subRedirInfo.split(" ");
+        if (subRedirInfo.startsWith("#") || sx.length != 3) {
             return;
         }
         sid2primary.put(sx[0], sx[1]);

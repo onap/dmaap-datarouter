@@ -48,9 +48,9 @@ import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 import org.slf4j.MDC;
 
 /**
- * Servlet for handling all http and https requests to the data router node
- * <p>
- * Handled requests are:
+ * Servlet for handling all http and https requests to the data router node.
+ *
+ * <p>Handled requests are:
  * <br>
  * GET http://<i>node</i>/internal/fetchProv - fetch the provisioning data
  * <br>
@@ -86,7 +86,7 @@ public class NodeServlet extends HttpServlet {
     }
 
     /**
-     * Get the NodeConfigurationManager
+     * Get the NodeConfigurationManager.
      */
     @Override
     public void init() {
@@ -104,7 +104,7 @@ public class NodeServlet extends HttpServlet {
     }
 
     /**
-     * Handle a GET for /internal/fetchProv
+     * Handle a GET for /internal/fetchProv.
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
@@ -144,7 +144,7 @@ public class NodeServlet extends HttpServlet {
     }
 
     /**
-     * Handle all PUT requests
+     * Handle all PUT requests.
      */
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
@@ -162,7 +162,7 @@ public class NodeServlet extends HttpServlet {
     }
 
     /**
-     * Handle all DELETE requests
+     * Handle all DELETE requests.
      */
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
@@ -210,8 +210,8 @@ public class NodeServlet extends HttpServlet {
         }
         if (fileid.startsWith(PUBLISH)) {
             fileid = fileid.substring(9);
-            int i = fileid.indexOf('/');
-            if (i == -1 || i == fileid.length() - 1) {
+            int index = fileid.indexOf('/');
+            if (index == -1 || index == fileid.length() - 1) {
                 eelfLogger.error("NODE0205 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + FROM + req
                         .getRemoteAddr());
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND,
@@ -219,7 +219,7 @@ public class NodeServlet extends HttpServlet {
                 eelfLogger.info(EelfMsgs.EXIT);
                 return;
             }
-            feedid = fileid.substring(0, i);
+            feedid = fileid.substring(0, index);
 
             if (config.getCadiEnabled()) {
                 String path = req.getPathInfo();
@@ -242,7 +242,7 @@ public class NodeServlet extends HttpServlet {
                 }
             }
 
-            fileid = fileid.substring(i + 1);
+            fileid = fileid.substring(index + 1);
             pubid = config.getPublishId();
             targets = config.getTargets(feedid);
         } else if (fileid.startsWith(INTERNAL_PUBLISH)) {
@@ -352,13 +352,13 @@ public class NodeServlet extends HttpServlet {
             while (hnames.hasMoreElements()) {
                 String hn = (String) hnames.nextElement();
                 String hnlc = hn.toLowerCase();
-                if ((isput && ("content-type".equals(hnlc) ||
-                        "content-language".equals(hnlc) ||
-                        "content-md5".equals(hnlc) ||
-                        "content-range".equals(hnlc))) ||
-                        "x-dmaap-dr-meta".equals(hnlc) ||
-                        (feedid == null && "x-dmaap-dr-received".equals(hnlc)) ||
-                        (hnlc.startsWith("x-") && !hnlc.startsWith("x-dmaap-dr-"))) {
+                if ((isput && ("content-type".equals(hnlc)
+                        || "content-language".equals(hnlc)
+                        || "content-md5".equals(hnlc)
+                        || "content-range".equals(hnlc)))
+                        || "x-dmaap-dr-meta".equals(hnlc)
+                        || (feedid == null && "x-dmaap-dr-received".equals(hnlc))
+                        || (hnlc.startsWith("x-") && !hnlc.startsWith("x-dmaap-dr-"))) {
                     Enumeration hvals = req.getHeaders(hn);
                     while (hvals.hasMoreElements()) {
                         String hv = (String) hvals.nextElement();
@@ -469,11 +469,11 @@ public class NodeServlet extends HttpServlet {
 
     private String writeInputStreamToFile(HttpServletRequest req, File data) {
         byte[] buf = new byte[1024 * 1024];
-        int i;
+        int bytesRead;
         try (OutputStream dos = new FileOutputStream(data);
                 InputStream is = req.getInputStream()) {
-            while ((i = is.read(buf)) > 0) {
-                dos.write(buf, 0, i);
+            while ((bytesRead = is.read(buf)) > 0) {
+                dos.write(buf, 0, bytesRead);
             }
         } catch (IOException ioe) {
             eelfLogger.error("NODE0530 Exception common: " + ioe, ioe);
@@ -497,8 +497,8 @@ public class NodeServlet extends HttpServlet {
         final String FROM_DR_MESSAGE = ".M) from DR Node: ";
         try {
             fileid = fileid.substring(8);
-            int i = fileid.indexOf('/');
-            if (i == -1 || i == fileid.length() - 1) {
+            int index = fileid.indexOf('/');
+            if (index == -1 || index == fileid.length() - 1) {
                 eelfLogger.error("NODE0112 Rejecting bad URI for DELETE of " + req.getPathInfo() + FROM + req
                         .getRemoteAddr());
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND,
@@ -506,9 +506,9 @@ public class NodeServlet extends HttpServlet {
                 eelfLogger.info(EelfMsgs.EXIT);
                 return;
             }
-            String subscriptionId = fileid.substring(0, i);
+            String subscriptionId = fileid.substring(0, index);
             int subId = Integer.parseInt(subscriptionId);
-            pubid = fileid.substring(i + 1);
+            pubid = fileid.substring(index + 1);
             String errorMessage = "Unable to delete files (" + pubid + ", " + pubid + FROM_DR_MESSAGE
                     + config.getMyName() + ".";
             int subIdDir = subId - (subId % 100);
@@ -571,8 +571,8 @@ public class NodeServlet extends HttpServlet {
                 return false;
             }
         } catch (NullPointerException npe) {
-            eelfLogger.error("NODE0114 " + errorMessage + " Error: Subscription " + subscriptionId +
-                    " does not exist", npe);
+            eelfLogger.error("NODE0114 " + errorMessage + " Error: Subscription " + subscriptionId
+                    + " does not exist", npe);
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             eelfLogger.info(EelfMsgs.EXIT);
             return false;

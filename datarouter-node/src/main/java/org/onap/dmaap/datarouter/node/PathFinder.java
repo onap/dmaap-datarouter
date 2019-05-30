@@ -32,7 +32,7 @@ import org.onap.dmaap.datarouter.node.NodeConfig.ProvHop;
 
 /**
  * Given a set of node names and next hops, identify and ignore any cycles and figure out the sequence of next hops to
- * get from this node to any other node
+ * get from this node to any other node.
  */
 
 public class PathFinder {
@@ -55,13 +55,13 @@ public class PathFinder {
             ht.put(n, new HashMap<>());
         }
         for (NodeConfig.ProvHop ph : hops) {
-            Hop h = getHop(known, ht, ph);
-            if (h == null) {
+            Hop hop = getHop(known, ht, ph);
+            if (hop == null) {
                 continue;
             }
             if (ph.getVia().equals(ph.getTo())) {
                 errors.add(ph + " gives destination as via");
-                h.bad = true;
+                hop.bad = true;
             }
         }
         for (String n : known) {
@@ -73,7 +73,7 @@ public class PathFinder {
     }
 
     /**
-     * Get list of errors encountered while finding paths
+     * Get list of errors encountered while finding paths.
      *
      * @return array of error descriptions
      */
@@ -82,7 +82,7 @@ public class PathFinder {
     }
 
     /**
-     * Get the route from this node to the specified node
+     * Get the route from this node to the specified node.
      *
      * @param destination node
      * @return list of node names separated by and ending with "/"
@@ -109,12 +109,12 @@ public class PathFinder {
             return (to);
         }
         nh.mark = true;
-        String x = plot(nh.basis.getVia(), to, info);
+        String route = plot(nh.basis.getVia(), to, info);
         nh.mark = false;
         if (nh.bad) {
             return (to);
         }
-        return (nh.basis.getVia() + "/" + x);
+        return (nh.basis.getVia() + "/" + route);
     }
 
     @Nullable
@@ -128,21 +128,21 @@ public class PathFinder {
             return null;
         }
         HashMap<String, Hop> ht2 = ht.get(ph.getTo());
-        Hop h = ht2.get(ph.getFrom());
-        if (h != null) {
-            h.bad = true;
-            errors.add(ph + " gives duplicate next hop - previous via was " + h.basis.getVia());
+        Hop hop = ht2.get(ph.getFrom());
+        if (hop != null) {
+            hop.bad = true;
+            errors.add(ph + " gives duplicate next hop - previous via was " + hop.basis.getVia());
             return null;
         }
-        h = new Hop();
-        h.basis = ph;
-        ht2.put(ph.getFrom(), h);
+        hop = new Hop();
+        hop.basis = ph;
+        ht2.put(ph.getFrom(), hop);
         if (!known.contains(ph.getVia())) {
             errors.add(ph + " references unknown via node");
-            h.bad = true;
+            hop.bad = true;
             return null;
         }
-        return h;
+        return hop;
     }
 
     private static class Hop {

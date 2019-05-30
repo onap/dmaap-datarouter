@@ -21,7 +21,7 @@
 package org.onap.dmaap.datarouter.node;
 
 /**
- * FORTIFY SCAN FIXES
+ * FORTIFY SCAN FIXES.
  * <p>This Utility is used for Fortify fixes. It Validates the path url formed from
  * the string passed in the request parameters.</p>
  */
@@ -34,16 +34,16 @@ class PathUtil {
     /**
      * This method takes String as the parameter and return the filtered path string.
      *
-     * @param aString String to clean
+     * @param string String to clean
      * @return A cleaned String
      */
-    static String cleanString(String aString) {
-        if (aString == null) {
+    static String cleanString(String string) {
+        if (string == null) {
             return null;
         }
         StringBuilder cleanString = new StringBuilder();
-        for (int i = 0; i < aString.length(); ++i) {
-            cleanString.append(cleanChar(aString.charAt(i)));
+        for (int i = 0; i < string.length(); ++i) {
+            cleanString.append(cleanChar(string.charAt(i)));
         }
         return cleanString.toString();
     }
@@ -51,34 +51,34 @@ class PathUtil {
     /**
      * This method filters the valid special characters in path string.
      *
-     * @param aChar The char to be cleaned
+     * @param character The char to be cleaned
      * @return The cleaned char
      */
-    private static char cleanChar(char aChar) {
+    private static char cleanChar(char character) {
         // 0 - 9
         for (int i = 48; i < 58; ++i) {
-            if (aChar == i) {
+            if (character == i) {
                 return (char) i;
             }
         }
         // 'A' - 'Z'
         for (int i = 65; i < 91; ++i) {
-            if (aChar == i) {
+            if (character == i) {
                 return (char) i;
             }
         }
         // 'a' - 'z'
         for (int i = 97; i < 123; ++i) {
-            if (aChar == i) {
+            if (character == i) {
                 return (char) i;
             }
         }
-        return getValidCharacter(aChar);
+        return getValidCharacter(character);
     }
 
-    private static char getValidCharacter(char aChar) {
+    private static char getValidCharacter(char character) {
         // other valid characters
-        switch (aChar) {
+        switch (character) {
             case '/':
                 return '/';
             case '.':
