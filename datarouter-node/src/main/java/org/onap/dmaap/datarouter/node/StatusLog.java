@@ -53,7 +53,7 @@ public class StatusLog {
     private long nexttime;
     private OutputStream os;
     private long intvl;
-    private NodeConfigManager config = NodeConfigManager.getInstance();
+    private static NodeConfigManager config = NodeConfigManager.getInstance();
 
     private StatusLog() {
     }
