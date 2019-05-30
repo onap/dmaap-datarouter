@@ -1,0 +1,2 @@
+2019-05-27T18:53:39.255Z|PUB|1558983219068.dmaap-dr-node|1|https://dmaap-dr-node/publish/1/A20190526.2117+0000-2131+0000_perf-large-pnf-sim-lw-35.xml.gz|PUT|application/octet-stream|188547||dradmin|204
+2019-05-27T18:53:43.963Z|DEL|1558983219068.dmaap-dr-node|1|1|https://dcae-pm-mapper:8443/delivery/A20190526.2117+0000-2131+0000_perf-large-pnf-sim-lw-35.xml|PUT|application/octet-stream|188547|LOGIN|200|null
