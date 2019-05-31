@@ -39,6 +39,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
@@ -355,11 +356,25 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
      * Remove meta and data files.
      */
     void clean() {
-        datafile.delete();
-        metafile.delete();
+        deleteWithRetry(datafile);
+        deleteWithRetry(metafile);
         eelfLogger.info(EelfMsgs.INVOKE, newInvocationId);
         eelfLogger.info(EelfMsgs.EXIT);
         hdrs = null;
+    }
+
+    private void deleteWithRetry(File file) {
+        int maxTries = 3;
+        int tryCount = 1;
+        boolean deleted = false;
+        while (!deleted || (tryCount <= maxTries)) {
+            try {
+                deleted = Files.deleteIfExists(file.toPath());
+            } catch (IOException e) {
+                eelfLogger.error("IOException : Failed to delete file :" + file.getName() + " on attempt " + tryCount, e);
+            }
+            tryCount++;
+        }
     }
 
     /**
