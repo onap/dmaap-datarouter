@@ -20,17 +20,16 @@
 package org.onap.dmaap.datarouter.node;
 
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.modules.junit4.PowerMockRunner;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 public class ProvDataTest {
@@ -40,77 +39,77 @@ public class ProvDataTest {
     public void Validate_Values_Are_Set_Correctly_Through_ProvData_Constuctor() throws Exception {
         String InternalProvData =
                 "{" +
-                "\"ingress\":[{" +
-                  "\"feedid\":1," +
-                  "\"subnet\":\"\"," +
-                  "\"user\":\"\"," +
-                  "\"node\":\"node\"" +
-                "}]," +
-                "\"routing\":[{" +
-                  "\"from\":\"172.10.10.10\"," +
-                  "\"to\":\"172.10.10.12\"," +
-                  "\"via\":\"172.10.10.11\"" +
-                "}]," +
-                "\"subscriptions\":[{" +
-                  "\"subid\":1," +
-                  "\"suspend\":false," +
-                  "\"delivery\":{" +
-                    "\"use100\":true," +
-                    "\"password\":\"PASSWORD\"," +
-                    "\"user\":\"LOGIN\"," +
-                    "\"url\":\"http://172.18.0.2:7070\"" +
-                  "}," +
-                  "\"last_mod\":1553608460000," +
-                  "\"subscriber\":\"PMMAPER\"," +
-                  "\"feedid\":1," +
-                  "\"decompress\":false," +
-                  "\"groupid\":1," +
-                  "\"metadataOnly\":false," +
-                  "\"follow_redirect\":false," +
-                  "\"links\":{" +
-                    "\"feed\":\"https://dmaap-dr-prov/feed/1\"" +
-                    ",\"log\":\"https://dmaap-dr-prov/sublog/1\"" +
-                    ",\"self\":\"https://dmaap-dr-prov/subs/1\"" +
-                  "}," +
-                  "\"created_date\":1553608460000," +
-                  "\"privilegedSubscriber\":false" +
-                "}]," +
-                "\"feeds\":[{" +
-                  "\"suspend\":false," +
-                  "\"groupid\":0," +
-                  "\"description\":\"Default feed\"," +
-                  "\"version\":\"m1.0\"," +
-                  "\"authorization\":{" +
-                    "\"endpoint_addrs\":[\"172.10.10.20\"]," +
-                    "\"classification\":\"unclassified\"," +
-                    "\"endpoint_ids\":[{" +
-                      "\"password\":\"password\"," +
-                      "\"id\":\"user\"" +
-                    "}]" +
-                  "}," +
-                  "\"last_mod\":1553608454000," +
-                  "\"deleted\":false," +
-                  "\"feedid\":1," +
-                  "\"name\":\"CSIT_Test2\"" +
-                  ",\"business_description\":\"Default Feed\"" +
-                  ",\"publisher\":\"dradmin\"" +
-                  ",\"links\":{" +
-                    "\"subscribe\":\"https://dmaap-dr-prov/subscribe/1\"," +
-                    "\"log\":\"https://dmaap-dr-prov/feedlog/1\"," +
-                    "\"publish\":\"https://dmaap-dr-prov/publish/1\"," +
-                    "\"self\":\"https://dmaap-dr-prov/feed/1\"" +
-                  "}," +
-                  "\"created_date\":1553608454000" +
-                "}]," +
-                "\"groups\":[]," +
-                "\"parameters\":{" +
-                  "\"NODES\":[\"dmaap-dr-node\"]," +
-                  "\"PROV_DOMAIN\":\"\"" +
-                "}," +
-                "\"egress\":{" +
-                "\"1\":1" +
-                "}" +
-                "}" ;
+                        "\"ingress\":[{" +
+                        "\"feedid\":1," +
+                        "\"subnet\":\"\"," +
+                        "\"user\":\"\"," +
+                        "\"node\":\"node\"" +
+                        "}]," +
+                        "\"routing\":[{" +
+                        "\"from\":\"172.10.10.10\"," +
+                        "\"to\":\"172.10.10.12\"," +
+                        "\"via\":\"172.10.10.11\"" +
+                        "}]," +
+                        "\"subscriptions\":[{" +
+                        "\"subid\":1," +
+                        "\"suspend\":false," +
+                        "\"delivery\":{" +
+                        "\"use100\":true," +
+                        "\"password\":\"PASSWORD\"," +
+                        "\"user\":\"LOGIN\"," +
+                        "\"url\":\"http://172.18.0.2:7070\"" +
+                        "}," +
+                        "\"last_mod\":1553608460000," +
+                        "\"subscriber\":\"PMMAPER\"," +
+                        "\"feedid\":1," +
+                        "\"decompress\":false," +
+                        "\"groupid\":1," +
+                        "\"metadataOnly\":false," +
+                        "\"follow_redirect\":false," +
+                        "\"links\":{" +
+                        "\"feed\":\"https://dmaap-dr-prov/feed/1\"" +
+                        ",\"log\":\"https://dmaap-dr-prov/sublog/1\"" +
+                        ",\"self\":\"https://dmaap-dr-prov/subs/1\"" +
+                        "}," +
+                        "\"created_date\":1553608460000," +
+                        "\"privilegedSubscriber\":false" +
+                        "}]," +
+                        "\"feeds\":[{" +
+                        "\"suspend\":false," +
+                        "\"groupid\":0," +
+                        "\"description\":\"Default feed\"," +
+                        "\"version\":\"m1.0\"," +
+                        "\"authorization\":{" +
+                        "\"endpoint_addrs\":[\"172.10.10.20\"]," +
+                        "\"classification\":\"unclassified\"," +
+                        "\"endpoint_ids\":[{" +
+                        "\"password\":\"password\"," +
+                        "\"id\":\"user\"" +
+                        "}]" +
+                        "}," +
+                        "\"last_mod\":1553608454000," +
+                        "\"deleted\":false," +
+                        "\"feedid\":1," +
+                        "\"name\":\"CSIT_Test2\"" +
+                        ",\"business_description\":\"Default Feed\"" +
+                        ",\"publisher\":\"dradmin\"" +
+                        ",\"links\":{" +
+                        "\"subscribe\":\"https://dmaap-dr-prov/subscribe/1\"," +
+                        "\"log\":\"https://dmaap-dr-prov/feedlog/1\"," +
+                        "\"publish\":\"https://dmaap-dr-prov/publish/1\"," +
+                        "\"self\":\"https://dmaap-dr-prov/feed/1\"" +
+                        "}," +
+                        "\"created_date\":1553608454000" +
+                        "}]," +
+                        "\"groups\":[]," +
+                        "\"parameters\":{" +
+                        "\"NODES\":[\"dmaap-dr-node\"]," +
+                        "\"PROV_DOMAIN\":\"\"" +
+                        "}," +
+                        "\"egress\":{" +
+                        "\"1\":1" +
+                        "}" +
+                        "}";
         Reader r = new InputStreamReader(new ByteArrayInputStream(InternalProvData.getBytes(StandardCharsets.UTF_8)));
         ProvData pd = new ProvData(r);
 
