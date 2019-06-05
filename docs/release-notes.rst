@@ -10,7 +10,7 @@ Release-notes
 Version: 2.1.0 (Dublin)
 ---------------------------
 
-:Release Date: 2019-05-30
+:Release Date: 2019-06-06
 
 The DataRouter(DR) provisioning API is a HTTPS-based, REST-like API for creating and managing DR feeds and
 subscriptions.
