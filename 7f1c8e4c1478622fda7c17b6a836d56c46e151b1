@@ -22,6 +22,29 @@
       "revId": "7f1c8e4c1478622fda7c17b6a836d56c46e151b1",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a22ea3ed_c01b8db4",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DeliveryQueue.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-06-05T10:49:28Z",
+      "side": 1,
+      "message": "Could we add some logging to the \"mark*\" methods also.\nWould help with debugging.",
+      "range": {
+        "startLine": 171,
+        "startChar": 30,
+        "endLine": 171,
+        "endChar": 47
+      },
+      "revId": "7f1c8e4c1478622fda7c17b6a836d56c46e151b1",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }
