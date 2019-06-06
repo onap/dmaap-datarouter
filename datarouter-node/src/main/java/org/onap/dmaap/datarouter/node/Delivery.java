@@ -134,7 +134,7 @@ public class Delivery {
         cur = spoolfile.getUsableSpace();
         if (cur >= stop) {
             logger.info("NODE0503 Free disk space at or above yellow threshold.  current=" + cur + YELLOW + stop
-                    + TOTAL + tspace);
+                                + TOTAL + tspace);
             return;
         }
         logger.warn(
@@ -209,6 +209,7 @@ public class Delivery {
     private void dodelivery() {
         DeliveryQueue dq;
         while ((dq = getNextQueue()) != null) {
+            logger.debug("Current Threads: " + curthreads + ", Max Threads: " + threads);
             dq.run();
         }
     }
@@ -249,7 +250,7 @@ public class Delivery {
         for (DelItem item : items) {
             long amount = dqs.get(item.getSpool()).cancelTask(item.getPublishId());
             logger.info("NODE0502 Attempting to discard " + item.getSpool() + "/" + item.getPublishId()
-                    + " to free up disk");
+                                + " to free up disk");
             if (amount > 0) {
                 cur += amount;
                 if (cur >= stop) {
@@ -302,7 +303,7 @@ public class Delivery {
             }
             DelItem delItem = (DelItem) object;
             return Objects.equals(pubid, delItem.pubid)
-                    && Objects.equals(getSpool(), delItem.getSpool());
+                           && Objects.equals(getSpool(), delItem.getSpool());
         }
 
         @Override
