@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc0a2d64_fdf25675",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/Delivery.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-06-11T16:17:51Z",
+      "side": 1,
+      "message": "Could maybe do with indexing the thread name here.\n\n\"thread-\" + curthreads",
+      "range": {
+        "startLine": 198,
+        "startChar": 25,
+        "endLine": 198,
+        "endChar": 40
+      },
+      "revId": "351041523c9102f5f9fff19e395d3ce1377c540a",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
