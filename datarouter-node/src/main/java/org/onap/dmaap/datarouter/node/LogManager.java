@@ -227,4 +227,14 @@ public class LogManager extends TimerTask {
             return lastqueued;
         }
     }
+    /**
+     * Trigger check for expired log files and log files to upload
+     */
+    public void run() {
+        worker.poke();
+    }
+
+    public Uploader getWorker() {
+        return worker;
+    }
 }

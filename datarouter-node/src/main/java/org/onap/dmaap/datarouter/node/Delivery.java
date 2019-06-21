@@ -266,7 +266,7 @@ public class Delivery {
         return false;
     }
 
-    private static class DelItem implements Comparable<DelItem> {
+    static class DelItem implements Comparable<DelItem> {
 
         private String pubid;
         private String spool;
