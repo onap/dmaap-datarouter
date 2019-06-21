@@ -87,7 +87,7 @@ public class LogManager extends TimerTask {
         worker.poke();
     }
 
-    private class Uploader extends Thread implements DeliveryQueueHelper {
+    class Uploader extends Thread implements DeliveryQueueHelper {
 
         private static final String EXCEPTION = "Exception";
         private static final String META = "/.meta";
