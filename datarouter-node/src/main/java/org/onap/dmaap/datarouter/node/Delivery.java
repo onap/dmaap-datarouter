@@ -28,7 +28,7 @@ import com.att.eelf.configuration.EELFManager;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -50,7 +50,7 @@ public class Delivery {
     private int threads;
     private int curthreads;
     private NodeConfigManager config;
-    private Hashtable<String, DeliveryQueue> dqs = new Hashtable<>();
+    private HashMap<String, DeliveryQueue> dqs = new HashMap<>();
     private DeliveryQueue[] queues = new DeliveryQueue[0];
     private int qpos = 0;
     private long nextcheck;
@@ -178,7 +178,7 @@ public class Delivery {
         DestInfo[] alldis = config.getAllDests();
         DeliveryQueue[] nqs = new DeliveryQueue[alldis.length];
         qpos = 0;
-        Hashtable<String, DeliveryQueue> ndqs = new Hashtable<>();
+        HashMap<String, DeliveryQueue> ndqs = new HashMap<>();
         for (DestInfo di : alldis) {
             String spl = di.getSpool();
             DeliveryQueue dq = dqs.get(spl);
@@ -266,7 +266,7 @@ public class Delivery {
         return false;
     }
 
-    private static class DelItem implements Comparable<DelItem> {
+    static class DelItem implements Comparable<DelItem> {
 
         private String pubid;
         private String spool;
