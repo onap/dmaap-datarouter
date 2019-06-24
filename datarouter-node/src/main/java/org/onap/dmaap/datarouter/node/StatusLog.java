@@ -37,7 +37,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Logging for data router delivery events (PUB/DEL/EXP)
+ * Logging for data router delivery events (PUB/DEL/EXP).
  */
 public class StatusLog {
 
@@ -64,9 +64,9 @@ public class StatusLog {
      */
     public static long parseInterval(String interval, int def) {
         try {
-            Matcher m = Pattern.compile("(?:(\\d+)[Hh])?(?:(\\d+)[Mm])?(?:(\\d+)[Ss]?)?").matcher(interval);
-            if (m.matches()) {
-                int dur = getDur(m);
+            Matcher matcher = Pattern.compile("(?:(\\d+)[Hh])?(?:(\\d+)[Mm])?(?:(\\d+)[Ss]?)?").matcher(interval);
+            if (matcher.matches()) {
+                int dur = getDur(matcher);
                 int best = 86400;
                 int dist = best - dur;
                 if (dur > best) {
@@ -106,19 +106,19 @@ public class StatusLog {
         return best;
     }
 
-    private static int getDur(Matcher m) {
+    private static int getDur(Matcher matcher) {
         int dur = 0;
-        String x = m.group(1);
-        if (x != null) {
-            dur += 3600 * Integer.parseInt(x);
+        String match = matcher.group(1);
+        if (match != null) {
+            dur += 3600 * Integer.parseInt(match);
         }
-        x = m.group(2);
-        if (x != null) {
-            dur += 60 * Integer.parseInt(x);
+        match = matcher.group(2);
+        if (match != null) {
+            dur += 60 * Integer.parseInt(match);
         }
-        x = m.group(3);
-        if (x != null) {
-            dur += Integer.parseInt(x);
+        match = matcher.group(3);
+        if (match != null) {
+            dur += Integer.parseInt(match);
         }
         if (dur < 60) {
             dur = 60;
@@ -127,7 +127,7 @@ public class StatusLog {
     }
 
     /**
-     * Get the name of the current log file
+     * Get the name of the current log file.
      *
      * @return The full path name of the current event log file
      */
@@ -161,7 +161,7 @@ public class StatusLog {
     }
 
     /**
-     * Log a data transfer error receiving a publication attempt
+     * Log a data transfer error receiving a publication attempt.
      *
      * @param pubid The publish ID assigned by the node
      * @param feedid The feed id given by the publisher
@@ -205,7 +205,7 @@ public class StatusLog {
     }
 
     /**
-     * Log delivery attempts expired
+     * Log delivery attempts expired.
      *
      * @param pubid The publish ID assigned by the node
      * @param feedid The feed ID
@@ -235,7 +235,7 @@ public class StatusLog {
      * @param subid The (space delimited list of) subscription ID
      * @param clen The content length
      * @param sent The # of bytes sent or -1 if subscriber returned an error instead of 100 Continue, otherwise, the
-     * number of bytes sent before an error occurred.
+     *      number of bytes sent before an error occurred.
      */
     public static void logDelExtra(String pubid, String feedid, String subid, long clen, long sent) {
         if (feedid == null) {
@@ -260,7 +260,7 @@ public class StatusLog {
         }
     }
 
-    private synchronized void log(String s) {
+    private synchronized void log(String string) {
         try {
             long now = System.currentTimeMillis();
             checkRoll(now);
@@ -269,7 +269,7 @@ public class StatusLog {
                 (new File(plainfile)).delete();
                 Files.createLink(Paths.get(plainfile), Paths.get(curfile));
             }
-            os.write((NodeUtils.logts(new Date(now)) + '|' + s + '\n').getBytes());
+            os.write((NodeUtils.logts(new Date(now)) + '|' + string + '\n').getBytes());
             os.flush();
         } catch (IOException ioe) {
             eelfLogger.error("IOException", ioe);

@@ -79,11 +79,11 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
 
 
     /**
-     * Create a delivery task for a given delivery queue and pub ID
+     * Create a delivery task for a given delivery queue and pub ID.
      *
      * @param deliveryTaskHelper The delivery task helper for the queue this task is in.
      * @param pubid The publish ID for this file.  This is used as the base for the file name in the spool directory and
-     * is of the form <milliseconds since 1970>.<fqdn of initial data router node>
+     *      is of the form (milliseconds since 1970).(fqdn of initial data router node)
      */
     DeliveryTask(DeliveryTaskHelper deliveryTaskHelper, String pubid) {
         this.deliveryTaskHelper = deliveryTaskHelper;

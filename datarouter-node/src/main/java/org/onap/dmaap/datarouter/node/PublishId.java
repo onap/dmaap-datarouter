@@ -25,7 +25,7 @@
 package org.onap.dmaap.datarouter.node;
 
 /**
- * Generate publish IDs
+ * Generate publish IDs.
  */
 public class PublishId {
 
@@ -33,7 +33,7 @@ public class PublishId {
     private String myname;
 
     /**
-     * Generate publish IDs for the specified name
+     * Generate publish IDs for the specified name.
      *
      * @param myname Unique identifier for this publish ID generator (usually fqdn of server)
      */

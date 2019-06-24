@@ -48,6 +48,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class LogManager extends TimerTask {
 
+    private static final String EXCEPTION = "Exception";
     private EELFLogger logger = EELFManager.getInstance().getLogger(LogManager.class);
     private NodeConfigManager config;
     private Matcher isnodelog;
@@ -55,8 +56,6 @@ public class LogManager extends TimerTask {
     private Uploader worker;
     private String uploaddir;
     private String logdir;
-
-    private static final String EXCEPTION = "Exception";
 
     /**
      * Construct a log manager

@@ -38,13 +38,13 @@ import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 
 /**
  * Maintain the configuration of a Data Router node
- * <p>
- * The NodeConfigManager is the single point of contact for servlet, delivery, event logging, and log retention
+ *
+ * <p>The NodeConfigManager is the single point of contact for servlet, delivery, event logging, and log retention
  * subsystems to access configuration information.
- * <p>
- * There are two basic sets of configuration data.  The static local configuration data, stored in a local configuration
- * file (created as part of installation by SWM), and the dynamic global configuration data fetched from the data router
- * provisioning server.
+ *
+ * <p>There are two basic sets of configuration data.  The static local configuration data, stored in a local
+ * configuration file (created as part of installation by SWM), and the dynamic global configuration data fetched from
+ * the data router provisioning server.
  */
 public class NodeConfigManager implements DeliveryQueueHelper {
 
@@ -103,7 +103,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
 
 
     /**
-     * Initialize the configuration of a Data Router node
+     * Initialize the configuration of a Data Router node.
      */
     private NodeConfigManager() {
 
@@ -148,8 +148,6 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         gfport = Integer.parseInt(drNodeProperties.getProperty("IntHttpPort", "8080"));
         svcport = Integer.parseInt(drNodeProperties.getProperty("IntHttpsPort", "8443"));
         port = Integer.parseInt(drNodeProperties.getProperty("ExtHttpsPort", "443"));
-        long minpfinterval = Long.parseLong(drNodeProperties.getProperty("MinProvFetchInterval", "10000"));
-        long minrsinterval = Long.parseLong(drNodeProperties.getProperty("MinRedirSaveInterval", "10000"));
         spooldir = drNodeProperties.getProperty("SpoolDir", "spool");
         File fdir = new File(spooldir + "/f");
         fdir.mkdirs();
@@ -187,6 +185,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         }
         eelfLogger.info("NODE0304 My certificate says my name is " + myname);
         pid = new PublishId(myname);
+        long minrsinterval = Long.parseLong(drNodeProperties.getProperty("MinRedirSaveInterval", "10000"));
+        long minpfinterval = Long.parseLong(drNodeProperties.getProperty("MinProvFetchInterval", "10000"));
         rdmgr = new RedirManager(redirfile, minrsinterval, timer);
         pfetcher = new RateLimitedOperation(minpfinterval, timer) {
             public void run() {
@@ -198,7 +198,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Get the default node configuration manager
+     * Get the default node configuration manager.
      */
     public static NodeConfigManager getInstance() {
         return base;
@@ -285,8 +285,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private void fetchconfig() {
         try {
             eelfLogger.info("NodeConfigMan.fetchConfig: provurl:: " + provurl);
-            Reader r = new InputStreamReader((new URL(provurl)).openStream());
-            config = new NodeConfig(new ProvData(r), myname, spooldir, port, nak);
+            Reader reader = new InputStreamReader((new URL(provurl)).openStream());
+            config = new NodeConfig(new ProvData(reader), myname, spooldir, port, nak);
             localconfig();
             configtasks.startRun();
             runTasks();
@@ -324,14 +324,14 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Am I configured?
+     * Am I configured.
      */
     public boolean isConfigured() {
         return (config != null);
     }
 
     /**
-     * Am I shut down?
+     * Am I shut down.
      */
     public boolean isShutdown() {
         return (quiesce.exists());
@@ -348,7 +348,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Given a set of credentials and an IP address, is this request from another node?
+     * Given a set of credentials and an IP address, is this request from another node.
      *
      * @param credentials Credentials offered by the supposed node
      * @param ip IP address the request came from
@@ -371,16 +371,6 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Check whether delete file is allowed.
-     *
-     * @param subId The ID of the subscription being requested
-     * @return True if the delete file is permitted for the subscriber.
-     */
-    public boolean isDeletePermitted(String subId) {
-        return (config.isDeletePermitted(subId));
-    }
-
-    /**
      * Check whether publication is allowed for AAF Feed.
      *
      * @param feedid The ID of the feed being requested
@@ -389,6 +379,16 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      */
     public String isPublishPermitted(String feedid, String ip) {
         return (config.isPublishPermitted(feedid, ip));
+    }
+
+    /**
+     * Check whether delete file is allowed.
+     *
+     * @param subId The ID of the subscription being requested
+     * @return True if the delete file is permitted for the subscriber.
+     */
+    public boolean isDeletePermitted(String subId) {
+        return (config.isDeletePermitted(subId));
     }
 
     /**
@@ -403,12 +403,16 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * AAF changes: TDP EPIC US# 307413 Check AAF_instance for feed ID in NodeConfig
+     * AAF changes: TDP EPIC US# 307413 Check AAF_instance for feed ID in NodeConfig.
      *
      * @param feedid The ID of the feed specified
      */
     public String getAafInstance(String feedid) {
         return (config.getAafInstance(feedid));
+    }
+
+    public String getAafInstance() {
+        return aafInstance;
     }
 
     /**
@@ -424,7 +428,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Get a provisioned configuration parameter (from the provisioning server configuration)
+     * Get a provisioned configuration parameter (from the provisioning server configuration).
      *
      * @param name The name of the parameter
      * @return The value of the parameter or null if it is not defined.
@@ -434,7 +438,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Get a provisioned configuration parameter (from the provisioning server configuration)
+     * Get a provisioned configuration parameter (from the provisioning server configuration).
      *
      * @param name The name of the parameter
      * @param defaultValue The value to use if the parameter is not defined
@@ -449,7 +453,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Generate a publish ID
+     * Generate a publish ID.
      */
     public String getPublishId() {
         return (pid.next());
@@ -463,14 +467,14 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Register a task to run whenever the configuration changes
+     * Register a task to run whenever the configuration changes.
      */
     public void registerConfigTask(Runnable task) {
         configtasks.addTask(task);
     }
 
     /**
-     * Deregister a task to run whenever the configuration changes
+     * Deregister a task to run whenever the configuration changes.
      */
     public void deregisterConfigTask(Runnable task) {
         configtasks.removeTask(task);
@@ -493,14 +497,14 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Is a destination redirected?
+     * Is a destination redirected.
      */
     public boolean isDestRedirected(DestInfo destinfo) {
         return (followredirects && rdmgr.isRedirected(destinfo.getSubId()));
     }
 
     /**
-     * Set up redirection on receipt of a 3XX from a target URL
+     * Set up redirection on receipt of a 3XX from a target URL.
      */
     public boolean handleRedirection(DestInfo destinationInfo, String redirto, String fileid) {
         fileid = "/" + fileid;
@@ -517,7 +521,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Set up redirection on receipt of a 3XX from a target URL
+     * Set up redirection on receipt of a 3XX from a target URL.
      */
     public boolean handleRedirectionSubLevel(DeliveryTask task, DestInfo destinfo, String redirto, String fileid) {
         fileid = "/" + fileid;
@@ -534,7 +538,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Handle unreachable target URL
+     * Handle unreachable target URL.
      */
     public void handleUnreachable(DestInfo destinationInfo) {
         String subid = destinationInfo.getSubId();
@@ -544,35 +548,35 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Get the timeout before retrying after an initial delivery failure
+     * Get the timeout before retrying after an initial delivery failure.
      */
     public long getInitFailureTimer() {
         return (initfailuretimer);
     }
 
     /**
-     * Get the timeout before retrying after delivery and wait for file processing
+     * Get the timeout before retrying after delivery and wait for file processing.
      */
     public long getWaitForFileProcessFailureTimer() {
         return (waitForFileProcessFailureTimer);
     }
 
     /**
-     * Get the maximum timeout between delivery attempts
+     * Get the maximum timeout between delivery attempts.
      */
     public long getMaxFailureTimer() {
         return (maxfailuretimer);
     }
 
     /**
-     * Get the ratio between consecutive delivery attempts
+     * Get the ratio between consecutive delivery attempts.
      */
     public double getFailureBackoff() {
         return (failurebackoff);
     }
 
     /**
-     * Get the expiration timer for deliveries
+     * Get the expiration timer for deliveries.
      */
     public long getExpirationTimer() {
         return (expirationtimer);
@@ -593,7 +597,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Get the targets for a feed
+     * Get the targets for a feed.
      *
      * @param feedid The feed ID
      * @return The targets this feed should be delivered to
@@ -603,7 +607,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Get the creation date for a feed
+     * Get the creation date for a feed.
      *
      * @param feedid The feed ID
      * @return the timestamp of creation date of feed id passed
@@ -613,140 +617,160 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Get the spool directory for temporary files
+     * Get the spool directory for temporary files.
      */
     public String getSpoolDir() {
         return (spooldir + "/f");
     }
 
     /**
-     * Get the base directory for spool directories
+     * Get the spool directory for a subscription.
+     */
+    public String getSpoolDir(String subid, String remoteaddr) {
+        if (provcheck.isFrom(remoteaddr)) {
+            String sdir = config.getSpoolDir(subid);
+            if (sdir != null) {
+                eelfLogger.info("NODE0310 Received subscription reset request for subscription " + subid
+                        + " from provisioning server " + remoteaddr);
+            } else {
+                eelfLogger.info("NODE0311 Received subscription reset request for unknown subscription " + subid
+                        + " from provisioning server " + remoteaddr);
+            }
+            return (sdir);
+        } else {
+            eelfLogger.info("NODE0312 Received subscription reset request from unexpected server " + remoteaddr);
+            return (null);
+        }
+    }
+
+    /**
+     * Get the base directory for spool directories.
      */
     public String getSpoolBase() {
         return (spooldir);
     }
 
     /**
-     * Get the key store type
+     * Get the key store type.
      */
     public String getKSType() {
         return (kstype);
     }
 
     /**
-     * Get the key store file
+     * Get the key store file.
      */
     public String getKSFile() {
         return (ksfile);
     }
 
     /**
-     * Get the key store password
+     * Get the key store password.
      */
     public String getKSPass() {
         return (kspass);
     }
 
     /**
-     * Get the key password
+     * Get the key password.
      */
     public String getKPass() {
         return (kpass);
     }
 
     /**
-     * Get the http port
+     * Get the http port.
      */
     public int getHttpPort() {
         return (gfport);
     }
 
     /**
-     * Get the https port
+     * Get the https port.
      */
     public int getHttpsPort() {
         return (svcport);
     }
 
     /**
-     * Get the externally visible https port
+     * Get the externally visible https port.
      */
     public int getExtHttpsPort() {
         return (port);
     }
 
     /**
-     * Get the external name of this machine
+     * Get the external name of this machine.
      */
     public String getMyName() {
         return (myname);
     }
 
     /**
-     * Get the number of threads to use for delivery
+     * Get the number of threads to use for delivery.
      */
     public int getDeliveryThreads() {
         return (deliverythreads);
     }
 
     /**
-     * Get the URL for uploading the event log data
+     * Get the URL for uploading the event log data.
      */
     public String getEventLogUrl() {
         return (eventlogurl);
     }
 
     /**
-     * Get the prefix for the names of event log files
+     * Get the prefix for the names of event log files.
      */
     public String getEventLogPrefix() {
         return (eventlogprefix);
     }
 
     /**
-     * Get the suffix for the names of the event log files
+     * Get the suffix for the names of the event log files.
      */
     public String getEventLogSuffix() {
         return (eventlogsuffix);
     }
 
     /**
-     * Get the interval between event log file rollovers
+     * Get the interval between event log file rollovers.
      */
     public String getEventLogInterval() {
         return (eventloginterval);
     }
 
     /**
-     * Should I follow redirects from subscribers?
+     * Should I follow redirects from subscribers.
      */
     public boolean isFollowRedirects() {
         return (followredirects);
     }
 
     /**
-     * Get the directory where the event and node log files live
+     * Get the directory where the event and node log files live.
      */
     public String getLogDir() {
         return (logdir);
     }
 
     /**
-     * How long do I keep log files (in milliseconds)
+     * How long do I keep log files (in milliseconds).
      */
     public long getLogRetention() {
         return (logretention);
     }
 
     /**
-     * Get the timer
+     * Get the timer.
      */
     public Timer getTimer() {
         return (timer);
     }
 
     /**
-     * Get the feed ID for a subscription
+     * Get the feed ID for a subscription.
      *
      * @param subid The subscription ID
      * @return The feed ID
@@ -756,7 +780,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Get the authorization string this node uses
+     * Get the authorization string this node uses.
      *
      * @return The Authorization string for this node
      */
@@ -781,7 +805,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Disable and enable protocols
+     * Disable and enable protocols.
      */
     public String[] getEnabledprotocols() {
         return enabledprotocols;
@@ -791,36 +815,12 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         this.enabledprotocols = enabledprotocols.clone();
     }
 
-    /**
-     * Get the spool directory for a subscription
-     */
-    public String getSpoolDir(String subid, String remoteaddr) {
-        if (provcheck.isFrom(remoteaddr)) {
-            String sdir = config.getSpoolDir(subid);
-            if (sdir != null) {
-                eelfLogger.info("NODE0310 Received subscription reset request for subscription " + subid
-                        + " from provisioning server " + remoteaddr);
-            } else {
-                eelfLogger.info("NODE0311 Received subscription reset request for unknown subscription " + subid
-                        + " from provisioning server " + remoteaddr);
-            }
-            return (sdir);
-        } else {
-            eelfLogger.info("NODE0312 Received subscription reset request from unexpected server " + remoteaddr);
-            return (null);
-        }
-    }
-
     public String getAafType() {
         return aafType;
     }
 
     public void setAafType(String aafType) {
         this.aafType = aafType;
-    }
-
-    public String getAafInstance() {
-        return aafInstance;
     }
 
     public void setAafInstance(String aafInstance) {
@@ -855,7 +855,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Builds the permissions string to be verified
+     * Builds the permissions string to be verified.
      *
      * @param aafInstance The aaf instance
      * @return The permissions
