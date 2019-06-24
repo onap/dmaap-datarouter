@@ -50,7 +50,7 @@ public class DrServletTestBase {
         FieldUtils.writeDeclaredStaticField(DB.class, "props", props, true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsgFlag", false, true);
         SynchronizerTask synchronizerTask = mock(SynchronizerTask.class);
-        when(synchronizerTask.getState()).thenReturn(SynchronizerTask.UNKNOWN);
+        when(synchronizerTask.getPodState()).thenReturn(SynchronizerTask.UNKNOWN_POD);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "synctask", synchronizerTask, true);
     }
 

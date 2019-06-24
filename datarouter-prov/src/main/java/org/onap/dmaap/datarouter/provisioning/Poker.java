@@ -86,8 +86,8 @@ public class Poker extends TimerTask {
         try {
             thisPod = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            thisPod = "*UNKNOWN*"; // not a major problem
-            logger.info("UnknownHostException: Setting thisPod to \"*UNKNOWN*\"", e);
+            thisPod = "*UNKNOWN_POD*"; // not a major problem
+            logger.info("UnknownHostException: Setting thisPod to \"*UNKNOWN_POD*\"", e);
         }
         provString = buildProvisioningString();
 

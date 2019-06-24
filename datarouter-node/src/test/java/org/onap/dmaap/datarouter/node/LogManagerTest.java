@@ -26,7 +26,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Timer;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -55,14 +57,9 @@ public class LogManagerTest {
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws IOException {
         File spoolDir = new File(System.getProperty("user.dir") + "/src/test/resources/.spool");
-        for (File file : spoolDir.listFiles()) {
-            if (file.exists()) {
-                file.delete();
-            }
-        }
-        spoolDir.delete();
+        FileUtils.deleteDirectory(spoolDir);
     }
 
     @Test

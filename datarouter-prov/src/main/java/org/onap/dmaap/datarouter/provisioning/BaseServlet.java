@@ -242,7 +242,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     private static String provName = "feeds-drtr.web.att.com";
 
     /**
-     * The standard FQDN of the ACTIVE provisioning server in this Data Router ecosystem
+     * The standard FQDN of the ACTIVE_POD provisioning server in this Data Router ecosystem
      */
     private static String activeProvName = "feeds-drtr.web.att.com";
 
@@ -719,7 +719,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     }
 
     /**
-     * Gets the FQDN of the initially ACTIVE provisioning server (POD). Note: this used to be called isActivePOD(),
+     * Gets the FQDN of the initially ACTIVE_POD provisioning server (POD). Note: this used to be called isActivePOD(),
      * however, that is a misnomer, as the active status could shift to the standby POD without these parameters
      * changing.  Hence, the function names have been changed to more accurately reflect their purpose.
      *
@@ -730,7 +730,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     }
 
     /**
-     * Gets the FQDN of the initially STANDBY provisioning server (POD). Note: this used to be called isStandbyPOD(),
+     * Gets the FQDN of the initially STANDBY_POD provisioning server (POD). Note: this used to be called isStandbyPOD(),
      * however, that is a misnomer, as the standby status could shift to the active POD without these parameters
      * changing.  Hence, the function names have been changed to more accurately reflect their purpose.
      *
