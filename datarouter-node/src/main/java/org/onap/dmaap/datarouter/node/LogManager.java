@@ -56,6 +56,8 @@ public class LogManager extends TimerTask {
     private String uploaddir;
     private String logdir;
 
+    private static final String EXCEPTION = "Exception";
+
     /**
      * Construct a log manager
      *
@@ -68,7 +70,7 @@ public class LogManager extends TimerTask {
             isnodelog = Pattern.compile("node\\.log\\.\\d{8}").matcher("");
             iseventlog = Pattern.compile("events-\\d{12}\\.log").matcher("");
         } catch (Exception e) {
-            logger.error("Exception", e);
+            logger.error(EXCEPTION, e);
         }
         logdir = config.getLogDir();
         uploaddir = logdir + "/.spool";
@@ -89,7 +91,6 @@ public class LogManager extends TimerTask {
 
     private class Uploader extends Thread implements DeliveryQueueHelper {
 
-        private static final String EXCEPTION = "Exception";
         private static final String META = "/.meta";
         private EELFLogger logger = EELFManager.getInstance().getLogger(Uploader.class);
         private DeliveryQueue dq;
@@ -166,6 +167,7 @@ public class LogManager extends TimerTask {
             notify();
         }
 
+        @Override
         public void run() {
             while (true) {
                 scan();
