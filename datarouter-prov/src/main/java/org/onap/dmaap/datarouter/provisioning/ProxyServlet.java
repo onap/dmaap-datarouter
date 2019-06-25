@@ -146,7 +146,7 @@ public class ProxyServlet extends BaseServlet {
      */
     public boolean isProxyServer() {
         SynchronizerTask st = SynchronizerTask.getSynchronizer();
-        return st.getState() == SynchronizerTask.STANDBY;
+        return st.getPodState() == SynchronizerTask.STANDBY_POD;
     }
 
     /**

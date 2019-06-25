@@ -1,0 +1,129 @@
+{
+  "feeds": [
+    {
+      "suspend": false,
+      "groupid": 0,
+      "description": "Default feed provisioned for PM File collector",
+      "version": "m1.0",
+      "authorization": {
+        "endpoint_addrs": [
+
+        ],
+        "classification": "unclassified",
+        "endpoint_ids": [
+          {
+            "password": "dradmin",
+            "id": "dradmin"
+          }
+        ]
+      },
+      "last_mod": 1560871903000,
+      "deleted": false,
+      "feedid": 1,
+      "name": "Default PM Feed",
+      "business_description": "Default Feed",
+      "aaf_instance": "legacy",
+      "publisher": "dradmin",
+      "links": {
+        "subscribe": "https://dmaap-dr-prov/subscribe/1",
+        "log": "https://dmaap-dr-prov/feedlog/1",
+        "publish": "https://dmaap-dr-prov/publish/1",
+        "self": "https://dmaap-dr-prov/feed/1"
+      },
+      "created_date": 1560871903000
+    }
+  ],
+  "groups": [
+    {
+      "authid": "GROUP-0000-c2754bb7-92ef-4869-9c6b-1bc1283be4c0",
+      "name": "Test Group",
+      "description": "Test Description of Group .",
+      "classification": "publisher/subscriber",
+      "members": "{id=attuid, name=User1}, {id=attuid, name=User 2]"
+    }
+  ],
+  "subscriptions": [
+    {
+      "suspend": false,
+      "delivery": {
+        "use100": true,
+        "password": "PASSWORD",
+        "user": "LOGIN",
+        "url": "https://dcae-pm-mapper:8443/delivery"
+      },
+      "subscriber": "dradmin",
+      "groupid": 0,
+      "metadataOnly": false,
+      "privilegedSubscriber": true,
+      "subid": 1,
+      "last_mod": 1560872889000,
+      "feedid": 1,
+      "follow_redirect": false,
+      "decompress": true,
+      "aaf_instance": "legacy",
+      "links": {
+        "feed": "https://dmaap-dr-prov/feed/1",
+        "log": "https://dmaap-dr-prov/sublog/1",
+        "self": "https://dmaap-dr-prov/subs/1"
+      },
+      "created_date": 1560872889000
+    }
+  ],
+  "parameters": {
+    "ACTIVE_POD": "dmaap-dr-prov",
+    "DELIVERY_FILE_PROCESS_INTERVAL": 10,
+    "DELIVERY_INIT_RETRY_INTERVAL": 10,
+    "DELIVERY_MAX_AGE": 86400,
+    "DELIVERY_MAX_RETRY_INTERVAL": 3600,
+    "DELIVERY_RETRY_RATIO": 2,
+    "LOGROLL_INTERVAL": 30,
+    "NODES": [
+      "dmaap-dr-node"
+    ],
+    "PROV_ACTIVE_NAME": "dmaap-dr-prov",
+    "PROV_AUTH_ADDRESSES": [
+      "dmaap-dr-prov",
+      "dmaap-dr-node"
+    ],
+    "PROV_AUTH_SUBJECTS": [
+      ""
+    ],
+    "PROV_DOMAIN": "",
+    "PROV_MAXFEED_COUNT": 10000,
+    "PROV_MAXSUB_COUNT": 100000,
+    "PROV_NAME": "dmaap-dr-prov",
+    "PROV_REQUIRE_CERT": "false",
+    "PROV_REQUIRE_SECURE": "true",
+    "STANDBY_POD": "",
+    "_INT_VALUES": [
+      "LOGROLL_INTERVAL",
+      "PROV_MAXFEED_COUNT",
+      "PROV_MAXSUB_COUNT",
+      "DELIVERY_INIT_RETRY_INTERVAL",
+      "DELIVERY_MAX_RETRY_INTERVAL",
+      "DELIVERY_RETRY_RATIO",
+      "DELIVERY_MAX_AGE",
+      "DELIVERY_FILE_PROCESS_INTERVAL"
+    ]
+  },
+  "ingress": [
+    {
+      "feedid": 1,
+      "subnet": "",
+      "user": "",
+      "node": [
+        "stub_from."
+      ]
+    }
+  ],
+  "egress": {
+    "1": "stub_to."
+  },
+  "routing": [
+    {
+      "from": 1,
+      "to": 3,
+      "via": 2
+    }
+  ]
+}
