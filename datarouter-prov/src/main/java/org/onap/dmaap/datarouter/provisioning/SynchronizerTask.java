@@ -24,6 +24,11 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
+import static org.onap.dmaap.datarouter.provisioning.BaseServlet.TEXT_CT;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,8 +55,6 @@ import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -85,7 +88,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
  * <li>Checking DNS once per minute to see which POD the DNS CNAME points to. The CNAME will point to
  * the active (master) POD.</li>
  * <li>On non-master (standby) PODs, fetches provisioning data and logs in order to keep MariaDB in sync.</li>
- * <li>Providing information to other parts of the system as to the current role (ACTIVE, STANDBY, UNKNOWN)
+ * <li>Providing information to other parts of the system as to the current role (ACTIVE_POD, STANDBY_POD, UNKNOWN_POD)
  * of this POD.</li>
  * </ol>
  * <p>For this to work correctly, the following code needs to be placed at the beginning of main().</p>
@@ -99,32 +102,97 @@ import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 public class SynchronizerTask extends TimerTask {
 
     /**
-     * This is a singleton -- there is only one SynchronizerTask object in the server
+     * This is a singleton -- there is only one SynchronizerTask object in the server.
      */
     private static SynchronizerTask synctask;
 
     /**
-     * This POD is unknown -- not on the list of PODs
+     * This POD is unknown -- not on the list of PODs.
      */
-    public static final int UNKNOWN = 0;
+    public static final int UNKNOWN_POD = 0;
     /**
-     * This POD is active -- on the list of PODs, and the DNS CNAME points to us
+     * This POD is active -- on the list of PODs, and the DNS CNAME points to us.
      */
-    public static final int ACTIVE = 1;
+    public static final int ACTIVE_POD = 1;
     /**
-     * This POD is standby -- on the list of PODs, and the DNS CNAME does not point to us
+     * This POD is standby -- on the list of PODs, and the DNS CNAME does not point to us.
      */
-    public static final int STANDBY = 2;
-    private static final String[] stnames = {"UNKNOWN", "ACTIVE", "STANDBY"};
+    public static final int STANDBY_POD = 2;
+
+    private static final String[] stnames = {"UNKNOWN_POD", "ACTIVE_POD", "STANDBY_POD"};
     private static final long ONE_HOUR = 60 * 60 * 1000L;
+
+    private long nextMsg = 0;    // only display the "Current podState" msg every 5 mins.
 
     private final EELFLogger logger;
     private final Timer rolex;
     private final String spooldir;
-    private int state;
+    private int podState;
     private boolean doFetch;
     private long nextsynctime;
     private AbstractHttpClient httpclient = null;
+
+    @SuppressWarnings("deprecation")
+    private SynchronizerTask() {
+        logger = EELFManager.getInstance().getLogger("InternalLog");
+        rolex = new Timer();
+        spooldir = (new DB()).getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
+        podState = UNKNOWN_POD;
+        doFetch = true;        // start off with a fetch
+        nextsynctime = 0;
+
+        logger.info("PROV5000: Sync task starting, server podState is UNKNOWN_POD");
+        try {
+            Properties props = (new DB()).getProperties();
+            String type = props.getProperty(Main.KEYSTORE_TYPE_PROPERTY, "jks");
+            String store = props.getProperty(Main.KEYSTORE_PATH_PROPERTY);
+            String pass = props.getProperty(Main.KEYSTORE_PASS_PROPERTY);
+            KeyStore keyStore = KeyStore.getInstance(type);
+            try (FileInputStream instream = new FileInputStream(new File(store))) {
+                keyStore.load(instream, pass.toCharArray());
+
+            }
+            store = props.getProperty(Main.TRUSTSTORE_PATH_PROPERTY);
+            pass = props.getProperty(Main.TRUSTSTORE_PASS_PROPERTY);
+            KeyStore trustStore = null;
+            if (store != null && store.length() > 0) {
+                trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                try (FileInputStream instream = new FileInputStream(new File(store))) {
+                    trustStore.load(instream, pass.toCharArray());
+
+                }
+            }
+
+            // We are connecting with the node name, but the certificate will have the CNAME
+            // So we need to accept a non-matching certificate name
+            String keystorepass = props.getProperty(Main.KEYSTORE_PASS_PROPERTY);
+            try (AbstractHttpClient hc = new DefaultHttpClient()) {
+                SSLSocketFactory socketFactory =
+                        (trustStore == null)
+                                ? new SSLSocketFactory(keyStore, keystorepass)
+                                : new SSLSocketFactory(keyStore, keystorepass, trustStore);
+                socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+                Scheme sch = new Scheme("https", 443, socketFactory);
+                hc.getConnectionManager().getSchemeRegistry().register(sch);
+                httpclient = hc;
+            }
+            setSynchTimer(props);
+        } catch (Exception e) {
+            logger.warn("PROV5005: Problem starting the synchronizer: " + e);
+        }
+    }
+
+    private void setSynchTimer(Properties props) {
+        // Run once every 5 seconds to check DNS, etc.
+        long interval;
+        try {
+            String s = props.getProperty("org.onap.dmaap.datarouter.provserver.sync_interval", "5000");
+            interval = Long.parseLong(s);
+        } catch (NumberFormatException e) {
+            interval = 5000L;
+        }
+        rolex.scheduleAtFixedRate(this, 0L, interval);
+    }
 
     /**
      * Get the singleton SynchronizerTask object.
@@ -138,128 +206,48 @@ public class SynchronizerTask extends TimerTask {
         return synctask;
     }
 
-    @SuppressWarnings("deprecation")
-    private SynchronizerTask() {
-        logger = EELFManager.getInstance().getLogger("InternalLog");
-        rolex = new Timer();
-        spooldir = (new DB()).getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
-        state = UNKNOWN;
-        doFetch = true;        // start off with a fetch
-        nextsynctime = 0;
-
-        logger.info("PROV5000: Sync task starting, server state is UNKNOWN");
-        try {
-            Properties props = (new DB()).getProperties();
-            String type = props.getProperty(Main.KEYSTORE_TYPE_PROPERTY, "jks");
-            String store = props.getProperty(Main.KEYSTORE_PATH_PROPERTY);
-            String pass = props.getProperty(Main.KEYSTORE_PASS_PROPERTY);
-            KeyStore keyStore = KeyStore.getInstance(type);
-            try(FileInputStream instream = new FileInputStream(new File(store))) {
-                keyStore.load(instream, pass.toCharArray());
-
-            }
-                store = props.getProperty(Main.TRUSTSTORE_PATH_PROPERTY);
-                pass = props.getProperty(Main.TRUSTSTORE_PASS_PROPERTY);
-                KeyStore trustStore = null;
-                if (store != null && store.length() > 0) {
-                    trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-                    try(FileInputStream instream = new FileInputStream(new File(store))){
-                        trustStore.load(instream, pass.toCharArray());
-
-                    }
-                }
-
-            // We are connecting with the node name, but the certificate will have the CNAME
-            // So we need to accept a non-matching certificate name
-            String keystorepass = props.getProperty(
-                Main.KEYSTORE_PASS_PROPERTY); //itrack.web.att.com/browse/DATARTR-6 for changing hard coded passphase ref
-           try(AbstractHttpClient hc = new DefaultHttpClient()) {
-               SSLSocketFactory socketFactory =
-                       (trustStore == null)
-                               ? new SSLSocketFactory(keyStore, keystorepass)
-                               : new SSLSocketFactory(keyStore, keystorepass, trustStore);
-               socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-               Scheme sch = new Scheme("https", 443, socketFactory);
-               hc.getConnectionManager().getSchemeRegistry().register(sch);
-            httpclient = hc;
-           }
-            // Run once every 5 seconds to check DNS, etc.
-            long interval = 0;
-            try {
-                String s = props.getProperty("org.onap.dmaap.datarouter.provserver.sync_interval", "5000");
-                interval = Long.parseLong(s);
-            } catch (NumberFormatException e) {
-                interval = 5000L;
-            }
-            rolex.scheduleAtFixedRate(this, 0L, interval);
-        } catch (Exception e) {
-            logger.warn("PROV5005: Problem starting the synchronizer: " + e);
-        }
-    }
-
     /**
-     * What is the state of this POD?
+     * What is the podState of this POD?.
      *
-     * @return one of ACTIVE, STANDBY, UNKNOWN
+     * @return one of ACTIVE_POD, STANDBY_POD, UNKNOWN_POD
      */
-    public int getState() {
-        return state;
+    public int getPodState() {
+        return podState;
     }
 
     /**
-     * Is this the active POD?
+     * Is this the active POD?.
      *
      * @return true if we are active (the master), false otherwise
      */
     public boolean isActive() {
-        return state == ACTIVE;
+        return podState == ACTIVE_POD;
     }
 
     /**
      * This method is used to signal that another POD (the active POD) has sent us a /fetchProv request, and that we
      * should re-synchronize with the master.
      */
-    public void doFetch() {
+    void doFetch() {
         doFetch = true;
     }
 
     /**
      * Runs once a minute in order to <ol>
      * <li>lookup DNS names,</li>
-     * <li>determine the state of this POD,</li>
-     * <li>if this is a standby POD, and the fetch flag is set, perform a fetch of state from the active POD.</li>
+     * <li>determine the podState of this POD,</li>
+     * <li>if this is a standby POD, and the fetch flag is set, perform a fetch of podState from the active POD.</li>
      * <li>if this is a standby POD, check if there are any new log records to be replicated.</li>
-     * </ol>
+     * </ol>.
      */
     @Override
     public void run() {
         try {
-            state = lookupState();
-            if (state == STANDBY) {
+            podState = lookupState();
+            if (podState == STANDBY_POD) {
                 // Only copy provisioning data FROM the active server TO the standby
                 if (doFetch || (System.currentTimeMillis() >= nextsynctime)) {
-                    logger.debug("Initiating a sync...");
-                    JSONObject jo = readProvisioningJSON();
-                    if (jo != null) {
-                        doFetch = false;
-                        syncFeeds(jo.getJSONArray("feeds"));
-                        syncSubs(jo.getJSONArray("subscriptions"));
-                        syncGroups(jo.getJSONArray("groups")); //Rally:US708115 - 1610
-                        syncParams(jo.getJSONObject("parameters"));
-                        // The following will not be present in a version=1.0 provfeed
-                        JSONArray ja = jo.optJSONArray("ingress");
-                        if (ja != null) {
-                            syncIngressRoutes(ja);
-                        }
-                        JSONObject j2 = jo.optJSONObject("egress");
-                        if (j2 != null) {
-                            syncEgressRoutes(j2);
-                        }
-                        ja = jo.optJSONArray("routing");
-                        if (ja != null) {
-                            syncNetworkRoutes(ja);
-                        }
-                    }
+                    syncProvisioningData();
                     logger.info("PROV5013: Sync completed.");
                     nextsynctime = System.currentTimeMillis() + ONE_HOUR;
                 }
@@ -278,7 +266,7 @@ public class SynchronizerTask extends TimerTask {
                 remote.andNot(local);
                 if (!remote.isEmpty()) {
                     logger.debug(" Replicating logs: " + remote);
-                    replicateDRLogs(remote);
+                    replicateDataRouterLogs(remote);
                 }
             }
         } catch (Exception e) {
@@ -286,14 +274,39 @@ public class SynchronizerTask extends TimerTask {
         }
     }
 
+    private void syncProvisioningData() {
+        logger.debug("Initiating a sync...");
+        JSONObject jo = readProvisioningJson();
+        if (jo != null) {
+            doFetch = false;
+            syncFeeds(jo.getJSONArray("feeds"));
+            syncSubs(jo.getJSONArray("subscriptions"));
+            syncGroups(jo.getJSONArray("groups")); //Rally:US708115 - 1610
+            syncParams(jo.getJSONObject("parameters"));
+            // The following will not be present in a version=1.0 provfeed
+            JSONArray ja = jo.optJSONArray("ingress");
+            if (ja != null) {
+                syncIngressRoutes(ja);
+            }
+            JSONObject j2 = jo.optJSONObject("egress");
+            if (j2 != null) {
+                syncEgressRoutes(j2);
+            }
+            ja = jo.optJSONArray("routing");
+            if (ja != null) {
+                syncNetworkRoutes(ja);
+            }
+        }
+    }
+
     /**
-     * This method is used to lookup the CNAME that points to the active server. It returns 0 (UNKNOWN), 1(ACTIVE), or 2
-     * (STANDBY) to indicate the state of this server.
+     * This method is used to lookup the CNAME that points to the active server.
+     * It returns 0 (UNKNOWN_POD), 1(ACTIVE_POD), or (STANDBY_POD) to indicate the podState of this server.
      *
-     * @return the current state
+     * @return the current podState
      */
-    private int lookupState() {
-        int newstate = UNKNOWN;
+    int lookupState() {
+        int newPodState = UNKNOWN_POD;
         try {
             InetAddress myaddr = InetAddress.getLocalHost();
             if (logger.isTraceEnabled()) {
@@ -303,9 +316,9 @@ public class SynchronizerTask extends TimerTask {
             Set<String> pods = new TreeSet<>(Arrays.asList(BaseServlet.getPods()));
             if (pods.contains(thisPod)) {
                 InetAddress pserver = InetAddress.getByName(BaseServlet.getActiveProvName());
-                newstate = myaddr.equals(pserver) ? ACTIVE : STANDBY;
+                newPodState = myaddr.equals(pserver) ? ACTIVE_POD : STANDBY_POD;
                 if (logger.isDebugEnabled() && System.currentTimeMillis() >= nextMsg) {
-                    logger.debug("Active POD = " + pserver + ", Current state is " + stnames[newstate]);
+                    logger.debug("Active POD = " + pserver + ", Current podState is " + stnames[newPodState]);
                     nextMsg = System.currentTimeMillis() + (5 * 60 * 1000L);
                 }
             } else {
@@ -315,14 +328,12 @@ public class SynchronizerTask extends TimerTask {
             logger.warn("PROV5002: Cannot determine the name of this provisioning server.", e);
         }
 
-        if (newstate != state) {
-            logger
-                .info(String.format("PROV5001: Server state changed from %s to %s", stnames[state], stnames[newstate]));
+        if (newPodState != podState) {
+            logger.info(String.format("PROV5001: Server podState changed from %s to %s",
+                    stnames[podState], stnames[newPodState]));
         }
-        return newstate;
+        return newPodState;
     }
-
-    private static long nextMsg = 0;    // only display the "Current state" msg every 5 mins.
 
     /**
      * Synchronize the Feeds in the JSONArray, with the Feeds in the DB.
@@ -396,7 +407,7 @@ public class SynchronizerTask extends TimerTask {
                 try {
                     v = "" + jo.getInt(k);
                 } catch (JSONException e1) {
-                    logger.warn("PROV5004: Invalid object in parameters: " + jo.optInt(k), e);
+                    logger.warn("PROV5004: Invalid object in parameters: " + jo.optInt(k), e1);
                     JSONArray ja = jo.getJSONArray(k);
                     for (int i = 0; i < ja.length(); i++) {
                         if (i > 0) {
@@ -455,7 +466,7 @@ public class SynchronizerTask extends TimerTask {
                 NetworkRoute nr = new NetworkRoute(ja.getJSONObject(n));
                 coll.add(nr);
             } catch (JSONException e) {
-                logger.warn("PROV5004: Invalid object in network routes: " + ja.optJSONObject(n));
+                logger.warn("PROV5004: Invalid object in network routes: " + ja.optJSONObject(n), e);
             }
         }
         if (sync(coll, NetworkRoute.getAllNetworkRoutes())) {
@@ -477,29 +488,11 @@ public class SynchronizerTask extends TimerTask {
                 Syncable newobj = newmap.get(n);
                 Syncable oldobj = oldmap.get(n);
                 if (oldobj == null) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("  Inserting record: " + newobj);
-                    }
-                    newobj.doInsert(conn);
-                    changes = true;
+                    changes = insertRecord(conn, newobj);
                 } else if (newobj == null) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("  Deleting record: " + oldobj);
-                    }
-                    oldobj.doDelete(conn);
-                    changes = true;
+                    changes = deleteRecord(conn, oldobj);
                 } else if (!newobj.equals(oldobj)) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("  Updating record: " + newobj);
-                    }
-                    newobj.doUpdate(conn);
-
-                    /**Rally US708115
-                     * Change Ownership of FEED - 1610, Syncronised with secondary DB.
-                     * */
-                    checkChnageOwner(newobj, oldobj);
-
-                    changes = true;
+                    changes = updateRecord(conn, newobj, oldobj);
                 }
             }
             db.release(conn);
@@ -507,6 +500,30 @@ public class SynchronizerTask extends TimerTask {
             logger.warn("PROV5009: problem during sync, exception: " + e);
         }
         return changes;
+    }
+
+    private boolean updateRecord(Connection conn, Syncable newobj, Syncable oldobj) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("  Updating record: " + newobj);
+        }
+        boolean changes = newobj.doUpdate(conn);
+        checkChangeOwner(newobj, oldobj);
+
+        return changes;
+    }
+
+    private boolean deleteRecord(Connection conn, Syncable oldobj) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("  Deleting record: " + oldobj);
+        }
+        return oldobj.doDelete(conn);
+    }
+
+    private boolean insertRecord(Connection conn, Syncable newobj) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("  Inserting record: " + newobj);
+        }
+        return newobj.doInsert(conn);
     }
 
     private Map<String, Syncable> getMap(Collection<? extends Syncable> c) {
@@ -517,18 +534,18 @@ public class SynchronizerTask extends TimerTask {
         return map;
     }
 
-    /**Change owner of FEED/SUBSCRIPTION*/
     /**
+     * Change owner of FEED/SUBSCRIPTION.
      * Rally US708115 Change Ownership of FEED - 1610
      */
-    private void checkChnageOwner(Syncable newobj, Syncable oldobj) {
+    private void checkChangeOwner(Syncable newobj, Syncable oldobj) {
         if (newobj instanceof Feed) {
             Feed oldfeed = (Feed) oldobj;
             Feed newfeed = (Feed) newobj;
 
             if (!oldfeed.getPublisher().equals(newfeed.getPublisher())) {
-                logger.info("PROV5013 -  Previous publisher: " + oldfeed.getPublisher() + ": New publisher-" + newfeed
-                    .getPublisher());
+                logger.info("PROV5013 -  Previous publisher: "
+                                    + oldfeed.getPublisher() + ": New publisher-" + newfeed.getPublisher());
                 oldfeed.setPublisher(newfeed.getPublisher());
                 oldfeed.changeOwnerShip();
             }
@@ -537,8 +554,8 @@ public class SynchronizerTask extends TimerTask {
             Subscription newsub = (Subscription) newobj;
 
             if (!oldsub.getSubscriber().equals(newsub.getSubscriber())) {
-                logger.info("PROV5013 -  Previous subscriber: " + oldsub.getSubscriber() + ": New subscriber-" + newsub
-                    .getSubscriber());
+                logger.info("PROV5013 -  Previous subscriber: "
+                                    + oldsub.getSubscriber() + ": New subscriber-" + newsub.getSubscriber());
                 oldsub.setSubscriber(newsub.getSubscriber());
                 oldsub.changeOwnerShip();
             }
@@ -551,26 +568,26 @@ public class SynchronizerTask extends TimerTask {
      *
      * @return the provisioning data (as a JONObject)
      */
-    private synchronized JSONObject readProvisioningJSON() {
+    private synchronized JSONObject readProvisioningJson() {
         String url = URLUtilities.generatePeerProvURL();
         HttpGet get = new HttpGet(url);
         try {
             HttpResponse response = httpclient.execute(get);
             int code = response.getStatusLine().getStatusCode();
             if (code != HttpServletResponse.SC_OK) {
-                logger.warn("PROV5010: readProvisioningJSON failed, bad error code: " + code);
+                logger.warn("PROV5010: readProvisioningJson failed, bad error code: " + code);
                 return null;
             }
             HttpEntity entity = response.getEntity();
             String ctype = entity.getContentType().getValue().trim();
-            if (!ctype.equals(BaseServlet.PROVFULL_CONTENT_TYPE1) && !ctype
-                .equals(BaseServlet.PROVFULL_CONTENT_TYPE2)) {
-                logger.warn("PROV5011: readProvisioningJSON failed, bad content type: " + ctype);
+            if (!ctype.equals(BaseServlet.PROVFULL_CONTENT_TYPE1)
+                        && !ctype.equals(BaseServlet.PROVFULL_CONTENT_TYPE2)) {
+                logger.warn("PROV5011: readProvisioningJson failed, bad content type: " + ctype);
                 return null;
             }
             return new JSONObject(new JSONTokener(entity.getContent()));
         } catch (Exception e) {
-            logger.warn("PROV5012: readProvisioningJSON failed, exception: " + e);
+            logger.warn("PROV5012: readProvisioningJson failed, exception: " + e);
             return null;
         } finally {
             get.releaseConnection();
@@ -583,7 +600,7 @@ public class SynchronizerTask extends TimerTask {
      *
      * @return the bitset
      */
-    private RLEBitSet readRemoteLoglist() {
+    RLEBitSet readRemoteLoglist() {
         RLEBitSet bs = new RLEBitSet();
         String url = URLUtilities.generatePeerLogsURL();
 
@@ -594,7 +611,7 @@ public class SynchronizerTask extends TimerTask {
         //End of fix.
 
         HttpGet get = new HttpGet(url);
-        try {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             HttpResponse response = httpclient.execute(get);
             int code = response.getStatusLine().getStatusCode();
             if (code != HttpServletResponse.SC_OK) {
@@ -603,13 +620,12 @@ public class SynchronizerTask extends TimerTask {
             }
             HttpEntity entity = response.getEntity();
             String ctype = entity.getContentType().getValue().trim();
-            if (!"text/plain".equals(ctype)) {
+            if (!TEXT_CT.equals(ctype)) {
                 logger.warn("PROV5011: readRemoteLoglist failed, bad content type: " + ctype);
                 return bs;
             }
             InputStream is = entity.getContent();
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            int ch = 0;
+            int ch;
             while ((ch = is.read()) >= 0) {
                 bos.write(ch);
             }
@@ -630,12 +646,12 @@ public class SynchronizerTask extends TimerTask {
      *
      * @param bs the bitset (an RELBitSet) of log records to fetch
      */
-    private void replicateDRLogs(RLEBitSet bs) {
+    void replicateDataRouterLogs(RLEBitSet bs) {
         String url = URLUtilities.generatePeerLogsURL();
         HttpPost post = new HttpPost(url);
         try {
             String t = bs.toString();
-            HttpEntity body = new ByteArrayEntity(t.getBytes(), ContentType.create("text/plain"));
+            HttpEntity body = new ByteArrayEntity(t.getBytes(), ContentType.create(TEXT_CT));
             post.setEntity(body);
             if (logger.isDebugEnabled()) {
                 logger.debug("Requesting records: " + t);
@@ -644,13 +660,13 @@ public class SynchronizerTask extends TimerTask {
             HttpResponse response = httpclient.execute(post);
             int code = response.getStatusLine().getStatusCode();
             if (code != HttpServletResponse.SC_OK) {
-                logger.warn("PROV5010: replicateDRLogs failed, bad error code: " + code);
+                logger.warn("PROV5010: replicateDataRouterLogs failed, bad error code: " + code);
                 return;
             }
             HttpEntity entity = response.getEntity();
             String ctype = entity.getContentType().getValue().trim();
-            if (!"text/plain".equals(ctype)) {
-                logger.warn("PROV5011: replicateDRLogs failed, bad content type: " + ctype);
+            if (!TEXT_CT.equals(ctype)) {
+                logger.warn("PROV5011: replicateDataRouterLogs failed, bad content type: " + ctype);
                 return;
             }
 
@@ -661,7 +677,7 @@ public class SynchronizerTask extends TimerTask {
             Files.move(tmppath, donepath, StandardCopyOption.REPLACE_EXISTING);
             logger.info("Approximately " + bs.cardinality() + " records replicated.");
         } catch (Exception e) {
-            logger.warn("PROV5012: replicateDRLogs failed, exception: " + e);
+            logger.warn("PROV5012: replicateDataRouterLogs failed, exception: " + e);
         } finally {
             post.releaseConnection();
         }
