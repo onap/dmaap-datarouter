@@ -437,22 +437,6 @@
             </plugins>
         </pluginManagement>
     </build>
-    <distributionManagement>
-        <repository>
-            <id>ecomp-releases</id>
-            <name>DR Release Repository</name>
-            <url>${onap.nexus.url}${releaseNexusPath}</url>
-        </repository>
-        <snapshotRepository>
-            <id>ecomp-snapshots</id>
-            <name>DR Snapshot Repository</name>
-            <url>${onap.nexus.url}${snapshotNexusPath}</url>
-        </snapshotRepository>
-        <site>
-            <id>ecomp-site</id>
-            <url>dav:${onap.nexus.url}${sitePath}</url>
-        </site>
-    </distributionManagement>
     <pluginRepositories>
         <pluginRepository>
             <id>onap-plugin-snapshots</id>
