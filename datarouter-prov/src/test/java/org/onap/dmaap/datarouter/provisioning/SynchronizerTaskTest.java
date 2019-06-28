@@ -84,9 +84,6 @@ public class SynchronizerTaskTest {
     @Mock
     private CloseableHttpResponse response;
 
-    @Mock
-    private ByteArrayOutputStream byteArrayOutputStream;
-
     private SynchronizerTask synchronizerTask;
 
     private ExecutorService executorService;
@@ -136,7 +133,8 @@ public class SynchronizerTaskTest {
     }
 
     @Test
-    public void Given_Synch_Task_readRemoteLoglist_Called_And_Valid_BitSet_Returned_Success() throws Exception {
+    public void Given_Synch_Task_readRemoteLoglist_Called_And_Valid_BitSet_Returned_Success()
+            throws IOException, IllegalAccessException {
         mockHttpClientForGetRequest();
         Mockito.when(response.getStatusLine().getStatusCode()).thenReturn(200);
         Mockito.when(httpEntity.getContentType()).thenReturn(new BasicHeader("header", "text/plain"));
@@ -146,7 +144,8 @@ public class SynchronizerTaskTest {
     }
 
     @Test
-    public void Given_Synch_Task_readRemoteLoglist_Called_And_Invalid_Resonse_Code_Failure() throws Exception {
+    public void Given_Synch_Task_readRemoteLoglist_Called_And_Invalid_Resonse_Code_Failure()
+            throws IOException, IllegalAccessException {
         mockHttpClientForGetRequest();
         Mockito.when(response.getStatusLine().getStatusCode()).thenReturn(404);
         RLEBitSet rleBitSet = synchronizerTask.readRemoteLoglist();
@@ -154,7 +153,8 @@ public class SynchronizerTaskTest {
     }
 
     @Test
-    public void Given_Synch_Task_readRemoteLoglist_Called_And_Invalid_Content_Type_Failure() throws Exception {
+    public void Given_Synch_Task_readRemoteLoglist_Called_And_Invalid_Content_Type_Failure()
+            throws IOException, IllegalAccessException {
         mockHttpClientForGetRequest();
         Mockito.when(response.getStatusLine().getStatusCode()).thenReturn(200);
         Mockito.when(httpEntity.getContentType()).thenReturn(new BasicHeader("header", "invalid_content_type"));
@@ -163,7 +163,8 @@ public class SynchronizerTaskTest {
     }
 
     @Test
-    public void Given_Synch_Task_replicateDataRouterLogs_Called_And_Valid_BitSet_Returned_Success() throws Exception {
+    public void Given_Synch_Task_replicateDataRouterLogs_Called_And_Valid_BitSet_Returned_Success()
+            throws IOException, IllegalAccessException {
         mockHttpClientForGetRequest();
         Mockito.when(response.getStatusLine().getStatusCode()).thenReturn(200);
         Mockito.when(httpEntity.getContentType()).thenReturn(new BasicHeader("header", "text/plain"));
@@ -172,7 +173,8 @@ public class SynchronizerTaskTest {
     }
 
     @Test
-    public void Given_Synch_Task_replicateDataRouterLogs_Called_And_Invalid_Content_Type_Failure() throws Exception {
+    public void Given_Synch_Task_replicateDataRouterLogs_Called_And_Invalid_Content_Type_Failure()
+            throws IOException, IllegalAccessException {
         mockHttpClientForGetRequest();
         Mockito.when(response.getStatusLine().getStatusCode()).thenReturn(200);
         Mockito.when(httpEntity.getContentType()).thenReturn(new BasicHeader("header", "invalid_content_type"));
@@ -181,7 +183,8 @@ public class SynchronizerTaskTest {
     }
 
     @Test
-    public void Given_Synch_Task_replicateDataRouterLogs_Called_And_Invalid_Resonse_Code_Failure() throws Exception {
+    public void Given_Synch_Task_replicateDataRouterLogs_Called_And_Invalid_Resonse_Code_Failure()
+            throws IOException, IllegalAccessException {
         mockHttpClientForGetRequest();
         Mockito.when(response.getStatusLine().getStatusCode()).thenReturn(404);
         RLEBitSet rleBitSet = synchronizerTask.readRemoteLoglist();
@@ -189,7 +192,8 @@ public class SynchronizerTaskTest {
     }
 
     @Test
-    public void Given_Synch_Task_Is_Started_And_LogFileLoader_Is_Idle_Then_Standby_Pod_Synch_Is_Successful() throws Exception {
+    public void Given_Synch_Task_Is_Started_And_LogFileLoader_Is_Idle_Then_Standby_Pod_Synch_Is_Successful()
+            throws IOException, IllegalAccessException {
         mockHttpClientForGetRequest();
         Mockito.when(response.getStatusLine().getStatusCode()).thenReturn(200);
         Mockito.when(httpEntity.getContentType()).thenReturn(new BasicHeader("header", "application/vnd.dmaap-dr.provfeed-full; version=1.0"));
@@ -197,7 +201,7 @@ public class SynchronizerTaskTest {
     }
 
 
-    private void mockHttpClientForGetRequest() throws Exception {
+    private void mockHttpClientForGetRequest() throws IllegalAccessException, IOException {
         FieldUtils.writeField(synchronizerTask, "httpclient", httpClient, true);
         Mockito.when(httpClient.execute(anyObject())).thenReturn(response);
         Mockito.when(response.getEntity()).thenReturn(httpEntity);
