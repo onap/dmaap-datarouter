@@ -31,6 +31,7 @@ import java.util.Timer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,8 +57,8 @@ public class LogManagerTest {
         logManager = new LogManager(config);
     }
 
-    @After
-    public void tearDown() throws IOException {
+    @AfterClass
+    public static void tearDown() throws IOException {
         File spoolDir = new File(System.getProperty("user.dir") + "/src/test/resources/.spool");
         FileUtils.deleteDirectory(spoolDir);
     }

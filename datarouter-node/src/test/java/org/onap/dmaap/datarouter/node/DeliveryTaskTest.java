@@ -23,43 +23,105 @@ package org.onap.dmaap.datarouter.node;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({DeliveryTask.class})
 public class DeliveryTaskTest {
 
     @Mock
     private DeliveryQueue deliveryQueue;
 
+    private ExecutorService executorService;
+
+    @Before
+    public void setUp() throws Exception {
+        DestInfo destInfo = getPrivDestInfo();
+        deliveryQueue = mockDelvieryQueue(destInfo);
+
+        URL url = PowerMockito.mock(URL.class);
+        HttpURLConnection urlConnection = PowerMockito.mock(HttpURLConnection.class);
+        OutputStream outputStream = PowerMockito.mock(OutputStream.class);
+
+        PowerMockito.whenNew(URL.class).withParameterTypes(String.class).withArguments(Mockito.anyString())
+                .thenReturn(url);
+        PowerMockito.when(urlConnection.getOutputStream()).thenReturn(outputStream);
+        PowerMockito.when(url.openConnection()).thenReturn(urlConnection);
+        PowerMockito.when(urlConnection.getHeaderField(0)).thenReturn("PUT");
+        PowerMockito.when(urlConnection.getResponseCode()).thenReturn(200);
+    }
+
+    @After
+    public void tearDown() {
+    }
+
+
     @Test
     public void Validate_Delivery_Task_Equals() {
-        DestInfo destInfo = getDestInfo();
-        deliveryQueue = mockDelvieryQueue(destInfo);
         DeliveryTask task = new DeliveryTask(deliveryQueue, "123456789.test-dr-datafile");
         DeliveryTask task2 = new DeliveryTask(deliveryQueue, "123456789.test-dr-datafile");
         Assert.assertEquals(task, task2);
         Assert.assertEquals(task.hashCode(), task2.hashCode());
         Assert.assertEquals(task.toString(), task2.toString());
+        Assert.assertEquals(task.getPublishId(), task2.getPublishId());
+        Assert.assertEquals(task.getSubId(), task2.getSubId());
+        Assert.assertEquals(task.getFeedId(), task2.getFeedId());
+        Assert.assertEquals(task.getLength(), task2.getLength());
+        Assert.assertEquals(task.isCleaned(), task2.isCleaned());
+        Assert.assertEquals(task.getDate(), task2.getDate());
+        Assert.assertEquals(task.getURL(), task2.getURL());
+        Assert.assertEquals(task.getCType(), task2.getCType());
+        Assert.assertEquals(task.getMethod(), task2.getMethod());
+        Assert.assertEquals(task.getFileId(), task2.getFileId());
+        Assert.assertEquals(task.getAttempts(), task2.getAttempts());
+        Assert.assertEquals(task.getFollowRedirects(), task2.getFollowRedirects());
+
         Assert.assertEquals(0, task.compareTo(task2));
     }
 
     @Test
-    public void Validate_Delivery_Tasks_Not_Equal() {
-        DestInfo destInfo = getDestInfo();
-        deliveryQueue = mockDelvieryQueue(destInfo);
+    public void Validate_Delivery_Tasks_Success_For_Standard_File() throws InterruptedException {
         DeliveryTask task = new DeliveryTask(deliveryQueue, "123456789.test-dr-node");
-        DeliveryTask task2 = new DeliveryTask(deliveryQueue, "123456789.test-dr-datafile");
-        Assert.assertNotEquals(task, task2);
-        Assert.assertNotEquals(0, task.compareTo(task2));
+        executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(task);
+
+        executorService.shutdown();
+        executorService.awaitTermination(2, TimeUnit.SECONDS);
     }
 
-    private DestInfo getDestInfo() {
+    @Test
+    public void Validate_Delivery_Tasks_Success_For_Compressed_File() throws InterruptedException {
+
+        DeliveryTask task = new DeliveryTask(deliveryQueue, "123456789.test-dr-node.gz");
+        executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(task);
+
+        executorService.shutdown();
+        executorService.awaitTermination(2, TimeUnit.SECONDS);
+    }
+
+    private DestInfo getPrivDestInfo() {
         return new DestInfoBuilder().setName("n:" + "dmaap-dr-node")
-                .setSpool(System.getProperty("user.dir") + "/src/test/resources")
-                .setSubid("1").setLogdata("n2n-dmaap-dr-node").setUrl("https://dmaap-dr-node:8443/internal/publish")
-                .setAuthuser("dmaap-dr-node").setAuthentication("Auth").setMetaonly(false).setUse100(true)
-                .setPrivilegedSubscriber(false).setFollowRedirects(false).setDecompress(false).createDestInfo();
+                       .setSpool(System.getProperty("user.dir") + "/src/test/resources/delivery_files")
+                       .setSubid("1").setLogdata("n2n-dmaap-dr-node").setUrl("https://dmaap-dr-node:8443/internal/publish")
+                       .setAuthuser("dmaap-dr-node").setAuthentication("Auth").setMetaonly(false).setUse100(true)
+                       .setPrivilegedSubscriber(true).setFollowRedirects(false).setDecompress(true).createDestInfo();
     }
 
     private DeliveryQueue mockDelvieryQueue(DestInfo destInfo) {
