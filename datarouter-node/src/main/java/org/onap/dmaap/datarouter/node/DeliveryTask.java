@@ -96,7 +96,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
         spool = destInfo.getSpool();
         String dfn = spool + "/" + pubid;
         String mfn = dfn + ".M";
-        datafile = new File(spool + "/" + pubid);
+        datafile = new File(spool + File.separator + pubid);
         metafile = new File(mfn);
         boolean monly = destInfo.isMetaDataOnly();
         date = Long.parseLong(pubid.substring(0, pubid.indexOf('.')));
@@ -242,7 +242,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
         httpURLConnection.setRequestProperty(DECOMPRESSION_STATUS, "SUCCESS");
         OutputStream outputStream = getOutputStream(httpURLConnection);
         if (outputStream != null) {
-            int bytesRead = 0;
+            int bytesRead;
             try (InputStream gzipInputStream = new GZIPInputStream(new FileInputStream(datafile))) {
                 int bufferLength = buffer.length;
                 while ((bytesRead = gzipInputStream.read(buffer, 0, bufferLength)) > 0) {
@@ -371,7 +371,8 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 Files.deleteIfExists(file.toPath());
                 break;
             } catch (IOException e) {
-                eelfLogger.error("IOException : Failed to delete file :" + file.getName() + " on attempt " + tryCount, e);
+                eelfLogger.error("IOException : Failed to delete file :"
+                                         + file.getName() + " on attempt " + tryCount, e);
             }
             tryCount++;
         }
@@ -464,7 +465,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     /**
      * Get the followRedirects for this delivery task.
      */
-    public boolean getFollowRedirects() {
+    boolean getFollowRedirects() {
         return (followRedirects);
     }
 }

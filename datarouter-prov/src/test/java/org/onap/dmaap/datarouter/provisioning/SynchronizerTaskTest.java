@@ -29,9 +29,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
-import com.att.eelf.configuration.EELFManager;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -42,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
@@ -59,7 +56,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
 import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 import org.powermock.api.mockito.PowerMockito;
@@ -84,11 +80,7 @@ public class SynchronizerTaskTest {
     @Mock
     private CloseableHttpResponse response;
 
-    @Mock
-    private ByteArrayOutputStream byteArrayOutputStream;
-
     private SynchronizerTask synchronizerTask;
-
     private ExecutorService executorService;
 
     private static EntityManagerFactory emf;
@@ -125,7 +117,7 @@ public class SynchronizerTaskTest {
         synchronizerTask = Mockito.spy(SynchronizerTask.getSynchronizer());
         doReturn(2).when(synchronizerTask).lookupState();
 
-        executorService = Executors.newSingleThreadExecutor();
+        executorService = Executors.newCachedThreadPool();
         executorService.execute(synchronizerTask);
     }
 
@@ -136,7 +128,8 @@ public class SynchronizerTaskTest {
     }
 
     @Test
-    public void Given_Synch_Task_readRemoteLoglist_Called_And_Valid_BitSet_Returned_Success() throws Exception {
+    public void Given_Synch_Task_readRemoteLoglist_Called_And_Valid_BitSet_Returned_Success()
+            throws IOException, IllegalAccessException {
         mockHttpClientForGetRequest();
         Mockito.when(response.getStatusLine().getStatusCode()).thenReturn(200);
         Mockito.when(httpEntity.getContentType()).thenReturn(new BasicHeader("header", "text/plain"));
@@ -146,7 +139,8 @@ public class SynchronizerTaskTest {
     }
 
     @Test
-    public void Given_Synch_Task_readRemoteLoglist_Called_And_Invalid_Resonse_Code_Failure() throws Exception {
+    public void Given_Synch_Task_readRemoteLoglist_Called_And_Invalid_Resonse_Code_Failure()
+            throws IOException, IllegalAccessException {
         mockHttpClientForGetRequest();
         Mockito.when(response.getStatusLine().getStatusCode()).thenReturn(404);
         RLEBitSet rleBitSet = synchronizerTask.readRemoteLoglist();
@@ -154,7 +148,8 @@ public class SynchronizerTaskTest {
     }
 
     @Test
-    public void Given_Synch_Task_readRemoteLoglist_Called_And_Invalid_Content_Type_Failure() throws Exception {
+    public void Given_Synch_Task_readRemoteLoglist_Called_And_Invalid_Content_Type_Failure()
+            throws IOException, IllegalAccessException {
         mockHttpClientForGetRequest();
         Mockito.when(response.getStatusLine().getStatusCode()).thenReturn(200);
         Mockito.when(httpEntity.getContentType()).thenReturn(new BasicHeader("header", "invalid_content_type"));
@@ -163,7 +158,8 @@ public class SynchronizerTaskTest {
     }
 
     @Test
-    public void Given_Synch_Task_replicateDataRouterLogs_Called_And_Valid_BitSet_Returned_Success() throws Exception {
+    public void Given_Synch_Task_replicateDataRouterLogs_Called_And_Valid_BitSet_Returned_Success()
+            throws IOException, IllegalAccessException {
         mockHttpClientForGetRequest();
         Mockito.when(response.getStatusLine().getStatusCode()).thenReturn(200);
         Mockito.when(httpEntity.getContentType()).thenReturn(new BasicHeader("header", "text/plain"));
@@ -172,7 +168,8 @@ public class SynchronizerTaskTest {
     }
 
     @Test
-    public void Given_Synch_Task_replicateDataRouterLogs_Called_And_Invalid_Content_Type_Failure() throws Exception {
+    public void Given_Synch_Task_replicateDataRouterLogs_Called_And_Invalid_Content_Type_Failure()
+            throws IOException, IllegalAccessException {
         mockHttpClientForGetRequest();
         Mockito.when(response.getStatusLine().getStatusCode()).thenReturn(200);
         Mockito.when(httpEntity.getContentType()).thenReturn(new BasicHeader("header", "invalid_content_type"));
@@ -181,7 +178,8 @@ public class SynchronizerTaskTest {
     }
 
     @Test
-    public void Given_Synch_Task_replicateDataRouterLogs_Called_And_Invalid_Resonse_Code_Failure() throws Exception {
+    public void Given_Synch_Task_replicateDataRouterLogs_Called_And_Invalid_Resonse_Code_Failure()
+            throws IOException, IllegalAccessException {
         mockHttpClientForGetRequest();
         Mockito.when(response.getStatusLine().getStatusCode()).thenReturn(404);
         RLEBitSet rleBitSet = synchronizerTask.readRemoteLoglist();
@@ -189,7 +187,8 @@ public class SynchronizerTaskTest {
     }
 
     @Test
-    public void Given_Synch_Task_Is_Started_And_LogFileLoader_Is_Idle_Then_Standby_Pod_Synch_Is_Successful() throws Exception {
+    public void Given_Synch_Task_Is_Started_And_LogFileLoader_Is_Idle_Then_Standby_Pod_Synch_Is_Successful()
+            throws IOException, IllegalAccessException {
         mockHttpClientForGetRequest();
         Mockito.when(response.getStatusLine().getStatusCode()).thenReturn(200);
         Mockito.when(httpEntity.getContentType()).thenReturn(new BasicHeader("header", "application/vnd.dmaap-dr.provfeed-full; version=1.0"));
@@ -197,7 +196,7 @@ public class SynchronizerTaskTest {
     }
 
 
-    private void mockHttpClientForGetRequest() throws Exception {
+    private void mockHttpClientForGetRequest() throws IllegalAccessException, IOException {
         FieldUtils.writeField(synchronizerTask, "httpclient", httpClient, true);
         Mockito.when(httpClient.execute(anyObject())).thenReturn(response);
         Mockito.when(response.getEntity()).thenReturn(httpEntity);
