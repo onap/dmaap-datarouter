@@ -31,13 +31,13 @@ import ch.qos.logback.core.spi.FilterReply;
  * added code in logback.xml to add jetty statements in node.log.
  * This class removes extran EELF statements from node.log since they are being logged in apicalls.log
  */
-public class EELFFilter extends Filter<ILoggingEvent> {
+public class JettyFilter extends Filter<ILoggingEvent> {
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        if (event.getMessage().contains("EELF")) {
-            return FilterReply.DENY;
-        } else {
+        if (event.getMessage().contains("jetty")) {
             return FilterReply.ACCEPT;
+        } else {
+            return FilterReply.DENY;
         }
     }
 }
