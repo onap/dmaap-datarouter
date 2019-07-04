@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "2bdbc0d7_5748fa83",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/AuditFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-07-04T15:12:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e18b0aca_eb78008c",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 80
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6520a7da_c5f728e5",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/AuditFilter.java",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2019-07-04T14:45:46Z",
       "side": 1,
       "message": "Can prob scrap this comment.\nSame for other Filters",
+      "range": {
+        "startLine": 31,
+        "startChar": 2,
+        "endLine": 33,
+        "endChar": 102
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94e0d14d_f2aa2f6a",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/AuditFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-07-04T15:12:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6520a7da_c5f728e5",
       "range": {
         "startLine": 31,
         "startChar": 2,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "05cf95e9_d37a303a",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/JettyFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-07-04T15:12:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b41a22a_30e3aa37",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 80
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a8c356d6_133c3dea",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/JettyFilter.java",
         "patchSetId": 1
@@ -82,6 +154,30 @@
       "writtenOn": "2019-07-04T14:45:46Z",
       "side": 1,
       "message": "Can be removed.",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 3
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d1e7e51_14194321",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/JettyFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-07-04T15:12:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a8c356d6_133c3dea",
       "range": {
         "startLine": 29,
         "startChar": 0,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "f6d54ce7_645bf569",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/JettyFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-07-04T15:12:12Z",
+      "side": 1,
+      "message": "For continuity sake if nothing else we probably should\nDone",
+      "parentUuid": "0545d739_9bbde8c2",
+      "range": {
+        "startLine": 37,
+        "startChar": 41,
+        "endLine": 37,
+        "endChar": 46
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e8aefe5_9c0d67f5",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/MetricsFilter.java",
         "patchSetId": 1
@@ -128,6 +248,30 @@
       "writtenOn": "2019-07-04T14:45:46Z",
       "side": 1,
       "message": "Update licence",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 4
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fbdee976_39a586cb",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/MetricsFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-07-04T15:12:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e8aefe5_9c0d67f5",
       "range": {
         "startLine": 1,
         "startChar": 0,
@@ -163,6 +307,30 @@
     },
     {
       "key": {
+        "uuid": "a2da37fb_d46f721e",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/MetricsFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-07-04T15:12:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a0a05e83_dbb56aae",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 102
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "961bf0e3_5ee64efd",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/MetricsFilter.java",
         "patchSetId": 1
@@ -174,6 +342,30 @@
       "writtenOn": "2019-07-04T14:45:46Z",
       "side": 1,
       "message": "Are we ONLY logging \"INFO\" here?",
+      "range": {
+        "startLine": 38,
+        "startChar": 42,
+        "endLine": 38,
+        "endChar": 46
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ec0a711c_7d4ba709",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/MetricsFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-07-04T15:12:12Z",
+      "side": 1,
+      "message": "We are only logging INFO here and in Audit log",
+      "parentUuid": "961bf0e3_5ee64efd",
       "range": {
         "startLine": 38,
         "startChar": 42,
@@ -209,6 +401,30 @@
     },
     {
       "key": {
+        "uuid": "d3d5da99_e516892b",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/MetricsFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-07-04T15:12:12Z",
+      "side": 1,
+      "message": "We could. I\u0027ll look into this",
+      "parentUuid": "eb18f353_e83912b4",
+      "range": {
+        "startLine": 39,
+        "startChar": 30,
+        "endLine": 40,
+        "endChar": 65
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "240efb1d_0ace40c7",
         "filename": "datarouter-node/src/main/resources/docker/Dockerfile",
         "patchSetId": 1
@@ -220,6 +436,30 @@
       "writtenOn": "2019-07-04T14:45:46Z",
       "side": 1,
       "message": "Can do this in one line.\n\nchown -R datarouter:onap /opt /var",
+      "range": {
+        "startLine": 38,
+        "startChar": 32,
+        "endLine": 38,
+        "endChar": 39
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cc953b48_682b928e",
+        "filename": "datarouter-node/src/main/resources/docker/Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-07-04T15:12:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "240efb1d_0ace40c7",
       "range": {
         "startLine": 38,
         "startChar": 32,
@@ -255,6 +495,30 @@
     },
     {
       "key": {
+        "uuid": "16650122_768f03ae",
+        "filename": "datarouter-node/src/main/resources/logback.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-07-04T15:12:12Z",
+      "side": 1,
+      "message": "This is for logbacks status data",
+      "parentUuid": "880a1e38_83715897",
+      "range": {
+        "startLine": 23,
+        "startChar": 50,
+        "endLine": 23,
+        "endChar": 63
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f70d94b9_e2282dde",
         "filename": "datarouter-node/src/main/resources/logback.xml",
         "patchSetId": 1
@@ -266,6 +530,30 @@
       "writtenOn": "2019-07-04T14:45:46Z",
       "side": 1,
       "message": "May need to add the component name to the path.\n\n/var/log/onap/datarouter\n\nFileBeat scans from /var/log/onap/*/*.log down 3 levels so may not pick this path up.",
+      "range": {
+        "startLine": 25,
+        "startChar": 33,
+        "endLine": 25,
+        "endChar": 46
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "64888fc1_349bdf99",
+        "filename": "datarouter-node/src/main/resources/logback.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-07-04T15:12:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f70d94b9_e2282dde",
       "range": {
         "startLine": 25,
         "startChar": 33,
@@ -301,6 +589,30 @@
     },
     {
       "key": {
+        "uuid": "f6334d27_fcaf9554",
+        "filename": "datarouter-node/src/main/resources/logback.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-07-04T15:12:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6be7705c_8d190eb9",
+      "range": {
+        "startLine": 31,
+        "startChar": 41,
+        "endLine": 31,
+        "endChar": 51
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f640494_6edf07c9",
         "filename": "datarouter-node/src/main/resources/logback.xml",
         "patchSetId": 1
@@ -312,6 +624,30 @@
       "writtenOn": "2019-07-04T14:45:46Z",
       "side": 1,
       "message": "Is it ok to use the default pattern for all logs?\nSample here is a bit old but defines diff patterns for each.\n\nhttps://git.onap.org/oom/tree/kubernetes/portal/charts/portal-sdk/resources/config/deliveries/properties/ONAPPORTALSDK/logback.xml",
+      "range": {
+        "startLine": 34,
+        "startChar": 18,
+        "endLine": 34,
+        "endChar": 32
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "03b58df5_7369bb4e",
+        "filename": "datarouter-node/src/main/resources/logback.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-07-04T15:12:12Z",
+      "side": 1,
+      "message": "This commit is moreso for the functionality. The pattern will be looked at in a later patch",
+      "parentUuid": "5f640494_6edf07c9",
       "range": {
         "startLine": 34,
         "startChar": 18,
