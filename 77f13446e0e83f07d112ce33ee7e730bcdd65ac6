@@ -1,0 +1,349 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e18b0aca_eb78008c",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/AuditFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-07-04T14:45:46Z",
+      "side": 1,
+      "message": "Any new java files need the Nordix licence.\n\n/*-\n * \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003dLICENSE_START\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n *  Copyright (C) 2019 Nordix Foundation.\n * \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n *\n * SPDX-License-Identifier: Apache-2.0\n * \u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003dLICENSE_END\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\u003d\n */",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 80
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6520a7da_c5f728e5",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/AuditFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-07-04T14:45:46Z",
+      "side": 1,
+      "message": "Can prob scrap this comment.\nSame for other Filters",
+      "range": {
+        "startLine": 31,
+        "startChar": 2,
+        "endLine": 33,
+        "endChar": 102
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b41a22a_30e3aa37",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/JettyFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-07-04T14:45:46Z",
+      "side": 1,
+      "message": "Update licence",
+      "range": {
+        "startLine": 4,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 80
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a8c356d6_133c3dea",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/JettyFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-07-04T14:45:46Z",
+      "side": 1,
+      "message": "Can be removed.",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 3
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0545d739_9bbde8c2",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/JettyFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-07-04T14:45:46Z",
+      "side": 1,
+      "message": "Might be best to go with \"org.eclipse.jetty\" like in dr-prov just in case",
+      "range": {
+        "startLine": 37,
+        "startChar": 41,
+        "endLine": 37,
+        "endChar": 46
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e8aefe5_9c0d67f5",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/MetricsFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-07-04T14:45:46Z",
+      "side": 1,
+      "message": "Update licence",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 4
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0a05e83_dbb56aae",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/MetricsFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-07-04T14:45:46Z",
+      "side": 1,
+      "message": "Can be removed",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 102
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "961bf0e3_5ee64efd",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/MetricsFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-07-04T14:45:46Z",
+      "side": 1,
+      "message": "Are we ONLY logging \"INFO\" here?",
+      "range": {
+        "startLine": 38,
+        "startChar": 42,
+        "endLine": 38,
+        "endChar": 46
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eb18f353_e83912b4",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/MetricsFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-07-04T14:45:46Z",
+      "side": 1,
+      "message": "General comment. \nIs there a risk of losing any logs if we are filtering? \nOr will the DENIED events get logged in one of the other logs by default?",
+      "range": {
+        "startLine": 39,
+        "startChar": 30,
+        "endLine": 40,
+        "endChar": 65
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "240efb1d_0ace40c7",
+        "filename": "datarouter-node/src/main/resources/docker/Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-07-04T14:45:46Z",
+      "side": 1,
+      "message": "Can do this in one line.\n\nchown -R datarouter:onap /opt /var",
+      "range": {
+        "startLine": 38,
+        "startChar": 32,
+        "endLine": 38,
+        "endChar": 39
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "880a1e38_83715897",
+        "filename": "datarouter-node/src/main/resources/logback.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-07-04T14:45:46Z",
+      "side": 1,
+      "message": "How and where does this kick in?",
+      "range": {
+        "startLine": 23,
+        "startChar": 50,
+        "endLine": 23,
+        "endChar": 63
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f70d94b9_e2282dde",
+        "filename": "datarouter-node/src/main/resources/logback.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-07-04T14:45:46Z",
+      "side": 1,
+      "message": "May need to add the component name to the path.\n\n/var/log/onap/datarouter\n\nFileBeat scans from /var/log/onap/*/*.log down 3 levels so may not pick this path up.",
+      "range": {
+        "startLine": 25,
+        "startChar": 33,
+        "endLine": 25,
+        "endChar": 46
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6be7705c_8d190eb9",
+        "filename": "datarouter-node/src/main/resources/logback.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-07-04T14:45:46Z",
+      "side": 1,
+      "message": "Can close the same as the above",
+      "range": {
+        "startLine": 31,
+        "startChar": 41,
+        "endLine": 31,
+        "endChar": 51
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f640494_6edf07c9",
+        "filename": "datarouter-node/src/main/resources/logback.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-07-04T14:45:46Z",
+      "side": 1,
+      "message": "Is it ok to use the default pattern for all logs?\nSample here is a bit old but defines diff patterns for each.\n\nhttps://git.onap.org/oom/tree/kubernetes/portal/charts/portal-sdk/resources/config/deliveries/properties/ONAPPORTALSDK/logback.xml",
+      "range": {
+        "startLine": 34,
+        "startChar": 18,
+        "endLine": 34,
+        "endChar": 32
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e82c2eb9_91403751",
+        "filename": "datarouter-node/src/main/resources/logback.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-07-04T14:45:46Z",
+      "side": 1,
+      "message": "Can we control the jetty log level from here and remove it from the root log level block below?",
+      "range": {
+        "startLine": 219,
+        "startChar": 76,
+        "endLine": 219,
+        "endChar": 82
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
