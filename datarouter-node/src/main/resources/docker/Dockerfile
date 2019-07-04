@@ -35,6 +35,7 @@ ENTRYPOINT ["sh", "startup.sh"]
 
 RUN addgroup -S -g 1001 onap \
     && adduser -S -u 1000 datarouter -G onap \
-    && chown -R datarouter:onap /opt/
+    && chown -R datarouter:onap /opt/ \
+    && chown -R datarouter:onap /var/
 
 USER datarouter
