@@ -35,6 +35,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -42,6 +43,7 @@ import org.slf4j.MDC;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.onap.dmaap.datarouter.node.NodeUtils")
+@PowerMockIgnore({"java.net.ssl", "javax.security.auth.x500.X500Principal"})
 @PrepareForTest({UUID.class, InetAddress.class})
 public class NodeUtilsTest {
 
@@ -103,5 +105,11 @@ public class NodeUtilsTest {
         NodeUtils.setRequestIdAndInvocationId(request);
         Assert.assertEquals("123", MDC.get("RequestId"));
         Assert.assertEquals("456", MDC.get("InvocationId"));
+    }
+
+    @Test
+    public void Given_Get_CanonicalName_Called_Valid_CN_Returned() {
+        String canonicalName = NodeUtils.getCanonicalName("jks", "aaf_certs/org.onap.dmaap-dr.jks", "WGxd2P6MDo*Bi4+UdzWs{?$8");
+        Assert.assertEquals("dmaap-dr-node", canonicalName);
     }
 }

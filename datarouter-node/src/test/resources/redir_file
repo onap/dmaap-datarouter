@@ -1,0 +1,2 @@
+1 http://destination:8443/path/to http://redirect:8443/path/to
+2 http://destination2:8443/path/to http://redirect2:8443/path/to
