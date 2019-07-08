@@ -425,6 +425,30 @@
     },
     {
       "key": {
+        "uuid": "a9588f00_4ac0cd5c",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/MetricsFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-07-08T11:15:36Z",
+      "side": 1,
+      "message": "Programmatically I don\u0027t see us losing any logs",
+      "parentUuid": "d3d5da99_e516892b",
+      "range": {
+        "startLine": 39,
+        "startChar": 30,
+        "endLine": 40,
+        "endChar": 65
+      },
+      "revId": "77f13446e0e83f07d112ce33ee7e730bcdd65ac6",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "240efb1d_0ace40c7",
         "filename": "datarouter-node/src/main/resources/docker/Dockerfile",
         "patchSetId": 1
