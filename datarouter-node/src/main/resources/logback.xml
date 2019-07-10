@@ -226,7 +226,6 @@
   <root level="INFO">
     <appender-ref ref="asyncAudit" />
     <appender-ref ref="asyncMetrics" />
-    <appender-ref ref="asyncDebug" />
     <appender-ref ref="asyncError" />
     <appender-ref ref="asyncJettyLog" />
   </root>
