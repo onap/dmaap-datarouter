@@ -47,6 +47,7 @@ public class DrServletTestBase {
         props.setProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir", "unit-test-logs");
         props.setProperty("org.onap.dmaap.datarouter.provserver.spooldir", "unit-test-logs/spool");
         props.setProperty("org.onap.dmaap.datarouter.provserver.https.relaxation", "false");
+        props.setProperty("org.onap.dmaap.datarouter.provserver.passwordencryption", "PasswordEncryptionKey#@$%^&1234#");
         FieldUtils.writeDeclaredStaticField(DB.class, "props", props, true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsgFlag", false, true);
         SynchronizerTask synchronizerTask = mock(SynchronizerTask.class);
