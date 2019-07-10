@@ -23,6 +23,8 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.io.InvalidObjectException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -34,9 +36,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
@@ -597,8 +596,8 @@ public class Subscription extends Syncable {
         if (feedid != os.feedid) {
             return false;
         }
-        if (groupid != os.groupid) //New field is added - Groups feature Rally:US708115 - 1610
-        {
+        if (groupid != os.groupid) {
+            //New field is added - Groups feature Rally:US708115 - 1610
             return false;
         }
         if (!delivery.equals(os.delivery)) {

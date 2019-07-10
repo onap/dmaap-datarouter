@@ -37,10 +37,10 @@ import java.util.Timer;
 /**
  * Track redirections of subscriptions.
  */
-public class RedirManager {
+class RedirManager {
 
     private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(RedirManager.class);
-    RateLimitedOperation op;
+    private RateLimitedOperation op;
     private HashMap<String, String> sid2primary = new HashMap<>();
     private HashMap<String, String> sid2secondary = new HashMap<>();
     private String redirfile;
@@ -52,7 +52,7 @@ public class RedirManager {
      * @param mininterval The minimum number of milliseconds between writes to the redirection information file.
      * @param timer The timer thread used to run delayed file writes.
      */
-    public RedirManager(String redirfile, long mininterval, Timer timer) {
+    RedirManager(String redirfile, long mininterval, Timer timer) {
         this.redirfile = redirfile;
         op = new RateLimitedOperation(mininterval, timer) {
             public void run() {
@@ -92,7 +92,7 @@ public class RedirManager {
      * @param primary The URL associated with that subscription ID
      * @param secondary The replacement URL to use instead
      */
-    public synchronized void redirect(String sid, String primary, String secondary) {
+    synchronized void redirect(String sid, String primary, String secondary) {
         sid2primary.put(sid, primary);
         sid2secondary.put(sid, secondary);
         op.request();
@@ -103,7 +103,7 @@ public class RedirManager {
      *
      * @param sid The subscription ID to remove from the table.
      */
-    public synchronized void forget(String sid) {
+    synchronized void forget(String sid) {
         sid2primary.remove(sid);
         sid2secondary.remove(sid);
         op.request();
@@ -117,7 +117,7 @@ public class RedirManager {
      * @param primary The configured primary URL.
      * @return The destination URL to really use.
      */
-    public synchronized String lookup(String sid, String primary) {
+    synchronized String lookup(String sid, String primary) {
         String oprim = sid2primary.get(sid);
         if (primary.equals(oprim)) {
             return (sid2secondary.get(sid));
@@ -130,7 +130,7 @@ public class RedirManager {
     /**
      * Is a subscription redirected.
      */
-    public synchronized boolean isRedirected(String sid) {
+    synchronized boolean isRedirected(String sid) {
         return (sid != null && sid2secondary.get(sid) != null);
     }
 
