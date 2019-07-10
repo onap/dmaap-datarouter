@@ -35,7 +35,7 @@ import org.onap.dmaap.datarouter.node.NodeConfig.ProvHop;
  * get from this node to any other node.
  */
 
-public class PathFinder {
+class PathFinder {
 
     private ArrayList<String> errors = new ArrayList<>();
     private HashMap<String, String> routes = new HashMap<>();
@@ -47,7 +47,7 @@ public class PathFinder {
      * @param nodes where we can go
      * @param hops detours along the way
      */
-    public PathFinder(String origin, String[] nodes, NodeConfig.ProvHop[] hops) {
+    PathFinder(String origin, String[] nodes, NodeConfig.ProvHop[] hops) {
         HashSet<String> known = new HashSet<>();
         HashMap<String, HashMap<String, Hop>> ht = new HashMap<>();
         for (String n : nodes) {
@@ -77,8 +77,8 @@ public class PathFinder {
      *
      * @return array of error descriptions
      */
-    public String[] getErrors() {
-        return (errors.toArray(new String[errors.size()]));
+    String[] getErrors() {
+        return (errors.toArray(new String[0]));
     }
 
     /**
@@ -87,7 +87,7 @@ public class PathFinder {
      * @param destination node
      * @return list of node names separated by and ending with "/"
      */
-    public String getPath(String destination) {
+    String getPath(String destination) {
         String ret = routes.get(destination);
         if (ret == null) {
             return ("");

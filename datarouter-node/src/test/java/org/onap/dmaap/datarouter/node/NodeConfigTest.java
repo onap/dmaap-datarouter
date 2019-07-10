@@ -35,8 +35,7 @@ import org.powermock.core.classloader.annotations.SuppressStaticInitializationFo
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.node.ProvData",
-        "org.onap.dmaap.datarouter.node.NodeUtils"})
+@SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.node.ProvData"})
 public class NodeConfigTest {
 
     private static NodeConfig nodeConfig;

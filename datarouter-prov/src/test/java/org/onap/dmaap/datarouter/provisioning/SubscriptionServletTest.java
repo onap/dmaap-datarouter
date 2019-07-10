@@ -323,6 +323,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscriptionServlet.doPut(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
         resetAafSubscriptionInDB();
+        addNewSubscriptionInDB();
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -626,5 +627,19 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setDecompress(false);
         subscription.setPrivilegedSubscriber(false);
         subscription.doUpdate(db.getConnection());
+    }
+
+    private void addNewSubscriptionInDB() throws SQLException {
+        Subscription subscription = new Subscription("https://172.100.0.6:8080", "user3", "password3");
+        subscription.setSubid(3);
+        subscription.setSubscriber("user3");
+        subscription.setFeedid(1);
+        SubDelivery subDelivery = new SubDelivery(URL, USER, PASSWORD, true);
+        subscription.setDelivery(subDelivery);
+        subscription.setGroupid(1);
+        subscription.setMetadataOnly(false);
+        subscription.setSuspended(false);
+        subscription.setDecompress(false);
+        subscription.doInsert(db.getConnection());
     }
 }

@@ -22,8 +22,25 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.contains;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
+
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -36,30 +53,11 @@ import org.mockito.Mock;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
-import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.*;
-import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(Subscription.class)
 public class SubscribeServletTest extends DrServletTestBase {
     private static SubscribeServlet subscribeServlet;
     private static EntityManagerFactory emf;
@@ -144,10 +142,6 @@ public class SubscribeServletTest extends DrServletTestBase {
         ServletOutputStream outStream = mock(ServletOutputStream.class);
         when(response.getOutputStream()).thenReturn(outStream);
         when(request.getPathInfo()).thenReturn("/1");
-        PowerMockito.mockStatic(Subscription.class);
-        List<String> list = new ArrayList<>();
-        list.add("{}");
-        PowerMockito.when(Subscription.getSubscriptionUrlList(anyInt())).thenReturn(list);
         subscribeServlet.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
         verifyEnteringExitCalled(listAppender);
@@ -294,8 +288,6 @@ public class SubscribeServletTest extends DrServletTestBase {
         when(response.getOutputStream()).thenReturn(outStream);
         when(request.getPathInfo()).thenReturn("/2");
         when(request.isUserInRole("org.onap.dmaap-dr.feed|*|approveSub")).thenReturn(true);
-        PowerMockito.mockStatic(Subscription.class);
-        PowerMockito.when(Subscription.getSubscriptionMatching(new Subscription())).thenReturn(null);
         JSONObject JSObject = buildRequestJsonObject();
         SubscribeServlet subscribeServlet = new SubscribeServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -353,8 +345,6 @@ public class SubscribeServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_POST_And_POST_Fails_Bad_Request_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn("/2");
-        PowerMockito.mockStatic(Subscription.class);
-        PowerMockito.when(Subscription.getSubscriptionMatching(new Subscription())).thenReturn(null);
         JSONObject JSObject = buildRequestJsonObject();
         SubscribeServlet subscribeServlet = new SubscribeServlet() {
             protected JSONObject getJSONfromInput(HttpServletRequest req) {

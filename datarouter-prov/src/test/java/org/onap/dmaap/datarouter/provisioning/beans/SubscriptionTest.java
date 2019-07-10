@@ -23,22 +23,50 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
+import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-
 @RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.provisioning.beans.Subscription"})
 public class SubscriptionTest {
 
     private Subscription subscription;
 
+    private static EntityManagerFactory emf;
+    private static EntityManager em;
+    private DB db;
+
+    @BeforeClass
+    public static void init() {
+        emf = Persistence.createEntityManagerFactory("dr-unit-tests");
+        em = emf.createEntityManager();
+        System.setProperty(
+                "org.onap.dmaap.datarouter.provserver.properties",
+                "src/test/resources/h2Database.properties");
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+        em.clear();
+        em.close();
+        emf.close();
+    }
+    @Before
+    public void setUp() throws Exception {
+        db = new DB();
+        subscription = new Subscription();
+    }
+
     @Test
     public void validate_Subscription_Created_With_Default_Constructor() {
-        subscription = new Subscription();
         Assert.assertEquals(subscription.getSubid(), -1);
         Assert.assertEquals(subscription.getGroupid(), -1);
         Assert.assertEquals(subscription.getSubscriber(), "");
@@ -56,13 +84,13 @@ public class SubscriptionTest {
         subLinks.setLog("log");
         subLinks.setSelf("self");
 
-        subscription = new Subscription();
         subscription.setGroupid(2);
         subscription.setDelivery(subDelivery);
         subscription.setMetadataOnly(false);
         subscription.setSubscriber(subscriber);
         subscription.setSuspended(false);
         subscription.setPrivilegedSubscriber(false);
+        subscription.setFollowRedirect(true);
         subscription.setLinks(subLinks);
         subscription.setDecompress(false);
 
@@ -73,5 +101,19 @@ public class SubscriptionTest {
         Assert.assertFalse(subscription.isSuspended());
         Assert.assertFalse(subscription.isPrivilegedSubscriber());
         Assert.assertFalse(subscription.isDecompress());
+
+        Subscription sub2 = new Subscription();
+        sub2.setGroupid(2);
+        sub2.setDelivery(subDelivery);
+        sub2.setMetadataOnly(false);
+        sub2.setSubscriber(subscriber);
+        sub2.setSuspended(false);
+        sub2.setPrivilegedSubscriber(false);
+        sub2.setFollowRedirect(true);
+        sub2.setLinks(subLinks);
+        sub2.setDecompress(false);
+        Assert.assertTrue(subscription.equals(sub2));
+        Assert.assertNotNull(sub2.toString());
+        sub2.hashCode();
     }
 }

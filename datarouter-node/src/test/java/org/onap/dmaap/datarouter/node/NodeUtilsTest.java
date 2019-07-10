@@ -22,27 +22,19 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.node;
 
-import static com.att.eelf.configuration.Configuration.MDC_SERVER_FQDN;
-import static com.att.eelf.configuration.Configuration.MDC_SERVER_IP_ADDRESS;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.MDC;
 
 @RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor("org.onap.dmaap.datarouter.node.NodeUtils")
-@PrepareForTest({UUID.class, InetAddress.class})
+@PowerMockIgnore({"java.net.ssl", "javax.security.auth.x500.X500Principal"})
 public class NodeUtilsTest {
 
     @Mock
@@ -52,6 +44,7 @@ public class NodeUtilsTest {
     public void Given_Uri_With_Params_Then_Get_Feed_And_File_Id_Returns_Correct_Values() {
         String uri = "prov.datarouternew.com:8443/feed/12/fileName";
         String[] uriParams = NodeUtils.getFeedAndFileID(uri);
+        assert uriParams != null;
         Assert.assertEquals("12", uriParams[0]);
         Assert.assertEquals("fileName", uriParams[1]);
     }
@@ -85,23 +78,8 @@ public class NodeUtilsTest {
     }
 
     @Test
-    public void Given_setIpAndFqdnForEelf_Called_Set_MDC_Values() throws IOException {
-        mockStatic(InetAddress.class);
-        when(InetAddress.getLocalHost().getHostName()).thenReturn("testHostName");
-        when(InetAddress.getLocalHost().getHostAddress()).thenReturn("testHostAddress");
-        NodeUtils.setIpAndFqdnForEelf("doGet");
-        Assert.assertEquals("testHostName", MDC.get(MDC_SERVER_FQDN));
-        Assert.assertEquals("testHostAddress", MDC.get(MDC_SERVER_IP_ADDRESS));
-    }
-
-    @Test
-    public void Given_Request_Has_Empty_RequestId_And_InvocationId_Headers_Generate_MDC_Values() {
-        when(request.getHeader("X-ONAP-RequestID")).thenReturn("");
-        when(request.getHeader("X-InvocationID")).thenReturn("");
-        mockStatic(UUID.class);
-        when(UUID.randomUUID().toString()).thenReturn("123", "456");
-        NodeUtils.setRequestIdAndInvocationId(request);
-        Assert.assertEquals("123", MDC.get("RequestId"));
-        Assert.assertEquals("456", MDC.get("InvocationId"));
+    public void Given_Get_CanonicalName_Called_Valid_CN_Returned() {
+        String canonicalName = NodeUtils.getCanonicalName("jks", "src/test/resources/org.onap.dmaap-dr-test-cert.jks", "WGxd2P6MDo*Bi4+UdzWs{?$8");
+        Assert.assertEquals("dmaap-dr-node", canonicalName);
     }
 }
