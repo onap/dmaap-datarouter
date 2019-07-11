@@ -158,6 +158,8 @@ public class StatusLog {
         instance.log(
                 "PUB|" + pubid + "|" + feedid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen + "|" + srcip
                         + "|" + user + "|" + status);
+        eelfLogger.info("PUB|" + pubid + "|" + feedid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen + "|" + srcip
+                                + "|" + user + "|" + status);
     }
 
     /**
@@ -178,6 +180,8 @@ public class StatusLog {
             long rcvd, String srcip, String user, String error) {
         instance.log("PBF|" + pubid + "|" + feedid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen + "|" + rcvd
                 + "|" + srcip + "|" + user + "|" + error);
+        eelfLogger.info("PBF|" + pubid + "|" + feedid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen + "|" + rcvd
+                                + "|" + srcip + "|" + user + "|" + error);
     }
 
     /**
@@ -202,6 +206,8 @@ public class StatusLog {
         instance.log(
                 "DEL|" + pubid + "|" + feedid + "|" + subid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen
                         + "|" + user + "|" + status + "|" + xpubid);
+        eelfLogger.info("DEL|" + pubid + "|" + feedid + "|" + subid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen
+                                + "|" + user + "|" + status + "|" + xpubid);
     }
 
     /**
@@ -225,6 +231,8 @@ public class StatusLog {
         instance.log(
                 "EXP|" + pubid + "|" + feedid + "|" + subid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen
                         + "|" + reason + "|" + attempts);
+        eelfLogger.info("EXP|" + pubid + "|" + feedid + "|" + subid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen
+                                + "|" + reason + "|" + attempts);
     }
 
     /**
@@ -242,6 +250,7 @@ public class StatusLog {
             return;
         }
         instance.log("DLX|" + pubid + "|" + feedid + "|" + subid + "|" + clen + "|" + sent);
+        eelfLogger.info("DLX|" + pubid + "|" + feedid + "|" + subid + "|" + clen + "|" + sent);
     }
 
     private synchronized void checkRoll(long now) throws IOException {
