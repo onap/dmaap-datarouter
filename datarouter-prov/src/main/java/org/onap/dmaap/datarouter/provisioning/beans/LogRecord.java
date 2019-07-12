@@ -3,6 +3,8 @@
  * * org.onap.dmaap
  * * ===========================================================================
  * * Copyright © 2017 AT&T Intellectual Property. All rights reserved.
+ *
+ * * Modification Copyright © 2019 IBM
  * * ===========================================================================
  * * Licensed under the Apache License, Version 2.0 (the "License");
  * * you may not use this file except in compliance with the License.
@@ -56,30 +58,6 @@ public class LogRecord extends BaseLogRecord {
      * @throws IOException
      */
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
-
-    public static void printLogRecords(OutputStream os, RLEBitSet bs) throws IOException {
-        final String sql = "select * from LOG_RECORDS where RECORD_ID >= ? AND RECORD_ID <= ?";
-        DB db = new DB();
-        try (Connection conn = db.getConnection()) {
-            Iterator<Long[]> iter = bs.getRangeIterator();
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                while (iter.hasNext()) {
-                    Long[] n = iter.next();
-                    ps.setLong(1, n[0]);
-                    ps.setLong(2, n[1]);
-                    try (ResultSet rs = ps.executeQuery()) {
-                        while (rs.next()) {
-                            LogRecord lr = new LogRecord(rs);
-                            os.write(lr.toString().getBytes());
-                        }
-                        ps.clearParameters();
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            intlogger.error("PROV0001 printLogRecords: " + e.getMessage(), e);
-        }
-    }
 
     private final String type;
     private final String feedFileid;
@@ -135,6 +113,31 @@ public class LogRecord extends BaseLogRecord {
         this.fileName = pp[20];
     }
 
+
+    public static void printLogRecords(OutputStream os, RLEBitSet bs) throws IOException {
+        final String sql = "select * from LOG_RECORDS where RECORD_ID >= ? AND RECORD_ID <= ?";
+        DB db = new DB();
+        try (Connection conn = db.getConnection()) {
+            Iterator<Long[]> iter = bs.getRangeIterator();
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                while (iter.hasNext()) {
+                    Long[] n = iter.next();
+                    ps.setLong(1, n[0]);
+                    ps.setLong(2, n[1]);
+                    try (ResultSet rs = ps.executeQuery()) {
+                        while (rs.next()) {
+                            LogRecord lr = new LogRecord(rs);
+                            os.write(lr.toString().getBytes());
+                        }
+                        ps.clearParameters();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            intlogger.error("PROV0001 printLogRecords: " + e.getMessage(), e);
+        }
+    }
+
     public long getRecordId() {
         return record_id;
     }
@@ -169,7 +172,7 @@ public class LogRecord extends BaseLogRecord {
     public void load(PreparedStatement ps) throws SQLException {
         ps.setString(1, type);
         super.load(ps);                // loads fields 2-8
-        if (type.equals("pub")) {
+        if (("pub").equals(type)) {
             ps.setString(9, feedFileid);
             ps.setString(10, remoteAddr);
             ps.setString(11, user);
@@ -182,7 +185,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setLong(18, record_id);
             ps.setNull(19, Types.BIGINT);
             ps.setString(20, fileName);
-        } else if (type.equals("del")) {
+        } else if (("del").equals(type)) {
             ps.setNull(9, Types.VARCHAR);
             ps.setNull(10, Types.VARCHAR);
             ps.setString(11, user);
@@ -195,7 +198,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setLong(18, record_id);
             ps.setNull(19, Types.BIGINT);
             ps.setString(20, fileName);
-        } else if (type.equals("exp")) {
+        } else if (("exp").equals(type)) {
             ps.setNull(9, Types.VARCHAR);
             ps.setNull(10, Types.VARCHAR);
             ps.setNull(11, Types.VARCHAR);
@@ -208,7 +211,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setLong(18, record_id);
             ps.setNull(19, Types.BIGINT);
             ps.setString(20, fileName);
-        } else if (type.equals("pbf")) {
+        } else if (("pbf").equals(type)) {
             ps.setString(9, feedFileid);
             ps.setString(10, remoteAddr);
             ps.setString(11, user);
@@ -221,7 +224,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setLong(18, record_id);
             ps.setLong(19, clength2);
             ps.setString(20, fileName);
-        } else if (type.equals("dlx")) {
+        } else if (("dlx").equals(type)) {
             ps.setNull(9, Types.VARCHAR);
             ps.setNull(10, Types.VARCHAR);
             ps.setNull(11, Types.VARCHAR);
