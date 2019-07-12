@@ -1,8 +1,9 @@
 /*******************************************************************************
  * ============LICENSE_START==================================================
  * * org.onap.dmaap
- * * ===========================================================================
+ * * ======================================================================
  * * Copyright © 2017 AT&T Intellectual Property. All rights reserved.
+ * * Modification Copyright © 2019 IBM
  * * ===========================================================================
  * * Licensed under the Apache License, Version 2.0 (the "License");
  * * you may not use this file except in compliance with the License.
@@ -50,6 +51,21 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
     private static final String SQLEXCEPTION = "SQLException: ";
     private final int subid;
     private final int nodeid;
+
+
+
+    public EgressRoute(int subid, int nodeid) {
+        this.subid = subid;
+        this.nodeid = nodeid;
+// Note: unlike for Feeds, it subscriptions can be removed from the tables, so it is
+// possible that an orphan ERT entry can exist if a sub is removed.
+//        if (Subscription.getSubscriptionById(subid) == null)
+//            throw new IllegalArgumentException("No such subscription: "+subid);
+    }
+
+    public EgressRoute(int subid, String node) {
+        this(subid, lookupNodeName(node));
+    }
 
     /**
      * Get a set of all Egress Routes in the DB.  The set is sorted according to the natural sorting order of the routes
@@ -116,19 +132,6 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             }
         }
         return v;
-    }
-
-    public EgressRoute(int subid, int nodeid) {
-        this.subid = subid;
-        this.nodeid = nodeid;
-// Note: unlike for Feeds, it subscriptions can be removed from the tables, so it is
-// possible that an orphan ERT entry can exist if a sub is removed.
-//        if (Subscription.getSubscriptionById(subid) == null)
-//            throw new IllegalArgumentException("No such subscription: "+subid);
-    }
-
-    public EgressRoute(int subid, String node) {
-        this(subid, lookupNodeName(node));
     }
 
     @Override
