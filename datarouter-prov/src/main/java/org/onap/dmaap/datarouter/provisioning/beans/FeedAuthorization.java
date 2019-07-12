@@ -3,6 +3,7 @@
  * * org.onap.dmaap
  * * ===========================================================================
  * * Copyright © 2017 AT&T Intellectual Property. All rights reserved.
+ * * Modification Copyright © 2019 IBM
  * * ===========================================================================
  * * Licensed under the Apache License, Version 2.0 (the "License");
  * * you may not use this file except in compliance with the License.
@@ -44,8 +45,8 @@ public class FeedAuthorization implements JSONable {
 
     public FeedAuthorization() {
         this.classification = "";
-        this.endpoint_ids = new HashSet<FeedEndpointID>();
-        this.endpoint_addrs = new HashSet<String>();
+        this.endpoint_ids = new HashSet<>();
+        this.endpoint_addrs = new HashSet<>();
     }
 
     public String getClassification() {
