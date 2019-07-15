@@ -126,14 +126,14 @@ public class Delivery {
         DelItem[] items = cv.toArray(new DelItem[cv.size()]);
         Arrays.sort(items);
         long stop = (long) (tspace * fdstop);
-        logger.info(
+        logger.warn(
                 "NODE0501 Free disk space below red threshold.  current=" + cur + " red=" + start + TOTAL + tspace);
         if (determineFreeDiskSpace(spoolfile, tspace, stop, cur, items)) {
             return;
         }
         cur = spoolfile.getUsableSpace();
         if (cur >= stop) {
-            logger.info("NODE0503 Free disk space at or above yellow threshold.  current=" + cur + YELLOW + stop
+            logger.warn("NODE0503 Free disk space at or above yellow threshold.  current=" + cur + YELLOW + stop
                                 + TOTAL + tspace);
             return;
         }
@@ -248,7 +248,7 @@ public class Delivery {
     private boolean determineFreeDiskSpace(File spoolfile, long tspace, long stop, long cur, DelItem[] items) {
         for (DelItem item : items) {
             long amount = dqs.get(item.getSpool()).cancelTask(item.getPublishId());
-            logger.info("NODE0502 Attempting to discard " + item.getSpool() + "/" + item.getPublishId()
+            logger.debug("NODE0502 Attempting to discard " + item.getSpool() + "/" + item.getPublishId()
                                 + " to free up disk");
             if (amount > 0) {
                 cur += amount;
@@ -256,7 +256,7 @@ public class Delivery {
                     cur = spoolfile.getUsableSpace();
                 }
                 if (cur >= stop) {
-                    logger.info(
+                    logger.warn(
                             "NODE0503 Free disk space at or above yellow threshold.  current=" + cur + YELLOW + stop
                                     + TOTAL + tspace);
                     return true;
