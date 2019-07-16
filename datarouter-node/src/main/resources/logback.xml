@@ -110,10 +110,7 @@
   <appender name="Debug"
             class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${logDirectory}/${debugLog}.log</file>
-    <filter class="ch.qos.logback.classic.filter.LevelFilter">
-      <level>DEBUG</level>
-      <onMatch>ACCEPT</onMatch>
-      <onMismatch>DENY</onMismatch>
+    <filter class="org.onap.dmaap.datarouter.node.eelf.DebugFilter">
     </filter>
     <rollingPolicy
             class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -141,10 +138,7 @@
   <appender name="Error"
     class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${logDirectory}/${errorLog}.log</file>
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-        <level>WARN</level>
-        <onMatch>ACCEPT</onMatch>
-        <onMismatch>DENY</onMismatch>
+    <filter class="org.onap.dmaap.datarouter.node.eelf.ErrorFilter">
     </filter>
     <rollingPolicy
       class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -223,7 +217,7 @@
 
 
 
-  <root level="INFO">
+  <root level="DEBUG">
     <appender-ref ref="asyncAudit" />
     <appender-ref ref="asyncMetrics" />
     <appender-ref ref="asyncDebug" />

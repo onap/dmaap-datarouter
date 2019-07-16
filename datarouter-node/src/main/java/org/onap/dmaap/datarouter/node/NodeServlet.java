@@ -91,13 +91,13 @@ public class NodeServlet extends HttpServlet {
     @Override
     public void init() {
         config = NodeConfigManager.getInstance();
-        eelfLogger.info("NODE0101 Node Servlet Configured");
+        eelfLogger.debug("NODE0101 Node Servlet Configured");
     }
 
     private boolean down(HttpServletResponse resp) {
         if (config.isShutdown() || !config.isConfigured()) {
             sendResponseError(resp, HttpServletResponse.SC_SERVICE_UNAVAILABLE, eelfLogger);
-            eelfLogger.info("NODE0102 Rejecting request: Service is being quiesced");
+            eelfLogger.error("NODE0102 Rejecting request: Service is being quiesced");
             return true;
         }
         return false;
@@ -112,7 +112,7 @@ public class NodeServlet extends HttpServlet {
         NodeUtils.setRequestIdAndInvocationId(req);
         eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(ON_BEHALF_OF),
+            eelfLogger.debug(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(ON_BEHALF_OF),
                     getIdFromPath(req) + "");
             if (down(resp)) {
                 return;
@@ -136,7 +136,7 @@ public class NodeServlet extends HttpServlet {
                 }
             }
 
-            eelfLogger.info("NODE0103 Rejecting invalid GET of " + path + FROM + ip);
+            eelfLogger.debug("NODE0103 Rejecting invalid GET of " + path + FROM + ip);
             sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, eelfLogger);
         } finally {
             eelfLogger.info(EelfMsgs.EXIT);
@@ -151,7 +151,7 @@ public class NodeServlet extends HttpServlet {
         NodeUtils.setIpAndFqdnForEelf("doPut");
         NodeUtils.setRequestIdAndInvocationId(req);
         eelfLogger.info(EelfMsgs.ENTRY);
-        eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(ON_BEHALF_OF),
+        eelfLogger.debug(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(ON_BEHALF_OF),
                 getIdFromPath(req) + "");
         try {
             common(req, resp, true);
@@ -169,7 +169,7 @@ public class NodeServlet extends HttpServlet {
         NodeUtils.setIpAndFqdnForEelf("doDelete");
         NodeUtils.setRequestIdAndInvocationId(req);
         eelfLogger.info(EelfMsgs.ENTRY);
-        eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(ON_BEHALF_OF),
+        eelfLogger.debug(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(ON_BEHALF_OF),
                 getIdFromPath(req) + "");
         try {
             common(req, resp, false);
@@ -228,7 +228,7 @@ public class NodeServlet extends HttpServlet {
                     if (!("legacy".equalsIgnoreCase(aafInstance))) {
                         isAAFFeed = true;
                         String permission = config.getPermission(aafInstance);
-                        eelfLogger.info("NodeServlet.common() permission string - " + permission);
+                        eelfLogger.debug("NodeServlet.common() permission string - " + permission);
                         //Check in CADI Framework API if user has AAF permission or not
                         if (!req.isUserInRole(permission)) {
                             String message = "AAF disallows access to permission string - " + permission;
@@ -303,7 +303,7 @@ public class NodeServlet extends HttpServlet {
                             .cleanString(feedid) + " fileid " + PathUtil.cleanString(fileid) + FROM + PathUtil
                             .cleanString(ip) + " reason   Invalid AAF user- " + PathUtil.cleanString(reason));
                     String message = "Invalid AAF user- " + PathUtil.cleanString(reason);
-                    eelfLogger.info("NODE0308 Rejecting unauthenticated PUT or DELETE of " + PathUtil
+                    eelfLogger.debug("NODE0308 Rejecting unauthenticated PUT or DELETE of " + PathUtil
                             .cleanString(req.getPathInfo()) + FROM + PathUtil.cleanString(req.getRemoteAddr()));
                     resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
                     return;
@@ -326,7 +326,7 @@ public class NodeServlet extends HttpServlet {
                 }
                 String redirto = HTTPS + newnode + port + PUBLISH + feedid + "/" + fileid;
                 eelfLogger
-                        .info("NODE0108 Redirecting publish attempt for feed " + PathUtil.cleanString(feedid) + USER
+                        .debug("NODE0108 Redirecting publish attempt for feed " + PathUtil.cleanString(feedid) + USER
                                 + PathUtil.cleanString(user) + " ip " + PathUtil.cleanString(ip) + " to " + PathUtil
                                 .cleanString(redirto));  //Fortify scan fixes - log forging
                 resp.sendRedirect(PathUtil.cleanString(redirto));         //Fortify scan fixes-open redirect - 2 issues
@@ -517,7 +517,7 @@ public class NodeServlet extends HttpServlet {
             }
             boolean result = delivery.markTaskSuccess(config.getSpoolBase() + "/s/" + subIdDir + "/" + subId, pubid);
             if (result) {
-                eelfLogger.info("NODE0115 Successfully deleted files (" + pubid + ", " + pubid + FROM_DR_MESSAGE
+                eelfLogger.debug("NODE0115 Successfully deleted files (" + pubid + ", " + pubid + FROM_DR_MESSAGE
                         + config.getMyName());
                 resp.setStatus(HttpServletResponse.SC_OK);
                 eelfLogger.info(EelfMsgs.EXIT);
