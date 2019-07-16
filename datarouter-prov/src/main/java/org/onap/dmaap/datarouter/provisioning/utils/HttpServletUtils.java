@@ -20,14 +20,19 @@
  * * ECOMP is a trademark and service mark of AT&T Intellectual Property.
  * *
  ******************************************************************************/
+
 package org.onap.dmaap.datarouter.provisioning.utils;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
 import com.att.eelf.configuration.EELFLogger;
+import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
 
 public class HttpServletUtils {
+
+    private HttpServletUtils(){
+
+    }
+
     public static void sendResponseError(HttpServletResponse response, int errorCode, String message, EELFLogger intlogger) {
         try {
             response.sendError(errorCode, message);

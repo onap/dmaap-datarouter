@@ -18,21 +18,27 @@
  * ============LICENSE_END=========================================================
  */
 
-package org.onap.dmaap.datarouter.node.eelf;
+package org.onap.dmaap.datarouter.node;
 
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.filter.Filter;
-import ch.qos.logback.core.spi.FilterReply;
+import org.junit.Test;
 
+public class TaskListTest {
 
-public class AuditFilter extends Filter<ILoggingEvent> {
-    @Override
-    public FilterReply decide(ILoggingEvent event) {
-        if (event.getMessage().contains("DEL|") || event.getMessage().contains("PUB|") || event.getMessage().contains("PBF|")
-                                                        || event.getMessage().contains("EXP|") || event.getMessage().contains("DLX|")) {
-            return FilterReply.ACCEPT;
-        } else {
-            return FilterReply.DENY;
-        }
+    @Test
+    public void Given_New_Task_List_Verify_Add_And_Run() {
+        TaskList taskList = new TaskList();
+        taskList.startRun();
+        taskList.addTask(() -> {
+        });
+        taskList.next();
+        taskList.removeTask(() -> {
+        });
+    }
+
+    @Test
+    public void Given_Empty_Task_List_Verify_Next() {
+        TaskList taskList = new TaskList();
+        taskList.startRun();
+        taskList.next();
     }
 }

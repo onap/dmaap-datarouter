@@ -34,9 +34,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -81,7 +78,6 @@ public class SynchronizerTaskTest {
     private CloseableHttpResponse response;
 
     private SynchronizerTask synchronizerTask;
-    private ExecutorService executorService;
 
     private static EntityManagerFactory emf;
     private static EntityManager em;
@@ -116,15 +112,10 @@ public class SynchronizerTaskTest {
 
         synchronizerTask = Mockito.spy(SynchronizerTask.getSynchronizer());
         doReturn(2).when(synchronizerTask).lookupState();
-
-        executorService = Executors.newCachedThreadPool();
-        executorService.execute(synchronizerTask);
     }
 
     @After
-    public void tearDown() throws InterruptedException {
-        executorService.shutdown();
-        executorService.awaitTermination(2, TimeUnit.SECONDS);
+    public void tearDown() {
     }
 
     @Test
@@ -193,6 +184,7 @@ public class SynchronizerTaskTest {
         Mockito.when(response.getStatusLine().getStatusCode()).thenReturn(200);
         Mockito.when(httpEntity.getContentType()).thenReturn(new BasicHeader("header", "application/vnd.dmaap-dr.provfeed-full; version=1.0"));
         mockResponseFromGet();
+        synchronizerTask.run();
     }
 
 
