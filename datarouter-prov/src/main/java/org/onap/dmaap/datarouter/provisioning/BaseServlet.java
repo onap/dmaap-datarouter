@@ -24,30 +24,33 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
+import static com.att.eelf.configuration.Configuration.MDC_KEY_REQUEST_ID;
 import static com.att.eelf.configuration.Configuration.MDC_SERVER_FQDN;
-
 import static com.att.eelf.configuration.Configuration.MDC_SERVER_IP_ADDRESS;
 import static com.att.eelf.configuration.Configuration.MDC_SERVICE_NAME;
-import static com.att.eelf.configuration.Configuration.MDC_KEY_REQUEST_ID;
 
-
-
-import java.io.IOException;
-import java.io.InputStream;
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.SQLException;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.UUID;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,20 +58,18 @@ import org.json.JSONTokener;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.authz.impl.ProvAuthorizer;
 import org.onap.dmaap.datarouter.authz.impl.ProvDataProvider;
-import org.onap.dmaap.datarouter.provisioning.beans.*;
+import org.onap.dmaap.datarouter.provisioning.beans.Deleteable;
+import org.onap.dmaap.datarouter.provisioning.beans.Feed;
+import org.onap.dmaap.datarouter.provisioning.beans.Group;
+import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
+import org.onap.dmaap.datarouter.provisioning.beans.NodeClass;
+import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
+import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
+import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.PasswordProcessor;
 import org.onap.dmaap.datarouter.provisioning.utils.ThrottleFilter;
 import org.slf4j.MDC;
-
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import java.security.GeneralSecurityException;
-import java.util.*;
-import java.util.regex.Pattern;
 
 
 /**
@@ -94,10 +95,10 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     static final String CREATE_PERMISSION = "create";
     static final String EDIT_PERMISSION = "edit";
     static final String DELETE_PERMISSION = "delete";
-    static final String PUBLISH_PERMISSION = "publish";
-    static final String SUSPEND_PERMISSION = "suspend";
-    static final String RESTORE_PERMISSION = "restore";
-    static final String SUBSCRIBE_PERMISSION = "subscribe";
+    private static final String PUBLISH_PERMISSION = "publish";
+    private static final String SUSPEND_PERMISSION = "suspend";
+    private static final String RESTORE_PERMISSION = "restore";
+    private static final String SUBSCRIBE_PERMISSION = "subscribe";
     static final String APPROVE_SUB_PERMISSION = "approveSub";
 
     static final String FEED_BASECONTENT_TYPE = "application/vnd.dmaap-dr.feed";
@@ -113,7 +114,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     //Adding groups functionality, ...1610
     static final String GROUP_BASECONTENT_TYPE = "application/vnd.dmaap-dr.group";
     static final String GROUP_CONTENT_TYPE = "application/vnd.dmaap-dr.group; version=2.0";
-    public static final String GROUPFULL_CONTENT_TYPE = "application/vnd.dmaap-dr.group-full; version=2.0";
+    static final String GROUPFULL_CONTENT_TYPE = "application/vnd.dmaap-dr.group-full; version=2.0";
     public static final String GROUPLIST_CONTENT_TYPE = "application/vnd.dmaap-dr.fegrouped-list; version=1.0";
 
 
@@ -130,127 +131,123 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     private static final int DEFAULT_POKETIMER2 = 30;
     private static final String DEFAULT_DOMAIN = "onap";
     private static final String DEFAULT_PROVSRVR_NAME = "dmaap-dr-prov";
-    private static final String STATIC_ROUTING_NODES = ""; //Adding new param for static Routing - Rally:US664862-1610
 
     //Common Errors
-    public static final String MISSING_ON_BEHALF = "Missing X-DMAAP-DR-ON-BEHALF-OF header.";
-    public static final String MISSING_FEED = "Missing or bad feed number.";
-    public static final String POLICY_ENGINE = "Policy Engine disallows access.";
-    public static final String UNAUTHORIZED = "Unauthorized.";
-    public static final String BAD_SUB = "Missing or bad subscription number.";
-    public static final String BAD_JSON = "Badly formed JSON";
-    public static final String BAD_URL = "Bad URL.";
+    static final String MISSING_ON_BEHALF = "Missing X-DMAAP-DR-ON-BEHALF-OF header.";
+    static final String MISSING_FEED = "Missing or bad feed number.";
+    static final String POLICY_ENGINE = "Policy Engine disallows access.";
+    static final String UNAUTHORIZED = "Unauthorized.";
+    static final String BAD_SUB = "Missing or bad subscription number.";
+    static final String BAD_JSON = "Badly formed JSON";
+    static final String BAD_URL = "Bad URL.";
 
     public static final String API = "/api/";
-    public static final String LOGS = "/logs/";
-    public static final String TEXT_CT = "text/plain";
-    public static final String INGRESS = "/ingress/";
-    public static final String EGRESS = "/egress/";
-    public static final String NETWORK = "/network/";
-    public static final String GROUPID = "groupid";
+    static final String LOGS = "/logs/";
+    static final String TEXT_CT = "text/plain";
+    static final String INGRESS = "/ingress/";
+    static final String EGRESS = "/egress/";
+    static final String NETWORK = "/network/";
+    static final String GROUPID = "groupid";
     public static final String FEEDID = "feedid";
-    public static final String FEEDIDS = "feedids";
-    public static final String SUBID = "subid";
-    public static final String EVENT_TYPE = "eventType";
-    public static final String OUTPUT_TYPE = "output_type";
-    public static final String START_TIME = "start_time";
-    public static final String END_TIME = "end_time";
-    public static final String REASON_SQL = "reasonSQL";
+    static final String FEEDIDS = "feedids";
+    static final String SUBID = "subid";
+    static final String EVENT_TYPE = "eventType";
+    static final String OUTPUT_TYPE = "output_type";
+    static final String START_TIME = "start_time";
+    static final String END_TIME = "end_time";
+    static final String REASON_SQL = "reasonSQL";
 
 
     /**
-     * A boolean to trigger one time "provisioning changed" event on startup
+     * A boolean to trigger one time "provisioning changed" event on startup.
      */
     private static boolean startmsgFlag = true;
     /**
-     * This POD should require SSL connections from clients; pulled from the DB (PROV_REQUIRE_SECURE)
+     * This POD should require SSL connections from clients; pulled from the DB (PROV_REQUIRE_SECURE).
      */
     private static boolean requireSecure = true;
     /**
-     * This POD should require signed, recognized certificates from clients; pulled from the DB (PROV_REQUIRE_CERT)
+     * This POD should require signed, recognized certificates from clients; pulled from the DB (PROV_REQUIRE_CERT).
      */
     private static boolean requireCert = true;
     /**
-     * The set of authorized addresses and networks; pulled from the DB (PROV_AUTH_ADDRESSES)
+     * The set of authorized addresses and networks; pulled from the DB (PROV_AUTH_ADDRESSES).
      */
     private static Set<String> authorizedAddressesAndNetworks = new HashSet<>();
     /**
-     * The set of authorized names; pulled from the DB (PROV_AUTH_SUBJECTS)
+     * The set of authorized names; pulled from the DB (PROV_AUTH_SUBJECTS).
      */
     private static Set<String> authorizedNames = new HashSet<>();
     /**
-     * The FQDN of the initially "active" provisioning server in this Data Router ecosystem
+     * The FQDN of the initially "active" provisioning server in this Data Router ecosystem.
      */
     private static String initialActivePod;
     /**
-     * The FQDN of the initially "standby" provisioning server in this Data Router ecosystem
+     * The FQDN of the initially "standby" provisioning server in this Data Router ecosystem.
      */
     private static String initialStandbyPod;
     /**
-     * The FQDN of this provisioning server in this Data Router ecosystem
+     * The FQDN of this provisioning server in this Data Router ecosystem.
      */
     private static String thisPod;
     /**
-     * "Timer 1" - used to determine when to notify nodes of provisioning changes
+     * "Timer 1" - used to determine when to notify nodes of provisioning changes.
      */
     private static long pokeTimer1;
     /**
-     * "Timer 2" - used to determine when to notify nodes of provisioning changes
+     * "Timer 2" - used to determine when to notify nodes of provisioning changes.
      */
     private static long pokeTimer2;
     /**
-     * Array of nodes names and/or FQDNs
+     * Array of nodes names and/or FQDNs.
      */
     private static String[] nodes = new String[0];
     /**
-     * [DATARTR-27] Poke all the DR nodes : Array of nodes names and/or FQDNs
+     * [DATARTR-27] Poke all the DR nodes : Array of nodes names and/or FQDNs.
      */
     private static String[] drnodes = new String[0];
     /**
-     * Array of node IP addresses
+     * Array of node IP addresses.
      */
     private static InetAddress[] nodeAddresses = new InetAddress[0];
     /**
-     * Array of POD IP addresses
+     * Array of POD IP addresses.
      */
     private static InetAddress[] podAddresses = new InetAddress[0];
     /**
-     * The maximum number of feeds allowed; pulled from the DB (PROV_MAXFEED_COUNT)
+     * The maximum number of feeds allowed; pulled from the DB (PROV_MAXFEED_COUNT).
      */
     static int maxFeeds = 0;
     /**
-     * The maximum number of subscriptions allowed; pulled from the DB (PROV_MAXSUB_COUNT)
+     * The maximum number of subscriptions allowed; pulled from the DB (PROV_MAXSUB_COUNT).
      */
     static int maxSubs = 0;
     /**
-     * The current number of feeds in the system
+     * The current number of feeds in the system.
      */
     static int activeFeeds = 0;
     /**
-     * The current number of subscriptions in the system
+     * The current number of subscriptions in the system.
      */
     static int activeSubs = 0;
 
     /**
-     * The domain used to generate a FQDN from the "bare" node names
+     * The domain used to generate a FQDN from the "bare" node names.
      */
     private static String provDomain = "web.att.com";
 
     /**
-     * The standard FQDN of the provisioning server in this Data Router ecosystem
+     * The standard FQDN of the provisioning server in this Data Router ecosystem.
      */
     private static String provName = "feeds-drtr.web.att.com";
 
     /**
-     * The standard FQDN of the ACTIVE_POD provisioning server in this Data Router ecosystem
+     * The standard FQDN of the ACTIVE_POD provisioning server in this Data Router ecosystem.
      */
     private static String activeProvName = "feeds-drtr.web.att.com";
 
-    //Adding new param for static Routing - Rally:US664862-1610
-    private static String staticRoutingNodes = STATIC_ROUTING_NODES;
-
     /**
-     * This logger is used to log provisioning events
+     * This logger is used to log provisioning events.
      */
     protected static EELFLogger eventlogger;
     /**
@@ -258,21 +255,17 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     protected static EELFLogger intlogger;
     /**
-     * Authorizer - interface to the Policy Engine
+     * Authorizer - interface to the Policy Engine.
      */
     protected static Authorizer authz;
     /**
-     * The Synchronizer used to sync active DB to standby one
+     * The Synchronizer used to sync active DB to standby one.
      */
     private static SynchronizerTask synctask = null;
 
     //Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
     private InetAddress thishost;
     private InetAddress loopback;
-    private static Boolean mailSendFlag = false;
-
-    private static final String MAILCONFIG_FILE = "mail.properties";
-    private static Properties mailprops;
 
     //DMAAP-597 (Tech Dept) REST request source IP auth relaxation to accommodate OOM kubernetes deploy
     private static String isAddressAuthEnabled = (new DB()).getProperties()
@@ -285,10 +278,10 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * Initialize data common to all the provisioning server servlets.
      */
     protected BaseServlet() {
-        if(eventlogger == null) {
-            this.eventlogger = EELFManager.getInstance().getLogger("EventLog");
+        if (eventlogger == null) {
+            eventlogger = EELFManager.getInstance().getLogger("EventLog");
         }
-        if(intlogger == null) {
+        if (intlogger == null) {
             this.intlogger = EELFManager.getInstance().getLogger("InternalLog");
         }
         if (authz == null) {
@@ -329,7 +322,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     }
 
     /**
-     * Read the request's input stream and return a JSONObject from it
+     * Read the request's input stream and return a JSONObject from it.
      *
      * @param req the HTTP request
      * @return the JSONObject, or null if the stream cannot be parsed
@@ -348,33 +341,38 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     }
 
     /**
-     * This method encrypt/decrypt the key in the JSON passed by user request inside the authorisation header object in request before logging the JSON.
+     * This method encrypt/decrypt the key in the JSON passed by user request inside the authorisation
+     * header object in request before logging the JSON.
      *
-     * @param jo-      the JSON passed in http request.
-     * @param maskKey- the key to be masked in the JSON passed.
-     * @param action-  whether to mask the key or unmask it in a JSON passed.
+     * @param jo      the JSON passed in http request.
+     * @param maskKey the key to be masked in the JSON passed.
+     * @param action  whether to mask the key or unmask it in a JSON passed.
      * @return the JSONObject, or null if the stream cannot be parsed.
      */
-    public static JSONObject maskJSON(JSONObject jo, String maskKey, boolean action) {
+    static JSONObject maskJSON(JSONObject jo, String maskKey, boolean action) {
         if (!jo.isNull("authorization")) {
-            JSONObject j2 = jo.getJSONObject("authorization");
-            JSONArray ja = j2.getJSONArray("endpoint_ids");
-            for (int i = 0; i < ja.length(); i++) {
-                if ((!ja.getJSONObject(i).isNull(maskKey))) {
-                    String password = ja.getJSONObject(i).get(maskKey).toString();
-                    try {
-                        if (action) {
-                            ja.getJSONObject(i).put(maskKey, PasswordProcessor.encrypt(password));
-                        } else {
-                            ja.getJSONObject(i).put(maskKey, PasswordProcessor.decrypt(password));
-                        }
-                    } catch (JSONException | GeneralSecurityException e) {
-                        intlogger.info("Error reading JSON while masking: " + e);
-                    }
+            JSONArray endpointIds = jo.getJSONObject("authorization").getJSONArray("endpoint_ids");
+            for (int index = 0; index < endpointIds.length(); index++) {
+                if ((!endpointIds.getJSONObject(index).isNull(maskKey))) {
+                    String password = endpointIds.getJSONObject(index).get(maskKey).toString();
+                    processPassword(maskKey, action, endpointIds, index, password);
                 }
             }
         }
         return jo;
+    }
+
+    private static void processPassword(String maskKey, boolean action, JSONArray endpointIds, int index,
+            String password) {
+        try {
+            if (action) {
+                endpointIds.getJSONObject(index).put(maskKey, PasswordProcessor.encrypt(password));
+            } else {
+                endpointIds.getJSONObject(index).put(maskKey, PasswordProcessor.decrypt(password));
+            }
+        } catch (JSONException | GeneralSecurityException e) {
+            intlogger.info("Error reading JSON while masking: " + e);
+        }
     }
 
     /**
@@ -393,20 +391,9 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         if (requireSecure && !request.isSecure()) {
             return "Request must be made over an HTTPS connection.";
         }
-        // Is remote IP authorized?
-        String remote = request.getRemoteAddr();
-        try {
-            boolean found = false;
-            InetAddress ip = InetAddress.getByName(remote);
-            for (String addrnet : authorizedAddressesAndNetworks) {
-                found |= addressMatchesNetwork(ip, addrnet);
-            }
-            if (!found) {
-                return "Unauthorized address: " + remote;
-            }
-        } catch (UnknownHostException e) {
-            intlogger.error("PROV0051 BaseServlet.isAuthorizedForProvisioning: " + e.getMessage(), e);
-            return "Unauthorized address: " + remote;
+        String remoteHostCheck = checkRemoteHostAuthorization(request);
+        if (remoteHostCheck != null) {
+            return remoteHostCheck;
         }
         // Does remote have a valid certificate?
         if (requireCert) {
@@ -425,6 +412,26 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         return null;
     }
 
+    @Nullable
+    private String checkRemoteHostAuthorization(HttpServletRequest request) {
+        // Is remote IP authorized?
+        String remote = request.getRemoteAddr();
+        try {
+            boolean found = false;
+            InetAddress ip = InetAddress.getByName(remote);
+            for (String addrnet : authorizedAddressesAndNetworks) {
+                found |= addressMatchesNetwork(ip, addrnet);
+            }
+            if (!found) {
+                return "Unauthorized address: " + remote;
+            }
+        } catch (UnknownHostException e) {
+            intlogger.error("PROV0051 BaseServlet.isAuthorizedForProvisioning: " + e.getMessage(), e);
+            return "Unauthorized address: " + remote;
+        }
+        return null;
+    }
+
     /**
      * Check if the remote IP address is authorized to see the /internal URL tree.
      *
@@ -438,19 +445,19 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             }
             InetAddress ip = InetAddress.getByName(request.getRemoteAddr());
             for (InetAddress node : getNodeAddresses()) {
-                if (node != null && ip.equals(node)) {
+                if (ip.equals(node)) {
                     return true;
                 }
             }
             for (InetAddress pod : getPodAddresses()) {
-                if (pod != null && ip.equals(pod)) {
+                if (ip.equals(pod)) {
                     return true;
                 }
             }
-            if (thishost != null && ip.equals(thishost)) {
+            if (ip.equals(thishost)) {
                 return true;
             }
-            if (loopback != null && ip.equals(loopback)) {
+            if (ip.equals(loopback)) {
                 return true;
             }
         } catch (UnknownHostException e) {
@@ -468,7 +475,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     private static boolean addressMatchesNetwork(InetAddress ip, String s) {
         int mlen = -1;
-        int n = s.indexOf("/");
+        int n = s.indexOf('/');
         if (n >= 0) {
             mlen = Integer.parseInt(s.substring(n + 1));
             s = s.substring(0, n);
@@ -528,16 +535,16 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         maxSubs = getInt(map, Parameters.PROV_MAXSUB_COUNT, DEFAULT_MAX_SUBS);
         pokeTimer1 = getInt(map, Parameters.PROV_POKETIMER1, DEFAULT_POKETIMER1);
         pokeTimer2 = getInt(map, Parameters.PROV_POKETIMER2, DEFAULT_POKETIMER2);
-        /**
-         * The domain used to generate a FQDN from the "bare" node names
-         */
+
+        // The domain used to generate a FQDN from the "bare" node names
         provDomain = getString(map, Parameters.PROV_DOMAIN, DEFAULT_DOMAIN);
         provName = getString(map, Parameters.PROV_NAME, DEFAULT_PROVSRVR_NAME);
         activeProvName = getString(map, Parameters.PROV_ACTIVE_NAME, provName);
         initialActivePod = getString(map, Parameters.ACTIVE_POD, "");
         initialStandbyPod = getString(map, Parameters.STANDBY_POD, "");
-        staticRoutingNodes = getString(map, Parameters.STATIC_ROUTING_NODES,
-                ""); //Adding new param for static Routing - Rally:US664862-1610
+
+        //Adding new param for static Routing - Rally:US664862-1610
+        String staticRoutingNodes = getString(map, Parameters.STATIC_ROUTING_NODES, "");
         activeFeeds = Feed.countActiveFeeds();
         activeSubs = Subscription.countActiveSubscriptions();
         try {
@@ -597,78 +604,11 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         }
     }
 
-
-    /**
-     * Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047. Load mail properties.
-     *
-     * @author vs215k
-     **/
-    private void loadMailProperties() {
-        if (mailprops == null) {
-            mailprops = new Properties();
-            try (InputStream inStream = getClass().getClassLoader().getResourceAsStream(MAILCONFIG_FILE)) {
-                mailprops.load(inStream);
-            } catch (IOException e) {
-                intlogger.error("PROV9003 Opening properties: " + e.getMessage(), e);
-                System.exit(1);
-            }
-        }
-    }
-
-
-    /**
-     * Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
-     *
-     * @param email - list of email ids to notify if HTTP relexcation is enabled.
-     * @author vs215k
-     **/
-    private void notifyPSTeam(String email) {
-        loadMailProperties(); //Load HTTPS Relex mail properties.
-        String[] emails = email.split(Pattern.quote("|"));
-
-        Properties mailproperties = new Properties();
-        mailproperties.put("mail.smtp.host", mailprops.get("com.att.dmaap.datarouter.mail.server"));
-        mailproperties.put("mail.transport.protocol", mailprops.get("com.att.dmaap.datarouter.mail.protocol"));
-
-        Session session = Session.getDefaultInstance(mailproperties, null);
-        Multipart mp = new MimeMultipart();
-        MimeBodyPart htmlPart = new MimeBodyPart();
-
-        try {
-
-            Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress(mailprops.get("com.att.dmaap.datarouter.mail.from").toString()));
-
-            InternetAddress[] addressTo = new InternetAddress[emails.length];
-            for (int x = 0; x < emails.length; x++) {
-                addressTo[x] = new InternetAddress(emails[x]);
-            }
-
-            msg.addRecipients(Message.RecipientType.TO, addressTo);
-            msg.setSubject(mailprops.get("com.att.dmaap.datarouter.mail.subject").toString());
-            htmlPart.setContent(mailprops.get("com.att.dmaap.datarouter.mail.body").toString()
-                    .replace("[SERVER]", InetAddress.getLocalHost().getHostName()), "text/html");
-            mp.addBodyPart(htmlPart);
-            msg.setContent(mp);
-
-            intlogger.info(mailprops.get("com.att.dmaap.datarouter.mail.body").toString()
-                    .replace("[SERVER]", InetAddress.getLocalHost().getHostName()));
-
-            Transport.send(msg);
-            intlogger.info("HTTPS relaxation mail is sent to - : " + email);
-
-        } catch (MessagingException e) {
-            intlogger.error("Invalid email address, unable to send https relaxation mail to - : " + email, e);
-        } catch (UnknownHostException uhe) {
-            intlogger.error("UnknownHostException", uhe);
-        }
-    }
-
     public static String getProvName() {
         return provName;
     }
 
-    public static String getActiveProvName() {
+    static String getActiveProvName() {
         return activeProvName;
     }
 
@@ -696,7 +636,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      *
      * @return an array of InetAddresses
      */
-    public static InetAddress[] getNodeAddresses() {
+    private static InetAddress[] getNodeAddresses() {
         return nodeAddresses;
     }
 
@@ -814,7 +754,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
 
     private static boolean getBoolean(Map<String, String> map, String name) {
         String s = map.get(name);
-        return (s != null) && "true".equalsIgnoreCase(s);
+        return "true".equalsIgnoreCase(s);
     }
 
     private static String getString(Map<String, String> map, String name, String dflt) {
@@ -854,7 +794,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     public class ContentHeader {
 
-        private String type = "";
+        private String type;
         private Map<String, String> map = new HashMap<>();
 
         ContentHeader() {
@@ -870,7 +810,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             return type;
         }
 
-        public String getAttribute(String key) {
+        String getAttribute(String key) {
             String s = map.get(key);
             if (s == null) {
                 s = "";
@@ -976,19 +916,17 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     /*
      * @Method - getGroupByFeedGroupId- Rally:US708115
      * @Params - User to check in group and feedid which is assigned the group.
-     * @return - string value grupid/null
+     * @return - string value groupid/null
      */
     @Override
     public String getGroupByFeedGroupId(String owner, String feedId) {
         try {
-            int n = Integer.parseInt(feedId);
-            Feed f = Feed.getFeedById(n);
+            Feed f = Feed.getFeedById(Integer.parseInt(feedId));
             if (f != null) {
                 int groupid = f.getGroupid();
                 if (groupid > 0) {
                     Group group = Group.getGroupById(groupid);
-                    assert group != null;
-                    if (isUserMemberOfGroup(group, owner)) {
+                    if (group != null && isUserMemberOfGroup(group, owner)) {
                         return group.getAuthid();
                     }
                 }
@@ -1002,7 +940,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     /*
      * @Method - getGroupBySubGroupId - Rally:US708115
      * @Params - User to check in group and subid which is assigned the group.
-     * @return - string value grupid/null
+     * @return - string value groupid/null
      */
     @Override
     public String getGroupBySubGroupId(String owner, String subId) {
@@ -1013,8 +951,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 int groupid = s.getGroupid();
                 if (groupid > 0) {
                     Group group = Group.getGroupById(groupid);
-                    assert group != null;
-                    if (isUserMemberOfGroup(group, owner)) {
+                    if (group != null && isUserMemberOfGroup(group, owner)) {
                         return group.getAuthid();
                     }
                 }

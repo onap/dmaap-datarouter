@@ -152,7 +152,7 @@ public class ProvData {
     }
 
     /**
-     * Get the raw node configuration entries
+     * Get the raw node configuration entries.
      */
     public NodeConfig.ProvNode[] getNodes() {
         return (pn);
@@ -333,6 +333,9 @@ public class ProvData {
         if (jnodes != null) {
             for (int nx = 0; nx < jnodes.length(); nx++) {
                 String nn = gvas(jnodes, nx);
+                if (nn == null) {
+                    continue;
+                }
                 if (nn.indexOf('.') == -1) {
                     nn = nn + "." + sfx;
                 }
