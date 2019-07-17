@@ -44,21 +44,23 @@ public class AuthRespImpl implements AuthorizationResponse {
     /** Constructor.  This version will not be used in Data Router R1 since we will not have advice and obligations.
      *
      * @param authorized flag indicating whether the response carried a permit response (<code>true</code>)
-     * or something else (<code>false</code>).
+     *                   or something else (<code>false</code>).
      * @param advice list of advice elements returned in the response.
      * @param obligations list of obligation elements returned in the response.
      */
-    public AuthRespImpl(boolean authorized, List<AuthorizationResponseSupplement> advice, List<AuthorizationResponseSupplement> obligations) {
+    private AuthRespImpl(boolean authorized, List<AuthorizationResponseSupplement> advice,
+            List<AuthorizationResponseSupplement> obligations) {
         this.authorized = authorized;
-        this.advice = (advice == null ? null : new ArrayList<AuthorizationResponseSupplement> (advice));
-        this.obligations = (obligations == null ? null : new ArrayList<AuthorizationResponseSupplement> (obligations));
+        this.advice = (advice == null ? null : new ArrayList<>(advice));
+        this.obligations = (obligations == null ? null : new ArrayList<>(obligations));
     }
 
     /** Constructor.  Simple version for authorization responses that have no advice and no obligations.
      *
-     * @param authorized flag indicating whether the response carried a permit (<code>true</code>) or something else (<code>false</code>).
+     * @param authorized flag indicating whether the response carried a permit (<code>true</code>)
+     *                   or something else (<code>false</code>).
      */
-    public AuthRespImpl(boolean authorized) {
+    AuthRespImpl(boolean authorized) {
         this(authorized, null, null);
     }
 
@@ -69,25 +71,25 @@ public class AuthRespImpl implements AuthorizationResponse {
      */
     @Override
     public boolean isAuthorized() {
-            return authorized;
+        return authorized;
     }
 
     /**
      * Returns any advice elements that were included in the authorization response.
      *
-     * @return A list of objects implementing the <code>AuthorizationResponseSupplement</code> interface, with each object representing an
-     * advice element from the authorization response.
+     * @return A list of objects implementing the <code>AuthorizationResponseSupplement</code> interface,
+     * with each object representing an advice element from the authorization response.
      */
     @Override
     public List<AuthorizationResponseSupplement> getAdvice() {
-            return advice;
+        return advice;
     }
 
     /**
      * Returns any obligation elements that were included in the authorization response.
      *
-     * @return A list of objects implementing the <code>AuthorizationResponseSupplement</code> interface, with each object representing an
-     * obligation element from the authorization response.
+     * @return A list of objects implementing the <code>AuthorizationResponseSupplement</code> interface,
+     * with each object representing an obligation element from the authorization response.
      */
     @Override
     public List<AuthorizationResponseSupplement> getObligations() {
