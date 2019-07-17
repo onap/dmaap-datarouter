@@ -75,7 +75,7 @@ public class IsFrom {
                 logger.error("IsFrom: UnknownHostEx: " + e.toString(), e);
             }
             ips = hostAddrArray.toArray(new String[0]);
-            logger.info("IsFrom: DNS ENTRIES FOR FQDN " + fqdn + " : " + Arrays.toString(ips));
+            logger.debug("IsFrom: DNS ENTRIES FOR FQDN " + fqdn + " : " + Arrays.toString(ips));
         }
         for (String ipAddr : ips) {
             if (ipAddr.equals(ip)) {

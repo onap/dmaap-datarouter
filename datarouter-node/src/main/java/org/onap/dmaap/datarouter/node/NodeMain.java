@@ -71,10 +71,10 @@ public class NodeMain {
      * system property. By default, it is "/opt/app/datartr/etc/node.properties".
      */
     public static void main(String[] args) throws Exception {
-        nodeMainLogger.info("NODE0001 Data Router Node Starting");
+        nodeMainLogger.debug("NODE0001 Data Router Node Starting");
         IsFrom.setDNSCache();
         nodeConfigManager = NodeConfigManager.getInstance();
-        nodeMainLogger.info("NODE0002 I am " + nodeConfigManager.getMyName());
+        nodeMainLogger.debug("NODE0002 I am " + nodeConfigManager.getMyName());
         (new WaitForConfig(nodeConfigManager)).waitForConfig();
         delivery = new Delivery(nodeConfigManager);
         new LogManager(nodeConfigManager);
@@ -112,11 +112,11 @@ public class NodeMain {
 
             sslContextFactory.addExcludeProtocols("SSLv3");
             sslContextFactory.setIncludeProtocols(nodeConfigManager.getEnabledprotocols());
-            nodeMainLogger.info("NODE00004 Unsupported protocols node server:-"
+            nodeMainLogger.debug("NODE00004 Unsupported protocols node server:-"
                     + String.join(",", sslContextFactory.getExcludeProtocols()));
-            nodeMainLogger.info("NODE00004 Supported protocols node server:-"
+            nodeMainLogger.debug("NODE00004 Supported protocols node server:-"
                     + String.join(",", sslContextFactory.getIncludeProtocols()));
-            nodeMainLogger.info("NODE00004 Unsupported ciphers node server:-"
+            nodeMainLogger.debug("NODE00004 Unsupported ciphers node server:-"
                     + String.join(",", sslContextFactory.getExcludeCipherSuites()));
 
             HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
@@ -153,12 +153,12 @@ public class NodeMain {
 
         try {
             server.start();
-            nodeMainLogger.info("NODE00006 Node Server started-" + server.getState());
+            nodeMainLogger.debug("NODE00006 Node Server started-" + server.getState());
         } catch (Exception e) {
-            nodeMainLogger.info("NODE00006 Jetty failed to start. Reporting will we unavailable: " + e.getMessage(), e);
+            nodeMainLogger.error("NODE00006 Jetty failed to start. Reporting will we unavailable: " + e.getMessage(), e);
         }
         server.join();
-        nodeMainLogger.info("NODE00007 Node Server joined - " + server.getState());
+        nodeMainLogger.debug("NODE00007 Node Server joined - " + server.getState());
     }
 
     private static void enableCadi(ServletContextHandler servletContextHandler) throws ServletException {
@@ -172,7 +172,7 @@ public class NodeMain {
                     .error("NODE00005 Exception in NodeMain.Main() loading CADI properties " + e1.getMessage(), e1);
         }
         cadiProperties.setProperty("aaf_locate_url", nodeConfigManager.getAafURL());
-        nodeMainLogger.info("NODE00005  aaf_url set to - " + cadiProperties.getProperty("aaf_url"));
+        nodeMainLogger.debug("NODE00005  aaf_url set to - " + cadiProperties.getProperty("aaf_url"));
 
         PropAccess access = new PropAccess(cadiProperties);
         servletContextHandler.addFilter(new FilterHolder(new DRNodeCadiFilter(true, access)), "/*", EnumSet
@@ -194,7 +194,7 @@ public class NodeMain {
         synchronized void waitForConfig() {
             localNodeConfigManager.registerConfigTask(this);
             while (!localNodeConfigManager.isConfigured()) {
-                nodeMainLogger.info("NODE0003 Waiting for Node Configuration");
+                nodeMainLogger.debug("NODE0003 Waiting for Node Configuration");
                 try {
                     wait();
                 } catch (Exception exception) {
@@ -204,7 +204,7 @@ public class NodeMain {
                 }
             }
             localNodeConfigManager.deregisterConfigTask(this);
-            nodeMainLogger.info("NODE0004 Node Configuration Data Received");
+            nodeMainLogger.debug("NODE0004 Node Configuration Data Received");
         }
     }
 

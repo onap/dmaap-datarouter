@@ -27,7 +27,7 @@ import ch.qos.logback.core.spi.FilterReply;
 public class JettyFilter extends Filter<ILoggingEvent> {
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        if (event.getMessage().contains("org.eclipse.jetty")) {
+        if (event.getMessage().contains("org.eclipse.jetty") || event.getLoggerName().contains("org.eclipse.jetty")) {
             return FilterReply.ACCEPT;
         } else {
             return FilterReply.DENY;

@@ -117,7 +117,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
      */
     private synchronized void markSuccess(DeliveryTask task) {
         working.remove(task.getPublishId());
-        logger.debug(task.getPublishId() + " marked as success.");
+        logger.info(task.getPublishId() + " marked as success.");
         task.clean();
         failed = false;
         failduration = 0;
@@ -127,7 +127,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
      * Mark that a delivery task has expired.
      */
     private synchronized void markExpired(DeliveryTask task) {
-        logger.debug(task.getPublishId() + " marked as expired.");
+        logger.info(task.getPublishId() + " marked as expired.");
         task.clean();
     }
 
@@ -136,7 +136,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
      */
     private synchronized void markFailNoRetry(DeliveryTask task) {
         working.remove(task.getPublishId());
-        logger.debug(task.getPublishId() + " marked as failed permanently");
+        logger.info(task.getPublishId() + " marked as failed permanently");
         task.clean();
         failed = false;
         failduration = 0;
@@ -166,7 +166,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
      */
     private synchronized void markRedirect(DeliveryTask task) {
         working.remove(task.getPublishId());
-        logger.debug(task.getPublishId() + " marked as redirected.");
+        logger.info(task.getPublishId() + " marked as redirected.");
         retry.put(task.getPublishId(), task);
     }
 
@@ -175,7 +175,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
      */
     private synchronized void markFailWithRetry(DeliveryTask task) {
         working.remove(task.getPublishId());
-        logger.debug(task.getPublishId() + " marked as temporarily failed.");
+        logger.info(task.getPublishId() + " marked as temporarily failed.");
         retry.put(task.getPublishId(), task);
         fdupdate();
     }
@@ -334,7 +334,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
         long endtime = System.currentTimeMillis() + deliveryQueueHelper.getFairTimeLimit();
         int filestogo = deliveryQueueHelper.getFairFileLimit();
         while ((task = getNext()) != null) {
-            logger.debug("Processing file: " + task.getPublishId());
+            logger.info("Processing file: " + task.getPublishId());
             task.run();
             if (--filestogo <= 0 || System.currentTimeMillis() > endtime) {
                 break;
