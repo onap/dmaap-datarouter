@@ -57,6 +57,7 @@ public class Parameters extends Syncable {
     public static final String PROV_POKETIMER2 = "PROV_POKETIMER2";
     public static final String PROV_SPECIAL_SUBNET = "PROV_SPECIAL_SUBNET";
     public static final String PROV_LOG_RETENTION = "PROV_LOG_RETENTION";
+    public static final String DEFAULT_LOG_RETENTION = "DEFAULT_LOG_RETENTION";
     public static final String NODES = "NODES";
     public static final String ACTIVE_POD = "ACTIVE_POD";
     public static final String STANDBY_POD = "STANDBY_POD";

@@ -38,7 +38,7 @@ import java.util.Iterator;
  * called.
  * </ul>
  */
-public class TaskList {
+class TaskList {
 
     private Iterator<Runnable> runlist;
     private HashSet<Runnable> tasks = new HashSet<>();
@@ -50,7 +50,7 @@ public class TaskList {
     /**
      * Start executing the sequence of tasks.
      */
-    public synchronized void startRun() {
+    synchronized void startRun() {
         sofar = new HashSet<>();
         added = new HashSet<>();
         removed = new HashSet<>();
@@ -61,7 +61,7 @@ public class TaskList {
     /**
      * Get the next task to execute.
      */
-    public synchronized Runnable next() {
+    synchronized Runnable next() {
         while (runlist != null) {
             if (runlist.hasNext()) {
                 Runnable task = runlist.next();
@@ -88,7 +88,7 @@ public class TaskList {
     /**
      * Add a task to the list of tasks to run whenever the event occurs.
      */
-    public synchronized void addTask(Runnable task) {
+    synchronized void addTask(Runnable task) {
         if (runlist != null) {
             added.add(task);
             removed.remove(task);
@@ -99,7 +99,7 @@ public class TaskList {
     /**
      * Remove a task from the list of tasks to run whenever the event occurs.
      */
-    public synchronized void removeTask(Runnable task) {
+    synchronized void removeTask(Runnable task) {
         if (runlist != null) {
             removed.add(task);
             added.remove(task);
