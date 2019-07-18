@@ -1,0 +1,8 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Gerard Nugent <gerard.nugent@est.tech>
+Code-Review+2: Dominic Lunanuova <dgl@research.att.com>
+Submitted-by: Dominic Lunanuova <dgl@research.att.com>
+Submitted-at: Thu, 18 Jul 2019 14:59:19 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/dmaap/datarouter/+/91594
+Project: dmaap/datarouter
+Branch: refs/heads/master
