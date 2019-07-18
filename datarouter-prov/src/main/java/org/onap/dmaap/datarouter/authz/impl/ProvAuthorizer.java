@@ -23,17 +23,15 @@
 
 package org.onap.dmaap.datarouter.authz.impl;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.authz.impl.AuthzResource.ResourceType;
 
-/** Authorizer for the provisioning API for Data Router R1
+/** Authorizer for the provisioning API for Data Router R1.
  *
  * @author J. F. Lucas
  *
@@ -45,6 +43,7 @@ public class ProvAuthorizer implements Authorizer {
 
     private static final String SUBJECT_HEADER = "X-DMAAP-DR-ON-BEHALF-OF";  // HTTP header carrying requester identity
     private static final String SUBJECT_HEADER_GROUP = "X-DMAAP-DR-ON-BEHALF-OF-GROUP";  // HTTP header carrying requester identity  by group Rally : US708115
+
     /** Constructor. For the moment, do nothing special.  Make it a singleton?
      *
      */
@@ -63,7 +62,7 @@ public class ProvAuthorizer implements Authorizer {
      */
     @Override
     public AuthorizationResponse decide(HttpServletRequest request) {
-            return this.decide(request, null);
+        return this.decide(request, null);
     }
 
     /**
@@ -79,80 +78,66 @@ public class ProvAuthorizer implements Authorizer {
     @Override
     public AuthorizationResponse decide(HttpServletRequest request,
             Map<String, String> additionalAttrs) {
-        log.trace ("Entering decide()");
-
+        log.trace("Entering decide()");
         boolean decision = false;
-
         // Extract interesting parts of the HTTP request
         String method = request.getMethod();
         AuthzResource resource = new AuthzResource(request.getRequestURI());
-        String subject = (request.getHeader(SUBJECT_HEADER));         // identity of the requester
-        String subjectgroup = (request.getHeader(SUBJECT_HEADER_GROUP)); // identity of the requester by group Rally : US708115
+        String subject = (request.getHeader(SUBJECT_HEADER));
+        String subjectgroup = (request.getHeader(SUBJECT_HEADER_GROUP));
 
-        log.trace("Method: " + method + " -- Type: " + resource.getType() + " -- Id: " + resource.getId() +
-                " -- Subject: " + subject);
-
+        log.trace("Method: " + method + " -- Type: " + resource.getType() + " -- Id: " + resource.getId()
+                          + " -- Subject: " + subject);
         // Choose authorization method based on the resource type
         ResourceType resourceType = resource.getType();
         if (resourceType != null) {
-
             switch (resourceType) {
-
-            case FEEDS_COLLECTION:
-                decision = allowFeedsCollectionAccess(resource, method, subject, subjectgroup);
-                break;
-
-            case SUBS_COLLECTION:
-                decision = allowSubsCollectionAccess(resource, method, subject, subjectgroup);
-                break;
-
-            case FEED:
-                decision = allowFeedAccess(resource, method, subject, subjectgroup);
-                break;
-
-            case SUB:
-                decision = allowSubAccess(resource, method, subject, subjectgroup);
-                break;
-
-            default:
-                decision = false;
-                break;
+                case FEEDS_COLLECTION:
+                    decision = allowFeedsCollectionAccess(method);
+                    break;
+                case SUBS_COLLECTION:
+                    decision = allowSubsCollectionAccess(method);
+                    break;
+                case FEED:
+                    decision = allowFeedAccess(resource, method, subject, subjectgroup);
+                    break;
+                case SUB:
+                    decision = allowSubAccess(resource, method, subject, subjectgroup);
+                    break;
+                default:
+                    decision = false;
+                    break;
             }
         }
-        log.debug("Exit decide(): "  + method + "|" + resourceType + "|" + resource.getId() + "|" + subject + " ==> " + decision);
+        log.debug("Exit decide(): "  + method + "|" + resourceType + "|" + resource.getId() + "|"
+                          + subject + " ==> " + decision);
 
         return new AuthRespImpl(decision);
     }
 
-    private boolean allowFeedsCollectionAccess(AuthzResource resource,    String method, String subject, String subjectgroup) {
-
+    private boolean allowFeedsCollectionAccess(String method) {
         // Allow GET or POST unconditionally
         return method != null && ("GET".equalsIgnoreCase(method) || "POST".equalsIgnoreCase(method));
     }
 
-    private boolean allowSubsCollectionAccess(AuthzResource resource, String method, String subject, String subjectgroup) {
-
+    private boolean allowSubsCollectionAccess(String method) {
         // Allow GET or POST unconditionally
         return method != null && ("GET".equalsIgnoreCase(method) || "POST".equalsIgnoreCase(method));
     }
 
-    private boolean allowFeedAccess(AuthzResource resource, String method,    String subject, String subjectgroup) {
+    private boolean allowFeedAccess(AuthzResource resource, String method, String subject, String subjectgroup) {
         boolean decision = false;
-
         // Allow GET, PUT, or DELETE if requester (subject) is the owner (publisher) of the feed
-        if ( method != null && ("GET".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method) ||
-        		"DELETE".equalsIgnoreCase(method))) {
+        if ( method != null && ("GET".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method) || "DELETE".equalsIgnoreCase(method))) {
 
             String owner = provData.getFeedOwner(resource.getId());
             decision = (owner != null) && owner.equals(subject);
-
             //Verifying by group Rally : US708115
-            if(subjectgroup != null) {
-                String feedowner = provData.getGroupByFeedGroupId(subject, resource.getId());
-                decision = (feedowner != null) && feedowner.equals(subjectgroup);
+            if (subjectgroup != null) {
+                String feedOwner = provData.getGroupByFeedGroupId(subject, resource.getId());
+                decision = (feedOwner != null) && feedOwner.equals(subjectgroup);
             }
         }
-
         return decision;
     }
 
@@ -160,14 +145,13 @@ public class ProvAuthorizer implements Authorizer {
         boolean decision = false;
 
         // Allow GET, PUT, or DELETE if requester (subject) is the owner of the subscription (subscriber)
-        if (method != null && ("GET".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method) ||
-        		"DELETE".equalsIgnoreCase(method) || "POST".equalsIgnoreCase(method))) {
+        if (method != null && ("GET".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method) || "DELETE".equalsIgnoreCase(method) || "POST".equalsIgnoreCase(method))) {
 
             String owner = provData.getSubscriptionOwner(resource.getId());
             decision = (owner != null) && owner.equals(subject);
 
             //Verifying by group Rally : US708115
-            if(subjectgroup != null) {
+            if (subjectgroup != null) {
                 String feedowner = provData.getGroupBySubGroupId(subject, resource.getId());
                 decision = (feedowner != null) && feedowner.equals(subjectgroup);
             }

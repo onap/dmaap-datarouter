@@ -36,7 +36,8 @@
         <sitePath>/content/sites/site/${project.groupId}/${project.artifactId}/${project.version}</sitePath>
         <docker.location>${basedir}/target/${project.artifactId}</docker.location>
         <datarouter.prov.image.name>${docker.image.root}${project.artifactId}</datarouter.prov.image.name>
-        <sonar.exclusions>**/src/main/java/org/onap/dmaap/datarouter/reports/**</sonar.exclusions>
+        <sonar.exclusions>**/src/main/java/org/onap/dmaap/datarouter/reports/**,
+            **/src/main/java/org/onap/dmaap/authz/impl/AuthRespSupplementImpl.java</sonar.exclusions>
         <sonar.language>java</sonar.language>
         <sonar.skip>false</sonar.skip>
     </properties>
@@ -435,6 +436,7 @@
                 <configuration>
                     <excludes>
                         <exclude>**/src/main/java/org/onap/dmaap/datarouter/reports/**</exclude>
+                        <exclude>**/src/main/java/org/onap/dmaap/authz/impl/AuthRespSupplementImpl.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

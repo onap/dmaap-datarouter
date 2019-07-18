@@ -36,17 +36,17 @@ import org.onap.dmaap.datarouter.authz.AuthorizationResponseSupplement;
  */
 public class AuthRespSupplementImpl implements AuthorizationResponseSupplement {
 
-    private String id = null;
-    private Map<String, String> attributes = null;
+    private String id;
+    private Map<String, String> attributes;
 
     /** Constructor, available within the package.
      *
      * @param id  The identifier for the advice or obligation element
      * @param attributes The attributes (name-value pairs) for the advice or obligation element.
      */
-    AuthRespSupplementImpl (String id, Map<String, String> attributes) {
+    AuthRespSupplementImpl(String id, Map<String, String> attributes) {
         this.id = id;
-        this.attributes = new HashMap<String,String>(attributes);
+        this.attributes = new HashMap<>(attributes);
     }
 
     /** Return the identifier for the supplementary information element.
