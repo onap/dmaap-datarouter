@@ -189,38 +189,6 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
         return v;
     }
 
-    /**
-     * Get a collection of all Ingress Routes with a particular sequence number.
-     *
-     * @param seq the sequence number to look for
-     * @return the collection (may be empty).
-     */
-    public static Collection<IngressRoute> getIngressRoute(int seq) {
-        Collection<IngressRoute> rv = new ArrayList<IngressRoute>();
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            String sql = "select FEEDID, USERID, SUBNET, NODESET from INGRESS_ROUTES where SEQUENCE = ?";
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setInt(1, seq);
-                try (ResultSet rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        int feedid = rs.getInt("FEEDID");
-                        String user = rs.getString("USERID");
-                        String subnet = rs.getString("SUBNET");
-                        int nodeset = rs.getInt("NODESET");
-                        rv.add(new IngressRoute(seq, feedid, user, subnet, nodeset));
-                    }
-                }
-            }
-            db.release(conn);
-        } catch (SQLException e) {
-            intlogger.error("PROV0004 getIngressRoute: " + e.getMessage(), e);
-        }
-        return rv;
-    }
-
     public IngressRoute(int seq, int feedid, String user, String subnet, Collection<String> nodes)
             throws IllegalArgumentException {
         this(seq, feedid, user, subnet);

@@ -44,12 +44,7 @@ public class DeliveryExtraRecord extends BaseLogRecord {
         this.subid = Integer.parseInt(pp[4]);
         this.contentLength2 = Long.parseLong(pp[6]);
     }
-    public DeliveryExtraRecord(ResultSet rs) throws SQLException {
-        super(rs);
-        // Note: because this record should be "rare" these fields are mapped to unconventional fields in the DB
-        this.subid  = rs.getInt("DELIVERY_SUBID");
-        this.contentLength2 = rs.getInt("CONTENT_LENGTH_2");
-    }
+
     @Override
     public void load(PreparedStatement ps) throws SQLException {
         ps.setString(1, "dlx");        // field 1: type

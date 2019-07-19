@@ -39,10 +39,6 @@ public class FeedEndpointID implements JSONable {
     private String id;
     private String password;
 
-    public FeedEndpointID() {
-        this("", "");
-    }
-
     public FeedEndpointID(String id, String password) {
         this.id = id;
         this.password = password;

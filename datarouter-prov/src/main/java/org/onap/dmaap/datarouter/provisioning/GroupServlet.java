@@ -88,31 +88,6 @@ public class GroupServlet extends ProxyServlet {
             return;
         }
 
-        // Check with the Authorizer
-        /*AuthorizationResponse aresp = authz.decide(req);
-        if (! aresp.isAuthorized()) {
-            message = POLICY_ENGINE;
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-            eventlogger.error(elr.toString());
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
-            return;
-        }*/
-
-
-        /*ContentHeader ch = getContentHeader(req);
-        String ver = ch.getAttribute("version");
-        if (!ch.getType().equals(GROUPLIST_CONTENT_TYPE) || !(ver.equals("1.0") || ver.equals("2.0"))) {
-            intlogger.debug("Content-type is: "+req.getHeader("Content-Type"));
-            message = "Incorrect content-type";
-            elr.setMessage(message);
-            elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-            eventlogger.error(elr.toString());
-            resp.sendError(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE, message);
-            return;
-        }*/
-
-
         int groupid = getIdFromPath(req);
         if (groupid < 0) {
             message = "Missing or bad group number.";

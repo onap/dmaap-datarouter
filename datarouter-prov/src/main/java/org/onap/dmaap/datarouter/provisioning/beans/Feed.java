@@ -497,14 +497,6 @@ public class Feed extends Syncable {
         this.suspended = suspended;
     }
 
-    public Date getLast_mod() {
-        return last_mod;
-    }
-
-    public Date getCreated_date() {
-        return created_date;
-    }
-
     @Override
     public JSONObject asJSONObject() {
         JSONObject jo = new JSONObject();

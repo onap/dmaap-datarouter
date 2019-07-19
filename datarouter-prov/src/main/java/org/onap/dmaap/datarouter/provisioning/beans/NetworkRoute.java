@@ -113,10 +113,6 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
         return tonode;
     }
 
-    public int getVianode() {
-        return vianode;
-    }
-
     @Override
     public boolean doDelete(Connection c) {
         boolean rv = true;

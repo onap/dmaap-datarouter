@@ -622,16 +622,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     }
 
     /**
-     * [DATARTR-27] Poke all the DR nodes
-     * Get an array of all node names in the DR network.
-     *
-     * @return an array of Strings
-     */
-    public static String[] getDRNodes() {
-        return drnodes;
-    }
-
-    /**
      * Get an array of all node InetAddresses in the DR network.
      *
      * @return an array of InetAddresses

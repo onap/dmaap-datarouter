@@ -133,54 +133,6 @@ public class Group extends Syncable {
         return max;
     }
 
-    public static Collection<String> getGroupsByClassfication(String classfication) {
-        List<String> list = new ArrayList<>();
-        String sql = "select * from GROUPS where classification = ?";
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, classfication);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    while (rs.next()) {
-                        int groupid = rs.getInt("groupid");
-
-                    }
-                }
-            }
-            db.release(conn);
-        } catch (SQLException e) {
-            intlogger.error("PROV0002 getGroupsByClassfication: " + e.getMessage(), e);
-        }
-        return list;
-    }
-
-    /**
-     * Return a count of the number of active subscriptions in the DB.
-     *
-     * @return the count
-     */
-    public static int countActiveSubscriptions() {
-        int count = 0;
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery("select count(*) from SUBSCRIPTIONS")) {
-                    if (rs.next()) {
-                        count = rs.getInt(1);
-                    }
-                }
-            }
-            db.release(conn);
-        } catch (SQLException e) {
-            intlogger.warn("PROV0008 countActiveSubscriptions: " + e.getMessage(), e);
-        }
-        return count;
-    }
-
     public Group() {
         this("", "", "");
     }
@@ -251,14 +203,6 @@ public class Group extends Syncable {
         Group.intlogger = intlogger;
     }
 
-    public static int getNext_groupid() {
-        return next_groupid;
-    }
-
-    public static void setNext_groupid(int next_groupid) {
-        Group.next_groupid = next_groupid;
-    }
-
     public String getAuthid() {
         return authid;
     }
@@ -294,19 +238,6 @@ public class Group extends Syncable {
     public String getMembers() {
         return members;
     }
-
-    public void setMembers(String members) {
-        this.members = members;
-    }
-
-    public Date getLast_mod() {
-        return last_mod;
-    }
-
-    public void setLast_mod(Date last_mod) {
-        this.last_mod = last_mod;
-    }
-
 
     @Override
     public JSONObject asJSONObject() {

@@ -24,7 +24,6 @@
 package org.onap.dmaap.datarouter.provisioning.beans;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.text.ParseException;
@@ -47,15 +46,6 @@ public class PubFailRecord extends BaseLogRecord {
         this.sourceIP = pp[9];
         this.user = pp[10];
         this.error = pp[11];
-    }
-
-    public PubFailRecord(ResultSet rs) throws SQLException {
-        super(rs);
-        // Note: because this record should be "rare" these fields are mapped to unconventional fields in the DB
-        this.contentLengthReceived = rs.getLong("CONTENT_LENGTH_2");
-        this.sourceIP = rs.getString("REMOTE_ADDR");
-        this.user = rs.getString("USER");
-        this.error = rs.getString("FEED_FILEID");
     }
 
     public long getContentLengthReceived() {

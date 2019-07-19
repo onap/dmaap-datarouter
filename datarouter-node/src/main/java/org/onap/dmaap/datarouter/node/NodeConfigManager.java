@@ -497,13 +497,6 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     }
 
     /**
-     * Is a destination redirected.
-     */
-    public boolean isDestRedirected(DestInfo destinfo) {
-        return (followredirects && rdmgr.isRedirected(destinfo.getSubId()));
-    }
-
-    /**
      * Set up redirection on receipt of a 3XX from a target URL.
      */
     public boolean handleRedirection(DestInfo destinationInfo, String redirto, String fileid) {
@@ -518,23 +511,6 @@ public class NodeConfigManager implements DeliveryQueueHelper {
             }
         }
         return (false);
-    }
-
-    /**
-     * Set up redirection on receipt of a 3XX from a target URL.
-     */
-    public boolean handleRedirectionSubLevel(DeliveryTask task, DestInfo destinfo, String redirto, String fileid) {
-        fileid = "/" + fileid;
-        String subid = destinfo.getSubId();
-        String purl = destinfo.getURL();
-        if (task.getFollowRedirects() && subid != null && redirto.endsWith(fileid)) {
-            redirto = redirto.substring(0, redirto.length() - fileid.length());
-            if (!redirto.equals(purl)) {
-                rdmgr.redirect(subid, purl, redirto);
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -604,16 +580,6 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      */
     public Target[] getTargets(String feedid) {
         return (config.getTargets(feedid));
-    }
-
-    /**
-     * Get the creation date for a feed.
-     *
-     * @param feedid The feed ID
-     * @return the timestamp of creation date of feed id passed
-     */
-    public String getCreatedDate(String feedid) {
-        return (config.getCreatedDate(feedid));
     }
 
     /**
@@ -811,28 +777,12 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         return enabledprotocols;
     }
 
-    public void setEnabledprotocols(String[] enabledprotocols) {
-        this.enabledprotocols = enabledprotocols.clone();
-    }
-
     public String getAafType() {
         return aafType;
     }
 
-    public void setAafType(String aafType) {
-        this.aafType = aafType;
-    }
-
-    public void setAafInstance(String aafInstance) {
-        this.aafInstance = aafInstance;
-    }
-
     public String getAafAction() {
         return aafAction;
-    }
-
-    public void setAafAction(String aafAction) {
-        this.aafAction = aafAction;
     }
 
     /*
@@ -842,16 +792,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         return aafURL;
     }
 
-    public void setAafURL(String aafURL) {
-        this.aafURL = aafURL;
-    }
-
     public boolean getCadiEnabled() {
         return cadiEnabled;
-    }
-
-    public void setCadiEnabled(boolean cadiEnabled) {
-        this.cadiEnabled = cadiEnabled;
     }
 
     /**

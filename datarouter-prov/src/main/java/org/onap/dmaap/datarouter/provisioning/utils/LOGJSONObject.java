@@ -186,12 +186,10 @@ public class LOGJSONObject {
         }
     }
 
-
     /**
      * The map where the JSONObject's properties are kept.
      */
     private final Map<String, Object> map;
-
 
     /**
      * It is sometimes more convenient and less ambiguous to have a
@@ -201,14 +199,12 @@ public class LOGJSONObject {
      */
     public static final Object NULL = new Null();
 
-
     /**
      * Construct an empty JSONObject.
      */
     public LOGJSONObject() {
         this.map = new LinkedHashMap<>();
     }
-
 
     /**
      * Construct a JSONObject from a subset of another JSONObject.
@@ -228,7 +224,6 @@ public class LOGJSONObject {
             }
         }
     }
-
 
     /**
      * Construct a JSONObject from a JSONTokener.
@@ -287,7 +282,6 @@ public class LOGJSONObject {
         }
     }
 
-
     /**
      * Construct a JSONObject from a Map.
      *
@@ -308,7 +302,6 @@ public class LOGJSONObject {
             }
         }
     }
-
 
     /**
      * Construct a JSONObject from an Object using bean getters.
@@ -334,7 +327,6 @@ public class LOGJSONObject {
         this.populateMap(bean);
     }
 
-
     /**
      * Construct a JSONObject from an Object, using reflection to find the
      * public members. The resulting JSONObject's keys will be the strings
@@ -359,7 +351,6 @@ public class LOGJSONObject {
         }
     }
 
-
     /**
      * Construct a JSONObject from a source JSON text string.
      * This is the most commonly used JSONObject constructor.
@@ -373,7 +364,6 @@ public class LOGJSONObject {
     public LOGJSONObject(String source) throws JSONException {
         this(new JSONTokener(source));
     }
-
 
     /**
      * Construct a JSONObject from a ResourceBundle.
@@ -415,7 +405,6 @@ public class LOGJSONObject {
         }
     }
 
-
     /**
      * Accumulate values under a key. It is similar to the put method except
      * that if there is already an object stored under the key then a
@@ -451,7 +440,6 @@ public class LOGJSONObject {
         return this;
     }
 
-
     /**
      * Append values to the array under a key. If the key does not exist in the
      * JSONObject, then the key is put in the JSONObject with its value being a
@@ -477,7 +465,6 @@ public class LOGJSONObject {
         }
         return this;
     }
-
 
     /**
      * Produce a string from a double. The string "null" will be returned if
@@ -506,7 +493,6 @@ public class LOGJSONObject {
         return string;
     }
 
-
     /**
      * Get the value object associated with a key.
      *
@@ -525,7 +511,6 @@ public class LOGJSONObject {
         }
         return object;
     }
-
 
     /**
      * Get the boolean value associated with a key.
@@ -549,7 +534,6 @@ public class LOGJSONObject {
                 "] is not a Boolean.");
     }
 
-
     /**
      * Get the double value associated with a key.
      *
@@ -569,7 +553,6 @@ public class LOGJSONObject {
             throw new JSONException("JSONObject[" + quote(key) + "] is not a number.");
         }
     }
-
 
     /**
      * Get the int value associated with a key.
@@ -591,7 +574,6 @@ public class LOGJSONObject {
         }
     }
 
-
     /**
      * Get the JSONArray value associated with a key.
      *
@@ -609,7 +591,6 @@ public class LOGJSONObject {
                 "] is not a JSONArray.");
     }
 
-
     /**
      * Get the JSONObject value associated with a key.
      *
@@ -626,7 +607,6 @@ public class LOGJSONObject {
         throw new JSONException("JSONObject[" + quote(key) +
                 "] is not a JSONObject.");
     }
-
 
     /**
      * Get the long value associated with a key.
@@ -648,7 +628,6 @@ public class LOGJSONObject {
         }
     }
 
-
     /**
      * Get an array of field names from a JSONObject.
      *
@@ -669,30 +648,6 @@ public class LOGJSONObject {
         return names;
     }
 
-
-    /**
-     * Get an array of field names from an Object.
-     *
-     * @return An array of field names, or null if there are no names.
-     */
-    public static String[] getNames(Object object) {
-        if (object == null) {
-            return null;
-        }
-        Class<? extends Object> klass = object.getClass();
-        Field[] fields = klass.getFields();
-        int length = fields.length;
-        if (length == 0) {
-            return null;
-        }
-        String[] names = new String[length];
-        for (int i = 0; i < length; i += 1) {
-            names[i] = fields[i].getName();
-        }
-        return names;
-    }
-
-
     /**
      * Get the string associated with a key.
      *
@@ -709,7 +664,6 @@ public class LOGJSONObject {
                 "] not a string.");
     }
 
-
     /**
      * Determine if the JSONObject contains a specific key.
      *
@@ -719,7 +673,6 @@ public class LOGJSONObject {
     public boolean has(String key) {
         return this.map.containsKey(key);
     }
-
 
     /**
      * Increment a property of a JSONObject. If there is no such property,
@@ -749,20 +702,6 @@ public class LOGJSONObject {
         return this;
     }
 
-
-    /**
-     * Determine if the value associated with the key is null or if there is
-     * no value.
-     *
-     * @param key A key string.
-     * @return true if there is no value associated with the key or if
-     * the value is the JSONObject.NULL object.
-     */
-    public boolean isNull(String key) {
-        return LOGJSONObject.NULL.equals(this.opt(key));
-    }
-
-
     /**
      * Get an enumeration of the keys of the JSONObject.
      *
@@ -771,7 +710,6 @@ public class LOGJSONObject {
     public Iterator<String> keys() {
         return this.keySet().iterator();
     }
-
 
     /**
      * Get a set of keys of the JSONObject.
@@ -782,7 +720,6 @@ public class LOGJSONObject {
         return this.map.keySet();
     }
 
-
     /**
      * Get the number of keys stored in the JSONObject.
      *
@@ -791,7 +728,6 @@ public class LOGJSONObject {
     public int length() {
         return this.map.size();
     }
-
 
     /**
      * Produce a JSONArray containing the names of the elements of this
@@ -838,7 +774,6 @@ public class LOGJSONObject {
         return string;
     }
 
-
     /**
      * Get an optional value associated with a key.
      *
@@ -848,20 +783,6 @@ public class LOGJSONObject {
     public Object opt(String key) {
         return key == null ? null : this.map.get(key);
     }
-
-
-    /**
-     * Get an optional boolean associated with a key.
-     * It returns false if there is no such key, or if the value is not
-     * Boolean.TRUE or the String "true".
-     *
-     * @param key A key string.
-     * @return The truth.
-     */
-    public boolean optBoolean(String key) {
-        return this.optBoolean(key, false);
-    }
-
 
     /**
      * Get an optional boolean associated with a key.
@@ -880,21 +801,6 @@ public class LOGJSONObject {
             return defaultValue;
         }
     }
-
-
-    /**
-     * Get an optional double associated with a key,
-     * or NaN if there is no such key or if its value is not a number.
-     * If the value is a string, an attempt will be made to evaluate it as
-     * a number.
-     *
-     * @param key A string which is the key.
-     * @return An object which is the value.
-     */
-    public double optDouble(String key) {
-        return this.optDouble(key, Double.NaN);
-    }
-
 
     /**
      * Get an optional double associated with a key, or the
@@ -915,21 +821,6 @@ public class LOGJSONObject {
         }
     }
 
-
-    /**
-     * Get an optional int value associated with a key,
-     * or zero if there is no such key or if the value is not a number.
-     * If the value is a string, an attempt will be made to evaluate it as
-     * a number.
-     *
-     * @param key A key string.
-     * @return An object which is the value.
-     */
-    public int optInt(String key) {
-        return this.optInt(key, 0);
-    }
-
-
     /**
      * Get an optional int value associated with a key,
      * or the default if there is no such key or if the value is not a number.
@@ -949,21 +840,6 @@ public class LOGJSONObject {
         }
     }
 
-
-    /**
-     * Get an optional JSONArray associated with a key.
-     * It returns null if there is no such key, or if its value is not a
-     * JSONArray.
-     *
-     * @param key A key string.
-     * @return A JSONArray which is the value.
-     */
-    public JSONArray optJSONArray(String key) {
-        Object o = this.opt(key);
-        return o instanceof JSONArray ? (JSONArray) o : null;
-    }
-
-
     /**
      * Get an optional JSONObject associated with a key.
      * It returns null if there is no such key, or if its value is not a
@@ -976,21 +852,6 @@ public class LOGJSONObject {
         Object object = this.opt(key);
         return object instanceof LOGJSONObject ? (LOGJSONObject) object : null;
     }
-
-
-    /**
-     * Get an optional long value associated with a key,
-     * or zero if there is no such key or if the value is not a number.
-     * If the value is a string, an attempt will be made to evaluate it as
-     * a number.
-     *
-     * @param key A key string.
-     * @return An object which is the value.
-     */
-    public long optLong(String key) {
-        return this.optLong(key, 0);
-    }
-
 
     /**
      * Get an optional long value associated with a key,
@@ -1010,20 +871,6 @@ public class LOGJSONObject {
         }
     }
 
-
-    /**
-     * Get an optional string associated with a key.
-     * It returns an empty string if there is no such key. If the value is not
-     * a string and is not null, then it is converted to a string.
-     *
-     * @param key A key string.
-     * @return A string which is the value.
-     */
-    public String optString(String key) {
-        return this.optString(key, "");
-    }
-
-
     /**
      * Get an optional string associated with a key.
      * It returns the defaultValue if there is no such key.
@@ -1036,7 +883,6 @@ public class LOGJSONObject {
         Object object = this.opt(key);
         return NULL.equals(object) ? defaultValue : object.toString();
     }
-
 
     private void populateMap(Object bean) {
         Class<? extends Object> klass = bean.getClass();
@@ -1086,7 +932,6 @@ public class LOGJSONObject {
         }
     }
 
-
     /**
      * Put a key/boolean pair in the JSONObject.
      *
@@ -1099,7 +944,6 @@ public class LOGJSONObject {
         this.put(key, value ? Boolean.TRUE : Boolean.FALSE);
         return this;
     }
-
 
     /**
      * Put a key/value pair in the JSONObject, where the value will be a
@@ -1115,7 +959,6 @@ public class LOGJSONObject {
         return this;
     }
 
-
     /**
      * Put a key/double pair in the JSONObject.
      *
@@ -1128,7 +971,6 @@ public class LOGJSONObject {
         this.put(key, new Double(value));
         return this;
     }
-
 
     /**
      * Put a key/int pair in the JSONObject.
@@ -1143,7 +985,6 @@ public class LOGJSONObject {
         return this;
     }
 
-
     /**
      * Put a key/long pair in the JSONObject.
      *
@@ -1156,7 +997,6 @@ public class LOGJSONObject {
         this.put(key, new Long(value));
         return this;
     }
-
 
     /**
      * Put a key/value pair in the JSONObject, where the value will be a
@@ -1171,7 +1011,6 @@ public class LOGJSONObject {
         this.put(key, new LOGJSONObject(value));
         return this;
     }
-
 
     /**
      * Put a key/value pair in the JSONObject. If the value is null,
@@ -1208,7 +1047,6 @@ public class LOGJSONObject {
         return this;
     }
 
-
     /**
      * Put a key/value pair in the JSONObject, but only if the key and the
      * value are both non-null, and only if there is not already a member
@@ -1229,7 +1067,6 @@ public class LOGJSONObject {
         return this;
     }
 
-
     /**
      * Put a key/value pair in the JSONObject, but only if the
      * key and the value are both non-null.
@@ -1247,7 +1084,6 @@ public class LOGJSONObject {
         }
         return this;
     }
-
 
     /**
      * Produce a string in double quotes with backslash sequences in all the
@@ -1394,7 +1230,6 @@ public class LOGJSONObject {
         return string;
     }
 
-
     /**
      * Throw an exception if the object is a NaN or infinite number.
      *
@@ -1416,7 +1251,6 @@ public class LOGJSONObject {
             }
         }
     }
-
 
     /**
      * Produce a JSONArray containing the values of the members of this
@@ -1458,7 +1292,6 @@ public class LOGJSONObject {
             return "";
         }
     }
-
 
     /**
      * Make a prettyprinted JSON text of this JSONObject.
@@ -1592,21 +1425,6 @@ public class LOGJSONObject {
             return null;
         }
     }
-
-
-    /**
-     * Write the contents of the JSONObject as JSON text to a writer.
-     * For compactness, no whitespace is added.
-     * <p>
-     * Warning: This method assumes that the data structure is acyclical.
-     *
-     * @return The writer.
-     * @throws JSONException
-     */
-    public Writer write(Writer writer) throws JSONException {
-        return this.write(writer, 0, 0);
-    }
-
 
     @SuppressWarnings("unchecked")
     static final Writer writeValue(Writer writer, Object value,

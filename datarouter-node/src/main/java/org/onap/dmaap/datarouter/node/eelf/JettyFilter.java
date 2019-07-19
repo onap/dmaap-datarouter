@@ -17,6 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.dmaap.datarouter.node.eelf;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;

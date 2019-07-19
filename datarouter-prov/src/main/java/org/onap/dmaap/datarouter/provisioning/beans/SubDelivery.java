@@ -43,10 +43,6 @@ public class SubDelivery implements JSONable {
     private String password;
     private boolean use100;
 
-    public SubDelivery() {
-        this("", "", "", false);
-    }
-
     public SubDelivery(String url, String user, String password, boolean use100) {
         this.url = url;
         this.user = user;
@@ -88,10 +84,6 @@ public class SubDelivery implements JSONable {
 
     public boolean isUse100() {
         return use100;
-    }
-
-    public void setUse100(boolean use100) {
-        this.use100 = use100;
     }
 
     @Override

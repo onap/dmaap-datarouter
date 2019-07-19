@@ -156,10 +156,6 @@ public class Parameters extends Syncable {
         return keyname;
     }
 
-    public void setKeyname(String keyname) {
-        this.keyname = keyname;
-    }
-
     public String getValue() {
         return value;
     }
