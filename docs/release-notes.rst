@@ -47,6 +47,15 @@ Known Issues
 N/A
 
 Security Issues
+
+*Fixed Security Issues*
+
+*Known Security Issues*
+
+- In default deployment DMAAP (dmaap-dr-prov) exposes HTTP port 30259 outside of cluster. [`OJSI-158 <https://jira.onap.org/browse/OJSI-158>`_]
+
+*Known Vulnerabilities in Used Modules*
+
 DMAAP code has been formally scanned during build time using NexusIQ and all Critical vulnerabilities have been
 addressed, items that remain open have been assessed for risk and determined to be false positive. The DMAAP open
 Critical security vulnerabilities and their risk assessment have been documented as part of the `project <https://wiki.onap.org/pages/viewpage.action?pageId=42598688>`_.
