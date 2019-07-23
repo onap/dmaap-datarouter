@@ -23,15 +23,18 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
-
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 
@@ -67,7 +70,7 @@ public class Parameters extends Syncable {
     public static final String DELIVERY_RETRY_RATIO = "DELIVERY_RETRY_RATIO";
     public static final String DELIVERY_MAX_AGE = "DELIVERY_MAX_AGE";
     public static final String THROTTLE_FILTER = "THROTTLE_FILTER";
-    public static final String STATIC_ROUTING_NODES = "STATIC_ROUTING_NODES"; //Adding new param for static Routing - Rally:US664862-1610
+    public static final String STATIC_ROUTING_NODES = "STATIC_ROUTING_NODES";
 
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
     private static final String SQLEXCEPTION = "SQLException: ";
@@ -75,13 +78,23 @@ public class Parameters extends Syncable {
     private String keyname;
     private String value;
 
+    public Parameters(String k, String v) {
+        this.keyname = k;
+        this.value = v;
+    }
+
+    public Parameters(ResultSet rs) throws SQLException {
+        this.keyname = rs.getString("KEYNAME");
+        this.value = rs.getString("VALUE");
+    }
+
     /**
      * Get all parameters in the DB as a Map.
      *
      * @return the Map of keynames/values from the DB.
      */
     public static Map<String, String> getParameters() {
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, String> props = new HashMap<>();
         for (Parameters p : getParameterCollection()) {
             props.put(p.getKeyname(), p.getValue());
         }
@@ -89,23 +102,20 @@ public class Parameters extends Syncable {
     }
 
     public static Collection<Parameters> getParameterCollection() {
-        Collection<Parameters> coll = new ArrayList<Parameters>();
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                String sql = "select * from PARAMETERS";
-                try (ResultSet rs = stmt.executeQuery(sql)) {
-                    while (rs.next()) {
-                        Parameters p = new Parameters(rs);
-                        coll.add(p);
-                    }
+        Collection<Parameters> coll = new ArrayList<>();
+        DB db = new DB();
+        String sql = "select * from PARAMETERS";
+        try (Connection conn = db.getConnection();
+                Statement stmt = conn.createStatement()) {
+            try (ResultSet rs = stmt.executeQuery(sql)) {
+                while (rs.next()) {
+                    Parameters p = new Parameters(rs);
+                    coll.add(p);
                 }
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error(SQLEXCEPTION + e.getMessage());
+            intlogger.error(SQLEXCEPTION + e.getMessage(), e);
         }
         return coll;
     }
@@ -118,38 +128,21 @@ public class Parameters extends Syncable {
      */
     public static Parameters getParameter(String k) {
         Parameters v = null;
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (PreparedStatement stmt = conn
-                    .prepareStatement("select KEYNAME, VALUE from PARAMETERS where KEYNAME = ?")) {
-                stmt.setString(1, k);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next()) {
-                        v = new Parameters(rs);
-                    }
+        DB db = new DB();
+        String sql = "select KEYNAME, VALUE from PARAMETERS where KEYNAME = ?";
+        try (Connection conn = db.getConnection();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, k);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    v = new Parameters(rs);
                 }
             }
             db.release(conn);
         } catch (SQLException e) {
-            intlogger.error(SQLEXCEPTION + e.getMessage());
+            intlogger.error(SQLEXCEPTION + e.getMessage(), e);
         }
         return v;
-    }
-
-    public Parameters() {
-        this("", "");
-    }
-
-    public Parameters(String k, String v) {
-        this.keyname = k;
-        this.value = v;
-    }
-
-    public Parameters(ResultSet rs) throws SQLException {
-        this.keyname = rs.getString("KEYNAME");
-        this.value = rs.getString("VALUE");
     }
 
     public String getKeyname() {
@@ -175,25 +168,14 @@ public class Parameters extends Syncable {
     @Override
     public boolean doInsert(Connection c) {
         boolean rv = true;
-        PreparedStatement ps = null;
-        try {
-            // Create the SUBSCRIPTIONS row
-            String sql = "insert into PARAMETERS values (?, ?)";
-            ps = c.prepareStatement(sql);
+        String sql = "insert into PARAMETERS values (?, ?)";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, getKeyname());
             ps.setString(2, getValue());
             ps.execute();
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0005 doInsert: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage());
-            }
         }
         return rv;
     }
@@ -201,25 +183,14 @@ public class Parameters extends Syncable {
     @Override
     public boolean doUpdate(Connection c) {
         boolean rv = true;
-        PreparedStatement ps = null;
-        try {
-            // Update the PARAMETERS row
-            String sql = "update PARAMETERS set VALUE = ? where KEYNAME = ?";
-            ps = c.prepareStatement(sql);
+        String sql = "update PARAMETERS set VALUE = ? where KEYNAME = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, getValue());
             ps.setString(2, getKeyname());
             ps.executeUpdate();
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage(),e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
         }
         return rv;
     }
@@ -227,24 +198,13 @@ public class Parameters extends Syncable {
     @Override
     public boolean doDelete(Connection c) {
         boolean rv = true;
-        PreparedStatement ps = null;
-        try {
-            // Create the SUBSCRIPTIONS row
-            String sql = "delete from PARAMETERS where KEYNAME = ?";
-            ps = c.prepareStatement(sql);
+        String sql = "delete from PARAMETERS where KEYNAME = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, getKeyname());
             ps.execute();
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0007 doDelete: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
         }
         return rv;
     }
@@ -260,13 +220,7 @@ public class Parameters extends Syncable {
             return false;
         }
         Parameters of = (Parameters) obj;
-        if (!keyname.equals(of.keyname)) {
-            return false;
-        }
-        if (!value.equals(of.value)) {
-            return false;
-        }
-        return true;
+        return (!value.equals(of.value)) && (!keyname.equals(of.keyname));
     }
 
     @Override

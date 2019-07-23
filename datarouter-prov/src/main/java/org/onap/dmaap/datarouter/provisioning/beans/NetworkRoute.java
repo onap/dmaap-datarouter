@@ -24,6 +24,8 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,9 +34,6 @@ import java.sql.Statement;
 import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 
@@ -51,35 +50,6 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
     private final int fromnode;
     private final int tonode;
     private final int vianode;
-
-    /**
-     * Get a set of all Network Routes in the DB.  The set is sorted according to the natural sorting order of the
-     * routes (based on the from and to node names in each route).
-     *
-     * @return the sorted set
-     */
-    public static SortedSet<NetworkRoute> getAllNetworkRoutes() {
-        SortedSet<NetworkRoute> set = new TreeSet<>();
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery("select FROMNODE, TONODE, VIANODE from NETWORK_ROUTES")) {
-                    while (rs.next()) {
-                        int fromnode = rs.getInt("FROMNODE");
-                        int tonode = rs.getInt("TONODE");
-                        int vianode = rs.getInt("VIANODE");
-                        set.add(new NetworkRoute(fromnode, tonode, vianode));
-                    }
-                }
-            }
-            db.release(conn);
-        } catch (SQLException e) {
-            intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-        }
-        return set;
-    }
 
     public NetworkRoute(String fromnode, String tonode) {
         this.fromnode = lookupNodeName(fromnode);
@@ -99,10 +69,44 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
         this.vianode = lookupNodeName(jo.getString("via"));
     }
 
-    public NetworkRoute(int fromnode, int tonode, int vianode) {
+    private NetworkRoute(int fromnode, int tonode, int vianode) {
         this.fromnode = fromnode;
         this.tonode = tonode;
         this.vianode = vianode;
+    }
+
+    /**
+     * Get a set of all Network Routes in the DB.  The set is sorted according to the natural sorting order of the
+     * routes (based on the from and to node names in each route).
+     *
+     * @return the sorted set
+     */
+    public static SortedSet<NetworkRoute> getAllNetworkRoutes() {
+        SortedSet<NetworkRoute> set = new TreeSet<>();
+        try {
+            DB db = new DB();
+            @SuppressWarnings("resource")
+            Connection conn = db.getConnection();
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("select FROMNODE, TONODE, VIANODE from NETWORK_ROUTES")) {
+                    addNetworkRouteToSet(set, rs);
+                }
+            } finally {
+                db.release(conn);
+            }
+        } catch (SQLException e) {
+            intlogger.error(SQLEXCEPTION + e.getMessage(), e);
+        }
+        return set;
+    }
+
+    private static void addNetworkRouteToSet(SortedSet<NetworkRoute> set, ResultSet rs) throws SQLException {
+        while (rs.next()) {
+            int fromnode = rs.getInt("FROMNODE");
+            int tonode = rs.getInt("TONODE");
+            int vianode = rs.getInt("VIANODE");
+            set.add(new NetworkRoute(fromnode, tonode, vianode));
+        }
     }
 
     public int getFromnode() {
@@ -113,27 +117,21 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
         return tonode;
     }
 
+    public int getVianode() {
+        return vianode;
+    }
+
     @Override
     public boolean doDelete(Connection c) {
         boolean rv = true;
-        PreparedStatement ps = null;
-        try {
-            String sql = "delete from NETWORK_ROUTES where FROMNODE = ? AND TONODE = ?";
-            ps = c.prepareStatement(sql);
+        String sql = "delete from NETWORK_ROUTES where FROMNODE = ? AND TONODE = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, fromnode);
             ps.setInt(2, tonode);
             ps.execute();
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0007 doDelete: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
         }
         return rv;
     }
@@ -141,28 +139,17 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
     @Override
     public boolean doInsert(Connection c) {
         boolean rv = false;
+        String sql = "insert into NETWORK_ROUTES (FROMNODE, TONODE, VIANODE) values (?, ?, ?)";
         if (this.vianode >= 0) {
-            PreparedStatement ps = null;
-            try {
+            try (PreparedStatement ps = c.prepareStatement(sql)) {
                 // Create the NETWORK_ROUTES row
-                String sql = "insert into NETWORK_ROUTES (FROMNODE, TONODE, VIANODE) values (?, ?, ?)";
-                ps = c.prepareStatement(sql);
                 ps.setInt(1, this.fromnode);
                 ps.setInt(2, this.tonode);
                 ps.setInt(3, this.vianode);
                 ps.execute();
-                ps.close();
                 rv = true;
             } catch (SQLException e) {
                 intlogger.warn("PROV0005 doInsert: " + e.getMessage(), e);
-            } finally {
-                try {
-                    if (ps != null) {
-                        ps.close();
-                    }
-                } catch (SQLException e) {
-                    intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-                }
             }
         }
         return rv;
@@ -171,10 +158,8 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
     @Override
     public boolean doUpdate(Connection c) {
         boolean rv = true;
-        PreparedStatement ps = null;
-        try {
-            String sql = "update NETWORK_ROUTES set VIANODE = ? where FROMNODE = ? and TONODE = ?";
-            ps = c.prepareStatement(sql);
+        String sql = "update NETWORK_ROUTES set VIANODE = ? where FROMNODE = ? and TONODE = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, vianode);
             ps.setInt(2, fromnode);
             ps.setInt(3, tonode);
@@ -182,14 +167,6 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
         }
         return rv;
     }

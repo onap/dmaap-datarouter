@@ -35,6 +35,7 @@
         <sitePath>/content/sites/site/${project.groupId}/${project.artifactId}/${project.version}</sitePath>
         <docker.location>${basedir}/target/${project.artifactId}</docker.location>
         <datarouter.sub.image.name>${docker.image.root}${project.artifactId}</datarouter.sub.image.name>
+        <sonar.exclusions>src/main/java/org/onap/dmaap/datarouter/subscriber/**</sonar.exclusions>
         <sonar.language>java</sonar.language>
         <sonar.skip>false</sonar.skip>
     </properties>
@@ -290,6 +291,11 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+                  <configuration>
+                    <excludes>
+                      <exclude>src/main/java/org/onap/dmaap/datarouter/subscriber/**</exclude>
+                    </excludes>
+                  </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

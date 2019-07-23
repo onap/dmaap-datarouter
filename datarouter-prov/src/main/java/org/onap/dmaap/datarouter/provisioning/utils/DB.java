@@ -24,6 +24,11 @@
 
 package org.onap.dmaap.datarouter.provisioning.utils;
 
+import static java.lang.System.exit;
+import static java.lang.System.getProperty;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -42,9 +47,6 @@ import java.util.Properties;
 import java.util.Queue;
 import java.util.Set;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
-
 /**
  * Load the DB JDBC driver, and manage a simple pool of connections to the DB.
  *
@@ -55,14 +57,14 @@ public class DB {
 
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
 
-    private static String DB_URL;
-    private static String DB_LOGIN;
-    private static String DB_PASSWORD;
+    private static String dbUrl;
+    private static String dbLogin;
+    private static String dbPassword;
     private static Properties props;
     private static final Queue<Connection> queue = new LinkedList<>();
 
-    private static String HTTPS_PORT;
-    private static String HTTP_PORT;
+    private static String httpsPort;
+    private static String httpPort;
 
     /**
      * Construct a DB object.  If this is the very first creation of this object, it will load a copy of the properties
@@ -73,22 +75,22 @@ public class DB {
         if (props == null) {
             props = new Properties();
             try {
-                props.load(new FileInputStream(System.getProperty(
+                props.load(new FileInputStream(getProperty(
                     "org.onap.dmaap.datarouter.provserver.properties",
                     "/opt/app/datartr/etc/provserver.properties")));
-                String DB_DRIVER = (String) props.get("org.onap.dmaap.datarouter.db.driver");
-                DB_URL = (String) props.get("org.onap.dmaap.datarouter.db.url");
-                DB_LOGIN = (String) props.get("org.onap.dmaap.datarouter.db.login");
-                DB_PASSWORD = (String) props.get("org.onap.dmaap.datarouter.db.password");
-                HTTPS_PORT = (String) props.get("org.onap.dmaap.datarouter.provserver.https.port");
-                HTTP_PORT = (String) props.get("org.onap.dmaap.datarouter.provserver.http.port");
-                Class.forName(DB_DRIVER);
+                String dbDriver = (String) props.get("org.onap.dmaap.datarouter.db.driver");
+                dbUrl = (String) props.get("org.onap.dmaap.datarouter.db.url");
+                dbLogin = (String) props.get("org.onap.dmaap.datarouter.db.login");
+                dbPassword = (String) props.get("org.onap.dmaap.datarouter.db.password");
+                httpsPort = (String) props.get("org.onap.dmaap.datarouter.provserver.https.port");
+                httpPort = (String) props.get("org.onap.dmaap.datarouter.provserver.http.port");
+                Class.forName(dbDriver);
             } catch (IOException e) {
                 intlogger.error("PROV9003 Opening properties: " + e.getMessage(), e);
-                System.exit(1);
+                exit(1);
             } catch (ClassNotFoundException e) {
                 intlogger.error("PROV9004 cannot find the DB driver: " + e);
-                System.exit(1);
+                exit(1);
             }
         }
     }
@@ -107,7 +109,6 @@ public class DB {
      *
      * @return the Connection
      */
-    @SuppressWarnings("resource")
     public Connection getConnection() throws SQLException {
         Connection connection = null;
         while (connection == null) {
@@ -120,7 +121,7 @@ public class DB {
                     do {
                         // Try up to 3 times to get a connection
                         try {
-                            connection = DriverManager.getConnection(DB_URL, DB_LOGIN, DB_PASSWORD);
+                            connection = DriverManager.getConnection(dbUrl, dbLogin, dbPassword);
                         } catch (SQLException sqlEx) {
                             if (++n >= 3) {
                                 throw sqlEx;
@@ -164,11 +165,11 @@ public class DB {
 
 
     public static String getHttpsPort() {
-        return HTTPS_PORT;
+        return httpsPort;
     }
 
     public static String getHttpPort() {
-        return HTTP_PORT;
+        return httpPort;
     }
 
     /**
@@ -238,34 +239,35 @@ public class DB {
      */
     private void runInitScript(Connection connection, int scriptId) {
         String scriptDir = (String) props.get("org.onap.dmaap.datarouter.provserver.dbscripts");
-        StringBuilder strBuilder = new StringBuilder();
-        try {
-            String scriptFile = String.format("%s/sql_init_%02d.sql", scriptDir, scriptId);
-            if (!(new File(scriptFile)).exists()) {
-                intlogger.error("PROV9005 Failed to load sql script from : " + scriptFile);
-                System.exit(1);
-            }
-            LineNumberReader lineReader = new LineNumberReader(new FileReader(scriptFile));
+        String scriptFile = String.format("%s/sql_init_%02d.sql", scriptDir, scriptId);
+        if (!(new File(scriptFile)).exists()) {
+            intlogger.error("PROV9005 Failed to load sql script from : " + scriptFile);
+            exit(1);
+        }
+        try (LineNumberReader lineReader = new LineNumberReader(new FileReader(scriptFile));
+                Statement statement = connection.createStatement()) {
+            StringBuilder strBuilder = new StringBuilder();
             String line;
             while ((line = lineReader.readLine()) != null) {
                 if (!line.startsWith("--")) {
                     line = line.trim();
                     strBuilder.append(line);
-                    if (line.endsWith(";")) {
-                        // Execute one DDL statement
-                        String sql = strBuilder.toString();
-                        strBuilder.setLength(0);
-                        Statement statement = connection.createStatement();
-                        statement.execute(sql);
-                        statement.close();
-                    }
+                    executeDdlStatement(statement, strBuilder, line);
                 }
             }
-            lineReader.close();
             strBuilder.setLength(0);
         } catch (Exception e) {
             intlogger.error("PROV9002 Error when initializing table: " + e.getMessage(), e);
-            System.exit(1);
+            exit(1);
+        }
+    }
+
+    private void executeDdlStatement(Statement statement, StringBuilder strBuilder, String line) throws SQLException {
+        if (line.endsWith(";")) {
+            // Execute one DDL statement
+            String sql = strBuilder.toString();
+            strBuilder.setLength(0);
+            statement.execute(sql);
         }
     }
 }

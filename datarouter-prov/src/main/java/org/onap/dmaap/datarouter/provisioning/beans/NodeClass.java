@@ -23,6 +23,8 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,9 +34,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 
 /**
@@ -45,9 +44,11 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  */
 public abstract class NodeClass extends Syncable {
 
+    private static final String PROV_0005_DO_INSERT = "PROV0005 doInsert: ";
     private static Map<String, Integer> map;
     private static EELFLogger intLogger = EELFManager.getInstance().getLogger("InternalLog");
-    public NodeClass() {
+
+    NodeClass() {
         // init on first use
         if (map == null) {
             reload();
@@ -77,67 +78,50 @@ public abstract class NodeClass extends Syncable {
             if (!map.containsKey(node)) {
                 intLogger.info("..adding " + node + " to NODES with index " + nextid);
                 map.put(node, nextid);
-                PreparedStatement ps = null;
-                try {
-                    DB db = new DB();
-                    @SuppressWarnings("resource")
-                    Connection conn = db.getConnection();
-                    ps = conn.prepareStatement("insert into NODES (NODEID, NAME, ACTIVE) values (?, ?, 1)");
-                    ps.setInt(1, nextid);
-                    ps.setString(2, node);
-                    ps.execute();
-                    ps.close();
-                    db.release(conn);
-                } catch (SQLException e) {
-                    intLogger.error("PROV0005 doInsert: " + e.getMessage(),e);
-                } finally {
-                    try {
-                        if(ps!=null){
-                            ps.close();
-                        }
-                    } catch (SQLException e) {
-                        intLogger.error("Error in closing PreparedStatement: " + e.getMessage(),e);
-                    }
-                }
+                insertNodesToTable(nextid, node);
                 nextid++;
             }
         }
     }
 
-    public static void reload() {
-        Map<String, Integer> m = new HashMap<String, Integer>();
-        PreparedStatement ps = null;
+    private static void insertNodesToTable(int nextid, String node) {
+        DB db = new DB();
+        try (Connection conn = db.getConnection()) {
+            try (PreparedStatement ps = conn
+                    .prepareStatement("insert into NODES (NODEID, NAME, ACTIVE) values (?, ?, 1)")) {
+                ps.setInt(1, nextid);
+                ps.setString(2, node);
+                ps.execute();
+            } finally {
+                db.release(conn);
+            }
+        } catch (SQLException e) {
+            intLogger.error(PROV_0005_DO_INSERT + e.getMessage(), e);
+        }
+    }
 
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            String sql = "select NODEID, NAME from NODES";
-            ps = conn.prepareStatement(sql);
-            try(ResultSet rs = ps.executeQuery()) {
+    private static void reload() {
+        Map<String, Integer> m = new HashMap<>();
+        String sql = "select NODEID, NAME from NODES";
+        DB db = new DB();
+        try (Connection conn = db.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     int id = rs.getInt("NODEID");
                     String name = rs.getString("NAME");
                     m.put(name, id);
                 }
+            } finally {
+                db.release(conn);
             }
-            ps.close();
-            db.release(conn);
         } catch (SQLException e) {
-            intLogger.error("PROV0005 doInsert: " + e.getMessage(),e);
-        } finally {
-            try {
-                if(ps!=null){
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intLogger.error("PROV0005 doInsert: " + e.getMessage(),e);
-            }
+            intLogger.error(PROV_0005_DO_INSERT + e.getMessage(),e);
         }
         map = m;
     }
 
-    public static Integer lookupNodeName(final String name) {
+    static Integer lookupNodeName(final String name) {
         Integer n = map.get(name);
         if (n == null) {
             throw new IllegalArgumentException("Invalid node name: " + name);
@@ -146,16 +130,11 @@ public abstract class NodeClass extends Syncable {
     }
 
     public static Collection<String> lookupNodeNames(String patt) {
-        Collection<String> coll = new TreeSet<String>();
+        Collection<String> coll = new TreeSet<>();
         final Set<String> keyset = map.keySet();
         for (String s : patt.toLowerCase().split(",")) {
             if (s.endsWith("*")) {
-                s = s.substring(0, s.length() - 1);
-                for (String s2 : keyset) {
-                    if (s2.startsWith(s)) {
-                        coll.add(s2);
-                    }
-                }
+                addNodeToCollection(coll, keyset, s);
             } else if (keyset.contains(s)) {
                 coll.add(s);
             } else if (keyset.contains(normalizeNodename(s))) {
@@ -167,6 +146,15 @@ public abstract class NodeClass extends Syncable {
         return coll;
     }
 
+    private static void addNodeToCollection(Collection<String> coll, Set<String> keyset, String s) {
+        s = s.substring(0, s.length() - 1);
+        for (String s2 : keyset) {
+            if (s2.startsWith(s)) {
+                coll.add(s2);
+            }
+        }
+    }
+
     public static String normalizeNodename(String s) {
         if (s != null && s.indexOf('.') <= 0) {
             Parameters p = Parameters.getParameter(Parameters.PROV_DOMAIN);
@@ -175,17 +163,16 @@ public abstract class NodeClass extends Syncable {
                 s += "." + domain;
             }
             return s.toLowerCase();
-        }
-        else{
+        } else {
             return s;
         }
 
     }
 
-    protected String lookupNodeID(int n) {
-        for (String s : map.keySet()) {
-            if (map.get(s) == n) {
-                return s;
+    String lookupNodeID(int n) {
+        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+            if (entry.getValue() == n) {
+                return entry.getKey();
             }
         }
         return null;

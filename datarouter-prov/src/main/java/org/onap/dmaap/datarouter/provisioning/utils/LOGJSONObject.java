@@ -28,11 +28,14 @@ import com.att.eelf.configuration.EELFManager;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
-
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONString;
@@ -93,10 +96,13 @@ import org.json.JSONTokener;
  * @version 2012-12-01
  */
 public class LOGJSONObject {
+
     /**
      * The maximum number of keys in the key pool.
      */
-    private static final int keyPoolSize = 100;
+    private static final int KEY_POOL_SIZE = 100;
+    private static final String USING_DEFAULT_VALUE = "Using defaultValue: ";
+    private static final String JSON_OBJECT_CONST = "JSONObject[";
 
     /**
      * Key pooling is like string interning, but without permanently tying up
@@ -104,7 +110,7 @@ public class LOGJSONObject {
      * JSONObjects will be avoided by using a key pool to manage unique key
      * string objects. This is used by JSONObject.put(string, object).
      */
-    private static Map<String, Object> keyPool = new LinkedHashMap<String, Object>(keyPoolSize);
+    private static Map<String, Object> keyPool = new LinkedHashMap<>(KEY_POOL_SIZE);
 
     private static final EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
 
@@ -197,7 +203,7 @@ public class LOGJSONObject {
      * <code>JSONObject.NULL.equals(null)</code> returns <code>true</code>.
      * <code>JSONObject.NULL.toString()</code> returns <code>"null"</code>.
      */
-    public static final Object NULL = new Null();
+    private static final Object NULL = new Null();
 
     /**
      * Construct an empty JSONObject.
@@ -290,7 +296,7 @@ public class LOGJSONObject {
      * @throws JSONException
      */
     public LOGJSONObject(Map<String, Object> map) {
-        this.map = new LinkedHashMap<String, Object>();
+        this.map = new LinkedHashMap<>();
         if (map != null) {
             Iterator<Map.Entry<String, Object>> i = map.entrySet().iterator();
             while (i.hasNext()) {
@@ -328,84 +334,6 @@ public class LOGJSONObject {
     }
 
     /**
-     * Construct a JSONObject from an Object, using reflection to find the
-     * public members. The resulting JSONObject's keys will be the strings
-     * from the names array, and the values will be the field values associated
-     * with those keys in the object. If a key is not found or not visible,
-     * then it will not be copied into the new JSONObject.
-     *
-     * @param object An object that has fields that should be used to make a
-     *               JSONObject.
-     * @param names  An array of strings, the names of the fields to be obtained
-     *               from the object.
-     */
-    public LOGJSONObject(Object object, String names[]) {
-        this();
-        Class<? extends Object> c = object.getClass();
-        for (int i = 0; i < names.length; i += 1) {
-            String name = names[i];
-            try {
-                this.putOpt(name, c.getField(name).get(object));
-            } catch (Exception ignore) {
-            }
-        }
-    }
-
-    /**
-     * Construct a JSONObject from a source JSON text string.
-     * This is the most commonly used JSONObject constructor.
-     *
-     * @param source A string beginning
-     *               with <code>{</code>&nbsp;<small>(left brace)</small> and ending
-     *               with <code>}</code>&nbsp;<small>(right brace)</small>.
-     * @throws JSONException If there is a syntax error in the source
-     *                       string or a duplicated key.
-     */
-    public LOGJSONObject(String source) throws JSONException {
-        this(new JSONTokener(source));
-    }
-
-    /**
-     * Construct a JSONObject from a ResourceBundle.
-     *
-     * @param baseName The ResourceBundle base name.
-     * @param locale   The Locale to load the ResourceBundle for.
-     * @throws JSONException If any JSONExceptions are detected.
-     */
-    public LOGJSONObject(String baseName, Locale locale) throws JSONException {
-        this();
-        ResourceBundle bundle = ResourceBundle.getBundle(baseName, locale,
-                Thread.currentThread().getContextClassLoader());
-
-// Iterate through the keys in the bundle.
-
-        Enumeration<?> keys = bundle.getKeys();
-        while (keys.hasMoreElements()) {
-            Object key = keys.nextElement();
-            if (key instanceof String) {
-
-// Go through the path, ensuring that there is a nested JSONObject for each
-// segment except the last. Add the value using the last segment's name into
-// the deepest nested JSONObject.
-
-                String[] path = ((String) key).split("\\.");
-                int last = path.length - 1;
-                LOGJSONObject target = this;
-                for (int i = 0; i < last; i += 1) {
-                    String segment = path[i];
-                    LOGJSONObject nextTarget = target.optJSONObject(segment);
-                    if (nextTarget == null) {
-                        nextTarget = new LOGJSONObject();
-                        target.put(segment, nextTarget);
-                    }
-                    target = nextTarget;
-                }
-                target.put(path[last], bundle.getString((String) key));
-            }
-        }
-    }
-
-    /**
      * Accumulate values under a key. It is similar to the put method except
      * that if there is already an object stored under the key then a
      * JSONArray is stored under the key to hold all of the accumulated values.
@@ -423,15 +351,15 @@ public class LOGJSONObject {
      *                       or if the key is null.
      */
     public LOGJSONObject accumulate(
-            String key,
-            Object value
-    ) throws JSONException {
+        String key,
+        Object value
+    ) {
         testValidity(value);
         Object object = this.opt(key);
         if (object == null) {
             this.put(key, value instanceof JSONArray
-                    ? new JSONArray().put(value)
-                    : value);
+                ? new JSONArray().put(value)
+                : value);
         } else if (object instanceof JSONArray) {
             ((JSONArray) object).put(value);
         } else {
@@ -452,7 +380,7 @@ public class LOGJSONObject {
      * @throws JSONException If the key is null or if the current value
      *                       associated with the key is not a JSONArray.
      */
-    public LOGJSONObject append(String key, Object value) throws JSONException {
+    public LOGJSONObject append(String key, Object value) {
         testValidity(value);
         Object object = this.opt(key);
         if (object == null) {
@@ -460,8 +388,8 @@ public class LOGJSONObject {
         } else if (object instanceof JSONArray) {
             this.put(key, ((JSONArray) object).put(value));
         } else {
-            throw new JSONException("JSONObject[" + key +
-                    "] is not a JSONArray.");
+            throw new JSONException(JSON_OBJECT_CONST + key +
+                "] is not a JSONArray.");
         }
         return this;
     }
@@ -481,8 +409,8 @@ public class LOGJSONObject {
 // Shave off trailing zeros and decimal point, if possible.
 
         String string = Double.toString(d);
-        if (string.indexOf('.') > 0 && string.indexOf('e') < 0 &&
-                string.indexOf('E') < 0) {
+        if (string.indexOf('.') > 0 && string.indexOf('e') < 0
+            && string.indexOf('E') < 0) {
             while (string.endsWith("0")) {
                 string = string.substring(0, string.length() - 1);
             }
@@ -500,14 +428,14 @@ public class LOGJSONObject {
      * @return The object associated with the key.
      * @throws JSONException if the key is not found.
      */
-    public Object get(String key) throws JSONException {
+    public Object get(String key) {
         if (key == null) {
             throw new JSONException("Null key.");
         }
         Object object = this.opt(key);
         if (object == null) {
-            throw new JSONException("JSONObject[" + quote(key) +
-                    "] not found.");
+            throw new JSONException(JSON_OBJECT_CONST + quote(key) +
+                "] not found.");
         }
         return object;
     }
@@ -519,19 +447,19 @@ public class LOGJSONObject {
      * @return The truth.
      * @throws JSONException if the value is not a Boolean or the String "true" or "false".
      */
-    public boolean getBoolean(String key) throws JSONException {
+    public boolean getBoolean(String key) {
         Object object = this.get(key);
         if (object.equals(Boolean.FALSE) ||
-                (object instanceof String &&
-                        ((String) object).equalsIgnoreCase("false"))) {
+            (object instanceof String &&
+                "false".equalsIgnoreCase((String) object))) {
             return false;
         } else if (object.equals(Boolean.TRUE) ||
-                (object instanceof String &&
-                        ((String) object).equalsIgnoreCase("true"))) {
+            (object instanceof String &&
+                "true".equalsIgnoreCase((String) object))) {
             return true;
         }
-        throw new JSONException("JSONObject[" + quote(key) +
-                "] is not a Boolean.");
+        throw new JSONException(JSON_OBJECT_CONST + quote(key) +
+            "] is not a Boolean.");
     }
 
     /**
@@ -546,11 +474,11 @@ public class LOGJSONObject {
         Object object = this.get(key);
         try {
             return object instanceof Number
-                    ? ((Number) object).doubleValue()
-                    : Double.parseDouble((String) object);
+                ? ((Number) object).doubleValue()
+                : Double.parseDouble((String) object);
         } catch (Exception e) {
-            intlogger.error("JSONObject[" + quote(key) + "] is not a number.", e);
-            throw new JSONException("JSONObject[" + quote(key) + "] is not a number.");
+            intlogger.error(JSON_OBJECT_CONST + quote(key) + "] is not a number.", e);
+            throw new JSONException(JSON_OBJECT_CONST + quote(key) + "] is not a number.");
         }
     }
 
@@ -566,11 +494,11 @@ public class LOGJSONObject {
         Object object = this.get(key);
         try {
             return object instanceof Number
-                    ? ((Number) object).intValue()
-                    : Integer.parseInt((String) object);
+                ? ((Number) object).intValue()
+                : Integer.parseInt((String) object);
         } catch (Exception e) {
-            intlogger.error("JSONObject[" + quote(key) + "] is not an int.", e);
-            throw new JSONException("JSONObject[" + quote(key) + "] is not an int.");
+            intlogger.error(JSON_OBJECT_CONST + quote(key) + "] is not an int.", e);
+            throw new JSONException(JSON_OBJECT_CONST + quote(key) + "] is not an int.");
         }
     }
 
@@ -582,13 +510,13 @@ public class LOGJSONObject {
      * @throws JSONException if the key is not found or
      *                       if the value is not a JSONArray.
      */
-    public JSONArray getJSONArray(String key) throws JSONException {
+    public JSONArray getJSONArray(String key) {
         Object object = this.get(key);
         if (object instanceof JSONArray) {
             return (JSONArray) object;
         }
-        throw new JSONException("JSONObject[" + quote(key) +
-                "] is not a JSONArray.");
+        throw new JSONException(JSON_OBJECT_CONST + quote(key) +
+            "] is not a JSONArray.");
     }
 
     /**
@@ -599,13 +527,13 @@ public class LOGJSONObject {
      * @throws JSONException if the key is not found or
      *                       if the value is not a JSONObject.
      */
-    public LOGJSONObject getJSONObject(String key) throws JSONException {
+    public LOGJSONObject getJSONObject(String key) {
         Object object = this.get(key);
         if (object instanceof LOGJSONObject) {
             return (LOGJSONObject) object;
         }
-        throw new JSONException("JSONObject[" + quote(key) +
-                "] is not a JSONObject.");
+        throw new JSONException(JSON_OBJECT_CONST + quote(key) +
+            "] is not a JSONObject.");
     }
 
     /**
@@ -616,15 +544,15 @@ public class LOGJSONObject {
      * @throws JSONException if the key is not found or if the value cannot
      *                       be converted to a long.
      */
-    public long getLong(String key) throws JSONException {
+    public long getLong(String key) {
         Object object = this.get(key);
         try {
             return object instanceof Number
-                    ? ((Number) object).longValue()
-                    : Long.parseLong((String) object);
+                ? ((Number) object).longValue()
+                : Long.parseLong((String) object);
         } catch (Exception e) {
-            intlogger.error("JSONObject[" + quote(key) + "] is not a long.", e);
-            throw new JSONException("JSONObject[" + quote(key) + "] is not a long.");
+            intlogger.error(JSON_OBJECT_CONST + quote(key) + "] is not a long.", e);
+            throw new JSONException(JSON_OBJECT_CONST + quote(key) + "] is not a long.");
         }
     }
 
@@ -636,7 +564,7 @@ public class LOGJSONObject {
     public static String[] getNames(LOGJSONObject jo) {
         int length = jo.length();
         if (length == 0) {
-            return null;
+            return new String[]{};
         }
         Iterator<String> iterator = jo.keys();
         String[] names = new String[length];
@@ -660,8 +588,8 @@ public class LOGJSONObject {
         if (object instanceof String) {
             return (String) object;
         }
-        throw new JSONException("JSONObject[" + quote(key) +
-                "] not a string.");
+        throw new JSONException(JSON_OBJECT_CONST + quote(key) +
+            "] not a string.");
     }
 
     /**
@@ -753,7 +681,7 @@ public class LOGJSONObject {
      * @throws JSONException If n is a non-finite number.
      */
     public static String numberToString(Number number)
-            throws JSONException {
+        {
         if (number == null) {
             throw new JSONException("Null pointer");
         }
@@ -763,7 +691,7 @@ public class LOGJSONObject {
 
         String string = number.toString();
         if (string.indexOf('.') > 0 && string.indexOf('e') < 0 &&
-                string.indexOf('E') < 0) {
+            string.indexOf('E') < 0) {
             while (string.endsWith("0")) {
                 string = string.substring(0, string.length() - 1);
             }
@@ -797,7 +725,7 @@ public class LOGJSONObject {
         try {
             return this.getBoolean(key);
         } catch (Exception e) {
-            intlogger.trace("Using defaultValue: " + defaultValue, e);
+            intlogger.trace(USING_DEFAULT_VALUE + defaultValue, e);
             return defaultValue;
         }
     }
@@ -816,7 +744,7 @@ public class LOGJSONObject {
         try {
             return this.getDouble(key);
         } catch (Exception e) {
-            intlogger.trace("Using defaultValue: " + defaultValue, e);
+            intlogger.trace(USING_DEFAULT_VALUE + defaultValue, e);
             return defaultValue;
         }
     }
@@ -835,23 +763,11 @@ public class LOGJSONObject {
         try {
             return this.getInt(key);
         } catch (Exception e) {
-            intlogger.trace("Using defaultValue: " + defaultValue, e);
+            intlogger.trace(USING_DEFAULT_VALUE + defaultValue, e);
             return defaultValue;
         }
     }
 
-    /**
-     * Get an optional JSONObject associated with a key.
-     * It returns null if there is no such key, or if its value is not a
-     * JSONObject.
-     *
-     * @param key A key string.
-     * @return A JSONObject which is the value.
-     */
-    public LOGJSONObject optJSONObject(String key) {
-        Object object = this.opt(key);
-        return object instanceof LOGJSONObject ? (LOGJSONObject) object : null;
-    }
 
     /**
      * Get an optional long value associated with a key,
@@ -885,15 +801,15 @@ public class LOGJSONObject {
     }
 
     private void populateMap(Object bean) {
-        Class<? extends Object> klass = bean.getClass();
+        Class<?> klass = bean.getClass();
 
 // If klass is a System class then set includeSuperClass to false.
 
         boolean includeSuperClass = klass.getClassLoader() != null;
 
         Method[] methods = includeSuperClass
-                ? klass.getMethods()
-                : klass.getDeclaredMethods();
+            ? klass.getMethods()
+            : klass.getDeclaredMethods();
         for (int i = 0; i < methods.length; i += 1) {
             try {
                 Method method = methods[i];
@@ -902,7 +818,7 @@ public class LOGJSONObject {
                     String key = "";
                     if (name.startsWith("get")) {
                         if ("getClass".equals(name) ||
-                                "getDeclaringClass".equals(name)) {
+                            "getDeclaringClass".equals(name)) {
                             key = "";
                         } else {
                             key = name.substring(3);
@@ -911,13 +827,13 @@ public class LOGJSONObject {
                         key = name.substring(2);
                     }
                     if (key.length() > 0 &&
-                            Character.isUpperCase(key.charAt(0)) &&
-                            method.getParameterTypes().length == 0) {
+                        Character.isUpperCase(key.charAt(0)) &&
+                        method.getParameterTypes().length == 0) {
                         if (key.length() == 1) {
                             key = key.toLowerCase();
                         } else if (!Character.isUpperCase(key.charAt(1))) {
                             key = key.substring(0, 1).toLowerCase() +
-                                    key.substring(1);
+                                key.substring(1);
                         }
 
                         Object result = method.invoke(bean, (Object[]) null);
@@ -933,33 +849,6 @@ public class LOGJSONObject {
     }
 
     /**
-     * Put a key/boolean pair in the JSONObject.
-     *
-     * @param key   A key string.
-     * @param value A boolean which is the value.
-     * @return this.
-     * @throws JSONException If the key is null.
-     */
-    public LOGJSONObject put(String key, boolean value) throws JSONException {
-        this.put(key, value ? Boolean.TRUE : Boolean.FALSE);
-        return this;
-    }
-
-    /**
-     * Put a key/value pair in the JSONObject, where the value will be a
-     * JSONArray which is produced from a Collection.
-     *
-     * @param key   A key string.
-     * @param value A Collection value.
-     * @return this.
-     * @throws JSONException
-     */
-    public LOGJSONObject put(String key, Collection<Object> value) throws JSONException {
-        this.put(key, new JSONArray(value));
-        return this;
-    }
-
-    /**
      * Put a key/double pair in the JSONObject.
      *
      * @param key   A key string.
@@ -967,7 +856,7 @@ public class LOGJSONObject {
      * @return this.
      * @throws JSONException If the key is null or if the number is invalid.
      */
-    public LOGJSONObject put(String key, double value) throws JSONException {
+    public LOGJSONObject put(String key, double value) {
         this.put(key, new Double(value));
         return this;
     }
@@ -980,7 +869,7 @@ public class LOGJSONObject {
      * @return this.
      * @throws JSONException If the key is null.
      */
-    public LOGJSONObject put(String key, int value) throws JSONException {
+    public LOGJSONObject put(String key, int value) {
         this.put(key, new Integer(value));
         return this;
     }
@@ -993,22 +882,8 @@ public class LOGJSONObject {
      * @return this.
      * @throws JSONException If the key is null.
      */
-    public LOGJSONObject put(String key, long value) throws JSONException {
+    public LOGJSONObject put(String key, long value) {
         this.put(key, new Long(value));
-        return this;
-    }
-
-    /**
-     * Put a key/value pair in the JSONObject, where the value will be a
-     * JSONObject which is produced from a Map.
-     *
-     * @param key   A key string.
-     * @param value A Map value.
-     * @return this.
-     * @throws JSONException
-     */
-    public LOGJSONObject put(String key, Map<String, Object> value) throws JSONException {
-        this.put(key, new LOGJSONObject(value));
         return this;
     }
 
@@ -1024,7 +899,7 @@ public class LOGJSONObject {
      * @throws JSONException If the value is non-finite number
      *                       or if the key is null.
      */
-    public LOGJSONObject put(String key, Object value) throws JSONException {
+    public LOGJSONObject put(String key, Object value) {
         String pooled;
         if (key == null) {
             throw new JSONException("Null key.");
@@ -1033,8 +908,8 @@ public class LOGJSONObject {
             testValidity(value);
             pooled = (String) keyPool.get(key);
             if (pooled == null) {
-                if (keyPool.size() >= keyPoolSize) {
-                    keyPool = new LinkedHashMap<String, Object>(keyPoolSize);
+                if (keyPool.size() >= KEY_POOL_SIZE) {
+                    keyPool = new LinkedHashMap<>(KEY_POOL_SIZE);
                 }
                 keyPool.put(key, key);
             } else {
@@ -1057,29 +932,11 @@ public class LOGJSONObject {
      * @return his.
      * @throws JSONException if the key is a duplicate
      */
-    public LOGJSONObject putOnce(String key, Object value) throws JSONException {
+    public LOGJSONObject putOnce(String key, Object value) {
         if (key != null && value != null) {
             if (this.opt(key) != null) {
                 throw new JSONException("Duplicate key \"" + key + "\"");
             }
-            this.put(key, value);
-        }
-        return this;
-    }
-
-    /**
-     * Put a key/value pair in the JSONObject, but only if the
-     * key and the value are both non-null.
-     *
-     * @param key   A key string.
-     * @param value An object which is the value. It should be of one of these
-     *              types: Boolean, Double, Integer, JSONArray, JSONObject, Long, String,
-     *              or the JSONObject.NULL object.
-     * @return this.
-     * @throws JSONException If the value is a non-finite number.
-     */
-    public LOGJSONObject putOpt(String key, Object value) throws JSONException {
-        if (key != null && value != null) {
             this.put(key, value);
         }
         return this;
@@ -1151,7 +1008,7 @@ public class LOGJSONObject {
                     break;
                 default:
                     if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
-                            || (c >= '\u2000' && c < '\u2100')) {
+                        || (c >= '\u2000' && c < '\u2100')) {
                         w.write("\\u");
                         hhhh = Integer.toHexString(c);
                         w.write("0000", 0, 4 - hhhh.length());
@@ -1185,16 +1042,16 @@ public class LOGJSONObject {
      */
     public static Object stringToValue(String string) {
         Double d;
-        if (string.equals("")) {
+        if ("".equals(string)) {
             return string;
         }
-        if (string.equalsIgnoreCase("true")) {
+        if ("true".equalsIgnoreCase(string)) {
             return Boolean.TRUE;
         }
-        if (string.equalsIgnoreCase("false")) {
+        if ("false".equalsIgnoreCase(string)) {
             return Boolean.FALSE;
         }
-        if (string.equalsIgnoreCase("null")) {
+        if ("null".equalsIgnoreCase(string)) {
             return LOGJSONObject.NULL;
         }
 
@@ -1209,16 +1066,16 @@ public class LOGJSONObject {
         char b = string.charAt(0);
         if ((b >= '0' && b <= '9') || b == '.' || b == '-' || b == '+') {
             try {
-                if (string.indexOf('.') > -1 ||
-                        string.indexOf('e') > -1 || string.indexOf('E') > -1) {
+                if (string.indexOf('.') > -1 || string.indexOf('e') > -1
+                    || string.indexOf('E') > -1) {
                     d = Double.valueOf(string);
                     if (!d.isInfinite() && !d.isNaN()) {
                         return d;
                     }
                 } else {
                     Long myLong = new Long(string);
-                    if (myLong.longValue() == myLong.intValue()) {
-                        return new Integer(myLong.intValue());
+                    if (myLong == myLong.intValue()) {
+                        return myLong.intValue();
                     } else {
                         return myLong;
                     }
@@ -1241,13 +1098,11 @@ public class LOGJSONObject {
             if (o instanceof Double) {
                 if (((Double) o).isInfinite() || ((Double) o).isNaN()) {
                     throw new JSONException(
-                            "JSON does not allow non-finite numbers.");
+                        "JSON does not allow non-finite numbers.");
                 }
-            } else if (o instanceof Float) {
-                if (((Float) o).isInfinite() || ((Float) o).isNaN()) {
-                    throw new JSONException(
-                            "JSON does not allow non-finite numbers.");
-                }
+            } else if (o instanceof Float && (((Float) o).isInfinite() || ((Float) o).isNaN())) {
+                throw new JSONException(
+                    "JSON does not allow non-finite numbers.");
             }
         }
     }
@@ -1261,7 +1116,7 @@ public class LOGJSONObject {
      * @return A JSONArray of values.
      * @throws JSONException If any of the values are non-finite numbers.
      */
-    public JSONArray toJSONArray(JSONArray names) throws JSONException {
+    public JSONArray toJSONArray(JSONArray names) {
         if (names == null || names.length() == 0) {
             return null;
         }
@@ -1306,7 +1161,7 @@ public class LOGJSONObject {
      * with <code>}</code>&nbsp;<small>(right brace)</small>.
      * @throws JSONException If the object contains an invalid number.
      */
-    public String toString(int indentFactor) throws JSONException {
+    public String toString(int indentFactor) {
         StringWriter w = new StringWriter();
         synchronized (w.getBuffer()) {
             return this.write(w, indentFactor, 0).toString();
@@ -1336,27 +1191,27 @@ public class LOGJSONObject {
      * @throws JSONException If the value is or contains an invalid number.
      */
     @SuppressWarnings("unchecked")
-    public static String valueToString(Object value) throws JSONException {
+    public static String valueToString(Object value) {
         if (value == null) {
             return "null";
         }
         if (value instanceof JSONString) {
-            Object object;
+            String object;
             try {
                 object = ((JSONString) value).toJSONString();
             } catch (Exception e) {
                 throw new JSONException(e);
             }
-            if (object instanceof String) {
-                return (String) object;
+            if (object != null) {
+                return object;
             }
             throw new JSONException("Bad value from toJSONString: " + object);
         }
         if (value instanceof Number) {
             return numberToString((Number) value);
         }
-        if (value instanceof Boolean || value instanceof LOGJSONObject ||
-                value instanceof JSONArray) {
+        if (value instanceof Boolean || value instanceof LOGJSONObject
+            || value instanceof JSONArray) {
             return value.toString();
         }
         if (value instanceof Map) {
@@ -1390,12 +1245,12 @@ public class LOGJSONObject {
                 return NULL;
             }
             if (object instanceof LOGJSONObject || object instanceof JSONArray ||
-                    NULL.equals(object) || object instanceof JSONString ||
-                    object instanceof Byte || object instanceof Character ||
-                    object instanceof Short || object instanceof Integer ||
-                    object instanceof Long || object instanceof Boolean ||
-                    object instanceof Float || object instanceof Double ||
-                    object instanceof String) {
+                NULL.equals(object) || object instanceof JSONString ||
+                object instanceof Byte || object instanceof Character ||
+                object instanceof Short || object instanceof Integer ||
+                object instanceof Long || object instanceof Boolean ||
+                object instanceof Float || object instanceof Double ||
+                object instanceof String) {
                 return object;
             }
 
@@ -1410,13 +1265,13 @@ public class LOGJSONObject {
             }
             Package objectPackage = object.getClass().getPackage();
             String objectPackageName = objectPackage != null
-                    ? objectPackage.getName()
-                    : "";
+                ? objectPackage.getName()
+                : "";
             if (
-                    objectPackageName.startsWith("java.") ||
-                            objectPackageName.startsWith("javax.") ||
-                            object.getClass().getClassLoader() == null
-                    ) {
+                objectPackageName.startsWith("java.") ||
+                    objectPackageName.startsWith("javax.") ||
+                    object.getClass().getClassLoader() == null
+            ) {
                 return object.toString();
             }
             return new LOGJSONObject(object);
@@ -1427,8 +1282,7 @@ public class LOGJSONObject {
     }
 
     @SuppressWarnings("unchecked")
-    static final Writer writeValue(Writer writer, Object value,
-                                   int indentFactor, int indent) throws JSONException, IOException {
+    static Writer writeValue(Writer writer, Object value, int indentFactor, int indent) throws IOException {
         if (value == null) {
             writer.write("null");
         } else if (value instanceof LOGJSONObject) {
@@ -1438,8 +1292,7 @@ public class LOGJSONObject {
         } else if (value instanceof Map) {
             new LOGJSONObject((Map<String, Object>) value).write(writer, indentFactor, indent);
         } else if (value instanceof Collection) {
-            new JSONArray((Collection<Object>) value).write(writer, indentFactor,
-                    indent);
+            new JSONArray((Collection<Object>) value).write(writer, indentFactor, indent);
         } else if (value.getClass().isArray()) {
             new JSONArray(value).write(writer, indentFactor, indent);
         } else if (value instanceof Number) {
@@ -1460,7 +1313,7 @@ public class LOGJSONObject {
         return writer;
     }
 
-    static final void indent(Writer writer, int indent) throws IOException {
+    private static void indent(Writer writer, int indent) throws IOException {
         for (int i = 0; i < indent; i += 1) {
             writer.write(' ');
         }
@@ -1476,7 +1329,7 @@ public class LOGJSONObject {
      * @throws JSONException
      */
     Writer write(Writer writer, int indentFactor, int indent)
-            throws JSONException {
+        {
         try {
             boolean commanate = false;
             final int length = this.length();
@@ -1508,7 +1361,7 @@ public class LOGJSONObject {
                         writer.write(' ');
                     }
                     writeValue(writer, this.map.get(key), indentFactor,
-                            newindent);
+                        newindent);
                     commanate = true;
                 }
                 if (indentFactor > 0) {

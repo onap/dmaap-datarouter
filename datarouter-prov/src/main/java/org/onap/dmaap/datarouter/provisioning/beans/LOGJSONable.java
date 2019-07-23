@@ -32,11 +32,12 @@ import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
  * @author Robert Eby
  * @version $Id: JSONable.java,v 1.1 2013/04/26 21:00:26 eby Exp $
  */
+@FunctionalInterface
 public interface LOGJSONable {
     /**
      * Get a JSONObject representing this object.
      *
      * @return the JSONObject
      */
-    public LOGJSONObject asJSONObject();
+    LOGJSONObject asJSONObject();
 }

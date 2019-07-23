@@ -203,10 +203,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     private static String[] nodes = new String[0];
     /**
-     * [DATARTR-27] Poke all the DR nodes : Array of nodes names and/or FQDNs.
-     */
-    private static String[] drnodes = new String[0];
-    /**
      * Array of node IP addresses.
      */
     private static InetAddress[] nodeAddresses = new InetAddress[0];
@@ -565,9 +561,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 intlogger.warn("PROV0004 Cannot lookup " + nodes[i] + ": " + e.getMessage(), e);
             }
         }
-
-        //[DATARTR-27] Poke all the DR nodes: assigning DR Nodes
-        drnodes = nodes.clone();
 
         //Reset Nodes arr after - removing static routing Nodes, Rally Userstory - US664862 .
         List<String> filterNodes = new ArrayList<>();

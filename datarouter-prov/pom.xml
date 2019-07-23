@@ -37,7 +37,9 @@
         <docker.location>${basedir}/target/${project.artifactId}</docker.location>
         <datarouter.prov.image.name>${docker.image.root}${project.artifactId}</datarouter.prov.image.name>
         <sonar.exclusions>**/src/main/java/org/onap/dmaap/datarouter/reports/**,
-            **/src/main/java/org/onap/dmaap/authz/impl/AuthRespSupplementImpl.java</sonar.exclusions>
+            src/main/java/org/onap/dmaap/datarouter/authz/impl/AuthRespSupplementImpl.java,
+            src/main/java/org/onap/dmaap/datarouter/provisioning/Main.java,
+            src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DRRouteCLI.java</sonar.exclusions>
         <sonar.language>java</sonar.language>
         <sonar.skip>false</sonar.skip>
     </properties>
@@ -436,7 +438,9 @@
                 <configuration>
                     <excludes>
                         <exclude>**/src/main/java/org/onap/dmaap/datarouter/reports/**</exclude>
-                        <exclude>**/src/main/java/org/onap/dmaap/authz/impl/AuthRespSupplementImpl.java</exclude>
+                        <exclude>src/main/java/org/onap/dmaap/datarouter/authz/impl/AuthRespSupplementImpl.java</exclude>
+                        <exclude>src/main/java/org/onap/dmaap/datarouter/provisioning/Main.java</exclude>
+                        <exclude>src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DRRouteCLI.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

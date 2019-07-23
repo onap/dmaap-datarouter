@@ -25,7 +25,6 @@
 package org.onap.dmaap.datarouter.provisioning.beans;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.text.ParseException;

@@ -44,6 +44,7 @@ import javax.servlet.http.HttpServletResponse;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,6 +55,7 @@ import org.mockito.Mock;
 import org.onap.dmaap.datarouter.provisioning.beans.Deleteable;
 import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
 import org.onap.dmaap.datarouter.provisioning.beans.LogRecord;
+import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -277,6 +279,16 @@ public class InternalServletTest extends DrServletTestBase {
   }
 
   @Test
+  public void Given_Request_Is_HTTP_DELETE_With_LogRollInterval_Api_In_Endpoint_Request_Succeeds() {
+    when(request.getPathInfo()).thenReturn("/api/LOGROLL_INTERVAL");
+    internalServlet.doDelete(request, response);
+    verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+    Parameters p1 = Parameters.getParameter("NODES");
+    Assert.assertEquals("{\"keyname\":\"NODES\",\"value\":\"dmaap-dr-node\"}", p1.asJSONObject().toString());
+    Assert.assertEquals("PARAM: keyname=NODES, value=dmaap-dr-node", p1.toString());
+  }
+
+  @Test
   public void Given_Request_Is_HTTP_DELETE_With_Api_In_Endpoint_And_Delete_Fails_Then_Internal_Server_Error_Is_Generated()
       throws Exception {
     when(request.getPathInfo()).thenReturn("/api/NODES");
@@ -332,8 +344,7 @@ public class InternalServletTest extends DrServletTestBase {
   }
 
   @Test
-  public void Given_Request_Is_HTTP_POST_To_Logs_And_Content_Header_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated()
-      throws Exception {
+  public void Given_Request_Is_HTTP_POST_To_Logs_And_Content_Header_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated() {
     when(request.getHeader("Content-Type")).thenReturn("stub_contentType");
     when(request.getPathInfo()).thenReturn("/logs/");
     internalServlet.doPost(request, response);
@@ -341,8 +352,7 @@ public class InternalServletTest extends DrServletTestBase {
   }
 
   @Test
-  public void Given_Request_Is_HTTP_POST_To_Logs_And_Content_Encoding_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated()
-      throws Exception {
+  public void Given_Request_Is_HTTP_POST_To_Logs_And_Content_Encoding_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated() {
     when(request.getHeader("Content-Encoding")).thenReturn("not-supported");
     when(request.getPathInfo()).thenReturn("/logs/");
     internalServlet.doPost(request, response);
@@ -364,8 +374,7 @@ public class InternalServletTest extends DrServletTestBase {
   }
 
   @Test
-  public void Given_Request_Is_HTTP_POST_To_Drlogs_And_Then_Unsupported_Media_Type_Response_Is_Generated()
-      throws Exception {
+  public void Given_Request_Is_HTTP_POST_To_Drlogs_And_Then_Unsupported_Media_Type_Response_Is_Generated() {
     when(request.getHeader("Content-Type")).thenReturn("stub_contentType");
     when(request.getPathInfo()).thenReturn("/drlogs/");
     internalServlet.doPost(request, response);
@@ -379,6 +388,13 @@ public class InternalServletTest extends DrServletTestBase {
     when(inStream.read()).thenReturn(1, -1);
     when(request.getInputStream()).thenReturn(inStream);
     PowerMockito.mockStatic(LogRecord.class);
+    internalServlet.doPost(request, response);
+    verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+  }
+
+  @Test
+  public void Given_Request_Is_HTTP_POST_To_Api_And_Request_Succeeds() {
+    when(request.getPathInfo()).thenReturn("/api/NEW_PARAM?val=blah");
     internalServlet.doPost(request, response);
     verify(response).setStatus(eq(HttpServletResponse.SC_OK));
   }

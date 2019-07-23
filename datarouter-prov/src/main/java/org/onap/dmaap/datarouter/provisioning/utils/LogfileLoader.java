@@ -97,6 +97,19 @@ public class LogfileLoader extends Thread {
     private long nextId;
     private boolean idle;
 
+    private LogfileLoader() {
+        this.logger = EELFManager.getInstance().getLogger("InternalLog");
+        this.db = new DB();
+        this.spooldir = db.getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
+        this.setStart = getIdRange();
+        this.setEnd = setStart + SET_SIZE - 1;
+        this.seqSet = new RLEBitSet();
+        this.nextId = 0;
+        this.idle = false;
+        this.setDaemon(true);
+        this.setName("LogfileLoader");
+    }
+
     /**
      * Get the singleton LogfileLoader object, and start it if it is not running.
      *
@@ -110,20 +123,6 @@ public class LogfileLoader extends Thread {
             logfileLoader.start();
         }
         return logfileLoader;
-    }
-
-
-    private LogfileLoader() {
-        this.logger = EELFManager.getInstance().getLogger("InternalLog");
-        this.db = new DB();
-        this.spooldir = db.getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
-        this.setStart = getIdRange();
-        this.setEnd = setStart + SET_SIZE - 1;
-        this.seqSet = new RLEBitSet();
-        this.nextId = 0;
-        this.idle = false;
-        this.setDaemon(true);
-        this.setName("LogfileLoader");
     }
 
     private long getIdRange() {
@@ -211,7 +210,7 @@ public class LogfileLoader extends Thread {
         int[] n = process(infile);
         time = System.currentTimeMillis() - time;
         logger.info(String.format("PROV8000 Processed %s in %d ms; %d of %d records.",
-                infile.toString(), time, n[0], n[1]));
+            infile.toString(), time, n[0], n[1]));
         try {
             Files.delete(infile.toPath());
         } catch (IOException e) {
@@ -281,7 +280,7 @@ public class LogfileLoader extends Thread {
                     stmt.execute("OPTIMIZE TABLE LOG_RECORDS");
                 }
             } catch (SQLException e) {
-                logger.error(e.toString());
+                logger.error("LogfileLoader.pruneRecords: " + e.getMessage(), e);
             } finally {
                 db.release(conn);
             }
@@ -289,46 +288,40 @@ public class LogfileLoader extends Thread {
         return did1;
     }
 
-    long countRecords() {
+    private long countRecords() {
         long count = 0;
-        Connection conn = null;
-        try {
-            conn = db.getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery("SELECT COUNT(*) as COUNT from LOG_RECORDS")) {
-                    if (rs.next()) {
-                        count = rs.getLong("COUNT");
-                    }
+        try (Connection conn = db.getConnection();
+            Statement stmt = conn.createStatement()) {
+            try (ResultSet rs = stmt.executeQuery("SELECT COUNT(*) as COUNT from LOG_RECORDS")) {
+                if (rs.next()) {
+                    count = rs.getLong("COUNT");
                 }
+            } finally {
+                db.release(conn);
             }
         } catch (SQLException e) {
-            logger.error(e.toString());
-        } finally {
-            db.release(conn);
+            logger.error("LogfileLoader.countRecords: " + e.getMessage(), e);
         }
         return count;
     }
 
-    Map<Long, Long> getHistogram() {
+    private Map<Long, Long> getHistogram() {
         Map<Long, Long> map = new HashMap<>();
-        Connection conn = null;
-        try {
+        try (Connection conn = db.getConnection();
+            Statement stmt = conn.createStatement()) {
             logger.debug("  LOG_RECORD table histogram...");
-            conn = db.getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery("SELECT FLOOR(EVENT_TIME/86400000) AS DAY, COUNT(*) AS COUNT FROM LOG_RECORDS GROUP BY DAY")) {
-                    while (rs.next()) {
-                        long day = rs.getLong("DAY");
-                        long cnt = rs.getLong("COUNT");
-                        map.put(day, cnt);
-                        logger.debug("  " + day + "  " + cnt);
-                    }
+            try (ResultSet rs = stmt.executeQuery("SELECT FLOOR(EVENT_TIME/86400000) AS DAY, COUNT(*) AS COUNT FROM LOG_RECORDS GROUP BY DAY")) {
+                while (rs.next()) {
+                    long day = rs.getLong("DAY");
+                    long cnt = rs.getLong("COUNT");
+                    map.put(day, cnt);
+                    logger.debug("  " + day + "  " + cnt);
                 }
+            } finally {
+                db.release(conn);
             }
         } catch (SQLException e) {
-            logger.error(e.toString());
-        } finally {
-            db.release(conn);
+            logger.error("LogfileLoader.getHistogram: " + e.getMessage(), e);
         }
         return map;
     }
@@ -377,9 +370,9 @@ public class LogfileLoader extends Thread {
                     nextId = (t == 0) ? setStart : (t - 1);
                 }
             }
-            logger.debug(String.format("initializeNextid, next ID is %d (%x)", nextId, nextId));
+            logger.debug(String.format("LogfileLoader.initializeNextid, next ID is %d (%x)", nextId, nextId));
         } catch (SQLException e) {
-            logger.error(e.toString());
+            logger.error("LogfileLoader.initializeNextid: " + e.getMessage(), e);
         } finally {
             db.release(conn);
         }
@@ -393,8 +386,8 @@ public class LogfileLoader extends Thread {
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(INSERT_SQL);
             Reader r = f.getPath().endsWith(".gz")
-                               ? new InputStreamReader(new GZIPInputStream(new FileInputStream(f)))
-                               : new FileReader(f);
+                ? new InputStreamReader(new GZIPInputStream(new FileInputStream(f)))
+                : new FileReader(f);
             try (LineNumberReader in = new LineNumberReader(r)) {
                 String line;
                 while ((line = in.readLine()) != null) {

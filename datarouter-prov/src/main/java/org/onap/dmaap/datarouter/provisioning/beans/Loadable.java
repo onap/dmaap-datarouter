@@ -36,6 +36,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
  * @author Robert Eby
  * @version $Id: Loadable.java,v 1.2 2013/08/06 13:28:33 eby Exp $
  */
+@FunctionalInterface
 public interface Loadable {
     /**
      * Load the 18 fields in the PreparedStatement <i>ps</i>. The fields are:
@@ -62,5 +63,5 @@ public interface Loadable {
      *
      * @param ps the PreparedStatement to load
      */
-    public void load(PreparedStatement ps) throws SQLException;
+    void load(PreparedStatement ps) throws SQLException;
 }

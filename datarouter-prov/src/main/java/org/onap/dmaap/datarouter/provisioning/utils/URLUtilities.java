@@ -28,7 +28,6 @@ import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 
 import org.onap.dmaap.datarouter.provisioning.BaseServlet;
 
@@ -39,7 +38,14 @@ import org.onap.dmaap.datarouter.provisioning.BaseServlet;
  * @version $Id: URLUtilities.java,v 1.2 2014/03/12 19:45:41 eby Exp $
  */
 public class URLUtilities {
+
     private static final EELFLogger utilsLogger = EELFManager.getInstance().getLogger("UtilsLog");
+    private static final String HTTPS = "https://";
+    private static String otherPod;
+
+    private URLUtilities() {
+    }
+
     /**
      * Generate the URL used to access a feed.
      *
@@ -47,7 +53,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generateFeedURL(int feedid) {
-        return "https://" + BaseServlet.getProvName() + "/feed/" + feedid;
+        return HTTPS + BaseServlet.getProvName() + "/feed/" + feedid;
     }
 
     /**
@@ -57,7 +63,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generatePublishURL(int feedid) {
-        return "https://" + BaseServlet.getProvName() + "/publish/" + feedid;
+        return HTTPS + BaseServlet.getProvName() + "/publish/" + feedid;
     }
 
     /**
@@ -67,7 +73,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generateSubscribeURL(int feedid) {
-        return "https://" + BaseServlet.getProvName() + "/subscribe/" + feedid;
+        return HTTPS + BaseServlet.getProvName() + "/subscribe/" + feedid;
     }
 
     /**
@@ -77,7 +83,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generateFeedLogURL(int feedid) {
-        return "https://" + BaseServlet.getProvName() + "/feedlog/" + feedid;
+        return HTTPS + BaseServlet.getProvName() + "/feedlog/" + feedid;
     }
 
     /**
@@ -87,7 +93,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generateSubscriptionURL(int subid) {
-        return "https://" + BaseServlet.getProvName() + "/subs/" + subid;
+        return HTTPS + BaseServlet.getProvName() + "/subs/" + subid;
     }
 
     /**
@@ -97,7 +103,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generateSubLogURL(int subid) {
-        return "https://" + BaseServlet.getProvName() + "/sublog/" + subid;
+        return HTTPS + BaseServlet.getProvName() + "/sublog/" + subid;
     }
 
     /**
@@ -106,7 +112,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generatePeerProvURL() {
-        return "https://" + getPeerPodName() + "/internal/prov";
+        return HTTPS + getPeerPodName() + "/internal/prov";
     }
 
     /**
@@ -117,11 +123,11 @@ public class URLUtilities {
     public static String generatePeerLogsURL() {
         //Fixes for Itrack ticket - DATARTR-4#Fixing if only one Prov is configured, not to give exception to fill logs.
         String peerPodUrl = getPeerPodName();
-        if (peerPodUrl == null || peerPodUrl.equals("")) {
+        if (peerPodUrl == null || "".equals(peerPodUrl)) {
             return "";
         }
 
-        return "https://" + peerPodUrl + "/internal/drlogs/";
+        return HTTPS + peerPodUrl + "/internal/drlogs/";
     }
 
     /**
@@ -130,24 +136,21 @@ public class URLUtilities {
      * @return the name
      */
     public static String getPeerPodName() {
-        if (other_pod == null) {
-            String this_pod = "";
+        if (otherPod == null) {
+            String thisPod;
             try {
-                this_pod = InetAddress.getLocalHost().getHostName();
-                System.out.println("this_pod: " + this_pod);
+                thisPod = InetAddress.getLocalHost().getHostName();
             } catch (UnknownHostException e) {
                 utilsLogger.trace("UnkownHostException: " + e.getMessage(), e);
-                this_pod = "";
+                thisPod = "";
             }
-            System.out.println("ALL PODS: " + Arrays.asList(BaseServlet.getPods()));
             for (String pod : BaseServlet.getPods()) {
-                if (!pod.equals(this_pod)) {
-                    other_pod = pod;
+                if (!pod.equals(thisPod)) {
+                    otherPod = pod;
                 }
             }
         }
-        return other_pod;
+        return otherPod;
     }
 
-    private static String other_pod;
 }

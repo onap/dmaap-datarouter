@@ -24,12 +24,12 @@
 
 package org.onap.dmaap.datarouter.provisioning.utils;
 
-import java.io.File;
-import java.util.Properties;
-import java.util.TimerTask;
-
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
+import java.io.File;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.TimerTask;
 
 /**
  * This class provides a {@link TimerTask} that purges old logfiles (older than the number of days specified by the
@@ -50,9 +50,7 @@ public class PurgeLogDirTask extends TimerTask {
         Properties p = (new DB()).getProperties();
         logdir = p.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
         String s = p.getProperty("org.onap.dmaap.datarouter.provserver.logretention", "30");
-
         this.utilsLogger = EELFManager.getInstance().getLogger("UtilsLog");
-
         long n = 30;
         try {
             n = Long.parseLong(s);
@@ -67,15 +65,19 @@ public class PurgeLogDirTask extends TimerTask {
         try {
             File dir = new File(logdir);
             if (dir.exists()) {
-                long exptime = System.currentTimeMillis() - interval;
-                for (File logfile : dir.listFiles()) {
-                    if (logfile.lastModified() < exptime) {
-                        logfile.delete();
-                    }
-                }
+                purgeLogFiles(dir);
             }
         } catch (Exception e) {
             utilsLogger.error("Exception: " + e.getMessage(), e);
+        }
+    }
+
+    private void purgeLogFiles(File dir) {
+        long exptime = System.currentTimeMillis() - interval;
+        for (File logfile : Objects.requireNonNull(dir.listFiles())) {
+            if (logfile.lastModified() < exptime) {
+                logfile.delete();
+            }
         }
     }
 }

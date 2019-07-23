@@ -24,6 +24,8 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,9 +34,6 @@ import java.sql.Statement;
 import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 
@@ -47,9 +46,21 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
 public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
 
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
-    private static final String SQLEXCEPTION = "SQLException: ";
     private final int subid;
     private final int nodeid;
+
+    public EgressRoute(int subid, int nodeid) {
+        this.subid = subid;
+        this.nodeid = nodeid;
+        // Note: unlike for Feeds, it subscriptions can be removed from the tables, so it is
+        // possible that an orphan ERT entry can exist if a sub is removed.
+        //        if (Subscription.getSubscriptionById(subid) == null)
+        //            throw new IllegalArgumentException("No such subscription: "+subid);
+    }
+
+    public EgressRoute(int subid, String node) {
+        this(subid, lookupNodeName(node));
+    }
 
     /**
      * Get a set of all Egress Routes in the DB.  The set is sorted according to the natural sorting order of the routes
@@ -59,25 +70,28 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
      */
     public static SortedSet<EgressRoute> getAllEgressRoutes() {
         SortedSet<EgressRoute> set = new TreeSet<>();
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+        DB db = new DB();
+        String sql = "select SUBID, NODEID from EGRESS_ROUTES";
+        try (Connection conn = db.getConnection()) {
             try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery("select SUBID, NODEID from EGRESS_ROUTES")) {
-                    while (rs.next()) {
-                        int subid = rs.getInt("SUBID");
-                        int nodeid = rs.getInt("NODEID");
-                        set.add(new EgressRoute(subid, nodeid));
-                    }
+                try (ResultSet rs = stmt.executeQuery(sql)) {
+                    addEgressRouteToSet(set, rs);
                 }
+            } finally {
+                db.release(conn);
             }
-
-            db.release(conn);
         } catch (SQLException e) {
             intlogger.error("PROV0008 EgressRoute.getAllEgressRoutes: " + e.getMessage(), e);
         }
         return set;
+    }
+
+    private static void addEgressRouteToSet(SortedSet<EgressRoute> set, ResultSet rs) throws SQLException {
+        while (rs.next()) {
+            int subid = rs.getInt("SUBID");
+            int nodeid = rs.getInt("NODEID");
+            set.add(new EgressRoute(subid, nodeid));
+        }
     }
 
     /**
@@ -88,69 +102,35 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
      */
     public static EgressRoute getEgressRoute(int sub) {
         EgressRoute v = null;
-        PreparedStatement ps = null;
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            String sql = "select NODEID from EGRESS_ROUTES where SUBID = ?";
-            ps = conn.prepareStatement(sql);
+        DB db = new DB();
+        String sql = "select NODEID from EGRESS_ROUTES where SUBID = ?";
+        try (Connection conn = db.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, sub);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     int node = rs.getInt("NODEID");
                     v = new EgressRoute(sub, node);
                 }
+            } finally {
+                db.release(conn);
             }
-            ps.close();
-            db.release(conn);
         } catch (SQLException e) {
             intlogger.error("PROV0009 EgressRoute.getEgressRoute: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
         }
         return v;
-    }
-
-    public EgressRoute(int subid, int nodeid) {
-        this.subid = subid;
-        this.nodeid = nodeid;
-// Note: unlike for Feeds, it subscriptions can be removed from the tables, so it is
-// possible that an orphan ERT entry can exist if a sub is removed.
-//        if (Subscription.getSubscriptionById(subid) == null)
-//            throw new IllegalArgumentException("No such subscription: "+subid);
-    }
-
-    public EgressRoute(int subid, String node) {
-        this(subid, lookupNodeName(node));
     }
 
     @Override
     public boolean doDelete(Connection c) {
         boolean rv = true;
-        PreparedStatement ps = null;
-        try {
-            String sql = "delete from EGRESS_ROUTES where SUBID = ?";
-            ps = c.prepareStatement(sql);
+        String sql = "delete from EGRESS_ROUTES where SUBID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, subid);
             ps.execute();
         } catch (SQLException e) {
             rv = false;
             intlogger.error("PROV0007 doDelete: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
         }
         return rv;
     }
@@ -158,11 +138,9 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
     @Override
     public boolean doInsert(Connection c) {
         boolean rv = false;
-        PreparedStatement ps = null;
-        try {
+        String sql = "insert into EGRESS_ROUTES (SUBID, NODEID) values (?, ?)";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
             // Create the NETWORK_ROUTES row
-            String sql = "insert into EGRESS_ROUTES (SUBID, NODEID) values (?, ?)";
-            ps = c.prepareStatement(sql);
             ps.setInt(1, this.subid);
             ps.setInt(2, this.nodeid);
             ps.execute();
@@ -170,14 +148,6 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             rv = true;
         } catch (SQLException e) {
             intlogger.warn("PROV0005 doInsert: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
         }
         return rv;
     }
@@ -185,24 +155,14 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
     @Override
     public boolean doUpdate(Connection c) {
         boolean rv = true;
-        PreparedStatement ps = null;
-        try {
-            String sql = "update EGRESS_ROUTES set NODEID = ? where SUBID = ?";
-            ps = c.prepareStatement(sql);
+        String sql = "update EGRESS_ROUTES set NODEID = ? where SUBID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, nodeid);
             ps.setInt(2, subid);
             ps.executeUpdate();
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
         }
         return rv;
     }

@@ -32,11 +32,12 @@ import org.json.JSONObject;
  * @author Robert Eby
  * @version $Id: JSONable.java,v 1.1 2013/04/26 21:00:26 eby Exp $
  */
+@FunctionalInterface
 public interface JSONable {
     /**
      * Get a JSONObject representing this object.
      *
      * @return the JSONObject
      */
-    public JSONObject asJSONObject();
+    JSONObject asJSONObject();
 }

@@ -23,16 +23,19 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.io.InvalidObjectException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
-
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 
@@ -44,8 +47,9 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  */
 public class Group extends Syncable {
 
+    private static final String GROUP_ID_CONST = "groupid";
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
-    private static int next_groupid = getMaxGroupID() + 1;
+    private static int nextGroupid = getMaxGroupID() + 1;
     private static final String SQLEXCEPTION = "SQLException: ";
 
     private int groupid;
@@ -55,83 +59,6 @@ public class Group extends Syncable {
     private String classification;
     private String members;
     private Date last_mod;
-
-
-    public static Group getGroupMatching(Group gup) {
-        String sql = String.format(
-                "select * from GROUPS where NAME='%s'",
-                gup.getName()
-        );
-        List<Group> list = getGroupsForSQL(sql);
-        return list.size() > 0 ? list.get(0) : null;
-    }
-
-    public static Group getGroupMatching(Group gup, int groupid) {
-        String sql = String.format(
-                "select * from GROUPS where  NAME = '%s' and GROUPID != %d ",
-                gup.getName(),
-                gup.getGroupid()
-        );
-        List<Group> list = getGroupsForSQL(sql);
-        return list.size() > 0 ? list.get(0) : null;
-    }
-
-    public static Group getGroupById(int id) {
-        String sql = "select * from GROUPS where GROUPID = " + id;
-        List<Group> list = getGroupsForSQL(sql);
-        return list.size() > 0 ? list.get(0) : null;
-    }
-
-    public static Group getGroupByAuthId(String id) {
-        String sql = "select * from GROUPS where AUTHID = '" + id + "'";
-        List<Group> list = getGroupsForSQL(sql);
-        return list.size() > 0 ? list.get(0) : null;
-    }
-
-    public static Collection<Group> getAllgroups() {
-        return getGroupsForSQL("select * from GROUPS");
-    }
-
-    private static List<Group> getGroupsForSQL(String sql) {
-        List<Group> list = new ArrayList<Group>();
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery(sql)) {
-                    while (rs.next()) {
-                        Group group = new Group(rs);
-                        list.add(group);
-                    }
-                }
-            }
-            db.release(conn);
-        } catch (SQLException e) {
-            intlogger.error("PROV0009 getGroupsForSQL: " + e.getMessage(), e);
-        }
-        return list;
-    }
-
-    public static int getMaxGroupID() {
-        int max = 0;
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery("select MAX(groupid) from GROUPS")) {
-                    if (rs.next()) {
-                        max = rs.getInt(1);
-                    }
-                }
-            }
-            db.release(conn);
-        } catch (SQLException e) {
-            intlogger.info("PROV0001 getMaxSubID: " + e.getMessage(), e);
-        }
-        return max;
-    }
 
     public Group() {
         this("", "", "");
@@ -163,7 +90,7 @@ public class Group extends Syncable {
         this("", "", "");
         try {
             // The JSONObject is assumed to contain a vnd.dmaap-dr.group representation
-            this.groupid = jo.optInt("groupid", -1);
+            this.groupid = jo.optInt(GROUP_ID_CONST, -1);
             String gname = jo.getString("name");
             String gdescription = jo.getString("description");
 
@@ -185,6 +112,83 @@ public class Group extends Syncable {
             intlogger.warn("Invalid JSON: " + e.getMessage(), e);
             throw new InvalidObjectException("Invalid JSON: " + e.getMessage());
         }
+    }
+
+
+    public static Group getGroupMatching(Group gup) {
+        String sql = String.format(
+                "select * from GROUPS where NAME='%s'",
+                gup.getName()
+        );
+        List<Group> list = getGroupsForSQL(sql);
+        return list.size() > 0 ? list.get(0) : null;
+    }
+
+    public static Group getGroupMatching(Group gup, int groupid) {
+        String sql = String.format(
+                "select * from GROUPS where  NAME = '%s' and GROUPID != %d ",
+                gup.getName(),
+                gup.getGroupid()
+        );
+        List<Group> list = getGroupsForSQL(sql);
+        return list.size() > 0 ? list.get(0) : null;
+    }
+
+    public static Group getGroupById(int id) {
+        String sql = "select * from GROUPS where GROUPID = " + id;
+        List<Group> list = getGroupsForSQL(sql);
+        return list.size() > 0 ? list.get(0) : null;
+    }
+
+    static Group getGroupByAuthId(String id) {
+        String sql = "select * from GROUPS where AUTHID = '" + id + "'";
+        List<Group> list = getGroupsForSQL(sql);
+        return list.size() > 0 ? list.get(0) : null;
+    }
+
+    public static Collection<Group> getAllgroups() {
+        return getGroupsForSQL("select * from GROUPS");
+    }
+
+    private static List<Group> getGroupsForSQL(String sql) {
+        List<Group> list = new ArrayList<>();
+        try {
+            DB db = new DB();
+            @SuppressWarnings("resource")
+            Connection conn = db.getConnection();
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery(sql)) {
+                    while (rs.next()) {
+                        Group group = new Group(rs);
+                        list.add(group);
+                    }
+                }
+            }
+            db.release(conn);
+        } catch (SQLException e) {
+            intlogger.error("PROV0009 getGroupsForSQL: " + e.getMessage(), e);
+        }
+        return list;
+    }
+
+    private static int getMaxGroupID() {
+        int max = 0;
+        try {
+            DB db = new DB();
+            @SuppressWarnings("resource")
+            Connection conn = db.getConnection();
+            try (Statement stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("select MAX(groupid) from GROUPS")) {
+                    if (rs.next()) {
+                        max = rs.getInt(1);
+                    }
+                }
+            }
+            db.release(conn);
+        } catch (SQLException e) {
+            intlogger.info("PROV0001 getMaxSubID: " + e.getMessage(), e);
+        }
+        return max;
     }
 
     public int getGroupid() {
@@ -242,7 +246,7 @@ public class Group extends Syncable {
     @Override
     public JSONObject asJSONObject() {
         JSONObject jo = new JSONObject();
-        jo.put("groupid", groupid);
+        jo.put(GROUP_ID_CONST, groupid);
         jo.put("authid", authid);
         jo.put("name", name);
         jo.put("description", description);
@@ -259,11 +263,11 @@ public class Group extends Syncable {
         try {
             if (groupid == -1) {
                 // No feed ID assigned yet, so assign the next available one
-                setGroupid(next_groupid++);
+                setGroupid(nextGroupid++);
             }
             // In case we insert a gropup from synchronization
-            if (groupid > next_groupid) {
-                next_groupid = groupid + 1;
+            if (groupid > nextGroupid) {
+                nextGroupid = groupid + 1;
             }
 
             // Create the GROUPS row
