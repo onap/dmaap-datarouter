@@ -20,15 +20,9 @@
 
 package org.onap.dmaap.datarouter.node;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,13 +36,11 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({DeliveryTask.class})
+@PrepareForTest({URL.class})
 public class DeliveryTaskTest {
 
     @Mock
     private DeliveryQueue deliveryQueue;
-
-    private ExecutorService executorService;
 
     @Before
     public void setUp() throws Exception {
@@ -57,14 +49,13 @@ public class DeliveryTaskTest {
 
         URL url = PowerMockito.mock(URL.class);
         HttpURLConnection urlConnection = PowerMockito.mock(HttpURLConnection.class);
-        OutputStream outputStream = PowerMockito.mock(OutputStream.class);
 
-        PowerMockito.whenNew(URL.class).withParameterTypes(String.class).withArguments(Mockito.anyString())
-                .thenReturn(url);
-        PowerMockito.when(urlConnection.getOutputStream()).thenReturn(outputStream);
-        PowerMockito.when(url.openConnection()).thenReturn(urlConnection);
+        PowerMockito.whenNew(URL.class).withParameterTypes(String.class).withArguments(Mockito.anyString()).thenReturn(url);
+
+        PowerMockito.when(urlConnection.getOutputStream()).thenReturn(new ByteArrayOutputStream());
         PowerMockito.when(urlConnection.getHeaderField(0)).thenReturn("PUT");
         PowerMockito.when(urlConnection.getResponseCode()).thenReturn(200);
+        PowerMockito.when(url.openConnection()).thenReturn(urlConnection);
     }
 
     @After
@@ -74,8 +65,8 @@ public class DeliveryTaskTest {
 
     @Test
     public void Validate_Delivery_Task_Equals() {
-        DeliveryTask task = new DeliveryTask(deliveryQueue, "123456789.test-dr-datafile");
-        DeliveryTask task2 = new DeliveryTask(deliveryQueue, "123456789.test-dr-datafile");
+        DeliveryTask task = new DeliveryTask(deliveryQueue, "123456789.test-dr-node");
+        DeliveryTask task2 = new DeliveryTask(deliveryQueue, "123456789.test-dr-node");
         Assert.assertEquals(task, task2);
         Assert.assertEquals(task.hashCode(), task2.hashCode());
         Assert.assertEquals(task.toString(), task2.toString());
@@ -91,29 +82,19 @@ public class DeliveryTaskTest {
         Assert.assertEquals(task.getFileId(), task2.getFileId());
         Assert.assertEquals(task.getAttempts(), task2.getAttempts());
         Assert.assertEquals(task.getFollowRedirects(), task2.getFollowRedirects());
-
         Assert.assertEquals(0, task.compareTo(task2));
     }
 
     @Test
-    public void Validate_Delivery_Tasks_Success_For_Standard_File() throws InterruptedException {
+    public void Validate_Delivery_Tasks_Success_For_Standard_File() {
         DeliveryTask task = new DeliveryTask(deliveryQueue, "123456789.test-dr-node");
-        executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(task);
-
-        executorService.shutdown();
-        executorService.awaitTermination(2, TimeUnit.SECONDS);
+        task.run();
     }
 
     @Test
-    public void Validate_Delivery_Tasks_Success_For_Compressed_File() throws InterruptedException {
-
+    public void Validate_Delivery_Tasks_Success_For_Compressed_File() {
         DeliveryTask task = new DeliveryTask(deliveryQueue, "123456789.test-dr-node.gz");
-        executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(task);
-
-        executorService.shutdown();
-        executorService.awaitTermination(2, TimeUnit.SECONDS);
+        task.run();
     }
 
     private DestInfo getPrivDestInfo() {
@@ -125,8 +106,9 @@ public class DeliveryTaskTest {
     }
 
     private DeliveryQueue mockDelvieryQueue(DestInfo destInfo) {
-        DeliveryQueue mockedDeliveryQueue = mock(DeliveryQueue.class);
-        when(mockedDeliveryQueue.getDestinationInfo()).thenReturn(destInfo);
+        DeliveryQueue mockedDeliveryQueue = PowerMockito.mock(DeliveryQueue.class);
+        PowerMockito.when(mockedDeliveryQueue.getDestinationInfo()).thenReturn(destInfo);
+        PowerMockito.when(mockedDeliveryQueue.getDestURL(Mockito.anyString())).thenReturn("https://dmaap-dr-node:8443/internal/publish");
         return mockedDeliveryQueue;
     }
 
