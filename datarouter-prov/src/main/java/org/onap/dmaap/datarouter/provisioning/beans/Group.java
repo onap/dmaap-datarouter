@@ -121,7 +121,7 @@ public class Group extends Syncable {
                 gup.getName()
         );
         List<Group> list = getGroupsForSQL(sql);
-        return list.size() > 0 ? list.get(0) : null;
+        return !list.isEmpty() ? list.get(0) : null;
     }
 
     public static Group getGroupMatching(Group gup, int groupid) {
@@ -131,19 +131,19 @@ public class Group extends Syncable {
                 gup.getGroupid()
         );
         List<Group> list = getGroupsForSQL(sql);
-        return list.size() > 0 ? list.get(0) : null;
+        return !list.isEmpty() ? list.get(0) : null;
     }
 
     public static Group getGroupById(int id) {
         String sql = "select * from GROUPS where GROUPID = " + id;
         List<Group> list = getGroupsForSQL(sql);
-        return list.size() > 0 ? list.get(0) : null;
+        return !list.isEmpty() ? list.get(0) : null;
     }
 
     static Group getGroupByAuthId(String id) {
         String sql = "select * from GROUPS where AUTHID = '" + id + "'";
         List<Group> list = getGroupsForSQL(sql);
-        return list.size() > 0 ? list.get(0) : null;
+        return !list.isEmpty() ? list.get(0) : null;
     }
 
     public static Collection<Group> getAllgroups() {

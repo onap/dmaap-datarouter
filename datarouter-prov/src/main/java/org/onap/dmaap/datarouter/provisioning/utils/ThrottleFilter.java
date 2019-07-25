@@ -103,7 +103,7 @@ public class ThrottleFilter extends TimerTask implements Filter {
     private static int action = ACTION_DROP;    // action to take (throttle or drop)
 
     private static EELFLogger logger = EELFManager.getInstance().getLogger("InternalLog");
-    private static Map<String, Counter> map = new HashMap<String, Counter>();
+    private static Map<String, Counter> map = new HashMap<>();
     private static final Timer rolex = new Timer();
 
     @Override
@@ -214,13 +214,13 @@ public class ThrottleFilter extends TimerTask implements Filter {
         }
     }
 
-    private Map<String, List<Continuation>> suspended_requests = new HashMap<String, List<Continuation>>();
+    private Map<String, List<Continuation>> suspended_requests = new HashMap<>();
 
     private void register(String id, Continuation continuation) {
         synchronized (suspended_requests) {
             List<Continuation> list = suspended_requests.get(id);
             if (list == null) {
-                list = new ArrayList<Continuation>();
+                list = new ArrayList<>();
                 suspended_requests.put(id, list);
             }
             list.add(continuation);
@@ -258,13 +258,12 @@ public class ThrottleFilter extends TimerTask implements Filter {
                 cnt = new Counter();
                 map.put(key, cnt);
             }
-            int n = cnt.getRequestRate();
-            return n;
+            return cnt.getRequestRate();
         }
     }
 
     public class Counter {
-        private List<Long> times = new Vector<Long>();    // a record of request times
+        private List<Long> times = new Vector<>();    // a record of request times
 
         public int prune() {
             try {
@@ -302,8 +301,7 @@ public class ThrottleFilter extends TimerTask implements Filter {
         if (ix < 0 || ix == path.length() - 1)
             return -2;
         try {
-            int feedid = Integer.parseInt(path.substring(0, ix));
-            return feedid;
+            return Integer.parseInt(path.substring(0, ix));
         } catch (NumberFormatException e) {
             return -1;
         }

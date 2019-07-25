@@ -44,8 +44,8 @@ public class FeedAuthorization implements JSONable {
 
     public FeedAuthorization() {
         this.classification = "";
-        this.endpoint_ids = new HashSet<FeedEndpointID>();
-        this.endpoint_addrs = new HashSet<String>();
+        this.endpoint_ids = new HashSet<>();
+        this.endpoint_addrs = new HashSet<>();
     }
 
     public String getClassification() {

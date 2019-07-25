@@ -45,7 +45,7 @@ public class FeedLinks implements JSONable {
         self = publish = subscribe = log = null;
     }
 
-    public FeedLinks(JSONObject jo) throws InvalidObjectException {
+    public FeedLinks(JSONObject jo) {
         this();
         self = jo.getString("self");
         publish = jo.getString("publish");

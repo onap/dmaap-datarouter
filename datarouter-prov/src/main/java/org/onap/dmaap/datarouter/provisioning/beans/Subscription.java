@@ -236,8 +236,7 @@ public class Subscription extends Syncable {
             this.feedid = jo.optInt(FEEDID_KEY, -1);
             this.groupid = jo.optInt(GROUPID_KEY, -1); //New field is added - Groups feature Rally:US708115 - 1610
             this.aafInstance = jo.optString("aaf_instance", "legacy");
-            if(!(aafInstance.equalsIgnoreCase("legacy"))){
-                if (aafInstance.length() > 255)
+            if(!(aafInstance.equalsIgnoreCase("legacy")) && aafInstance.length() > 255) {
                     throw new InvalidObjectException("aaf_instance field is too long");
             }
             JSONObject jdeli = jo.getJSONObject("delivery");

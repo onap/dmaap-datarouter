@@ -101,7 +101,7 @@ public class DeliveryRecord extends BaseLogRecord {
 
 
     public LOGJSONObject reOrderObject(LOGJSONObject jo) {
-        LinkedHashMap<String, Object> logrecordObj = new LinkedHashMap<String, Object>();
+        LinkedHashMap<String, Object> logrecordObj = new LinkedHashMap<>();
 
         logrecordObj.put("statusCode", jo.get("statusCode"));
         logrecordObj.put("deliveryId", jo.get("deliveryId"));
@@ -116,8 +116,7 @@ public class DeliveryRecord extends BaseLogRecord {
         logrecordObj.put("contentLength", jo.get("contentLength"));
 
 
-        LOGJSONObject newjo = new LOGJSONObject(logrecordObj);
-        return newjo;
+        return new LOGJSONObject(logrecordObj);
     }
 
     @Override
@@ -127,8 +126,7 @@ public class DeliveryRecord extends BaseLogRecord {
         jo.put("deliveryId", user);
         jo.put("statusCode", result);
 
-        LOGJSONObject newjo = this.reOrderObject(jo);
-        return newjo;
+        return this.reOrderObject(jo);
     }
 
     @Override

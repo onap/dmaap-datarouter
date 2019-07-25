@@ -100,7 +100,7 @@ public class ExpiryRecord extends BaseLogRecord {
     }
 
     public LOGJSONObject reOrderObject(LOGJSONObject jo) {
-        LinkedHashMap<String, Object> logrecordObj = new LinkedHashMap<String, Object>();
+        LinkedHashMap<String, Object> logrecordObj = new LinkedHashMap<>();
 
         logrecordObj.put("expiryReason", jo.get("expiryReason"));
         logrecordObj.put("publishId", jo.get("publishId"));
@@ -112,8 +112,7 @@ public class ExpiryRecord extends BaseLogRecord {
         logrecordObj.put("date", jo.get("date"));
         logrecordObj.put("contentLength", jo.get("contentLength"));
 
-        LOGJSONObject newjo = new LOGJSONObject(logrecordObj);
-        return newjo;
+        return new LOGJSONObject(logrecordObj);
     }
 
     @Override
@@ -123,8 +122,7 @@ public class ExpiryRecord extends BaseLogRecord {
         jo.put("expiryReason", reason);
         jo.put("attempts", attempts);
 
-        LOGJSONObject newjo = this.reOrderObject(jo);
-        return newjo;
+        return this.reOrderObject(jo);
     }
 
     @Override
