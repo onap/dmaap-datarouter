@@ -109,7 +109,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
 
         Properties drNodeProperties = new Properties();
         try {
-            eelfLogger.info("NODE0301 Loading local config file node.properties");
+            eelfLogger.debug("NODE0301 Loading local config file node.properties");
             drNodeProperties.load(new FileInputStream(System
                     .getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties")));
         } catch (Exception e) {
@@ -142,7 +142,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
             eelfLogger.error(EelfMsgs.MESSAGE_BAD_PROV_URL, e, provurl);
             System.exit(1);
         }
-        eelfLogger.info("NODE0303 Provisioning server is " + provhost);
+        eelfLogger.debug("NODE0303 Provisioning server is " + provhost);
         eventlogurl = drNodeProperties.getProperty("LogUploadURL", "https://feeds-drtr.web.att.com/internal/logs");
         provcheck = new IsFrom(provhost);
         gfport = Integer.parseInt(drNodeProperties.getProperty("IntHttpPort", "8080"));
@@ -183,7 +183,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
             eelfLogger.error("NODE0309 Unable to fetch canonical name from keystore file " + ksfile);
             System.exit(1);
         }
-        eelfLogger.info("NODE0304 My certificate says my name is " + myname);
+        eelfLogger.debug("NODE0304 My certificate says my name is " + myname);
         pid = new PublishId(myname);
         long minrsinterval = Long.parseLong(drNodeProperties.getProperty("MinRedirSaveInterval", "10000"));
         long minpfinterval = Long.parseLong(drNodeProperties.getProperty("MinProvFetchInterval", "10000"));
@@ -193,7 +193,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
                 fetchconfig();
             }
         };
-        eelfLogger.info("NODE0305 Attempting to fetch configuration at " + provurl);
+        eelfLogger.debug("NODE0305 Attempting to fetch configuration at " + provurl);
         pfetcher.request();
     }
 
@@ -284,7 +284,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
 
     private void fetchconfig() {
         try {
-            eelfLogger.info("NodeConfigMan.fetchConfig: provurl:: " + provurl);
+            eelfLogger.debug("NodeConfigMan.fetchConfig: provurl:: " + provurl);
             Reader reader = new InputStreamReader((new URL(provurl)).openStream());
             config = new NodeConfig(new ProvData(reader), myname, spooldir, port, nak);
             localconfig();
@@ -316,10 +316,10 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      */
     public synchronized void gofetch(String remoteAddr) {
         if (provcheck.isReachable(remoteAddr)) {
-            eelfLogger.info("NODE0307 Received configuration fetch request from provisioning server " + remoteAddr);
+            eelfLogger.debug("NODE0307 Received configuration fetch request from provisioning server " + remoteAddr);
             pfetcher.request();
         } else {
-            eelfLogger.info("NODE0308 Received configuration fetch request from unexpected server " + remoteAddr);
+            eelfLogger.debug("NODE0308 Received configuration fetch request from unexpected server " + remoteAddr);
         }
     }
 
@@ -596,15 +596,15 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         if (provcheck.isFrom(remoteaddr)) {
             String sdir = config.getSpoolDir(subid);
             if (sdir != null) {
-                eelfLogger.info("NODE0310 Received subscription reset request for subscription " + subid
+                eelfLogger.debug("NODE0310 Received subscription reset request for subscription " + subid
                         + " from provisioning server " + remoteaddr);
             } else {
-                eelfLogger.info("NODE0311 Received subscription reset request for unknown subscription " + subid
+                eelfLogger.debug("NODE0311 Received subscription reset request for unknown subscription " + subid
                         + " from provisioning server " + remoteaddr);
             }
             return (sdir);
         } else {
-            eelfLogger.info("NODE0312 Received subscription reset request from unexpected server " + remoteaddr);
+            eelfLogger.debug("NODE0312 Received subscription reset request from unexpected server " + remoteaddr);
             return (null);
         }
     }

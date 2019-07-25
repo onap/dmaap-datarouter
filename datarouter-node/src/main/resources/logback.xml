@@ -110,10 +110,7 @@
   <appender name="Debug"
             class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${logDirectory}/${debugLog}.log</file>
-    <filter class="ch.qos.logback.classic.filter.LevelFilter">
-      <level>DEBUG</level>
-      <onMatch>ACCEPT</onMatch>
-      <onMismatch>DENY</onMismatch>
+    <filter class="org.onap.dmaap.datarouter.node.eelf.DebugFilter">
     </filter>
     <rollingPolicy
             class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -141,10 +138,7 @@
   <appender name="Error"
     class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${logDirectory}/${errorLog}.log</file>
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-        <level>WARN</level>
-        <onMatch>ACCEPT</onMatch>
-        <onMismatch>DENY</onMismatch>
+    <filter class="org.onap.dmaap.datarouter.node.eelf.ErrorFilter">
     </filter>
     <rollingPolicy
       class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -204,21 +198,21 @@
     <appender-ref ref="asyncAudit" />
   </logger>
 
-  <logger name="com.att.eelf" level="info" additivity="false">
+  <logger name="com.att.eelf" additivity="false">
     <appender-ref ref="asyncMetrics" />
   </logger>
 
-  <logger name="com.att.eelf" level="debug" additivity="false">
+  <logger name="com.att.eelf" additivity="false">
     <appender-ref ref="asyncDebug" />
   </logger>
 
-     <logger name="com.att.eelf.error" level="error" additivity="false">
-          <appender-ref ref="asyncError" />
-      </logger>
+  <logger name="com.att.eelf.error" additivity="false">
+    <appender-ref ref="asyncError" />
+  </logger>
 
-     <logger name="log4j.logger.org.eclipse.jetty" additivity="false" level="info">
-        <appender-ref ref="asyncJettyLog"/>
-    </logger>
+  <logger name="log4j.logger.org.eclipse.jetty" additivity="false">
+    <appender-ref ref="asyncJettyLog"/>
+  </logger>
 
 
 
