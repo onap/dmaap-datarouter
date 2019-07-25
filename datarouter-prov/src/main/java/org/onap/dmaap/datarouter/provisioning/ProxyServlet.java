@@ -24,6 +24,8 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
+import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.sendResponseError;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -53,8 +55,6 @@ import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
-
-import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.sendResponseError;
 
 /**
  * This class is the base class for those servlets that need to proxy their requests from the standby to active server.
@@ -96,7 +96,7 @@ public class ProxyServlet extends BaseServlet {
             // We are connecting with the node name, but the certificate will have the CNAME
             // So we need to accept a non-matching certificate name
             SSLSocketFactory socketFactory = new SSLSocketFactory(keyStore,
-                props.getProperty(Main.KEYSTORE_PASS_PROPERTY), trustStore);
+                    props.getProperty(Main.KEYSTORE_PASS_PROPERTY), trustStore);
             socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
             sch = new Scheme("https", 443, socketFactory);
             inited = true;
@@ -125,7 +125,7 @@ public class ProxyServlet extends BaseServlet {
      * @param req the HTTP request
      * @return true or false
      */
-    protected boolean isProxyOK(final HttpServletRequest req) {
+    boolean isProxyOK(final HttpServletRequest req) {
         String t = req.getQueryString();
         if (t != null) {
             t = t.replaceAll("&amp;", "&");
@@ -144,7 +144,7 @@ public class ProxyServlet extends BaseServlet {
      *
      * @return true if this server is the standby (and hence a proxy server).
      */
-    public boolean isProxyServer() {
+    boolean isProxyServer() {
         SynchronizerTask st = SynchronizerTask.getSynchronizer();
         return st.getPodState() == SynchronizerTask.STANDBY_POD;
     }
@@ -187,7 +187,7 @@ public class ProxyServlet extends BaseServlet {
      *
      * @return true if the proxy succeeded
      */
-    public boolean doGetWithFallback(HttpServletRequest req, HttpServletResponse resp) {
+    boolean doGetWithFallback(HttpServletRequest req, HttpServletResponse resp) {
         boolean rv = false;
         if (inited) {
             String url = buildUrl(req);
@@ -234,12 +234,8 @@ public class ProxyServlet extends BaseServlet {
 
                     // Copy request headers and request body
                     copyRequestHeaders(req, proxy);
-                    if ("POST".equals(method) || "PUT".equals(method)) {
-                        BasicHttpEntity body = new BasicHttpEntity();
-                        body.setContent(req.getInputStream());
-                        body.setContentLength(-1);    // -1 = unknown
-                        proxy.setEntity(body);
-                    }
+
+                    handlePutOrPost(req, method, proxy);
 
                     // Execute the request
                     HttpResponse pxyResponse = httpclient.execute(proxy);
@@ -263,6 +259,15 @@ public class ProxyServlet extends BaseServlet {
         }
     }
 
+    private void handlePutOrPost(HttpServletRequest req, String method, ProxyHttpRequest proxy) throws IOException {
+        if ("POST".equals(method) || "PUT".equals(method)) {
+            BasicHttpEntity body = new BasicHttpEntity();
+            body.setContent(req.getInputStream());
+            body.setContentLength(-1);    // -1 = unknown
+            proxy.setEntity(body);
+        }
+    }
+
     private String buildUrl(HttpServletRequest req) {
         StringBuilder sb = new StringBuilder("https://");
         sb.append(URLUtilities.getPeerPodName());
@@ -275,7 +280,6 @@ public class ProxyServlet extends BaseServlet {
     }
 
     private void copyRequestHeaders(HttpServletRequest from, HttpRequestBase to) {
-        @SuppressWarnings("unchecked")
         List<String> list = Collections.list(from.getHeaderNames());
         for (String name : list) {
             // Proxy code will add this one
@@ -285,7 +289,7 @@ public class ProxyServlet extends BaseServlet {
         }
     }
 
-    private void copyResponseHeaders(HttpResponse from, HttpServletResponse to) {
+    void copyResponseHeaders(HttpResponse from, HttpServletResponse to) {
         for (Header hdr : from.getAllHeaders()) {
             // Don't copy Date: our Jetty will add another Date header
             if (!"Date".equals(hdr.getName())) {
@@ -294,7 +298,7 @@ public class ProxyServlet extends BaseServlet {
         }
     }
 
-    private void copyEntityContent(HttpResponse pxyResponse, HttpServletResponse resp) {
+    void copyEntityContent(HttpResponse pxyResponse, HttpServletResponse resp) {
         HttpEntity entity = pxyResponse.getEntity();
         if (entity != null) {
             try (InputStream in = entity.getContent()) {
@@ -305,11 +309,11 @@ public class ProxyServlet extends BaseServlet {
         }
     }
 
-    public class ProxyHttpRequest extends HttpEntityEnclosingRequestBase {
+    public static class ProxyHttpRequest extends HttpEntityEnclosingRequestBase {
 
         private final String method;
 
-        public ProxyHttpRequest(final String method, final String uri) {
+        ProxyHttpRequest(final String method, final String uri) {
             super();
             this.method = method;
             setURI(URI.create(uri));
