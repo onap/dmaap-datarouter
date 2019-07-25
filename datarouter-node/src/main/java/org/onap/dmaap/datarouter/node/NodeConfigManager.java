@@ -24,13 +24,18 @@
 
 package org.onap.dmaap.datarouter.node;
 
+import static java.lang.System.exit;
+
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.nio.file.Files;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Timer;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
@@ -134,13 +139,12 @@ public class NodeConfigManager implements DeliveryQueueHelper {
          */
         //Disable and enable protocols*/
         enabledprotocols = ((drNodeProperties.getProperty("NodeHttpsProtocols")).trim()).split("\\|");
-
         try {
             provhost = (new URL(provurl)).getHost();
         } catch (Exception e) {
             NodeUtils.setIpAndFqdnForEelf(NODE_CONFIG_MANAGER);
             eelfLogger.error(EelfMsgs.MESSAGE_BAD_PROV_URL, e, provurl);
-            System.exit(1);
+            exit(1);
         }
         eelfLogger.debug("NODE0303 Provisioning server is " + provhost);
         eventlogurl = drNodeProperties.getProperty("LogUploadURL", "https://feeds-drtr.web.att.com/internal/logs");
@@ -151,9 +155,11 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         spooldir = drNodeProperties.getProperty("SpoolDir", "spool");
         File fdir = new File(spooldir + "/f");
         fdir.mkdirs();
-        for (File junk : fdir.listFiles()) {
-            if (junk.isFile()) {
-                junk.delete();
+        for (File junk : Objects.requireNonNull(fdir.listFiles())) {
+            try {
+                Files.deleteIfExists(junk.toPath());
+            } catch (IOException e) {
+                eelfLogger.error("NODE0313 Failed to clear junk files from " + fdir.getPath());
             }
         }
         logdir = drNodeProperties.getProperty("LogDir", "logs");
@@ -181,7 +187,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
             NodeUtils.setIpAndFqdnForEelf(NODE_CONFIG_MANAGER);
             eelfLogger.error(EelfMsgs.MESSAGE_KEYSTORE_FETCH_ERROR, ksfile);
             eelfLogger.error("NODE0309 Unable to fetch canonical name from keystore file " + ksfile);
-            System.exit(1);
+            exit(1);
         }
         eelfLogger.debug("NODE0304 My certificate says my name is " + myname);
         pid = new PublishId(myname);

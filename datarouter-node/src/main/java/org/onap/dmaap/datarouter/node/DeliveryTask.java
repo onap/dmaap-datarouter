@@ -296,7 +296,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
      * @param httpURLConnection connection used to make request
      * @return AN Outpustream that can be used to send your data.
      */
-    private OutputStream getOutputStream(HttpURLConnection httpURLConnection) throws IOException {
+    OutputStream getOutputStream(HttpURLConnection httpURLConnection) throws IOException {
         OutputStream outputStream = null;
         try {
             outputStream = httpURLConnection.getOutputStream();
