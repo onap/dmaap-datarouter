@@ -162,7 +162,7 @@ public class Feed extends Syncable {
     }
 
     public static Collection<Feed> getAllFeeds() {
-        Map<Integer, Feed> map = new HashMap<Integer, Feed>();
+        Map<Integer, Feed> map = new HashMap<>();
         try {
             DB db = new DB();
             @SuppressWarnings("resource")
@@ -208,7 +208,7 @@ public class Feed extends Syncable {
     }
 
     public static List<String> getFilteredFeedUrlList(final String name, final String val) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         String sql = "select SELF_LINK from FEEDS where DELETED = 0";
         if (name.equals("name")) {
             sql += " and NAME = ?";
@@ -329,10 +329,8 @@ public class Feed extends Syncable {
             this.groupid = jo.optInt("groupid");
             this.name = jo.getString("name");
             this.aaf_instance = jo.optString("aaf_instance", "legacy");
-            if(!(aaf_instance.equalsIgnoreCase("legacy"))){
-                if (aaf_instance.length() > 255){
+            if(!(aaf_instance.equalsIgnoreCase("legacy")) && aaf_instance.length() > 255){
                     throw new InvalidObjectException("aaf_instance field is too long");
-                }
             }
             if (name.length() > 255)
                 throw new InvalidObjectException("name field is too long");
@@ -365,7 +363,7 @@ public class Feed extends Syncable {
                     throw new InvalidObjectException("password field is too long ("+ fid.getPassword()+")");  //Fortify scan fixes - Privacy Violation
                 this.authorization.getEndpoint_ids().add(fid);
             }
-            if (this.authorization.getEndpoint_ids().size() < 1)
+            if (this.authorization.getEndpoint_ids().isEmpty())
                 throw new InvalidObjectException("need to specify at least one endpoint_id");
             endPointIds = jauth.getJSONArray("endpoint_addrs");
             for (int i = 0; i < endPointIds.length(); i++) {

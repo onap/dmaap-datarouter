@@ -44,7 +44,7 @@ public class SubLinks implements JSONable {
         self = feed = log = null;
     }
 
-    public SubLinks(JSONObject jo) throws InvalidObjectException {
+    public SubLinks(JSONObject jo) {
         this();
         self = jo.getString("self");
         feed = jo.getString("feed");

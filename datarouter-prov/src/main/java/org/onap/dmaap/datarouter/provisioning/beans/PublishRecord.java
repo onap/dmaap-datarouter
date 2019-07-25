@@ -109,7 +109,7 @@ public class PublishRecord extends BaseLogRecord {
 
 
     public LOGJSONObject reOrderObject(LOGJSONObject jo) {
-        LinkedHashMap<String, Object> logrecordObj = new LinkedHashMap<String, Object>();
+        LinkedHashMap<String, Object> logrecordObj = new LinkedHashMap<>();
 
 
         logrecordObj.put("statusCode", jo.get("statusCode"));
@@ -124,8 +124,7 @@ public class PublishRecord extends BaseLogRecord {
         logrecordObj.put("contentLength", jo.get("contentLength"));
         logrecordObj.put("fileName", jo.get("fileName"));
 
-        LOGJSONObject newjo = new LOGJSONObject(logrecordObj);
-        return newjo;
+        return new LOGJSONObject(logrecordObj);
     }
 
     @Override
@@ -140,9 +139,7 @@ public class PublishRecord extends BaseLogRecord {
         jo.put("statusCode", status);
         jo.put("fileName", fileName);
 
-        LOGJSONObject newjo = this.reOrderObject(jo);
-
-        return newjo;
+        return this.reOrderObject(jo);
     }
 
     @Override

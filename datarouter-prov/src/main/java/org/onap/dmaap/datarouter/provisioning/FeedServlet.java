@@ -338,15 +338,13 @@ public class FeedServlet extends ProxyServlet {
                 return;
             }
             //  US DSCDR-19 for DCAE if version is not null, version can't be changed
-            if ((oldFeed.getVersion() != null) && (feed.getVersion() != null)) {
-                if (!oldFeed.getVersion().equals(feed.getVersion())) {
+            if ((oldFeed.getVersion() != null) && (feed.getVersion() != null) && !oldFeed.getVersion().equals(feed.getVersion())) {
                     message = "The version of the feed may not be updated.";
                     elr.setMessage(message);
                     elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
                     eventlogger.error(elr.toString());
                     sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                     return;
-                }
             }
 
             /*

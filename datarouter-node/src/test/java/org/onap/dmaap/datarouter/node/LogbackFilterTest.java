@@ -83,7 +83,17 @@ public class LogbackFilterTest {
     }
 
     @Test
-    public void Given_Event_with_invalid_jetty_string_and_valid_logger_then_jetty_Filter_DENY()  {
+    public void Given_Event_with_invalid_jetty_string_and_valid_logger_then_jetty_Filter_ACCEPT()  {
+        final JettyFilter filter = new JettyFilter();
+        filter.start();
+        final LoggingEvent event = new LoggingEvent();
+        event.setMessage("org.invalid.jetty");
+        event.setLoggerName("org.eclipse.jetty");
+        assertEquals(FilterReply.ACCEPT, filter.decide(event));
+    }
+
+    @Test
+    public void Given_Event_with_invalid_jetty_string_and_invalid_logger_then_jetty_Filter_DENY()  {
         final JettyFilter filter = new JettyFilter();
         filter.start();
         final LoggingEvent event = new LoggingEvent();

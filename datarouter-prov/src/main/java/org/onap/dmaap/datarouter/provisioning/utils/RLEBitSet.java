@@ -144,7 +144,7 @@ public class RLEBitSet {
      * Creates a new bit set. All bits are initially <code>false</code>.
      */
     public RLEBitSet() {
-        bitsets = new TreeSet<RLE>();
+        bitsets = new TreeSet<>();
     }
 
     /**
@@ -153,7 +153,7 @@ public class RLEBitSet {
      * @param s the initialization String
      */
     public RLEBitSet(String s) {
-        bitsets = new TreeSet<RLE>();
+        bitsets = new TreeSet<>();
         set(s);
     }
 
@@ -196,7 +196,7 @@ public class RLEBitSet {
      * @throws NumberFormatException     - if a number is incorrectly formatted
      * @throws IndexOutOfBoundsException - if an index is negative
      */
-    public void set(String s) throws NumberFormatException {
+    public void set(String s) {
         s = s.trim();
         if (!s.isEmpty()) {
             for (String s2 : s.split("[, \n]+")) {
@@ -280,7 +280,7 @@ public class RLEBitSet {
     public void clear(long from, long to) {
         checkRange(from, to);
         RLE newbits = new RLE(from, to - from);
-        List<RLE> newranges = new ArrayList<RLE>();
+        List<RLE> newranges = new ArrayList<>();
         synchronized (bitsets) {
             for (RLE bs : bitsets) {
                 if (bs.intersects(newbits)) {
