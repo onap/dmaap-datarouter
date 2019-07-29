@@ -37,5 +37,5 @@ public interface Deleteable {
      * @param c the JDBC Connection to use
      * @return true if the DELETE succeeded, false otherwise
      */
-    public boolean doDelete(Connection c);
+    boolean doDelete(Connection c);
 }

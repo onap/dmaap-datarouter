@@ -129,7 +129,7 @@ public class RLEBitSet {
 
         @Override
         public int hashCode() {
-            return new Long(start ^ nbits).hashCode();
+            return Long.valueOf(start ^ nbits).hashCode();
         }
 
         @Override

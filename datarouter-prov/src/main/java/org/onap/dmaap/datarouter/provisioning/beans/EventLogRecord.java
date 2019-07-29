@@ -54,7 +54,7 @@ public class EventLogRecord {
         this.ipaddr = request.getRemoteAddr();
         String s = request.getHeader(BaseServlet.BEHALF_HEADER);
         this.behalfof = (s != null) ? s : "";
-        X509Certificate certs[] = (X509Certificate[]) request.getAttribute(BaseServlet.CERT_ATTRIBUTE);
+        X509Certificate [] certs = (X509Certificate[]) request.getAttribute(BaseServlet.CERT_ATTRIBUTE);
         this.clientSubject = (certs != null && certs.length > 0)
                 ? certs[0].getSubjectX500Principal().getName() : "";
 

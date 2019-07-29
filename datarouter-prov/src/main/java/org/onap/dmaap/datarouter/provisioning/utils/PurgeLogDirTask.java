@@ -27,6 +27,8 @@ package org.onap.dmaap.datarouter.provisioning.utils;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.TimerTask;
@@ -76,7 +78,11 @@ public class PurgeLogDirTask extends TimerTask {
         long exptime = System.currentTimeMillis() - interval;
         for (File logfile : Objects.requireNonNull(dir.listFiles())) {
             if (logfile.lastModified() < exptime) {
-                logfile.delete();
+                try {
+                    Files.delete(logfile.toPath());
+                } catch (IOException e) {
+                    utilsLogger.error("Failed to delete file: " + logfile.getPath(), e);
+                }
             }
         }
     }

@@ -52,10 +52,6 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
     public EgressRoute(int subid, int nodeid) {
         this.subid = subid;
         this.nodeid = nodeid;
-        // Note: unlike for Feeds, it subscriptions can be removed from the tables, so it is
-        // possible that an orphan ERT entry can exist if a sub is removed.
-        //        if (Subscription.getSubscriptionById(subid) == null)
-        //            throw new IllegalArgumentException("No such subscription: "+subid);
     }
 
     public EgressRoute(int subid, String node) {
@@ -144,7 +140,6 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             ps.setInt(1, this.subid);
             ps.setInt(2, this.nodeid);
             ps.execute();
-            ps.close();
             rv = true;
         } catch (SQLException e) {
             intlogger.warn("PROV0005 doInsert: " + e.getMessage(), e);

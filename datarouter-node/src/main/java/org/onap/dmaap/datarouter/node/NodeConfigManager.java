@@ -159,7 +159,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
             try {
                 Files.deleteIfExists(junk.toPath());
             } catch (IOException e) {
-                eelfLogger.error("NODE0313 Failed to clear junk files from " + fdir.getPath());
+                eelfLogger.error("NODE0313 Failed to clear junk files from " + fdir.getPath(), e);
             }
         }
         logdir = drNodeProperties.getProperty("LogDir", "logs");

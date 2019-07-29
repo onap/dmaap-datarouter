@@ -140,8 +140,8 @@ public class FeedTest {
         setA.add(new FeedEndpointID("1", "Name"));
         Set setB = new HashSet();
         setB.add("172.0.0.1");
-        fa.setEndpoint_ids(setA);
-        fa.setEndpoint_addrs(setB);
+        fa.setEndpointIDS(setA);
+        fa.setEndpointAddrs(setB);
         feed.setAuthorization(fa);
         Assert.assertEquals(feed.doInsert(connection), false);
 

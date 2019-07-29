@@ -46,6 +46,9 @@ import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.send
  */
 @SuppressWarnings("serial")
 public class GroupServlet extends ProxyServlet {
+
+    public static final String MISSING_HEADER_MESSAGE = "Missing " + BEHALF_HEADER + " header.";
+
     /**
      * DELETE on the &lt;GRUPS&gt; -- not supported.
      */
@@ -80,11 +83,10 @@ public class GroupServlet extends ProxyServlet {
         }
         String bhdr = req.getHeader(BEHALF_HEADER);
         if (bhdr == null) {
-            message = "Missing "+BEHALF_HEADER+" header.";
-            elr.setMessage(message);
+            elr.setMessage(MISSING_HEADER_MESSAGE);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.error(elr.toString());
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, MISSING_HEADER_MESSAGE, eventlogger);
             return;
         }
 
@@ -131,11 +133,10 @@ public class GroupServlet extends ProxyServlet {
         }
         String bhdr = req.getHeader(BEHALF_HEADER);
         if (bhdr == null) {
-            message = "Missing "+BEHALF_HEADER+" header.";
-            elr.setMessage(message);
+            elr.setMessage(MISSING_HEADER_MESSAGE);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.error(elr.toString());
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, MISSING_HEADER_MESSAGE, eventlogger);
             return;
         }
         int groupid = getIdFromPath(req);
@@ -241,11 +242,10 @@ public class GroupServlet extends ProxyServlet {
         }
         String bhdr = req.getHeader(BEHALF_HEADER);
         if (bhdr == null) {
-            message = "Missing "+BEHALF_HEADER+" header.";
-            elr.setMessage(message);
+            elr.setMessage(MISSING_HEADER_MESSAGE);
             elr.setResult(HttpServletResponse.SC_BAD_REQUEST);
             eventlogger.error(elr.toString());
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, MISSING_HEADER_MESSAGE, eventlogger);
             return;
         }
 
@@ -284,8 +284,6 @@ public class GroupServlet extends ProxyServlet {
             sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
             return;
         }
-        //gup.setFeedid(feedid);
-        //sub.setSubscriber(bhdr);    // set from X-DMAAP-DR-ON-BEHALF-OF header
 
         // Check if this group already exists; not an error (yet), just warn
         Group gb2 = Group.getGroupMatching(gup);
@@ -295,7 +293,6 @@ public class GroupServlet extends ProxyServlet {
             sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Duplicate Group:"+gup.getName(), eventlogger);
             return;
         }
-
 
         // Create GROUPS table entries
         if (doInsert(gup)) {

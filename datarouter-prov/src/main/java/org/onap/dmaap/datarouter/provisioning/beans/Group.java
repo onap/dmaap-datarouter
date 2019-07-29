@@ -58,7 +58,7 @@ public class Group extends Syncable {
     private String description;
     private String classification;
     private String members;
-    private Date last_mod;
+    private Date lastMod;
 
     public Group() {
         this("", "", "");
@@ -71,7 +71,7 @@ public class Group extends Syncable {
         this.description = desc;
         this.members = members;
         this.classification = "";
-        this.last_mod = new Date();
+        this.lastMod = new Date();
     }
 
 
@@ -82,7 +82,7 @@ public class Group extends Syncable {
         this.description = rs.getString("DESCRIPTION");
         this.classification = rs.getString("CLASSIFICATION");
         this.members = rs.getString("MEMBERS");
-        this.last_mod = rs.getDate("LAST_MOD");
+        this.lastMod = rs.getDate("LAST_MOD");
     }
 
 
@@ -126,10 +126,7 @@ public class Group extends Syncable {
 
     public static Group getGroupMatching(Group gup, int groupid) {
         String sql = String.format(
-                "select * from GROUPS where  NAME = '%s' and GROUPID != %d ",
-                gup.getName(),
-                gup.getGroupid()
-        );
+                "select * from GROUPS where  NAME = '%s' and GROUPID != %d ", gup.getName(), gup.getGroupid());
         List<Group> list = getGroupsForSQL(sql);
         return !list.isEmpty() ? list.get(0) : null;
     }
@@ -252,7 +249,7 @@ public class Group extends Syncable {
         jo.put("description", description);
         jo.put("classification", classification);
         jo.put("members", members);
-        jo.put("last_mod", last_mod.getTime());
+        jo.put("last_mod", lastMod.getTime());
         return jo;
     }
 
@@ -389,6 +386,6 @@ public class Group extends Syncable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(groupid, authid, name, description, classification, members, last_mod);
+        return Objects.hash(groupid, authid, name, description, classification, members, lastMod);
     }
 }
