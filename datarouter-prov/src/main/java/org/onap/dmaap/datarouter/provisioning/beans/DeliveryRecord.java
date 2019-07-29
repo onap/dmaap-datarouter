@@ -41,6 +41,9 @@ import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
  * @version $Id: DeliveryRecord.java,v 1.9 2014/03/12 19:45:41 eby Exp $
  */
 public class DeliveryRecord extends BaseLogRecord {
+
+    private static final String STATUS_CODE = "statusCode";
+    private static final String DELIVERY_ID = "deliveryId";
     private int subid;
     private String fileid;
     private int result;
@@ -48,11 +51,11 @@ public class DeliveryRecord extends BaseLogRecord {
 
     public DeliveryRecord(String[] pp) throws ParseException {
         super(pp);
-        String fileid = pp[5];
-        if (fileid.lastIndexOf('/') >= 0)
-            fileid = fileid.substring(fileid.lastIndexOf('/') + 1);
+        String thisFileid = pp[5];
+        if (thisFileid.lastIndexOf('/') >= 0)
+            thisFileid = thisFileid.substring(thisFileid.lastIndexOf('/') + 1);
         this.subid = Integer.parseInt(pp[4]);
-        this.fileid = fileid;
+        this.fileid = thisFileid;
         this.result = Integer.parseInt(pp[10]);
         this.user = pp[9];
         if (this.user != null && this.user.length() > 50)
@@ -103,14 +106,12 @@ public class DeliveryRecord extends BaseLogRecord {
     public LOGJSONObject reOrderObject(LOGJSONObject jo) {
         LinkedHashMap<String, Object> logrecordObj = new LinkedHashMap<>();
 
-        logrecordObj.put("statusCode", jo.get("statusCode"));
-        logrecordObj.put("deliveryId", jo.get("deliveryId"));
+        logrecordObj.put(STATUS_CODE, jo.get(STATUS_CODE));
+        logrecordObj.put(DELIVERY_ID, jo.get(DELIVERY_ID));
         logrecordObj.put("publishId", jo.get("publishId"));
         logrecordObj.put("requestURI", jo.get("requestURI"));
-        //logrecordObj.put("sourceIP", jo.get("sourceIP"));
         logrecordObj.put("method", jo.get("method"));
         logrecordObj.put("contentType", jo.get("contentType"));
-        //logrecordObj.put("endpointId", jo.get("endpointId"));
         logrecordObj.put("type", jo.get("type"));
         logrecordObj.put("date", jo.get("date"));
         logrecordObj.put("contentLength", jo.get("contentLength"));
@@ -123,8 +124,8 @@ public class DeliveryRecord extends BaseLogRecord {
     public LOGJSONObject asJSONObject() {
         LOGJSONObject jo = super.asJSONObject();
         jo.put("type", "del");
-        jo.put("deliveryId", user);
-        jo.put("statusCode", result);
+        jo.put(DELIVERY_ID, user);
+        jo.put(STATUS_CODE, result);
 
         return this.reOrderObject(jo);
     }

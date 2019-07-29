@@ -29,6 +29,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -167,7 +168,7 @@ public class LogManager extends TimerTask {
         }
 
         private synchronized void poke() {
-            notify();
+            notifyAll();
         }
 
         @Override
@@ -206,11 +207,15 @@ public class LogManager extends TimerTask {
                 }
                 File file = new File(dir, fn);
                 if (file.lastModified() < threshold) {
-                    file.delete();
+                    try {
+                        Files.deleteIfExists(file.toPath());
+                    } catch (IOException e) {
+                        logger.error("Failed to delete file: " + file.getPath(), e);
+                    }
                 }
             }
             try (Writer w = new FileWriter(uploaddir + "/.lastqueued")) {
-                (new File(uploaddir + META)).delete();
+                Files.deleteIfExists(new File(uploaddir + META).toPath());
                 w.write(lastqueued + "\n");
             } catch (Exception e) {
                 logger.error(EXCEPTION, e);

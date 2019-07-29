@@ -91,7 +91,7 @@ public class LogRecord extends BaseLogRecord {
     private final int result;
     private final int attempts;
     private final String reason;
-    private final long record_id;
+    private final long recordId;
     private final long clength2;
     private final String fileName;
 
@@ -110,7 +110,7 @@ public class LogRecord extends BaseLogRecord {
         this.attempts = rs.getInt("ATTEMPTS");
         this.reason = rs.getString("REASON");
 
-        this.record_id = rs.getLong("RECORD_ID");
+        this.recordId = rs.getLong("RECORD_ID");
         this.clength2 = rs.getLong("CONTENT_LENGTH_2");
         this.fileName = rs.getString("FILENAME");
     }
@@ -130,13 +130,13 @@ public class LogRecord extends BaseLogRecord {
         this.attempts = Integer.parseInt(pp[16]);
         this.reason = pp[17];
 
-        this.record_id = Long.parseLong(pp[18]);
+        this.recordId = Long.parseLong(pp[18]);
         this.clength2 = (pp.length == 21) ? Long.parseLong(pp[19]) : 0;
         this.fileName = pp[20];
     }
 
     public long getRecordId() {
-        return record_id;
+        return recordId;
     }
 
     @Override
@@ -160,7 +160,7 @@ public class LogRecord extends BaseLogRecord {
                         + result + "|"
                         + attempts + "|"
                         + reason + "|"
-                        + record_id + "|"
+                        + recordId + "|"
                         + clength2
                         + "\n";
     }
@@ -179,7 +179,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setNull(15, Types.INTEGER);
             ps.setNull(16, Types.INTEGER);
             ps.setNull(17, Types.VARCHAR);
-            ps.setLong(18, record_id);
+            ps.setLong(18, recordId);
             ps.setNull(19, Types.BIGINT);
             ps.setString(20, fileName);
         } else if (type.equals("del")) {
@@ -192,7 +192,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setInt(15, result);
             ps.setNull(16, Types.INTEGER);
             ps.setNull(17, Types.VARCHAR);
-            ps.setLong(18, record_id);
+            ps.setLong(18, recordId);
             ps.setNull(19, Types.BIGINT);
             ps.setString(20, fileName);
         } else if (type.equals("exp")) {
@@ -205,7 +205,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setNull(15, Types.INTEGER);
             ps.setInt(16, attempts);
             ps.setString(17, reason);
-            ps.setLong(18, record_id);
+            ps.setLong(18, recordId);
             ps.setNull(19, Types.BIGINT);
             ps.setString(20, fileName);
         } else if (type.equals("pbf")) {
@@ -218,7 +218,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setNull(15, Types.INTEGER);
             ps.setNull(16, Types.INTEGER);
             ps.setNull(17, Types.VARCHAR);
-            ps.setLong(18, record_id);
+            ps.setLong(18, recordId);
             ps.setLong(19, clength2);
             ps.setString(20, fileName);
         } else if (type.equals("dlx")) {
@@ -231,7 +231,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setNull(15, Types.INTEGER);
             ps.setNull(16, Types.INTEGER);
             ps.setNull(17, Types.VARCHAR);
-            ps.setLong(18, record_id);
+            ps.setLong(18, recordId);
             ps.setLong(19, clength2);
             ps.setString(20, fileName);
         }

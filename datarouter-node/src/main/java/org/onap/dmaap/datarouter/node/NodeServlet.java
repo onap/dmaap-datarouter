@@ -341,8 +341,7 @@ public class NodeServlet extends HttpServlet {
         String fbase = PathUtil.cleanString(config.getSpoolDir() + "/" + pubid);  //Fortify scan fixes-Path manipulation
         File data = new File(fbase);
         File meta = new File(fbase + ".M");
-        Writer mw = null;
-        try {
+        try (Writer mw = new FileWriter(meta)) {
             StringBuilder mx = new StringBuilder();
             mx.append(req.getMethod()).append('\t').append(fileid).append('\n');
             Enumeration hnames = req.getHeaderNames();
@@ -412,18 +411,17 @@ public class NodeServlet extends HttpServlet {
             for (Target t : targets) {
                 DestInfo di = t.getDestInfo();
                 if (di == null) {
-                    // TODO: unknown destination
+                    //Handle this? : unknown destination
                     continue;
                 }
                 String dbase = PathUtil
                         .cleanString(di.getSpool() + "/" + pubid);  //Fortify scan fixes-Path Manipulation
                 Files.createLink(Paths.get(dbase), dpath);
-                mw = new FileWriter(meta);
+
                 mw.write(metadata);
                 if (di.getSubId() == null) {
                     mw.write("X-DMAAP-DR-ROUTING\t" + t.getRouting() + "\n");
                 }
-                mw.close();
                 meta.renameTo(new File(dbase + ".M"));
             }
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -447,22 +445,11 @@ public class NodeServlet extends HttpServlet {
             eelfLogger.info(EelfMsgs.EXIT);
             throw ioe;
         } finally {
-            if (mw != null) {
-                try {
-                    mw.close();
-                } catch (Exception e) {
-                    eelfLogger.error("NODE0532 Exception common: " + e);
-                }
-            }
             try {
-                data.delete();
+                Files.delete(data.toPath());
+                Files.delete(meta.toPath());
             } catch (Exception e) {
                 eelfLogger.error("NODE0533 Exception common: " + e);
-            }
-            try {
-                meta.delete();
-            } catch (Exception e) {
-                eelfLogger.error("NODE0534 Exception common: " + e);
             }
         }
     }

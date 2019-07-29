@@ -188,7 +188,7 @@ public class NodeMain {
         }
 
         public synchronized void run() {
-            notify();
+            notifyAll();
         }
 
         synchronized void waitForConfig() {

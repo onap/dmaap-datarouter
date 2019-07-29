@@ -164,8 +164,8 @@ public class LogServlet extends BaseServlet {
             eventlogger.error(elr.toString());
             sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
         } finally {
-        eelfLogger.info(EelfMsgs.EXIT);
-    }
+            eelfLogger.info(EelfMsgs.EXIT);
+        }
     }
     /**
      * GET a logging URL -- retrieve logging data for a feed or subscription.
@@ -246,13 +246,13 @@ public class LogServlet extends BaseServlet {
         setIpFqdnRequestIDandInvocationIDForEelf("doPut", req);
         eelfLogger.info(EelfMsgs.ENTRY);
         try {
-        eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
-        String message = "PUT not allowed for the logURL.";
-        EventLogRecord elr = new EventLogRecord(req);
-        elr.setMessage(message);
-        elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-        eventlogger.error(elr.toString());
-        sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
+            String message = "PUT not allowed for the logURL.";
+            EventLogRecord elr = new EventLogRecord(req);
+            elr.setMessage(message);
+            elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            eventlogger.error(elr.toString());
+            sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
         } finally {
             eelfLogger.info(EelfMsgs.EXIT);
         }
@@ -265,13 +265,13 @@ public class LogServlet extends BaseServlet {
         setIpFqdnRequestIDandInvocationIDForEelf("doPost", req);
         eelfLogger.info(EelfMsgs.ENTRY);
         try {
-        eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
-        String message = "POST not allowed for the logURL.";
-        EventLogRecord elr = new EventLogRecord(req);
-        elr.setMessage(message);
-        elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-        eventlogger.error(elr.toString());
-        sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
+            String message = "POST not allowed for the logURL.";
+            EventLogRecord elr = new EventLogRecord(req);
+            elr.setMessage(message);
+            elr.setResult(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+            eventlogger.error(elr.toString());
+            sendResponseError(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, message, eventlogger);
         } finally {
             eelfLogger.info(EelfMsgs.EXIT);
         }
@@ -307,25 +307,32 @@ public class LogServlet extends BaseServlet {
 
         s = req.getParameter("filename");
         if (s != null) {
-            map.put(FILENAMESQL, " AND FILENAME = '"+s+"'");
+            map.put(FILENAMESQL, " AND FILENAME = '" + s + "'");
         }
 
         s = req.getParameter("statusCode");
         if (s != null) {
             String sql = null;
-            if ("success".equals(s)) {
-                sql = " AND STATUS >= 200 AND STATUS < 300";
-            } else if ("redirect".equals(s)) {
-                sql = " AND STATUS >= 300 AND STATUS < 400";
-            } else if ("failure".equals(s)) {
-                sql = " AND STATUS >= 400";
-            } else {
-                try {
-                    Integer n = Integer.parseInt(s);
-                    if ((n >= 100 && n < 600) || (n == -1))
-                        sql = " AND STATUS = " + n;
-                } catch (NumberFormatException e) {
-                }
+            switch (s) {
+                case "success":
+                    sql = " AND STATUS >= 200 AND STATUS < 300";
+                    break;
+                case "redirect":
+                    sql = " AND STATUS >= 300 AND STATUS < 400";
+                    break;
+                case "failure":
+                    sql = " AND STATUS >= 400";
+                    break;
+                default:
+                    try {
+                        int n = Integer.parseInt(s);
+                        if ((n >= 100 && n < 600) || (n == -1)) {
+                            sql = " AND STATUS = " + n;
+                        }
+                    } catch (NumberFormatException e) {
+                        intlogger.error("Failed to parse input", e);
+                    }
+                    break;
             }
             if (sql == null) {
                 map.put("err", "bad statusCode");
@@ -383,22 +390,22 @@ public class LogServlet extends BaseServlet {
             Date d = sdf.parse(s);
             return d.getTime();
         } catch (ParseException parseException) {
-            intlogger.error("Exception in getting Time :- "+parseException.getMessage(),parseException);
+            intlogger.error("Exception in getting Time :- " + parseException.getMessage(),parseException);
         }
         try {
             // Also allow a long (in ms); useful for testing
             return Long.parseLong(s);
         } catch (NumberFormatException numberFormatException) {
-            intlogger.error("Exception in getting Time :- "+numberFormatException.getMessage(),numberFormatException);
+            intlogger.error("Exception in getting Time :- " + numberFormatException.getMessage(),numberFormatException);
         }
-        intlogger.info("Error parsing time="+s);
+        intlogger.info("Error parsing time=" + s);
         return -1;
     }
 
     private void getPublishRecordsForFeed(int feedid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
         if ("all".equals(type) || "pub".equals(type)) {
-            String sql = LOG_RECORDSSQL+feedid
+            String sql = LOG_RECORDSSQL + feedid
                 + " AND TYPE = 'pub'"
                 + map.get(TIMESQL) + map.get(PUBLISHSQL) + map.get(STATUSSQL) + map.get(FILENAMESQL);
             getRecordsForSQL(sql, rh);
@@ -407,7 +414,7 @@ public class LogServlet extends BaseServlet {
     private void getDeliveryRecordsForFeed(int feedid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
         if ("all".equals(type) || "del".equals(type)) {
-            String sql = LOG_RECORDSSQL+feedid
+            String sql = LOG_RECORDSSQL + feedid
                 + " AND TYPE = 'del'"
                 + map.get(TIMESQL) + map.get(PUBLISHSQL) + map.get(RESULTSQL);
             getRecordsForSQL(sql, rh);
@@ -416,7 +423,7 @@ public class LogServlet extends BaseServlet {
     private void getDeliveryRecordsForSubscription(int subid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
         if ("all".equals(type) || "del".equals(type)) {
-            String sql = "select * from LOG_RECORDS where DELIVERY_SUBID = "+subid
+            String sql = "select * from LOG_RECORDS where DELIVERY_SUBID = " + subid
                 + " AND TYPE = 'del'"
                 + map.get(TIMESQL) + map.get(PUBLISHSQL) + map.get(RESULTSQL);
             getRecordsForSQL(sql, rh);
@@ -427,7 +434,7 @@ public class LogServlet extends BaseServlet {
         if ("all".equals(type) || "exp".equals(type)) {
             String st = map.get(STATUSSQL);
             if (st == null || st.length() == 0) {
-                String sql = LOG_RECORDSSQL+feedid
+                String sql = LOG_RECORDSSQL + feedid
                     + " AND TYPE = 'exp'"
                     + map.get(TIMESQL) + map.get(PUBLISHSQL) + map.get(REASON_SQL);
                 getRecordsForSQL(sql, rh);
@@ -439,13 +446,14 @@ public class LogServlet extends BaseServlet {
         if ("all".equals(type) || "exp".equals(type)) {
             String st = map.get(STATUSSQL);
             if (st == null || st.length() == 0) {
-                String sql = "select * from LOG_RECORDS where DELIVERY_SUBID = "+subid
+                String sql = "select * from LOG_RECORDS where DELIVERY_SUBID = " + subid
                     + " AND TYPE = 'exp'"
                     + map.get(TIMESQL) + map.get(PUBLISHSQL) + map.get(REASON_SQL);
                 getRecordsForSQL(sql, rh);
             }
         }
     }
+
     private void getRecordsForSQL(String sql, RowHandler rh) {
         intlogger.debug(sql);
         long start = System.currentTimeMillis();
@@ -453,19 +461,19 @@ public class LogServlet extends BaseServlet {
         Connection conn = null;
         try {
             conn = db.getConnection();
-           try( Statement  stmt = conn.createStatement()){
-             try(ResultSet rs = stmt.executeQuery(sql)){
-                 while (rs.next()) {
-                     rh.handleRow(rs);
-                 }
-             }
-           }
+            try (Statement  stmt = conn.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery(sql)) {
+                    while (rs.next()) {
+                        rh.handleRow(rs);
+                    }
+                }
+            }
         } catch (SQLException sqlException) {
-            intlogger.info("Failed to get Records. Exception = " +sqlException.getMessage(),sqlException);
+            intlogger.info("Failed to get Records. Exception = " + sqlException.getMessage(),sqlException);
         } finally {
             if (conn != null)
                 db.release(conn);
         }
-        intlogger.debug("Time: " + (System.currentTimeMillis()-start) + " ms");
+        intlogger.debug("Time: " + (System.currentTimeMillis() - start) + " ms");
     }
 }

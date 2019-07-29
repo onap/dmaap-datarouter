@@ -278,7 +278,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             eventlogger = EELFManager.getInstance().getLogger("EventLog");
         }
         if (intlogger == null) {
-            this.intlogger = EELFManager.getInstance().getLogger("InternalLog");
+            intlogger = EELFManager.getInstance().getLogger("InternalLog");
         }
         if (authz == null) {
             authz = new ProvAuthorizer(this);

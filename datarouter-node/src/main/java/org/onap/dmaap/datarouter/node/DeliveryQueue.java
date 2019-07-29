@@ -51,15 +51,15 @@ import org.jetbrains.annotations.Nullable;
  * or change the duration of any subsequent delay.
  * If, however, it succeeds, it will cancel the delay.
  * <p>
- * The queue maintains 3 collections of files to deliver: A todo list of
+ * The queue maintains 3 collections of files to deliver: A todoList of
  * files that will be attempted, a working set of files that are being
  * attempted, and a retry set of files that were attempted and failed.
- * Whenever the todo list is empty and needs to be refilled, a scan of the
+ * Whenever the todoList is empty and needs to be refilled, a scan of the
  * spool directory is made and the file names sorted.  Any files in the working set are ignored.
  * If a DeliveryTask for the file is in the retry set, then that delivery
- * task is placed on the todo list.  Otherwise, a new DeliveryTask for the
- * file is created and placed on the todo list.
- * If, when a DeliveryTask is about to be removed from the todo list, its
+ * task is placed on the todoList.  Otherwise, a new DeliveryTask for the
+ * file is created and placed on the todoList.
+ * If, when a DeliveryTask is about to be removed from the todoList, its
  * age exceeds DeliveryQueueHelper.getExpirationTimer(), then it is instead
  * marked as expired.
  * <p>
@@ -70,14 +70,14 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     private static EELFLogger logger = EELFManager.getInstance().getLogger(DeliveryQueue.class);
     private DeliveryQueueHelper deliveryQueueHelper;
     private DestInfo destinationInfo;
-    private Hashtable<String, DeliveryTask> working = new Hashtable<>();
-    private Hashtable<String, DeliveryTask> retry = new Hashtable<>();
+    private HashMap<String, DeliveryTask> working = new HashMap<>();
+    private HashMap<String, DeliveryTask> retry = new HashMap<>();
     private int todoindex;
     private boolean failed;
     private long failduration;
     private long resumetime;
     private File dir;
-    private Vector<DeliveryTask> todo = new Vector<>();
+    private List<DeliveryTask> todoList = new ArrayList<>();
 
     /**
      * Try to cancel a delivery task.
@@ -90,8 +90,8 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
         }
         DeliveryTask dt = retry.get(pubid);
         if (dt == null) {
-            for (int i = todoindex; i < todo.size(); i++) {
-                DeliveryTask xdt = todo.get(i);
+            for (int i = todoindex; i < todoList.size(); i++) {
+                DeliveryTask xdt = todoList.get(i);
                 if (xdt.getPublishId().equals(pubid)) {
                     dt = xdt;
                     break;
@@ -206,13 +206,13 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
             }
         }
         while (true) {
-            if (todoindex >= todo.size()) {
+            if (todoindex >= todoList.size()) {
                 todoindex = 0;
-                todo = new Vector<>();
+                todoList = new ArrayList<>();
                 String[] files = dir.list();
                 Arrays.sort(files);
                 scanForNextTask(files);
-                retry = new Hashtable<>();
+                retry = new HashMap<>();
             }
             DeliveryTask dt = getDeliveryTask(mindate);
             if (dt != null) {
@@ -385,14 +385,14 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
             if (dt == null) {
                 dt = new DeliveryTask(this, pubId);
             }
-            todo.add(dt);
+            todoList.add(dt);
         }
     }
 
     @Nullable
     private DeliveryTask getDeliveryTask(long mindate) {
-        if (todoindex < todo.size()) {
-            DeliveryTask dt = todo.get(todoindex);
+        if (todoindex < todoList.size()) {
+            DeliveryTask dt = todoList.get(todoindex);
             if (dt.isCleaned()) {
                 todoindex++;
             }
