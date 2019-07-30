@@ -54,6 +54,7 @@ import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 public class ProvData {
 
     private static final String FEED_ID = "feedid";
+
     private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(ProvData.class);
     private NodeConfig.ProvNode[] pn;
     private NodeConfig.ProvParam[] pp;
@@ -84,8 +85,8 @@ public class ProvData {
         try {
             JSONTokener jtx = new JSONTokener(reader);
             JSONObject jcfg = new JSONObject(jtx);
-            char c = jtx.nextClean();
-            if (c != '\0') {
+            char cch = jtx.nextClean();
+            if (cch != '\0') {
                 throw new JSONException("Spurious characters following configuration");
             }
             reader.close();

@@ -26,33 +26,33 @@ package org.onap.dmaap.datarouter.node;
 
 /**
  * Interface to allow independent testing of the DeliveryQueue code
- * <p>
- * This interface represents all of the configuration information and
+ *
+ * <p>This interface represents all of the configuration information and
  * feedback mechanisms that a delivery queue needs.
  */
 public interface DeliveryQueueHelper {
     /**
-     * Get the timeout (milliseconds) before retrying after an initial delivery failure
+     * Get the timeout (milliseconds) before retrying after an initial delivery failure.
      */
     long getInitFailureTimer();
 
     /**
-     * Get the timeout before retrying after delivery and wait for file processing
+     * Get the timeout before retrying after delivery and wait for file processing.
      */
     long getWaitForFileProcessFailureTimer();
 
     /**
-     * Get the ratio between timeouts on consecutive delivery attempts
+     * Get the ratio between timeouts on consecutive delivery attempts.
      */
     double getFailureBackoff();
 
     /**
-     * Get the maximum timeout (milliseconds) between delivery attempts
+     * Get the maximum timeout (milliseconds) between delivery attempts.
      */
     long getMaxFailureTimer();
 
     /**
-     * Get the expiration timer (milliseconds) for deliveries
+     * Get the expiration timer (milliseconds) for deliveries.
      */
     long getExpirationTimer();
 
@@ -68,7 +68,7 @@ public interface DeliveryQueueHelper {
     long getFairTimeLimit();
 
     /**
-     * Get the URL for delivering a file
+     * Get the URL for delivering a file.
      *
      * @param destinationInfo   The destination information for the file to be delivered.
      * @param fileid The file id for the file to be delivered.
@@ -77,14 +77,14 @@ public interface DeliveryQueueHelper {
     String getDestURL(DestInfo destinationInfo, String fileid);
 
     /**
-     * Forget redirections associated with a subscriber
+     * Forget redirections associated with a subscriber.
      *
      * @param    destinationInfo    Destination information to forget
      */
     void handleUnreachable(DestInfo destinationInfo);
 
     /**
-     * Post redirection for a subscriber
+     * Post redirection for a subscriber.
      *
      * @param    destinationInfo    Destination information to update
      * @param    location    Location given by subscriber
@@ -94,12 +94,12 @@ public interface DeliveryQueueHelper {
     boolean handleRedirection(DestInfo destinationInfo, String location, String fileid);
 
     /**
-     * Should I handle 3xx responses differently than 4xx responses?
+     * Should I handle 3xx responses differently than 4xx responses?.
      */
     boolean isFollowRedirects();
 
     /**
-     * Get the feed ID for a subscription
+     * Get the feed ID for a subscription.
      *
      * @param subid The subscription ID
      * @return The feed ID

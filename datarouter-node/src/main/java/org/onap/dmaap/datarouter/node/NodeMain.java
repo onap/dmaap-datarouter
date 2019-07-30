@@ -60,6 +60,7 @@ public class NodeMain {
     /**
      * Reset the retry timer for a subscription.
      */
+
     static void resetQueue(String subid, String ip) {
         delivery.resetQueue(nodeConfigManager.getSpoolDir(subid, ip));
     }
@@ -155,7 +156,8 @@ public class NodeMain {
             server.start();
             nodeMainLogger.debug("NODE00006 Node Server started-" + server.getState());
         } catch (Exception e) {
-            nodeMainLogger.error("NODE00006 Jetty failed to start. Reporting will we unavailable: " + e.getMessage(), e);
+            nodeMainLogger.error("NODE00006 Jetty failed to start. Reporting will we unavailable: "
+                                         + e.getMessage(), e);
         }
         server.join();
         nodeMainLogger.debug("NODE00007 Node Server joined - " + server.getState());

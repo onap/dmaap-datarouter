@@ -17,6 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.dmaap.datarouter.node.eelf;
 
 import ch.qos.logback.classic.Level;
@@ -28,7 +29,8 @@ import ch.qos.logback.core.spi.FilterReply;
 public class ErrorFilter extends Filter<ILoggingEvent> {
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        if ((event.getLevel().equals(Level.ERROR) || event.getLevel().equals(Level.WARN))  && !event.getMessage().contains("org.eclipse.jetty")) {
+        if ((event.getLevel().equals(Level.ERROR) || event.getLevel().equals(Level.WARN))
+                    && !event.getMessage().contains("org.eclipse.jetty")) {
             return FilterReply.ACCEPT;
         } else {
             return FilterReply.DENY;

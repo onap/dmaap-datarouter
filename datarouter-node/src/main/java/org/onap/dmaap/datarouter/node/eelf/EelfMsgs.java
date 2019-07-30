@@ -20,6 +20,7 @@
  * * ECOMP is a trademark and service mark of AT&T Intellectual Property.
  * *
  ******************************************************************************/
+
 package org.onap.dmaap.datarouter.node.eelf;
 
 import com.att.eelf.i18n.EELFResolvableErrorEnum;
@@ -28,12 +29,13 @@ import com.att.eelf.i18n.EELFResourceManager;
 public enum EelfMsgs implements EELFResolvableErrorEnum {
 
     /**
-     * Application message prints user (accepts one argument)
+     * Application message prints user (accepts one argument).
      */
+
     MESSAGE_WITH_BEHALF,
 
     /**
-     * Application message prints user and FeedID (accepts two arguments)
+     * Application message prints user and FeedID (accepts two arguments).
      */
 
     MESSAGE_WITH_BEHALF_AND_FEEDID,
@@ -45,13 +47,13 @@ public enum EelfMsgs implements EELFResolvableErrorEnum {
     INVOKE,
 
     /**
-     * Application message prints keystore file error in EELF errors log
+     * Application message prints keystore file error in EELF errors log.
      */
 
     MESSAGE_KEYSTORE_LOAD_ERROR,
 
     /**
-     * Application message prints Error extracting my name from my keystore file
+     * Application message prints Error extracting my name from my keystore file.
      */
 
     MESSAGE_KEYSORE_NAME_ERROR,
@@ -64,21 +66,21 @@ public enum EelfMsgs implements EELFResolvableErrorEnum {
     MESSAGE_PARSING_ERROR,
 
     /**
-     * Application message printsConfiguration failed
+     * Application message printsConfiguration failed.
      */
 
 
     MESSAGE_CONF_FAILED,
 
     /**
-     * Application message prints Bad provisioning server URL
+     * Application message prints Bad provisioning server URL.
      */
 
 
     MESSAGE_BAD_PROV_URL,
 
     /**
-     * Application message prints Unable to fetch canonical name from keystore file
+     * Application message prints Unable to fetch canonical name from keystore file.
      */
 
 

@@ -29,8 +29,10 @@ import ch.qos.logback.core.spi.FilterReply;
 public class MetricsFilter extends Filter<ILoggingEvent> {
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        if (event.getLevel().equals(Level.INFO) && !event.getMessage().contains("org.eclipse.jetty") && !event.getLoggerName().contains("org.eclipse.jetty")) {
-            if (!event.getMessage().contains("DEL|") && !event.getMessage().contains("PUB|") && !event.getMessage().contains(
+        if (event.getLevel().equals(Level.INFO) && !event.getMessage().contains("org.eclipse.jetty")
+                    && !event.getLoggerName().contains("org.eclipse.jetty")) {
+            if (!event.getMessage().contains("DEL|") && !event.getMessage().contains("PUB|")
+                        && !event.getMessage().contains(
                     "PBF|") && !event.getMessage().contains("EXP|") && !event.getMessage().contains("DLX|")) {
                 return FilterReply.ACCEPT;
             }

@@ -46,6 +46,7 @@ public class StatusLog {
     private static StatusLog instance = new StatusLog();
     private SimpleDateFormat filedate = new SimpleDateFormat("-yyyyMMddHHmm");
 
+
     private String prefix = "logs/events";
     private String suffix = ".log";
     private String plainfile;
@@ -158,8 +159,8 @@ public class StatusLog {
         instance.log(
                 "PUB|" + pubid + "|" + feedid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen + "|" + srcip
                         + "|" + user + "|" + status);
-        eelfLogger.info("PUB|" + pubid + "|" + feedid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen + "|" + srcip
-                                + "|" + user + "|" + status);
+        eelfLogger.info("PUB|" + pubid + "|" + feedid + "|" + requrl + "|" + method + "|" + ctype + "|"
+                                + clen + "|" + srcip + "|" + user + "|" + status);
     }
 
     /**
@@ -180,8 +181,8 @@ public class StatusLog {
             long rcvd, String srcip, String user, String error) {
         instance.log("PBF|" + pubid + "|" + feedid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen + "|" + rcvd
                 + "|" + srcip + "|" + user + "|" + error);
-        eelfLogger.info("PBF|" + pubid + "|" + feedid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen + "|" + rcvd
-                                + "|" + srcip + "|" + user + "|" + error);
+        eelfLogger.info("PBF|" + pubid + "|" + feedid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen
+                                + "|" + rcvd + "|" + srcip + "|" + user + "|" + error);
     }
 
     /**
@@ -206,8 +207,8 @@ public class StatusLog {
         instance.log(
                 "DEL|" + pubid + "|" + feedid + "|" + subid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen
                         + "|" + user + "|" + status + "|" + xpubid);
-        eelfLogger.info("DEL|" + pubid + "|" + feedid + "|" + subid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen
-                                + "|" + user + "|" + status + "|" + xpubid);
+        eelfLogger.info("DEL|" + pubid + "|" + feedid + "|" + subid + "|" + requrl + "|" + method + "|"
+                                + ctype + "|" + clen + "|" + user + "|" + status + "|" + xpubid);
     }
 
     /**
@@ -231,8 +232,8 @@ public class StatusLog {
         instance.log(
                 "EXP|" + pubid + "|" + feedid + "|" + subid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen
                         + "|" + reason + "|" + attempts);
-        eelfLogger.info("EXP|" + pubid + "|" + feedid + "|" + subid + "|" + requrl + "|" + method + "|" + ctype + "|" + clen
-                                + "|" + reason + "|" + attempts);
+        eelfLogger.info("EXP|" + pubid + "|" + feedid + "|" + subid + "|" + requrl + "|" + method + "|"
+                                + ctype + "|" + clen + "|" + reason + "|" + attempts);
     }
 
     /**
