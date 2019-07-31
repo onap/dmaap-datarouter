@@ -412,7 +412,7 @@ public class NodeServlet extends HttpServlet {
             for (Target t : targets) {
                 DestInfo di = t.getDestInfo();
                 if (di == null) {
-                    // TODO: unknown destination
+                    //Handle this? : unknown destination
                     continue;
                 }
                 String dbase = PathUtil
@@ -455,14 +455,10 @@ public class NodeServlet extends HttpServlet {
                 }
             }
             try {
-                data.delete();
+                Files.delete(data.toPath());
+                Files.delete(meta.toPath());
             } catch (Exception e) {
                 eelfLogger.error("NODE0533 Exception common: " + e);
-            }
-            try {
-                meta.delete();
-            } catch (Exception e) {
-                eelfLogger.error("NODE0534 Exception common: " + e);
             }
         }
     }

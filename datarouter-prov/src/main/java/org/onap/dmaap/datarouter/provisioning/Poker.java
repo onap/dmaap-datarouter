@@ -82,7 +82,7 @@ public class Poker extends TimerTask {
     private Poker() {
         timer1 = timer2 = 0;
         Timer rolex = new Timer();
-        logger = EELFManager.getInstance().getLogger("InternalLog");;
+        logger = EELFManager.getInstance().getLogger("InternalLog");
         try {
             thisPod = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {

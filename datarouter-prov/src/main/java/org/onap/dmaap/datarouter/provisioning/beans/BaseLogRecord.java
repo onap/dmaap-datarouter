@@ -53,11 +53,6 @@ public class BaseLogRecord implements LOGJSONable, Loadable {
     private long contentLength;
 
     protected BaseLogRecord(String[] pp) throws ParseException {
-//        This throws exceptions occasionally - don't know why.
-//        Date d = null;
-//        synchronized (sdf) {
-//            d = sdf.parse(pp[0]);
-//        }
         Date d = parseDate(pp[0]);
         this.eventTime     = d.getTime();
         this.publishId     = pp[2];

@@ -41,19 +41,22 @@ import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
  * @version $Id: ExpiryRecord.java,v 1.4 2013/10/28 18:06:52 eby Exp $
  */
 public class ExpiryRecord extends BaseLogRecord {
+
+    public static final String EXPIRY_REASON = "expiryReason";
+    public static final String ATTEMPTS = "attempts";
     private int subid;
     private String fileid;
-    private int attempts;
+    private int deliveryAttempts;
     private String reason;
 
     public ExpiryRecord(String[] pp) throws ParseException {
         super(pp);
-        String fileid = pp[5];
-        if (fileid.lastIndexOf('/') >= 0)
-            fileid = fileid.substring(fileid.lastIndexOf('/') + 1);
+        String thisFileid = pp[5];
+        if (thisFileid.lastIndexOf('/') >= 0)
+            thisFileid = thisFileid.substring(thisFileid.lastIndexOf('/') + 1);
         this.subid = Integer.parseInt(pp[4]);
-        this.fileid = fileid;
-        this.attempts = Integer.parseInt(pp[10]);
+        this.fileid = thisFileid;
+        this.deliveryAttempts = Integer.parseInt(pp[10]);
         this.reason = pp[9];
         if (!reason.equals("notRetryable") && !reason.equals("retriesExhausted") && !reason.equals("diskFull"))
             this.reason = "other";
@@ -63,7 +66,7 @@ public class ExpiryRecord extends BaseLogRecord {
         super(rs);
         this.subid = rs.getInt("DELIVERY_SUBID");
         this.fileid = rs.getString("DELIVERY_FILEID");
-        this.attempts = rs.getInt("ATTEMPTS");
+        this.deliveryAttempts = rs.getInt("ATTEMPTS");
         this.reason = rs.getString("REASON");
     }
 
@@ -83,12 +86,12 @@ public class ExpiryRecord extends BaseLogRecord {
         this.fileid = fileid;
     }
 
-    public int getAttempts() {
-        return attempts;
+    public int getDeliveryAttempts() {
+        return deliveryAttempts;
     }
 
-    public void setAttempts(int attempts) {
-        this.attempts = attempts;
+    public void setDeliveryAttempts(int deliveryAttempts) {
+        this.deliveryAttempts = deliveryAttempts;
     }
 
     public String getReason() {
@@ -102,9 +105,9 @@ public class ExpiryRecord extends BaseLogRecord {
     public LOGJSONObject reOrderObject(LOGJSONObject jo) {
         LinkedHashMap<String, Object> logrecordObj = new LinkedHashMap<>();
 
-        logrecordObj.put("expiryReason", jo.get("expiryReason"));
+        logrecordObj.put(EXPIRY_REASON, jo.get(EXPIRY_REASON));
         logrecordObj.put("publishId", jo.get("publishId"));
-        logrecordObj.put("attempts", jo.get("attempts"));
+        logrecordObj.put(ATTEMPTS, jo.get(ATTEMPTS));
         logrecordObj.put("requestURI", jo.get("requestURI"));
         logrecordObj.put("method", jo.get("method"));
         logrecordObj.put("contentType", jo.get("contentType"));
@@ -119,8 +122,8 @@ public class ExpiryRecord extends BaseLogRecord {
     public LOGJSONObject asJSONObject() {
         LOGJSONObject jo = super.asJSONObject();
         jo.put("type", "exp");
-        jo.put("expiryReason", reason);
-        jo.put("attempts", attempts);
+        jo.put(EXPIRY_REASON, reason);
+        jo.put(ATTEMPTS, deliveryAttempts);
 
         return this.reOrderObject(jo);
     }
@@ -136,7 +139,7 @@ public class ExpiryRecord extends BaseLogRecord {
         ps.setInt(13, getSubid());
         ps.setString(14, getFileid());
         ps.setNull(15, Types.INTEGER);
-        ps.setInt(16, getAttempts());
+        ps.setInt(16, getDeliveryAttempts());
         ps.setString(17, getReason());
         ps.setNull(19, Types.BIGINT);
         ps.setNull(20, Types.VARCHAR);
