@@ -108,7 +108,7 @@ public class ThrottleFilterTest {
         List<Continuation> continuation_list = new ArrayList<>();
         continuation_list.add(continuation);
         suspended_requests.put("null/-1", continuation_list);
-        FieldUtils.writeDeclaredField(throttlefilter, "suspended_requests", suspended_requests, true);
+        FieldUtils.writeDeclaredField(throttlefilter, "suspendedRequests", suspended_requests, true);
         throttlefilter.doFilter(request, response, filterchain);
         verify(continuation, times(1)).setAttribute(anyString(), any());
         verify(continuation, times(1)).resume();

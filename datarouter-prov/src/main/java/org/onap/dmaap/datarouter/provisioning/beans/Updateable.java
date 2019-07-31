@@ -38,5 +38,5 @@ public interface Updateable {
      * @param c the JDBC Connection to use
      * @return true if the UPDATE succeeded, false otherwise
      */
-    public boolean doUpdate(Connection c);
+    boolean doUpdate(Connection c);
 }

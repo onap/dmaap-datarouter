@@ -46,7 +46,7 @@ public class ExpiryRecordTest {
         Assert.assertEquals(2000, expiryRecord.getContentLength());
         Assert.assertEquals(285, expiryRecord.getSubid());
         Assert.assertEquals("file.txt", expiryRecord.getFileid());
-        Assert.assertEquals(100, expiryRecord.getAttempts());
+        Assert.assertEquals(100, expiryRecord.getDeliveryAttempts());
         Assert.assertEquals("other", expiryRecord.getReason());
     }
 
@@ -63,7 +63,7 @@ public class ExpiryRecordTest {
         expiryRecord.setMethod("PUT");
         expiryRecord.setSubid(322);
         expiryRecord.setFileid("file.txt");
-        expiryRecord.setAttempts(125);
+        expiryRecord.setDeliveryAttempts(125);
         expiryRecord.setReason("Out of memory");
 
         LOGJSONObject expiryRecordJson = createBaseLogRecordJson();
