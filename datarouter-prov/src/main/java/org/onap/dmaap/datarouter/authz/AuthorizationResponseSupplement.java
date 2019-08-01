@@ -29,14 +29,16 @@ import java.util.Map;
 /** An object that meets the <code>AuthorizationResponseSupplement</code> interface carries supplementary
  * information for an authorization response.  In a XACML-based system, a response to an authorization request
  * carries not just the permit/deny decision but, optionally, supplemental information in the form of advice and
- * obligation elements.  The structure of a XACML advice element and a XACML obligation element are similar: each has an identifier and
- * a set of attributes (name-value) pairs.  (The difference between a XACML advice element and a XACML obligation element is in
+ * obligation elements.  The structure of a XACML advice element and a XACML obligation element are similar:
+ * each has an identifier and a set of attributes (name-value) pairs.
+ * (The difference between a XACML advice element and a XACML obligation element is in
  * how the recipient of the response--the Policy Enforcement Point, in XACML terminology--handles the element.)
  *
  * @author J. F. Lucas
  *
  */
 public interface AuthorizationResponseSupplement {
+
     /** Return the identifier for the supplementary information element.
      *
      * @return a <code>String</code> containing the identifier.

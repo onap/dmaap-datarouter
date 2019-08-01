@@ -38,14 +38,18 @@ import org.json.JSONObject;
  * @version $Id: FeedAuthorization.java,v 1.2 2013/06/20 14:11:05 eby Exp $
  */
 public class FeedAuthorization implements JSONable {
-    private String classification;
-    private Set<FeedEndpointID> endpoint_ids;
-    private Set<String> endpoint_addrs;
 
+    private String classification;
+    private Set<FeedEndpointID> endpointIds;
+    private Set<String> endpointAddrs;
+
+    /**
+     * FeedAuthoization constructor.
+     */
     public FeedAuthorization() {
         this.classification = "";
-        this.endpoint_ids = new HashSet<>();
-        this.endpoint_addrs = new HashSet<>();
+        this.endpointIds = new HashSet<>();
+        this.endpointAddrs = new HashSet<>();
     }
 
     public String getClassification() {
@@ -57,19 +61,19 @@ public class FeedAuthorization implements JSONable {
     }
 
     public Set<FeedEndpointID> getEndpoint_ids() {
-        return endpoint_ids;
+        return endpointIds;
     }
 
-    public void setEndpoint_ids(Set<FeedEndpointID> endpoint_ids) {
-        this.endpoint_ids = endpoint_ids;
+    public void setEndpoint_ids(Set<FeedEndpointID> endpointIds) {
+        this.endpointIds = endpointIds;
     }
 
     public Set<String> getEndpoint_addrs() {
-        return endpoint_addrs;
+        return endpointAddrs;
     }
 
-    public void setEndpoint_addrs(Set<String> endpoint_addrs) {
-        this.endpoint_addrs = endpoint_addrs;
+    public void setEndpoint_addrs(Set<String> endpointAddrs) {
+        this.endpointAddrs = endpointAddrs;
     }
 
     @Override
@@ -77,12 +81,12 @@ public class FeedAuthorization implements JSONable {
         JSONObject jo = new JSONObject();
         jo.put("classification", classification);
         JSONArray ja = new JSONArray();
-        for (FeedEndpointID eid : endpoint_ids) {
+        for (FeedEndpointID eid : endpointIds) {
             ja.put(eid.asJSONObject());
         }
         jo.put("endpoint_ids", ja);
         ja = new JSONArray();
-        for (String t : endpoint_addrs) {
+        for (String t : endpointAddrs) {
             ja.put(t);
         }
         jo.put("endpoint_addrs", ja);
@@ -91,20 +95,24 @@ public class FeedAuthorization implements JSONable {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof FeedAuthorization))
+        if (!(obj instanceof FeedAuthorization)) {
             return false;
+        }
         FeedAuthorization of = (FeedAuthorization) obj;
-        if (!classification.equals(of.classification))
+        if (!classification.equals(of.classification)) {
             return false;
-        if (!endpoint_ids.equals(of.endpoint_ids))
+        }
+        if (!endpointIds.equals(of.endpointIds)) {
             return false;
-        if (!endpoint_addrs.equals(of.endpoint_addrs))
+        }
+        if (!endpointAddrs.equals(of.endpointAddrs)) {
             return false;
+        }
         return true;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(classification, endpoint_ids, endpoint_addrs);
+        return Objects.hash(classification, endpointIds, endpointAddrs);
     }
 }

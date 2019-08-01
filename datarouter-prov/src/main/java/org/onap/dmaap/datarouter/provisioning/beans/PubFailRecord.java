@@ -34,12 +34,18 @@ import java.text.ParseException;
  * @author Robert Eby
  * @version $Id: PubFailRecord.java,v 1.1 2013/10/28 18:06:53 eby Exp $
  */
+
 public class PubFailRecord extends BaseLogRecord {
     private long contentLengthReceived;
     private String sourceIP;
     private String user;
     private String error;
 
+    /**
+     * PBF record constructor.
+     * @param pp string array of PBF attributes
+     * @throws ParseException in case of parse error
+     */
     public PubFailRecord(String[] pp) throws ParseException {
         super(pp);
         this.contentLengthReceived = Long.parseLong(pp[8]);

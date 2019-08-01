@@ -42,7 +42,8 @@ public class ProvAuthorizer implements Authorizer {
     private ProvDataProvider provData;
 
     private static final String SUBJECT_HEADER = "X-DMAAP-DR-ON-BEHALF-OF";  // HTTP header carrying requester identity
-    private static final String SUBJECT_HEADER_GROUP = "X-DMAAP-DR-ON-BEHALF-OF-GROUP";  // HTTP header carrying requester identity  by group Rally : US708115
+    // HTTP header carrying requester identity  by group Rally : US708115
+    private static final String SUBJECT_HEADER_GROUP = "X-DMAAP-DR-ON-BEHALF-OF-GROUP";
 
     /** Constructor. For the moment, do nothing special.  Make it a singleton?
      *
@@ -66,11 +67,11 @@ public class ProvAuthorizer implements Authorizer {
     }
 
     /**
-     * Determine if the API request carried in the <code>request</code> parameter, with additional attributes provided in
+     * Determine if the API request carried in the <code>request</code> parameter,with additional attributes provided in
      * the <code>additionalAttrs</code> parameter, is permitted.   <code>additionalAttrs</code> isn't used in R1.
      *
      * @param request the HTTP request for which an authorization decision is needed
-     * @param additionalAttrs additional attributes that the <code>Authorizer</code> can in making an authorization decision
+     * @param additionalAttrs additional attributes that the <code>Authorizer</code> can in making a decision
      * @return an object implementing the <code>AuthorizationResponse</code> interface.  This object includes the
      * permit/deny decision for the request and (after R1) supplemental information related to the response in the form
      * of advice and obligations.
@@ -128,7 +129,8 @@ public class ProvAuthorizer implements Authorizer {
     private boolean allowFeedAccess(AuthzResource resource, String method, String subject, String subjectgroup) {
         boolean decision = false;
         // Allow GET, PUT, or DELETE if requester (subject) is the owner (publisher) of the feed
-        if ( method != null && ("GET".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method) || "DELETE".equalsIgnoreCase(method))) {
+        if ( method != null && ("GET".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method)
+                                        || "DELETE".equalsIgnoreCase(method))) {
 
             String owner = provData.getFeedOwner(resource.getId());
             decision = (owner != null) && owner.equals(subject);
@@ -145,7 +147,8 @@ public class ProvAuthorizer implements Authorizer {
         boolean decision = false;
 
         // Allow GET, PUT, or DELETE if requester (subject) is the owner of the subscription (subscriber)
-        if (method != null && ("GET".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method) || "DELETE".equalsIgnoreCase(method) || "POST".equalsIgnoreCase(method))) {
+        if (method != null && ("GET".equalsIgnoreCase(method) || "PUT".equalsIgnoreCase(method)
+                                       || "DELETE".equalsIgnoreCase(method) || "POST".equalsIgnoreCase(method))) {
 
             String owner = provData.getSubscriptionOwner(resource.getId());
             decision = (owner != null) && owner.equals(subject);

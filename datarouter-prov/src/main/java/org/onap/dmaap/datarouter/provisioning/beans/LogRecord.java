@@ -24,6 +24,8 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Connection;
@@ -34,10 +36,9 @@ import java.sql.Types;
 import java.text.ParseException;
 import java.util.Iterator;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
+
 
 /**
  * The representation of a Log Record, as retrieved from the DB.  Since this record format is only used to replicate
@@ -53,10 +54,16 @@ public class LogRecord extends BaseLogRecord {
      *
      * @param os the {@link OutputStream} to print the records on
      * @param bs the {@link RLEBitSet} listing the record IDs to print
-     * @throws IOException
+     * @throws IOException in case of I/O error
      */
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
 
+    /**
+     * Get Log Records.
+     * @param os outputstream
+     * @param bs RLEBitSet object
+     * @throws IOException in case of I/O error
+     */
     public static void printLogRecords(OutputStream os, RLEBitSet bs) throws IOException {
         final String sql = "select * from LOG_RECORDS where RECORD_ID >= ? AND RECORD_ID <= ?";
         DB db = new DB();
@@ -64,9 +71,9 @@ public class LogRecord extends BaseLogRecord {
             Iterator<Long[]> iter = bs.getRangeIterator();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 while (iter.hasNext()) {
-                    Long[] n = iter.next();
-                    ps.setLong(1, n[0]);
-                    ps.setLong(2, n[1]);
+                    Long[] nxt = iter.next();
+                    ps.setLong(1, nxt[0]);
+                    ps.setLong(2, nxt[1]);
                     try (ResultSet rs = ps.executeQuery()) {
                         while (rs.next()) {
                             LogRecord lr = new LogRecord(rs);
@@ -91,10 +98,15 @@ public class LogRecord extends BaseLogRecord {
     private final int result;
     private final int attempts;
     private final String reason;
-    private final long record_id;
+    private final long recordId;
     private final long clength2;
     private final String fileName;
 
+    /**
+     * LogRecord constructor.
+     * @param rs ResultSet from SQL statement
+     * @throws SQLException in case of SQL error
+     */
     public LogRecord(ResultSet rs) throws SQLException {
         super(rs);
         this.type = rs.getString("TYPE");
@@ -110,11 +122,16 @@ public class LogRecord extends BaseLogRecord {
         this.attempts = rs.getInt("ATTEMPTS");
         this.reason = rs.getString("REASON");
 
-        this.record_id = rs.getLong("RECORD_ID");
+        this.recordId = rs.getLong("RECORD_ID");
         this.clength2 = rs.getLong("CONTENT_LENGTH_2");
         this.fileName = rs.getString("FILENAME");
     }
 
+    /**
+     * LogRecord Constructor from string array.
+     * @param pp string array of LogRecord attributes
+     * @throws ParseException in case of parse error
+     */
     public LogRecord(String[] pp) throws ParseException {
         super(pp);
         this.type = pp[8];
@@ -130,13 +147,13 @@ public class LogRecord extends BaseLogRecord {
         this.attempts = Integer.parseInt(pp[16]);
         this.reason = pp[17];
 
-        this.record_id = Long.parseLong(pp[18]);
+        this.recordId = Long.parseLong(pp[18]);
         this.clength2 = (pp.length == 21) ? Long.parseLong(pp[19]) : 0;
         this.fileName = pp[20];
     }
 
     public long getRecordId() {
-        return record_id;
+        return recordId;
     }
 
     @Override
@@ -160,7 +177,7 @@ public class LogRecord extends BaseLogRecord {
                         + result + "|"
                         + attempts + "|"
                         + reason + "|"
-                        + record_id + "|"
+                        + recordId + "|"
                         + clength2
                         + "\n";
     }
@@ -179,7 +196,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setNull(15, Types.INTEGER);
             ps.setNull(16, Types.INTEGER);
             ps.setNull(17, Types.VARCHAR);
-            ps.setLong(18, record_id);
+            ps.setLong(18, recordId);
             ps.setNull(19, Types.BIGINT);
             ps.setString(20, fileName);
         } else if (type.equals("del")) {
@@ -192,7 +209,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setInt(15, result);
             ps.setNull(16, Types.INTEGER);
             ps.setNull(17, Types.VARCHAR);
-            ps.setLong(18, record_id);
+            ps.setLong(18, recordId);
             ps.setNull(19, Types.BIGINT);
             ps.setString(20, fileName);
         } else if (type.equals("exp")) {
@@ -205,7 +222,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setNull(15, Types.INTEGER);
             ps.setInt(16, attempts);
             ps.setString(17, reason);
-            ps.setLong(18, record_id);
+            ps.setLong(18, recordId);
             ps.setNull(19, Types.BIGINT);
             ps.setString(20, fileName);
         } else if (type.equals("pbf")) {
@@ -218,7 +235,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setNull(15, Types.INTEGER);
             ps.setNull(16, Types.INTEGER);
             ps.setNull(17, Types.VARCHAR);
-            ps.setLong(18, record_id);
+            ps.setLong(18, recordId);
             ps.setLong(19, clength2);
             ps.setString(20, fileName);
         } else if (type.equals("dlx")) {
@@ -231,13 +248,13 @@ public class LogRecord extends BaseLogRecord {
             ps.setNull(15, Types.INTEGER);
             ps.setNull(16, Types.INTEGER);
             ps.setNull(17, Types.VARCHAR);
-            ps.setLong(18, record_id);
+            ps.setLong(18, recordId);
             ps.setLong(19, clength2);
             ps.setString(20, fileName);
         }
     }
 
-    public static void main(String[] a) throws IOException {
-        LogRecord.printLogRecords(System.out, new RLEBitSet(a[0]));
+    public static void main(String[] args) throws IOException {
+        LogRecord.printLogRecords(System.out, new RLEBitSet(args[0]));
     }
 }

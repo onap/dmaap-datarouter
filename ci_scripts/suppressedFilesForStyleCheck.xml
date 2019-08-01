@@ -24,4 +24,5 @@
 
 <suppressions>
   <suppress files=".*Test\.java" checks="[a-zA-Z0-9]*"/>
+  <suppress files="." checks="JavadocTagContinuationIndentation"/>
 </suppressions>

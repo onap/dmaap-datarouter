@@ -46,19 +46,31 @@ public class DeliveryRecord extends BaseLogRecord {
     private int result;
     private String user;
 
+    /**
+     * Constructor for DeliverRecord.
+     * @param pp string array of DeliverRecord attributes
+     * @throws ParseException in case of parse error
+     */
     public DeliveryRecord(String[] pp) throws ParseException {
         super(pp);
         String fileid = pp[5];
-        if (fileid.lastIndexOf('/') >= 0)
+        if (fileid.lastIndexOf('/') >= 0) {
             fileid = fileid.substring(fileid.lastIndexOf('/') + 1);
+        }
         this.subid = Integer.parseInt(pp[4]);
         this.fileid = fileid;
         this.result = Integer.parseInt(pp[10]);
         this.user = pp[9];
-        if (this.user != null && this.user.length() > 50)
+        if (this.user != null && this.user.length() > 50) {
             this.user = this.user.substring(0, 50);
+        }
     }
 
+    /**
+     * DeliverRecord constructor from ResultSet.
+     * @param rs ResultSet
+     * @throws SQLException in case of get error from SQL statement
+     */
     public DeliveryRecord(ResultSet rs) throws SQLException {
         super(rs);
         this.subid = rs.getInt("DELIVERY_SUBID");
@@ -99,7 +111,11 @@ public class DeliveryRecord extends BaseLogRecord {
         this.user = user;
     }
 
-
+    /**
+     * Method to reorder LOGJSONObject.
+     * @param jo LOGJSONObject
+     * @return new LOGJSONObject
+     */
     public LOGJSONObject reOrderObject(LOGJSONObject jo) {
         LinkedHashMap<String, Object> logrecordObj = new LinkedHashMap<>();
 

@@ -20,19 +20,22 @@
  * * ECOMP is a trademark and service mark of AT&T Intellectual Property.
  * *
  ******************************************************************************/
+
 package org.onap.dmaap.datarouter.authz;
 
 import java.util.List;
 
 /**
  * The <code>AuthorizationResponse</code> interface gives the caller access to information about an authorization
- * decision.  This information includes the permit/deny decision itself, along with supplementary information in the form of
- * advice and obligations.  (The advice and obligations will not be used in Data Router R1.)
+ * decision.  This information includes the permit/deny decision itself,
+ * along with supplementary information in the form of advice and obligations.
+ * (The advice and obligations will not be used in Data Router R1.)
  *
  * @author J. F. Lucas
  *
  */
 public interface AuthorizationResponse {
+
     /**
      * Indicates whether the request is authorized or not.
      *
@@ -43,16 +46,16 @@ public interface AuthorizationResponse {
     /**
      * Returns any advice elements that were included in the authorization response.
      *
-     * @return A list of objects implementing the <code>AuthorizationResponseSupplement</code> interface, with each object representing an
-     * advice element from the authorization response.
+     * @return A list of objects implementing the <code>AuthorizationResponseSupplement</code> interface,
+     * each representing an advice element from the authorization response.
      */
     public List<AuthorizationResponseSupplement> getAdvice();
 
     /**
      * Returns any obligation elements that were included in the authorization response.
      *
-     * @return A list of objects implementing the <code>AuthorizationResponseSupplement</code> interface, with each object representing an
-     * obligation element from the authorization response.
+     * @return A list of objects implementing the <code>AuthorizationResponseSupplement</code> interface,
+     * each representing an obligation element from the authorization response.
      */
     public List<AuthorizationResponseSupplement> getObligations();
 }

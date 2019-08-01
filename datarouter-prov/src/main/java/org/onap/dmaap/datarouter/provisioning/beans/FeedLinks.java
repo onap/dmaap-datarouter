@@ -35,6 +35,7 @@ import org.json.JSONObject;
  * @author Robert Eby
  * @version $Id: FeedLinks.java,v 1.3 2013/07/05 13:48:05 eby Exp $
  */
+
 public class FeedLinks implements JSONable {
     private String self;
     private String publish;
@@ -45,6 +46,10 @@ public class FeedLinks implements JSONable {
         self = publish = subscribe = log = null;
     }
 
+    /**
+     * FeedLinks constructor.
+     * @param jo JSONObject
+     */
     public FeedLinks(JSONObject jo) {
         this();
         self = jo.getString("self");
@@ -97,17 +102,22 @@ public class FeedLinks implements JSONable {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof FeedLinks))
+        if (!(obj instanceof FeedLinks)) {
             return false;
+        }
         FeedLinks of = (FeedLinks) obj;
-        if (!self.equals(of.self))
+        if (!self.equals(of.self)) {
             return false;
-        if (!publish.equals(of.publish))
+        }
+        if (!publish.equals(of.publish)) {
             return false;
-        if (!subscribe.equals(of.subscribe))
+        }
+        if (!subscribe.equals(of.subscribe)) {
             return false;
-        if (!log.equals(of.log))
+        }
+        if (!log.equals(of.log)) {
             return false;
+        }
         return true;
     }
 

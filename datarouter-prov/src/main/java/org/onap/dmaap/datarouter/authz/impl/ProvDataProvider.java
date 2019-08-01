@@ -20,6 +20,7 @@
  * * ECOMP is a trademark and service mark of AT&T Intellectual Property.
  * *
  ******************************************************************************/
+
 package org.onap.dmaap.datarouter.authz.impl;
 
 /** Interface to access data about subscriptions and feeds.  A software component that
@@ -43,23 +44,24 @@ public interface ProvDataProvider {
      */
     public String getFeedClassification(String feedId);
 
-    /** Get the identity of the owner of a feed
+    /** Get the identity of the owner of a feed.
      *
      * @param subId the ID of the subscripition whose owner is being looked up.
      * @return the subscription owner's identity.
      */
     public String getSubscriptionOwner(String subId);
 
-    /** Get the identity of the owner of a feed by group id -  Rally : US708115
+    /** Get the identity of the owner of a feed by group id -  Rally : US708115.
      *
-     * @param feedId, user the ID of the feed whose owner is being looked up.
+     * @param feedId user the ID of the feed whose owner is being looked up.
      * @return the feed owner's identity by group.
      */
     public String getGroupByFeedGroupId(String owner, String feedId);
 
-    /** Get the identity of the owner of a sub by group id Rally : US708115
+    /** Get the identity of the owner of a sub by group id Rally : US708115.
      *
-     * @param subId, user the ID of the feed whose owner is being looked up.
+     * @param subId user the ID of the feed whose owner is being looked up.
+     *
      * @return the feed owner's identity by group.
      */
     public String getGroupBySubGroupId(String owner, String subId);

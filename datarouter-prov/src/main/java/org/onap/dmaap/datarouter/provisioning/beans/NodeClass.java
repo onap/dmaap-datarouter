@@ -42,6 +42,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  * @author Robert P. Eby
  * @version $Id: NodeClass.java,v 1.2 2014/01/15 16:08:43 eby Exp $
  */
+
 public abstract class NodeClass extends Syncable {
 
     private static final String PROV_0005_DO_INSERT = "PROV0005 doInsert: ";
@@ -101,7 +102,7 @@ public abstract class NodeClass extends Syncable {
     }
 
     private static void reload() {
-        Map<String, Integer> m = new HashMap<>();
+        Map<String, Integer> hmap = new HashMap<>();
         String sql = "select NODEID, NAME from NODES";
         DB db = new DB();
         try (Connection conn = db.getConnection();
@@ -110,7 +111,7 @@ public abstract class NodeClass extends Syncable {
                 while (rs.next()) {
                     int id = rs.getInt("NODEID");
                     String name = rs.getString("NAME");
-                    m.put(name, id);
+                    hmap.put(name, id);
                 }
             } finally {
                 db.release(conn);
@@ -118,17 +119,22 @@ public abstract class NodeClass extends Syncable {
         } catch (SQLException e) {
             intLogger.error(PROV_0005_DO_INSERT + e.getMessage(),e);
         }
-        map = m;
+        map = hmap;
     }
 
     static Integer lookupNodeName(final String name) {
-        Integer n = map.get(name);
-        if (n == null) {
+        Integer nodeName = map.get(name);
+        if (nodeName == null) {
             throw new IllegalArgumentException("Invalid node name: " + name);
         }
-        return n;
+        return nodeName;
     }
 
+    /**
+     * Get node names.
+     * @param patt pattern to search
+     * @return collection of node names
+     */
     public static Collection<String> lookupNodeNames(String patt) {
         Collection<String> coll = new TreeSet<>();
         final Set<String> keyset = map.keySet();
@@ -146,32 +152,37 @@ public abstract class NodeClass extends Syncable {
         return coll;
     }
 
-    private static void addNodeToCollection(Collection<String> coll, Set<String> keyset, String s) {
-        s = s.substring(0, s.length() - 1);
+    private static void addNodeToCollection(Collection<String> coll, Set<String> keyset, String str) {
+        str = str.substring(0, str.length() - 1);
         for (String s2 : keyset) {
-            if (s2.startsWith(s)) {
+            if (s2.startsWith(str)) {
                 coll.add(s2);
             }
         }
     }
 
-    public static String normalizeNodename(String s) {
-        if (s != null && s.indexOf('.') <= 0) {
-            Parameters p = Parameters.getParameter(Parameters.PROV_DOMAIN);
-            if (p != null) {
-                String domain = p.getValue();
-                s += "." + domain;
+    /**
+     * Method to add domain name.
+     * @param str nde name string
+     * @return normalized node name
+     */
+    public static String normalizeNodename(String str) {
+        if (str != null && str.indexOf('.') <= 0) {
+            Parameters param = Parameters.getParameter(Parameters.PROV_DOMAIN);
+            if (param != null) {
+                String domain = param.getValue();
+                str += "." + domain;
             }
-            return s.toLowerCase();
+            return str.toLowerCase();
         } else {
-            return s;
+            return str;
         }
 
     }
 
-    String lookupNodeID(int n) {
+    String lookupNodeID(int node) {
         for (Map.Entry<String, Integer> entry : map.entrySet()) {
-            if (entry.getValue() == n) {
+            if (entry.getValue() == node) {
                 return entry.getKey();
             }
         }

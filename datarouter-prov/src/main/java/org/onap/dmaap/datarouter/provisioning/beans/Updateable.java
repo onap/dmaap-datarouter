@@ -31,12 +31,13 @@ import java.sql.Connection;
  * @author Robert Eby
  * @version $Id: Updateable.java,v 1.2 2013/05/29 14:44:36 eby Exp $
  */
+
 public interface Updateable {
     /**
-     * Update this object in the DB.
+     * * Update this object in the DB.
      *
-     * @param c the JDBC Connection to use
+     * @param conn the JDBC Connection to use
      * @return true if the UPDATE succeeded, false otherwise
      */
-    public boolean doUpdate(Connection c);
+    boolean doUpdate(Connection conn);
 }

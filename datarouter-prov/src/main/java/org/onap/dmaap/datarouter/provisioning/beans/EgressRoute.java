@@ -49,6 +49,11 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
     private final int subid;
     private final int nodeid;
 
+    /**
+     * EgressRoute constructor.
+     * @param subid subscription id
+     * @param nodeid node id
+     */
     public EgressRoute(int subid, int nodeid) {
         this.subid = subid;
         this.nodeid = nodeid;
@@ -101,7 +106,7 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
      * @return an EgressRoute, or null if there is no route for this subscription
      */
     public static EgressRoute getEgressRoute(int sub) {
-        EgressRoute v = null;
+        EgressRoute er = null;
         DB db = new DB();
         String sql = "select NODEID from EGRESS_ROUTES where SUBID = ?";
         try (Connection conn = db.getConnection();
@@ -110,7 +115,7 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     int node = rs.getInt("NODEID");
-                    v = new EgressRoute(sub, node);
+                    er = new EgressRoute(sub, node);
                 }
             } finally {
                 db.release(conn);
@@ -118,14 +123,14 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
         } catch (SQLException e) {
             intlogger.error("PROV0009 EgressRoute.getEgressRoute: " + e.getMessage(), e);
         }
-        return v;
+        return er;
     }
 
     @Override
-    public boolean doDelete(Connection c) {
+    public boolean doDelete(Connection conn) {
         boolean rv = true;
         String sql = "delete from EGRESS_ROUTES where SUBID = ?";
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, subid);
             ps.execute();
         } catch (SQLException e) {
@@ -136,10 +141,10 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
     }
 
     @Override
-    public boolean doInsert(Connection c) {
+    public boolean doInsert(Connection conn) {
         boolean rv = false;
         String sql = "insert into EGRESS_ROUTES (SUBID, NODEID) values (?, ?)";
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             // Create the NETWORK_ROUTES row
             ps.setInt(1, this.subid);
             ps.setInt(2, this.nodeid);
@@ -153,10 +158,10 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
     }
 
     @Override
-    public boolean doUpdate(Connection c) {
+    public boolean doUpdate(Connection conn) {
         boolean rv = true;
         String sql = "update EGRESS_ROUTES set NODEID = ? where SUBID = ?";
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, nodeid);
             ps.setInt(2, subid);
             ps.executeUpdate();
@@ -189,8 +194,8 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
     }
 
     @Override
-    public int compareTo(EgressRoute o) {
-        return this.subid - o.subid;
+    public int compareTo(EgressRoute er) {
+        return this.subid - er.subid;
     }
 
     @Override

@@ -37,12 +37,20 @@ import org.json.JSONObject;
  * @author Robert Eby
  * @version $Id: SubDelivery.java,v 1.2 2013/06/20 14:11:05 eby Exp $
  */
+
 public class SubDelivery implements JSONable {
     private String url;
     private String user;
     private String password;
     private boolean use100;
 
+    /**
+     * SubDelivery constructor.
+     * @param url url string
+     * @param user user string
+     * @param password password string
+     * @param use100 use100 string
+     */
     public SubDelivery(String url, String user, String password, boolean use100) {
         this.url = url;
         this.user = user;
@@ -50,6 +58,11 @@ public class SubDelivery implements JSONable {
         this.use100 = use100;
     }
 
+    /**
+     * SubDelivery constructor.
+     * @param rs resultset from DB
+     * @throws SQLException in cse of SQL error
+     */
     public SubDelivery(ResultSet rs) throws SQLException {
         this.url = rs.getString("DELIVERY_URL");
         this.user = rs.getString("DELIVERY_USER");
@@ -98,17 +111,22 @@ public class SubDelivery implements JSONable {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof SubDelivery))
+        if (!(obj instanceof SubDelivery)) {
             return false;
+        }
         SubDelivery os = (SubDelivery) obj;
-        if (!url.equals(os.url))
+        if (!url.equals(os.url)) {
             return false;
-        if (!user.equals(os.user))
+        }
+        if (!user.equals(os.user)) {
             return false;
-        if (!password.equals(os.password))
+        }
+        if (!password.equals(os.password)) {
             return false;
-        if (use100 != os.use100)
+        }
+        if (use100 != os.use100) {
             return false;
+        }
         return true;
     }
 

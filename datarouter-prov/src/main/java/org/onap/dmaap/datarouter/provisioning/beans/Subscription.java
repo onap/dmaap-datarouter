@@ -47,6 +47,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
  * @author Robert Eby
  * @version $Id: Subscription.java,v 1.9 2013/10/28 18:06:53 eby Exp $
  */
+
 public class Subscription extends Syncable {
 
     private static final String SQLEXCEPTION = "SQLException: ";
@@ -74,22 +75,34 @@ public class Subscription extends Syncable {
     private String aafInstance;
     private boolean decompress;
 
+    /**
+     * Get specific subscription.
+     * @param sub subscription object
+     * @return subscription
+     */
     public static Subscription getSubscriptionMatching(Subscription sub) {
         SubDelivery deli = sub.getDelivery();
         String sql = String.format(
-                "select * from SUBSCRIPTIONS where FEEDID = %d and DELIVERY_URL = \"%s\" and DELIVERY_USER = \"%s\" and DELIVERY_PASSWORD = \"%s\" and DELIVERY_USE100 = %d and METADATA_ONLY = %d and FOLLOW_REDIRECTS = %d",
+                "select * from SUBSCRIPTIONS where FEEDID = %d and DELIVERY_URL = \"%s\" and DELIVERY_USER = \"%s\" "
+                        + "and DELIVERY_PASSWORD = \"%s\" and DELIVERY_USE100 = %d and METADATA_ONLY = %d "
+                        + "and FOLLOW_REDIRECTS = %d",
                 sub.getFeedid(),
                 deli.getUrl(),
                 deli.getUser(),
                 deli.getPassword(),
                 deli.isUse100() ? 1 : 0,
                 sub.isMetadataOnly() ? 1 : 0,
-                sub.isFollowRedirect() ? 1 :0
+                sub.isFollowRedirect() ? 1 : 0
         );
         List<Subscription> list = getSubscriptionsForSQL(sql);
         return !list.isEmpty() ? list.get(0) : null;
     }
 
+    /**
+     * Get subscription by id.
+     * @param id subscription id string
+     * @return subscription
+     */
     public static Subscription getSubscriptionById(int id) {
         String sql = "select * from SUBSCRIPTIONS where SUBID = " + id;
         List<Subscription> list = getSubscriptionsForSQL(sql);
@@ -100,6 +113,11 @@ public class Subscription extends Syncable {
         return getSubscriptionsForSQL("select * from SUBSCRIPTIONS");
     }
 
+    /**
+     * Get subscriptions from SQL.
+     * @param sql SQL statement
+     * @return List of subscriptions
+     */
     private static List<Subscription> getSubscriptionsForSQL(String sql) {
         List<Subscription> list = new ArrayList<>();
         try {
@@ -121,6 +139,10 @@ public class Subscription extends Syncable {
         return list;
     }
 
+    /**
+     * Get max subid.
+     * @return subid int
+     */
     public static int getMaxSubID() {
         int max = 0;
         try {
@@ -141,6 +163,11 @@ public class Subscription extends Syncable {
         return max;
     }
 
+    /**
+     * Get subscription URL list.
+     * @param feedid feedid int
+     * @return collection of subscription URL
+     */
     public static Collection<String> getSubscriptionUrlList(int feedid) {
         List<String> list = new ArrayList<>();
         String sql = "select SUBID from SUBSCRIPTIONS where FEEDID = ?";
@@ -194,6 +221,12 @@ public class Subscription extends Syncable {
         this("", "", "");
     }
 
+    /**
+     * Subscription constructor.
+     * @param url url string
+     * @param user user string
+     * @param password password string
+     */
     public Subscription(String url, String user, String password) {
         this.subid = -1;
         this.feedid = -1;
@@ -211,6 +244,11 @@ public class Subscription extends Syncable {
         this.decompress = false;
     }
 
+    /**
+     * Subscription constructor.
+     * @param rs resultset from SQL
+     * @throws SQLException in case of SQL error
+     */
     public Subscription(ResultSet rs) throws SQLException {
         this.subid = rs.getInt(SUBID_COL);
         this.feedid = rs.getInt("FEEDID");
@@ -219,7 +257,8 @@ public class Subscription extends Syncable {
         this.metadataOnly = rs.getBoolean("METADATA_ONLY");
         this.followRedirect = rs.getBoolean("FOLLOW_REDIRECTS");
         this.subscriber = rs.getString("SUBSCRIBER");
-        this.links = new SubLinks(rs.getString("SELF_LINK"), URLUtilities.generateFeedURL(feedid), rs.getString("LOG_LINK"));
+        this.links = new SubLinks(rs.getString("SELF_LINK"), URLUtilities.generateFeedURL(feedid),
+                rs.getString("LOG_LINK"));
         this.suspended = rs.getBoolean("SUSPENDED");
         this.lastMod = rs.getDate("LAST_MOD");
         this.createdDate = rs.getDate("CREATED_DATE");
@@ -228,6 +267,11 @@ public class Subscription extends Syncable {
         this.decompress  = rs.getBoolean("DECOMPRESS");
     }
 
+    /**
+     * Subscription constructor.
+     * @param jo JSONObject
+     * @throws InvalidObjectException in case of object error
+     */
     public Subscription(JSONObject jo) throws InvalidObjectException {
         this("", "", "");
         try {
@@ -236,18 +280,18 @@ public class Subscription extends Syncable {
             this.feedid = jo.optInt(FEEDID_KEY, -1);
             this.groupid = jo.optInt(GROUPID_KEY, -1); //New field is added - Groups feature Rally:US708115 - 1610
             this.aafInstance = jo.optString("aaf_instance", "legacy");
-            if(!(aafInstance.equalsIgnoreCase("legacy")) && aafInstance.length() > 255) {
-                    throw new InvalidObjectException("aaf_instance field is too long");
+            if (!(aafInstance.equalsIgnoreCase("legacy")) && aafInstance.length() > 255) {
+                throw new InvalidObjectException("aaf_instance field is too long");
             }
             JSONObject jdeli = jo.getJSONObject("delivery");
             String url = jdeli.getString("url");
             String user = jdeli.getString("user");
-            String password = jdeli.getString("password");
-            boolean use100 = jdeli.getBoolean("use100");
+            final String password = jdeli.getString("password");
+            final boolean use100 = jdeli.getBoolean("use100");
 
             //Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
-            Properties p = (new DB()).getProperties();
-            if (!url.startsWith("https://") && isHttpsRelaxationFalseAndHasSyncKey(jo, p)) {
+            Properties prop = (new DB()).getProperties();
+            if (!url.startsWith("https://") && isHttpsRelaxationFalseAndHasSyncKey(jo, prop)) {
                 throw new InvalidObjectException("delivery URL is not HTTPS");
             }
 
@@ -277,8 +321,8 @@ public class Subscription extends Syncable {
         }
     }
 
-    private boolean isHttpsRelaxationFalseAndHasSyncKey(JSONObject jo, Properties p) {
-        return p.get("org.onap.dmaap.datarouter.provserver.https.relaxation").toString().equals("false") && !jo
+    private boolean isHttpsRelaxationFalseAndHasSyncKey(JSONObject jo, Properties prop) {
+        return prop.get("org.onap.dmaap.datarouter.provserver.https.relaxation").toString().equals("false") && !jo
                 .has("sync");
     }
 
@@ -286,6 +330,10 @@ public class Subscription extends Syncable {
         return subid;
     }
 
+    /**
+     * Subid setter.
+     * @param subid subid string
+     */
     public void setSubid(int subid) {
         this.subid = subid;
 
@@ -299,6 +347,10 @@ public class Subscription extends Syncable {
         return feedid;
     }
 
+    /**
+     * feedid setter.
+     * @param feedid feedid string
+     */
     public void setFeedid(int feedid) {
         this.feedid = feedid;
 
@@ -306,6 +358,7 @@ public class Subscription extends Syncable {
         SubLinks sl = getLinks();
         sl.setFeed(URLUtilities.generateFeedURL(feedid));
     }
+
     public String getAafInstance() {
         return aafInstance;
     }
@@ -342,6 +395,7 @@ public class Subscription extends Syncable {
     private boolean isFollowRedirect() {
         return followRedirect;
     }
+
     public void setFollowRedirect(boolean followRedirect) {
         this.followRedirect = followRedirect;
     }
@@ -366,6 +420,10 @@ public class Subscription extends Syncable {
         return subscriber;
     }
 
+    /**
+     * Subscriber setter.
+     * @param subscriber subscriber string
+     */
     public void setSubscriber(String subscriber) {
         if (subscriber != null) {
             if (subscriber.length() > 8) {
@@ -411,14 +469,11 @@ public class Subscription extends Syncable {
         return jo;
     }
 
-    public JSONObject asLimitedJSONObject() {
-        JSONObject jo = asJSONObject();
-        jo.remove(SUBID_KEY);
-        jo.remove(FEEDID_KEY);
-        jo.remove(LAST_MOD_KEY);
-        return jo;
-    }
-
+    /**
+     * Method to hide attributes.
+     * @param hidepasswords true/false
+     * @return JSONObject
+     */
     public JSONObject asJSONObject(boolean hidepasswords) {
         JSONObject jo = asJSONObject();
         if (hidepasswords) {
@@ -430,8 +485,21 @@ public class Subscription extends Syncable {
         return jo;
     }
 
+    /**
+     * Method to remove some attributes from JSON.
+     * @ JSONObject
+     */
+    public JSONObject asLimitedJSONObject() {
+        JSONObject jo = asJSONObject();
+        jo.remove(SUBID_KEY);
+        jo.remove(FEEDID_KEY);
+        jo.remove(LAST_MOD_KEY);
+        return jo;
+    }
+
+
     @Override
-    public boolean doInsert(Connection c) {
+    public boolean doInsert(Connection conn) {
         boolean rv = true;
         PreparedStatement ps = null;
         try {
@@ -445,8 +513,11 @@ public class Subscription extends Syncable {
             }
 
             // Create the SUBSCRIPTIONS row
-            String sql = "insert into SUBSCRIPTIONS (SUBID, FEEDID, DELIVERY_URL, DELIVERY_USER, DELIVERY_PASSWORD, DELIVERY_USE100, METADATA_ONLY, SUBSCRIBER, SUSPENDED, GROUPID, PRIVILEGED_SUBSCRIBER, FOLLOW_REDIRECTS, DECOMPRESS, AAF_INSTANCE) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            ps = c.prepareStatement(sql, new String[]{SUBID_COL});
+            String sql = "insert into SUBSCRIPTIONS (SUBID, FEEDID, DELIVERY_URL, DELIVERY_USER, DELIVERY_PASSWORD, "
+                                 + "DELIVERY_USE100, METADATA_ONLY, SUBSCRIBER, SUSPENDED, GROUPID, "
+                                 + "PRIVILEGED_SUBSCRIBER, FOLLOW_REDIRECTS, DECOMPRESS, AAF_INSTANCE) "
+                                 + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            ps = conn.prepareStatement(sql, new String[]{SUBID_COL});
             ps.setInt(1, subid);
             ps.setInt(2, feedid);
             ps.setString(3, getDelivery().getUrl());
@@ -465,7 +536,7 @@ public class Subscription extends Syncable {
             ps.close();
             // Update the row to set the URLs
             sql = "update SUBSCRIPTIONS set SELF_LINK = ?, LOG_LINK = ? where SUBID = ?";
-            ps = c.prepareStatement(sql);
+            ps = conn.prepareStatement(sql);
             ps.setString(1, getLinks().getSelf());
             ps.setString(2, getLinks().getLog());
             ps.setInt(3, subid);
@@ -487,12 +558,15 @@ public class Subscription extends Syncable {
     }
 
     @Override
-    public boolean doUpdate(Connection c) {
+    public boolean doUpdate(Connection conn) {
         boolean rv = true;
         PreparedStatement ps = null;
         try {
-            String sql = "update SUBSCRIPTIONS set DELIVERY_URL = ?, DELIVERY_USER = ?, DELIVERY_PASSWORD = ?, DELIVERY_USE100 = ?, METADATA_ONLY = ?, SUSPENDED = ?, GROUPID = ?, PRIVILEGED_SUBSCRIBER = ?, FOLLOW_REDIRECTS = ?, DECOMPRESS = ? where SUBID = ?";
-            ps = c.prepareStatement(sql);
+            String sql = "update SUBSCRIPTIONS set DELIVERY_URL = ?, DELIVERY_USER = ?, DELIVERY_PASSWORD = ?, "
+                                 + "DELIVERY_USE100 = ?, METADATA_ONLY = ?, " + "SUSPENDED = ?, GROUPID = ?, "
+                                 + "PRIVILEGED_SUBSCRIBER = ?, "
+                                 + "FOLLOW_REDIRECTS = ?, DECOMPRESS = ? where SUBID = ?";
+            ps = conn.prepareStatement(sql);
             ps.setString(1, delivery.getUrl());
             ps.setString(2, delivery.getUser());
             ps.setString(3, delivery.getPassword());
@@ -522,7 +596,7 @@ public class Subscription extends Syncable {
 
 
     /**
-     * Rally US708115 Change Ownership of Subscription - 1610
+     * Rally US708115 Change Ownership of Subscription - 1610.
      */
     public boolean changeOwnerShip() {
         boolean rv = true;
@@ -531,9 +605,9 @@ public class Subscription extends Syncable {
 
             DB db = new DB();
             @SuppressWarnings("resource")
-            Connection c = db.getConnection();
+            Connection conn = db.getConnection();
             String sql = "update SUBSCRIPTIONS set SUBSCRIBER = ? where SUBID = ?";
-            ps = c.prepareStatement(sql);
+            ps = conn.prepareStatement(sql);
             ps.setString(1, this.subscriber);
             ps.setInt(2, subid);
             ps.execute();
@@ -555,12 +629,12 @@ public class Subscription extends Syncable {
 
 
     @Override
-    public boolean doDelete(Connection c) {
+    public boolean doDelete(Connection conn) {
         boolean rv = true;
         PreparedStatement ps = null;
         try {
             String sql = "delete from SUBSCRIPTIONS where SUBID = ?";
-            ps = c.prepareStatement(sql);
+            ps = conn.prepareStatement(sql);
             ps.setInt(1, subid);
             ps.execute();
         } catch (SQLException e) {

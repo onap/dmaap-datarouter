@@ -38,6 +38,11 @@ public class DeliveryExtraRecord extends BaseLogRecord {
     private int  subid;
     private long contentLength2;
 
+    /**
+     * DLX constructor.
+     * @param pp string array of DXL attributes
+     * @throws ParseException in case of parse error
+     */
     public DeliveryExtraRecord(String[] pp) throws ParseException {
         super(pp);
         this.subid = Integer.parseInt(pp[4]);
@@ -52,7 +57,7 @@ public class DeliveryExtraRecord extends BaseLogRecord {
         ps.setNull(10, Types.VARCHAR);
         ps.setNull(11, Types.VARCHAR);
         ps.setNull(12, Types.INTEGER);
-        ps.setInt (13, subid);
+        ps.setInt(13, subid);
         ps.setNull(14, Types.VARCHAR);
         ps.setNull(15, Types.INTEGER);
         ps.setNull(16, Types.INTEGER);

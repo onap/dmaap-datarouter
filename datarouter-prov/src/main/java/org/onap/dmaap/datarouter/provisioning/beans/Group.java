@@ -45,6 +45,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  * @author vikram
  * @version $Id: Group.java,v 1.0 2016/07/19
  */
+
 public class Group extends Syncable {
 
     private static final String GROUP_ID_CONST = "groupid";
@@ -58,12 +59,18 @@ public class Group extends Syncable {
     private String description;
     private String classification;
     private String members;
-    private Date last_mod;
+    private Date lastMod;
 
     public Group() {
         this("", "", "");
     }
 
+    /**
+     * Group constructor.
+     * @param name group name
+     * @param desc group description
+     * @param members group members
+     */
     public Group(String name, String desc, String members) {
         this.groupid = -1;
         this.authid = "";
@@ -71,10 +78,15 @@ public class Group extends Syncable {
         this.description = desc;
         this.members = members;
         this.classification = "";
-        this.last_mod = new Date();
+        this.lastMod = new Date();
     }
 
 
+    /**
+     * Group constructor from ResultSet.
+     * @param rs ResultSet
+     * @throws SQLException in case of SQL statement error
+     */
     public Group(ResultSet rs) throws SQLException {
         this.groupid = rs.getInt("GROUPID");
         this.authid = rs.getString("AUTHID");
@@ -82,10 +94,14 @@ public class Group extends Syncable {
         this.description = rs.getString("DESCRIPTION");
         this.classification = rs.getString("CLASSIFICATION");
         this.members = rs.getString("MEMBERS");
-        this.last_mod = rs.getDate("LAST_MOD");
+        this.lastMod = rs.getDate("LAST_MOD");
     }
 
-
+    /**
+     * Group constructor for JSONObject.
+     * @param jo JSONObject
+     * @throws InvalidObjectException in case of JSON error
+     */
     public Group(JSONObject jo) throws InvalidObjectException {
         this("", "", "");
         try {
@@ -114,7 +130,11 @@ public class Group extends Syncable {
         }
     }
 
-
+    /**
+     * Get a group frpm DB.
+     * @param gup group object
+     * @return Group object
+     */
     public static Group getGroupMatching(Group gup) {
         String sql = String.format(
                 "select * from GROUPS where NAME='%s'",
@@ -124,6 +144,12 @@ public class Group extends Syncable {
         return !list.isEmpty() ? list.get(0) : null;
     }
 
+    /**
+     * Get a group from DB using name and groupid.
+     * @param gup group object
+     * @param groupid id of group
+     * @return group object
+     */
     public static Group getGroupMatching(Group gup, int groupid) {
         String sql = String.format(
                 "select * from GROUPS where  NAME = '%s' and GROUPID != %d ",
@@ -134,12 +160,22 @@ public class Group extends Syncable {
         return !list.isEmpty() ? list.get(0) : null;
     }
 
+    /**
+     * Get group from DB using groupid only.
+     * @param id id of group
+     * @return group object
+     */
     public static Group getGroupById(int id) {
         String sql = "select * from GROUPS where GROUPID = " + id;
         List<Group> list = getGroupsForSQL(sql);
         return !list.isEmpty() ? list.get(0) : null;
     }
 
+    /**
+     * Get group from DB using AUTHID.
+     * @param id AUTHID
+     * @return group object
+     */
     static Group getGroupByAuthId(String id) {
         String sql = "select * from GROUPS where AUTHID = '" + id + "'";
         List<Group> list = getGroupsForSQL(sql);
@@ -252,12 +288,12 @@ public class Group extends Syncable {
         jo.put("description", description);
         jo.put("classification", classification);
         jo.put("members", members);
-        jo.put("last_mod", last_mod.getTime());
+        jo.put("last_mod", lastMod.getTime());
         return jo;
     }
 
     @Override
-    public boolean doInsert(Connection c) {
+    public boolean doInsert(Connection conn) {
         boolean rv = true;
         PreparedStatement ps = null;
         try {
@@ -271,8 +307,9 @@ public class Group extends Syncable {
             }
 
             // Create the GROUPS row
-            String sql = "insert into GROUPS (GROUPID, AUTHID, NAME, DESCRIPTION, CLASSIFICATION, MEMBERS) values (?, ?, ?, ?, ?, ?)";
-            ps = c.prepareStatement(sql, new String[]{"GROUPID"});
+            String sql = "insert into GROUPS (GROUPID, AUTHID, NAME, DESCRIPTION, CLASSIFICATION, MEMBERS) "
+                                 + "values (?, ?, ?, ?, ?, ?)";
+            ps = conn.prepareStatement(sql, new String[]{"GROUPID"});
             ps.setInt(1, groupid);
             ps.setString(2, authid);
             ps.setString(3, name);
@@ -297,12 +334,13 @@ public class Group extends Syncable {
     }
 
     @Override
-    public boolean doUpdate(Connection c) {
+    public boolean doUpdate(Connection conn) {
         boolean rv = true;
         PreparedStatement ps = null;
         try {
-            String sql = "update GROUPS set AUTHID = ?, NAME = ?, DESCRIPTION = ?, CLASSIFICATION = ? ,  MEMBERS = ? where GROUPID = ?";
-            ps = c.prepareStatement(sql);
+            String sql = "update GROUPS set AUTHID = ?, NAME = ?, DESCRIPTION = ?, CLASSIFICATION = ? ,  MEMBERS = ? "
+                                 + "where GROUPID = ?";
+            ps = conn.prepareStatement(sql);
             ps.setString(1, authid);
             ps.setString(2, name);
             ps.setString(3, description);
@@ -326,12 +364,12 @@ public class Group extends Syncable {
     }
 
     @Override
-    public boolean doDelete(Connection c) {
+    public boolean doDelete(Connection conn) {
         boolean rv = true;
         PreparedStatement ps = null;
         try {
             String sql = "delete from GROUPS where GROUPID = ?";
-            ps = c.prepareStatement(sql);
+            ps = conn.prepareStatement(sql);
             ps.setInt(1, groupid);
             ps.execute();
         } catch (SQLException e) {
@@ -389,6 +427,6 @@ public class Group extends Syncable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(groupid, authid, name, description, classification, members, last_mod);
+        return Objects.hash(groupid, authid, name, description, classification, members, lastMod);
     }
 }

@@ -32,13 +32,14 @@ import java.sql.Connection;
  * @author Robert Eby
  * @version $Id: Insertable.java,v 1.2 2013/05/29 14:44:36 eby Exp $
  */
+
 @FunctionalInterface
 public interface Insertable {
     /**
      * Insert this object into the DB.
      *
-     * @param c the JDBC Connection to use
+     * @param conn the JDBC Connection to use
      * @return true if the INSERT succeeded, false otherwise
      */
-    boolean doInsert(Connection c);
+    boolean doInsert(Connection conn);
 }

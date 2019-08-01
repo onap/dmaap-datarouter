@@ -36,23 +36,24 @@ import org.json.JSONObject;
  * @author Robert Eby
  * @version $Id: Syncable.java,v 1.1 2013/07/05 13:48:05 eby Exp $
  */
+
 public abstract class Syncable implements Deleteable, Insertable, Updateable, JSONable {
     @Override
-    abstract public JSONObject asJSONObject();
+    public abstract JSONObject asJSONObject();
 
     @Override
-    abstract public boolean doUpdate(Connection c);
+    public abstract boolean doUpdate(Connection conn);
 
     @Override
-    abstract public boolean doInsert(Connection c);
+    public abstract boolean doInsert(Connection conn);
 
     @Override
-    abstract public boolean doDelete(Connection c);
+    public abstract boolean doDelete(Connection conn);
 
     /**
      * Get the "natural key" for this object type, as a String.
      *
      * @return the key
      */
-    abstract public String getKey();
+    public abstract String getKey();
 }

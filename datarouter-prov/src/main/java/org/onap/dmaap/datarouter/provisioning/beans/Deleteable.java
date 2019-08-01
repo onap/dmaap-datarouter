@@ -25,17 +25,17 @@
 package org.onap.dmaap.datarouter.provisioning.beans;
 
 import java.sql.Connection;
-
 /**
  * An object that can be DELETE-ed from the database.
  * @author Robert Eby
  * @version $Id: Deleteable.java,v 1.2 2013/05/29 14:44:36 eby Exp $
  */
+
 public interface Deleteable {
     /**
      * Delete this object in the DB.
-     * @param c the JDBC Connection to use
+     * @param conn the JDBC Connection to use
      * @return true if the DELETE succeeded, false otherwise
      */
-    public boolean doDelete(Connection c);
+    public boolean doDelete(Connection conn);
 }

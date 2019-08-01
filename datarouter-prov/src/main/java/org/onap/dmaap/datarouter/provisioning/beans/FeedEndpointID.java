@@ -21,7 +21,6 @@
  * *
  ******************************************************************************/
 
-
 package org.onap.dmaap.datarouter.provisioning.beans;
 
 import java.sql.ResultSet;
@@ -75,8 +74,9 @@ public class FeedEndpointID implements JSONable {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof FeedEndpointID))
+        if (!(obj instanceof FeedEndpointID)) {
             return false;
+        }
         FeedEndpointID f2 = (FeedEndpointID) obj;
         return id.equals(f2.id) && password.equals(f2.password);
     }

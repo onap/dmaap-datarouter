@@ -46,19 +46,31 @@ public class ExpiryRecord extends BaseLogRecord {
     private int attempts;
     private String reason;
 
+    /**
+     * ExpiryRecord constructor.
+     * @param pp string array of ExpiryRecord attributes
+     * @throws ParseException in case of parse error
+     */
     public ExpiryRecord(String[] pp) throws ParseException {
         super(pp);
         String fileid = pp[5];
-        if (fileid.lastIndexOf('/') >= 0)
+        if (fileid.lastIndexOf('/') >= 0) {
             fileid = fileid.substring(fileid.lastIndexOf('/') + 1);
+        }
         this.subid = Integer.parseInt(pp[4]);
         this.fileid = fileid;
         this.attempts = Integer.parseInt(pp[10]);
         this.reason = pp[9];
-        if (!reason.equals("notRetryable") && !reason.equals("retriesExhausted") && !reason.equals("diskFull"))
+        if (!reason.equals("notRetryable") && !reason.equals("retriesExhausted") && !reason.equals("diskFull")) {
             this.reason = "other";
+        }
     }
 
+    /**
+     * ExpiryRecord constructor from ResultSet.
+     * @param rs ResultSet of ExpiryREcord attributes
+     * @throws SQLException in case of error with SQL statement
+     */
     public ExpiryRecord(ResultSet rs) throws SQLException {
         super(rs);
         this.subid = rs.getInt("DELIVERY_SUBID");
@@ -99,6 +111,11 @@ public class ExpiryRecord extends BaseLogRecord {
         this.reason = reason;
     }
 
+    /**
+     * Method to reorder LOGJSONObject.
+     * @param jo LOGJSONObject
+     * @return LOGJSONObject
+     */
     public LOGJSONObject reOrderObject(LOGJSONObject jo) {
         LinkedHashMap<String, Object> logrecordObj = new LinkedHashMap<>();
 
@@ -122,7 +139,7 @@ public class ExpiryRecord extends BaseLogRecord {
         jo.put("expiryReason", reason);
         jo.put("attempts", attempts);
 
-        return this.reOrderObject(jo);
+        return reOrderObject(jo);
     }
 
     @Override

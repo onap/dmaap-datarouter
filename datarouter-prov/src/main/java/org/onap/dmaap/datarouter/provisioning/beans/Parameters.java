@@ -45,6 +45,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  * @author Robert Eby
  * @version $Id: Parameters.java,v 1.11 2014/03/12 19:45:41 eby Exp $
  */
+
 public class Parameters extends Syncable {
 
     public static final String PROV_REQUIRE_SECURE = "PROV_REQUIRE_SECURE";
@@ -78,9 +79,9 @@ public class Parameters extends Syncable {
     private String keyname;
     private String value;
 
-    public Parameters(String k, String v) {
-        this.keyname = k;
-        this.value = v;
+    public Parameters(String key, String val) {
+        this.keyname = key;
+        this.value = val;
     }
 
     public Parameters(ResultSet rs) throws SQLException {
@@ -101,6 +102,10 @@ public class Parameters extends Syncable {
         return props;
     }
 
+    /**
+     * Method to get parameters.
+     * @return collection of parameters
+     */
     public static Collection<Parameters> getParameterCollection() {
         Collection<Parameters> coll = new ArrayList<>();
         DB db = new DB();
@@ -109,8 +114,8 @@ public class Parameters extends Syncable {
                 Statement stmt = conn.createStatement()) {
             try (ResultSet rs = stmt.executeQuery(sql)) {
                 while (rs.next()) {
-                    Parameters p = new Parameters(rs);
-                    coll.add(p);
+                    Parameters param = new Parameters(rs);
+                    coll.add(param);
                 }
             }
             db.release(conn);
@@ -123,26 +128,26 @@ public class Parameters extends Syncable {
     /**
      * Get a specific parameter value from the DB.
      *
-     * @param k the key to lookup
+     * @param key the key to lookup
      * @return the value, or null if non-existant
      */
-    public static Parameters getParameter(String k) {
-        Parameters v = null;
+    public static Parameters getParameter(String key) {
+        Parameters val = null;
         DB db = new DB();
         String sql = "select KEYNAME, VALUE from PARAMETERS where KEYNAME = ?";
         try (Connection conn = db.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, k);
+            stmt.setString(1, key);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    v = new Parameters(rs);
+                    val = new Parameters(rs);
                 }
             }
             db.release(conn);
         } catch (SQLException e) {
             intlogger.error(SQLEXCEPTION + e.getMessage(), e);
         }
-        return v;
+        return val;
     }
 
     public String getKeyname() {
@@ -166,10 +171,10 @@ public class Parameters extends Syncable {
     }
 
     @Override
-    public boolean doInsert(Connection c) {
+    public boolean doInsert(Connection conn) {
         boolean rv = true;
         String sql = "insert into PARAMETERS values (?, ?)";
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, getKeyname());
             ps.setString(2, getValue());
             ps.execute();
@@ -181,10 +186,10 @@ public class Parameters extends Syncable {
     }
 
     @Override
-    public boolean doUpdate(Connection c) {
+    public boolean doUpdate(Connection conn) {
         boolean rv = true;
         String sql = "update PARAMETERS set VALUE = ? where KEYNAME = ?";
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, getValue());
             ps.setString(2, getKeyname());
             ps.executeUpdate();
@@ -196,10 +201,10 @@ public class Parameters extends Syncable {
     }
 
     @Override
-    public boolean doDelete(Connection c) {
+    public boolean doDelete(Connection conn) {
         boolean rv = true;
         String sql = "delete from PARAMETERS where KEYNAME = ?";
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, getKeyname());
             ps.execute();
         } catch (SQLException e) {

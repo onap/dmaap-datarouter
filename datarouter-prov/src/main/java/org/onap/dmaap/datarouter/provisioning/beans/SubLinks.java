@@ -35,6 +35,7 @@ import org.json.JSONObject;
  * @author Robert Eby
  * @version $Id: SubLinks.java,v 1.3 2013/07/05 13:48:05 eby Exp $
  */
+
 public class SubLinks implements JSONable {
     private String self;
     private String feed;
@@ -44,6 +45,10 @@ public class SubLinks implements JSONable {
         self = feed = log = null;
     }
 
+    /**
+     * Sublinks constructor.
+     * @param jo JSONObject
+     */
     public SubLinks(JSONObject jo) {
         this();
         self = jo.getString("self");
@@ -51,6 +56,12 @@ public class SubLinks implements JSONable {
         log = jo.getString("log");
     }
 
+    /**
+     * Sublinks constructor.
+     * @param self string for self
+     * @param feed string for feed
+     * @param log string for log
+     */
     public SubLinks(String self, String feed, String log) {
         this.self = self;
         this.feed = feed;
@@ -92,15 +103,19 @@ public class SubLinks implements JSONable {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof SubLinks))
+        if (!(obj instanceof SubLinks)) {
             return false;
+        }
         SubLinks os = (SubLinks) obj;
-        if (!self.equals(os.self))
+        if (!self.equals(os.self)) {
             return false;
-        if (!feed.equals(os.feed))
+        }
+        if (!feed.equals(os.feed)) {
             return false;
-        if (!log.equals(os.log))
+        }
+        if (!log.equals(os.log)) {
             return false;
+        }
         return true;
     }
 

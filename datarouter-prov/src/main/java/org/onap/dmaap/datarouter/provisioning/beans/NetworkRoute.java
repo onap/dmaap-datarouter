@@ -51,24 +51,45 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
     private final int tonode;
     private final int vianode;
 
+    /**
+     * NetworkRoute Constructor.
+     * @param fromnode node source
+     * @param tonode node destination
+     */
     public NetworkRoute(String fromnode, String tonode) {
         this.fromnode = lookupNodeName(fromnode);
         this.tonode = lookupNodeName(tonode);
         this.vianode = -1;
     }
 
+    /**
+     * NetworkRoute Constructor.
+     * @param fromnode node source
+     * @param tonode node destination
+     * @param vianode via node
+     */
     public NetworkRoute(String fromnode, String tonode, String vianode) {
         this.fromnode = lookupNodeName(fromnode);
         this.tonode = lookupNodeName(tonode);
         this.vianode = lookupNodeName(vianode);
     }
 
+    /**
+     * NetworkRoute Constructor.
+     * @param jo JSONObject of attributes
+     */
     public NetworkRoute(JSONObject jo) {
         this.fromnode = lookupNodeName(jo.getString("from"));
         this.tonode = lookupNodeName(jo.getString("to"));
         this.vianode = lookupNodeName(jo.getString("via"));
     }
 
+    /**
+     * NetworkRoute Constructor.
+     * @param fromnode integer source node
+     * @param tonode integer destination node
+     * @param vianode integer via node
+     */
     private NetworkRoute(int fromnode, int tonode, int vianode) {
         this.fromnode = fromnode;
         this.tonode = tonode;
@@ -122,10 +143,10 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
     }
 
     @Override
-    public boolean doDelete(Connection c) {
+    public boolean doDelete(Connection conn) {
         boolean rv = true;
         String sql = "delete from NETWORK_ROUTES where FROMNODE = ? AND TONODE = ?";
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, fromnode);
             ps.setInt(2, tonode);
             ps.execute();
@@ -137,11 +158,11 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
     }
 
     @Override
-    public boolean doInsert(Connection c) {
+    public boolean doInsert(Connection conn) {
         boolean rv = false;
         String sql = "insert into NETWORK_ROUTES (FROMNODE, TONODE, VIANODE) values (?, ?, ?)";
         if (this.vianode >= 0) {
-            try (PreparedStatement ps = c.prepareStatement(sql)) {
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 // Create the NETWORK_ROUTES row
                 ps.setInt(1, this.fromnode);
                 ps.setInt(2, this.tonode);
@@ -156,10 +177,10 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
     }
 
     @Override
-    public boolean doUpdate(Connection c) {
+    public boolean doUpdate(Connection conn) {
         boolean rv = true;
         String sql = "update NETWORK_ROUTES set VIANODE = ? where FROMNODE = ? and TONODE = ?";
-        try (PreparedStatement ps = c.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, vianode);
             ps.setInt(2, fromnode);
             ps.setInt(3, tonode);
@@ -200,14 +221,14 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
     }
 
     @Override
-    public int compareTo(NetworkRoute o) {
-        if (this.fromnode == o.fromnode) {
-            if (this.tonode == o.tonode) {
-                return this.vianode - o.vianode;
+    public int compareTo(NetworkRoute nr) {
+        if (this.fromnode == nr.fromnode) {
+            if (this.tonode == nr.tonode) {
+                return this.vianode - nr.vianode;
             }
-            return this.tonode - o.tonode;
+            return this.tonode - nr.tonode;
         }
-        return this.fromnode - o.fromnode;
+        return this.fromnode - nr.fromnode;
     }
 
     @Override

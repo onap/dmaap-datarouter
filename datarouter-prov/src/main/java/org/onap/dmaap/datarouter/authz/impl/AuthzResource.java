@@ -55,11 +55,11 @@ public class AuthzResource {
     AuthzResource(String requestUri) {
         if (requestUri != null) {
             for (ResourceType t : ResourceType.values()) {
-                Matcher m = t.getPattern().matcher(requestUri);
-                if (m.find(0)) {
+                Matcher match = t.getPattern().matcher(requestUri);
+                if (match.find(0)) {
                     this.type = t;
-                    if (m.group("id") != null) {
-                        this.id = m.group("id");
+                    if (match.group("id") != null) {
+                        this.id = match.group("id");
                     }
                     break;
                 }

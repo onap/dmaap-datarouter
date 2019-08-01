@@ -40,6 +40,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
  * @author Robert Eby
  * @version $Id: PublishRecord.java,v 1.6 2013/10/28 18:06:53 eby Exp $
  */
+
 public class PublishRecord extends BaseLogRecord {
     private String feedFileid;
     private String remoteAddr;
@@ -47,14 +48,21 @@ public class PublishRecord extends BaseLogRecord {
     private int status;
     private String fileName;
 
+    /**
+     * Publish record constructor.
+     * @param pp string array of attributes
+     * @throws ParseException in case of parse error
+     */
     public PublishRecord(String[] pp) throws ParseException {
         super(pp);
         int ix = pp[4].indexOf("/publish/");
-        if (ix < 0)
+        if (ix < 0) {
             throw new ParseException("bad pattern", 0);
+        }
         ix = pp[4].indexOf('/', ix + 9);
-        if (ix < 0)
+        if (ix < 0) {
             throw new ParseException("bad pattern", 0);
+        }
         this.feedFileid = pp[4].substring(ix + 1);
         this.remoteAddr = pp[8];
         this.user = pp[9];
@@ -62,6 +70,11 @@ public class PublishRecord extends BaseLogRecord {
         this.fileName = StringUtils.substringAfterLast(this.getRequestUri(), "/");
     }
 
+    /**
+     * Publish record constructor.
+     * @param rs ResultSet from DB
+     * @throws SQLException in case of SQL error
+     */
     public PublishRecord(ResultSet rs) throws SQLException {
         super(rs);
         this.feedFileid = rs.getString("FEED_FILEID");
@@ -103,11 +116,20 @@ public class PublishRecord extends BaseLogRecord {
         this.status = status;
     }
 
-    public String getFileName() { return fileName;}
+    public String getFileName() {
+        return fileName;
+    }
 
-    public void setFileName(String fileName) { this.fileName = fileName; }
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
 
+    /**
+     * Method to reorder json object.
+     * @param jo LOGJSONObject
+     * @return LOGJSONObject
+     */
     public LOGJSONObject reOrderObject(LOGJSONObject jo) {
         LinkedHashMap<String, Object> logrecordObj = new LinkedHashMap<>();
 
@@ -126,6 +148,7 @@ public class PublishRecord extends BaseLogRecord {
 
         return new LOGJSONObject(logrecordObj);
     }
+
 
     @Override
     public LOGJSONObject asJSONObject() {
