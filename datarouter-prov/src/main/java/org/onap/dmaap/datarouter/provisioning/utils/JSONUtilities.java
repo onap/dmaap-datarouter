@@ -39,6 +39,10 @@ import java.util.Collection;
 public class JSONUtilities {
 
     private static final EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
+
+    private JSONUtilities(){
+
+    }
     /**
      * Does the String <i>v</i> represent a valid Internet address (with or without a
      * mask length appended).

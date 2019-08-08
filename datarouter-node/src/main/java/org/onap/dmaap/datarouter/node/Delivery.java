@@ -26,6 +26,8 @@ package org.onap.dmaap.datarouter.node;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -98,12 +100,16 @@ public class Delivery {
             return;
         }
         File fdir = new File(dir);
-        for (File junk : fdir.listFiles()) {
-            if (junk.isFile()) {
-                junk.delete();
+        try {
+            for (File junk : fdir.listFiles()) {
+                if (junk.isFile()) {
+                    Files.delete(fdir.toPath());
+                }
             }
+            Files.delete(fdir.toPath());
+        } catch (IOException e) {
+            logger.error("Failed to delete file: " + fdir.getPath(), e);
         }
-        fdir.delete();
     }
 
     private void freeDiskCheck() {
@@ -127,19 +133,19 @@ public class Delivery {
         Arrays.sort(items);
         long stop = (long) (tspace * fdstop);
         logger.warn(
-                "NODE0501 Free disk space below red threshold.  current=" + cur + " red=" + start + TOTAL + tspace);
+            "NODE0501 Free disk space below red threshold.  current=" + cur + " red=" + start + TOTAL + tspace);
         if (determineFreeDiskSpace(spoolfile, tspace, stop, cur, items)) {
             return;
         }
         cur = spoolfile.getUsableSpace();
         if (cur >= stop) {
             logger.warn("NODE0503 Free disk space at or above yellow threshold.  current=" + cur + YELLOW + stop
-                                + TOTAL + tspace);
+                + TOTAL + tspace);
             return;
         }
         logger.warn(
-                "NODE0504 Unable to recover sufficient disk space to reach green status.  current=" + cur + YELLOW
-                        + stop + TOTAL + tspace);
+            "NODE0504 Unable to recover sufficient disk space to reach green status.  current=" + cur + YELLOW
+                + stop + TOTAL + tspace);
     }
 
     private void cleardirs() {
@@ -161,7 +167,11 @@ public class Delivery {
                     cleardir(sxbase + "/" + sxdir + "/" + sdir);
                 }
             }
-            sxf.delete();  // won't if anything still in it
+            try {
+                Files.delete(sxf.toPath());  // won't if anything still in it
+            } catch (IOException e) {
+                logger.error("Failed to delete file: " + sxf.getPath(), e);
+            }
         }
     }
 
@@ -203,7 +213,7 @@ public class Delivery {
             }).start();
         }
         nextcheck = 0;
-        notify();
+        notifyAll();
     }
 
     private void dodelivery() {
@@ -225,7 +235,7 @@ public class Delivery {
                     continue;
                 }
                 nextcheck = 0;
-                notify();
+                notifyAll();
                 return (dq);
             }
             long now = System.currentTimeMillis();
@@ -249,7 +259,7 @@ public class Delivery {
         for (DelItem item : items) {
             long amount = dqs.get(item.getSpool()).cancelTask(item.getPublishId());
             logger.debug("NODE0502 Attempting to discard " + item.getSpool() + "/" + item.getPublishId()
-                                + " to free up disk");
+                + " to free up disk");
             if (amount > 0) {
                 cur += amount;
                 if (cur >= stop) {
@@ -257,8 +267,8 @@ public class Delivery {
                 }
                 if (cur >= stop) {
                     logger.warn(
-                            "NODE0503 Free disk space at or above yellow threshold.  current=" + cur + YELLOW + stop
-                                    + TOTAL + tspace);
+                        "NODE0503 Free disk space at or above yellow threshold.  current=" + cur + YELLOW + stop
+                            + TOTAL + tspace);
                     return true;
                 }
             }
@@ -302,7 +312,7 @@ public class Delivery {
             }
             DelItem delItem = (DelItem) object;
             return Objects.equals(pubid, delItem.pubid)
-                           && Objects.equals(getSpool(), delItem.getSpool());
+                && Objects.equals(getSpool(), delItem.getSpool());
         }
 
         @Override

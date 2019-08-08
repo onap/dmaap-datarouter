@@ -42,6 +42,11 @@ import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
  */
 
 public class PublishRecord extends BaseLogRecord {
+
+    public static final String STATUS_CODE = "statusCode";
+    public static final String SOURCE_IP = "sourceIP";
+    public static final String ENDPOINT_ID = "endpointId";
+    public static final String FILE_NAME = "fileName";
     private String feedFileid;
     private String remoteAddr;
     private String user;
@@ -134,17 +139,17 @@ public class PublishRecord extends BaseLogRecord {
         LinkedHashMap<String, Object> logrecordObj = new LinkedHashMap<>();
 
 
-        logrecordObj.put("statusCode", jo.get("statusCode"));
+        logrecordObj.put(STATUS_CODE, jo.get(STATUS_CODE));
         logrecordObj.put("publishId", jo.get("publishId"));
         logrecordObj.put("requestURI", jo.get("requestURI"));
-        logrecordObj.put("sourceIP", jo.get("sourceIP"));
+        logrecordObj.put(SOURCE_IP, jo.get(SOURCE_IP));
         logrecordObj.put("method", jo.get("method"));
         logrecordObj.put("contentType", jo.get("contentType"));
-        logrecordObj.put("endpointId", jo.get("endpointId"));
+        logrecordObj.put(ENDPOINT_ID, jo.get(ENDPOINT_ID));
         logrecordObj.put("type", jo.get("type"));
         logrecordObj.put("date", jo.get("date"));
         logrecordObj.put("contentLength", jo.get("contentLength"));
-        logrecordObj.put("fileName", jo.get("fileName"));
+        logrecordObj.put(FILE_NAME, jo.get(FILE_NAME));
 
         return new LOGJSONObject(logrecordObj);
     }
@@ -157,10 +162,10 @@ public class PublishRecord extends BaseLogRecord {
         jo.put("feedFileid", feedFileid);
         jo.put("remoteAddr", remoteAddr);
         jo.put("user", user);
-        jo.put("sourceIP", remoteAddr);
-        jo.put("endpointId", user);
-        jo.put("statusCode", status);
-        jo.put("fileName", fileName);
+        jo.put(SOURCE_IP, remoteAddr);
+        jo.put(ENDPOINT_ID, user);
+        jo.put(STATUS_CODE, status);
+        jo.put(FILE_NAME, fileName);
 
         return this.reOrderObject(jo);
     }

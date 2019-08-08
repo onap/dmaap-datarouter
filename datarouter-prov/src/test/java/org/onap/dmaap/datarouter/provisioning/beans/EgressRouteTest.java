@@ -64,15 +64,7 @@ public class EgressRouteTest {
     }
 
     @Test
-    public void Verify_NetworkRoute_Is_Added_Successfully() throws SQLException {
-        Assert.assertEquals(1, EgressRoute.getAllEgressRoutes().size());
-        egressRoute.doInsert(db.getConnection());
-        Assert.assertEquals(2, EgressRoute.getAllEgressRoutes().size());
-        egressRoute.doDelete(db.getConnection());
-    }
-
-    @Test
-    public void Verify_NetworkRoute_Is_Removed_Successfully() throws SQLException {
+    public void Verify_EgressRoute_Is_Removed_Successfully() throws SQLException {
         Assert.assertEquals(1, EgressRoute.getAllEgressRoutes().size());
         EgressRoute egressRoute = new EgressRoute(1, 1);
         egressRoute.doDelete(db.getConnection());
@@ -80,7 +72,7 @@ public class EgressRouteTest {
     }
 
     @Test
-    public void Verify_NetworkRoute_Is_Updated_Successfully() throws SQLException {
+    public void Verify_EgressRoute_Is_Updated_Successfully() throws SQLException {
         EgressRoute egressRoute = new EgressRoute(1, 1);
         EgressRoute egressRoute1 = new EgressRoute(1, 1);
         Assert.assertEquals(egressRoute.hashCode(), egressRoute1.hashCode());

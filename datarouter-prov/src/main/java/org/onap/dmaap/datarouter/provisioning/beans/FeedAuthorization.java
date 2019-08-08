@@ -60,19 +60,19 @@ public class FeedAuthorization implements JSONable {
         this.classification = classification;
     }
 
-    public Set<FeedEndpointID> getEndpoint_ids() {
+    public Set<FeedEndpointID> getEndpointIDS() {
         return endpointIds;
     }
 
-    public void setEndpoint_ids(Set<FeedEndpointID> endpointIds) {
+    public void setEndpointIDS(Set<FeedEndpointID> endpointIds) {
         this.endpointIds = endpointIds;
     }
 
-    public Set<String> getEndpoint_addrs() {
+    public Set<String> getEndpointAddrs() {
         return endpointAddrs;
     }
 
-    public void setEndpoint_addrs(Set<String> endpointAddrs) {
+    public void setEndpointAddrs(Set<String> endpointAddrs) {
         this.endpointAddrs = endpointAddrs;
     }
 
