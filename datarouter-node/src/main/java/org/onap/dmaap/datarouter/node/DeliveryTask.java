@@ -222,6 +222,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
             byte[] buf = new byte[4096];
             if (is != null) {
                 while (is.read(buf) > 0) {
+                    //flush the buffer
                 }
                 is.close();
             }

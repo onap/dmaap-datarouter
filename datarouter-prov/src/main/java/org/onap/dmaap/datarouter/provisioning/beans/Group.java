@@ -152,10 +152,7 @@ public class Group extends Syncable {
      */
     public static Group getGroupMatching(Group gup, int groupid) {
         String sql = String.format(
-                "select * from GROUPS where  NAME = '%s' and GROUPID != %d ",
-                gup.getName(),
-                gup.getGroupid()
-        );
+                "select * from GROUPS where  NAME = '%s' and GROUPID != %d ", gup.getName(), gup.getGroupid());
         List<Group> list = getGroupsForSQL(sql);
         return !list.isEmpty() ? list.get(0) : null;
     }

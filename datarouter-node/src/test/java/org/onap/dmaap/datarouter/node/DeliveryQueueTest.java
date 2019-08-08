@@ -34,7 +34,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
@@ -99,7 +102,7 @@ public class DeliveryQueueTest {
         DeliveryTask task = new DeliveryTask(deliveryQueue, "123.node.datarouternew.com");
         task.clean();
         tasks.add(task);
-        FieldUtils.writeField(deliveryQueue, "todo", tasks, true);
+        FieldUtils.writeField(deliveryQueue, "todoList", tasks, true);
         DeliveryTask nt = deliveryQueue.getNext();
         assertNull(nt);
     }
@@ -114,7 +117,7 @@ public class DeliveryQueueTest {
         long timeInFuture = 2558366240223L;
         task.setResumeTime(timeInFuture);
         tasks.add(task);
-        FieldUtils.writeField(deliveryQueue, "todo", tasks, true);
+        FieldUtils.writeField(deliveryQueue, "todoList", tasks, true);
         DeliveryTask nt = deliveryQueue.getNext();
         assertNull(nt);
     }
@@ -129,7 +132,7 @@ public class DeliveryQueueTest {
         long timeInPast = 1058366240223L;
         task.setResumeTime(timeInPast);
         tasks.add(task);
-        FieldUtils.writeField(deliveryQueue, "todo", tasks, true);
+        FieldUtils.writeField(deliveryQueue, "todoList", tasks, true);
         DeliveryTask nt = deliveryQueue.getNext();
         assertNull(nt);
     }
@@ -142,7 +145,7 @@ public class DeliveryQueueTest {
 
     @Test
     public void Given_Delivery_Task_Is_Working_Cancel_Task_Returns_Zero() throws IllegalAccessException {
-        Hashtable<String, DeliveryTask> tasks = new Hashtable<>();
+        HashMap<String, DeliveryTask> tasks = new HashMap<>();
         tasks.put("123.node.datarouternew.com", new DeliveryTask(deliveryQueue, "123.node.datarouternew.com"));
         FieldUtils.writeField(deliveryQueue, "working", tasks, true);
         long rc = deliveryQueue.cancelTask("123.node.datarouternew.com");
@@ -151,9 +154,9 @@ public class DeliveryQueueTest {
 
     @Test
     public void Given_Delivery_Task_In_Todo_Cancel_Task_Returns_Zero() throws IllegalAccessException {
-        Vector<DeliveryTask> tasks = new Vector<>();
+        List<DeliveryTask> tasks = new ArrayList<>();
         tasks.add(new DeliveryTask(deliveryQueue, "123.node.datarouternew.com"));
-        FieldUtils.writeField(deliveryQueue, "todo", tasks, true);
+        FieldUtils.writeField(deliveryQueue, "todoList", tasks, true);
         long rc = deliveryQueue.cancelTask("123.node.datarouternew.com");
         assertEquals(0, rc);
     }
@@ -186,7 +189,7 @@ public class DeliveryQueueTest {
 
     @Test
     public void Given_Task_In_Working_MarkTaskSuccess_Returns_True() throws IllegalAccessException {
-        Hashtable<String, DeliveryTask> tasks = new Hashtable<>();
+        HashMap<String, DeliveryTask> tasks = new HashMap<>();
         tasks.put("123.node.datarouternew.com", new DeliveryTask(deliveryQueue, "123.node.datarouternew.com"));
         FieldUtils.writeField(deliveryQueue, "working", tasks, true);
         assertTrue(deliveryQueue.markTaskSuccess("123.node.datarouternew.com"));
@@ -194,7 +197,7 @@ public class DeliveryQueueTest {
 
     @Test
     public void Given_Task_In_Retry_MarkTaskSuccess_Returns_True() throws IllegalAccessException {
-        Hashtable<String, DeliveryTask> tasks = new Hashtable<>();
+        HashMap<String, DeliveryTask> tasks = new HashMap<>();
         tasks.put("123.node.datarouternew.com", new DeliveryTask(deliveryQueue, "123.node.datarouternew.com"));
         FieldUtils.writeField(deliveryQueue, "retry", tasks, true);
         assertTrue(deliveryQueue.markTaskSuccess("123.node.datarouternew.com"));

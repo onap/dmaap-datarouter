@@ -266,7 +266,7 @@ public class StatusLog {
             nexttime = now - now % intvl + intvl;
             curfile = prefix + filedate.format(new Date(nexttime - intvl)) + suffix;
             plainfile = prefix + suffix;
-            notify();
+            notifyAll();
         }
     }
 
@@ -276,7 +276,7 @@ public class StatusLog {
             checkRoll(now);
             if (os == null) {
                 os = new FileOutputStream(curfile, true);
-                (new File(plainfile)).delete();
+                Files.deleteIfExists(new File(plainfile).toPath());
                 Files.createLink(Paths.get(plainfile), Paths.get(curfile));
             }
             os.write((NodeUtils.logts(new Date(now)) + '|' + string + '\n').getBytes());

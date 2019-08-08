@@ -64,14 +64,6 @@ public class NetworkRouteTest {
     }
 
     @Test
-    public void Verify_NetworkRoute_Is_Added_Successfully() throws SQLException {
-        Assert.assertEquals(1, NetworkRoute.getAllNetworkRoutes().size());
-        networkRoute.doInsert(db.getConnection());
-        Assert.assertEquals(2, NetworkRoute.getAllNetworkRoutes().size());
-        networkRoute.doDelete(db.getConnection());
-    }
-
-    @Test
     public void Verify_NetworkRoute_Is_Removed_Successfully() throws SQLException {
         Assert.assertEquals(1, NetworkRoute.getAllNetworkRoutes().size());
         NetworkRoute networkRoute = new NetworkRoute("stub_from.", "stub_to.");

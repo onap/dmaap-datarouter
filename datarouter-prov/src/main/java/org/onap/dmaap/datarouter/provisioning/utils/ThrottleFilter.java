@@ -24,6 +24,8 @@
 
 package org.onap.dmaap.datarouter.provisioning.utils;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -32,8 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Vector;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -42,12 +42,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationSupport;
-import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.HttpConnection;
+import org.eclipse.jetty.server.Request;
 import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 
 /**
@@ -88,9 +86,9 @@ import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
  * @version $Id: ThrottleFilter.java,v 1.2 2014/03/12 19:45:41 eby Exp $
  */
 public class ThrottleFilter extends TimerTask implements Filter {
-    public static final int DEFAULT_N = 10;
-    public static final int DEFAULT_M = 5;
-    public static final String THROTTLE_MARKER = "org.onap.dmaap.datarouter.provisioning.THROTTLE_MARKER";
+    private static final int DEFAULT_N = 10;
+    private static final int DEFAULT_M = 5;
+    private static final String THROTTLE_MARKER = "org.onap.dmaap.datarouter.provisioning.THROTTLE_MARKER";
     private static final String JETTY_REQUEST = "org.eclipse.jetty.server.Request";
     private static final long ONE_MINUTE = 60000L;
     private static final int ACTION_DROP = 0;
@@ -98,8 +96,8 @@ public class ThrottleFilter extends TimerTask implements Filter {
 
     // Configuration
     private static boolean enabled = false;        // enabled or not
-    private static int n_requests = 0;            // number of requests in M minutes
-    private static int m_minutes = 0;            // sampling period
+    private static int numRequests = 0;            // number of requests in M minutes
+    private static int samplingPeriod = 0;            // sampling period
     private static int action = ACTION_DROP;    // action to take (throttle or drop)
 
     private static EELFLogger logger = EELFManager.getInstance().getLogger("InternalLog");
@@ -121,19 +119,20 @@ public class ThrottleFilter extends TimerTask implements Filter {
             try {
                 Class.forName(JETTY_REQUEST);
                 String v = p.getValue();
-                if (v != null && !v.equals("off")) {
+                if (v != null && !"off".equals(v)) {
                     String[] pp = v.split(",");
                     if (pp != null) {
-                        n_requests = (pp.length > 0) ? getInt(pp[0], DEFAULT_N) : DEFAULT_N;
-                        m_minutes = (pp.length > 1) ? getInt(pp[1], DEFAULT_M) : DEFAULT_M;
-                        action = (pp.length > 2 && pp[2] != null && pp[2].equalsIgnoreCase("throttle")) ? ACTION_THROTTLE : ACTION_DROP;
+                        numRequests = (pp.length > 0) ? getInt(pp[0], DEFAULT_N) : DEFAULT_N;
+                        samplingPeriod = (pp.length > 1) ? getInt(pp[1], DEFAULT_M) : DEFAULT_M;
+                        action = (pp.length > 2 && pp[2] != null && "throttle".equalsIgnoreCase(pp[2])) ? ACTION_THROTTLE : ACTION_DROP;
                         enabled = true;
                         // ACTION_THROTTLE is not currently working, so is not supported
                         if (action == ACTION_THROTTLE) {
                             action = ACTION_DROP;
                             logger.info("Throttling is not currently supported; action changed to DROP");
                         }
-                        logger.info("ThrottleFilter is ENABLED for /publish requests; N=" + n_requests + ", M=" + m_minutes + ", Action=" + action);
+                        logger.info("ThrottleFilter is ENABLED for /publish requests; N=" + numRequests + ", M=" + samplingPeriod
+                            + ", Action=" + action);
                         return;
                     }
                 }
@@ -175,27 +174,29 @@ public class ThrottleFilter extends TimerTask implements Filter {
     public void dropFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         int rate = getRequestRate(request);
-        if (rate >= n_requests) {
+        if (rate >= numRequests) {
             // drop request - only works under Jetty
-            String m = String.format("Dropping connection: %s %d bad connections in %d minutes", getConnectionId(request), rate, m_minutes);
+            String m = String.format("Dropping connection: %s %d bad connections in %d minutes", getConnectionId(request), rate,
+                samplingPeriod);
             logger.info(m);
-            Request base_request = (request instanceof Request)
+            Request baseRequest = (request instanceof Request)
                     ? (Request) request
                     : HttpConnection.getCurrentConnection().getHttpChannel().getRequest();
-            base_request.getHttpChannel().getEndPoint().close();
+            baseRequest.getHttpChannel().getEndPoint().close();
         } else {
             chain.doFilter(request, response);
         }
     }
 
-    public void throttleFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+    private void throttleFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         // throttle request
         String id = getConnectionId(request);
         int rate = getRequestRate(request);
         Object results = request.getAttribute(THROTTLE_MARKER);
-        if (rate >= n_requests && results == null) {
-            String m = String.format("Throttling connection: %s %d bad connections in %d minutes", getConnectionId(request), rate, m_minutes);
+        if (rate >= numRequests && results == null) {
+            String m = String.format("Throttling connection: %s %d bad connections in %d minutes",
+                getConnectionId(request), rate, samplingPeriod);
             logger.info(m);
             Continuation continuation = ContinuationSupport.getContinuation(request);
             continuation.suspend();
@@ -214,22 +215,22 @@ public class ThrottleFilter extends TimerTask implements Filter {
         }
     }
 
-    private Map<String, List<Continuation>> suspended_requests = new HashMap<>();
+    private Map<String, List<Continuation>> suspendedRequests = new HashMap<>();
 
     private void register(String id, Continuation continuation) {
-        synchronized (suspended_requests) {
-            List<Continuation> list = suspended_requests.get(id);
+        synchronized (suspendedRequests) {
+            List<Continuation> list = suspendedRequests.get(id);
             if (list == null) {
                 list = new ArrayList<>();
-                suspended_requests.put(id, list);
+                suspendedRequests.put(id, list);
             }
             list.add(continuation);
         }
     }
 
     private void resume(String id) {
-        synchronized (suspended_requests) {
-            List<Continuation> list = suspended_requests.get(id);
+        synchronized (suspendedRequests) {
+            List<Continuation> list = suspendedRequests.get(id);
             if (list != null) {
                 // when the waited for event happens
                 Continuation continuation = list.remove(0);
@@ -248,7 +249,7 @@ public class ThrottleFilter extends TimerTask implements Filter {
      */
     private int getRequestRate(HttpServletRequest request) {
         String expecthdr = request.getHeader("Expect");
-        if (expecthdr != null && expecthdr.equalsIgnoreCase("100-continue"))
+        if (expecthdr != null && "100-continue".equalsIgnoreCase(expecthdr))
             return 0;
 
         String key = getConnectionId(request);
@@ -263,11 +264,11 @@ public class ThrottleFilter extends TimerTask implements Filter {
     }
 
     public class Counter {
-        private List<Long> times = new Vector<>();    // a record of request times
+        private List<Long> times = new ArrayList<>();    // a record of request times
 
         public int prune() {
             try {
-                long n = System.currentTimeMillis() - (m_minutes * ONE_MINUTE);
+                long n = System.currentTimeMillis() - (samplingPeriod * ONE_MINUTE);
                 long t = times.get(0);
                 while (t < n) {
                     times.remove(0);

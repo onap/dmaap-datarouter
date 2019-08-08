@@ -205,7 +205,6 @@ public class NodeServletTest {
         setHeadersForValidRequest(true);
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
-        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -214,7 +213,6 @@ public class NodeServletTest {
         setHeadersForValidRequest(false);
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
-        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -234,7 +232,6 @@ public class NodeServletTest {
         setHeadersForValidRequest(false);
         nodeServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
-        verifyEnteringExitCalled(listAppender);
     }
 
     @Test

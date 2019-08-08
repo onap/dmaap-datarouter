@@ -398,7 +398,6 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
             ps.setString(2, userid);
             ps.setString(3, subnet);
             ps.execute();
-            ps.close();
             // Delete the NodeSet
             ps2.setInt(1, nodelist);
             ps2.execute();

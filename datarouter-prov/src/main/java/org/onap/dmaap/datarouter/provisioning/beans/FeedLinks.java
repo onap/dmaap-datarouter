@@ -24,9 +24,7 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
-import java.io.InvalidObjectException;
 import java.util.Objects;
-
 import org.json.JSONObject;
 
 /**

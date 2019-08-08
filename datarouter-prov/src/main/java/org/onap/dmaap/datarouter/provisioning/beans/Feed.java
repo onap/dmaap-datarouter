@@ -200,7 +200,7 @@ public class Feed extends Syncable {
                         Feed feed = map.get(id);
                         if (feed != null) {
                             FeedEndpointID epi = new FeedEndpointID(rs);
-                            Collection<FeedEndpointID> ecoll = feed.getAuthorization().getEndpoint_ids();
+                            Collection<FeedEndpointID> ecoll = feed.getAuthorization().getEndpointIDS();
                             ecoll.add(epi);
                         }
                     }
@@ -212,7 +212,7 @@ public class Feed extends Syncable {
                         int id = rs.getInt("FEEDID");
                         Feed feed = map.get(id);
                         if (feed != null) {
-                            Collection<String> acoll = feed.getAuthorization().getEndpoint_addrs();
+                            Collection<String> acoll = feed.getAuthorization().getEndpointAddrs();
                             acoll.add(rs.getString("ADDR"));
                         }
                     }
@@ -281,7 +281,7 @@ public class Feed extends Syncable {
                 if (feed != null) {
                     sql = "select * from FEED_ENDPOINT_IDS where FEEDID = " + feed.feedid;
                     try (ResultSet rs = stmt.executeQuery(sql)) {
-                        Collection<FeedEndpointID> ecoll = feed.getAuthorization().getEndpoint_ids();
+                        Collection<FeedEndpointID> ecoll = feed.getAuthorization().getEndpointIDS();
                         while (rs.next()) {
                             FeedEndpointID epi = new FeedEndpointID(rs);
                             ecoll.add(epi);
@@ -289,7 +289,7 @@ public class Feed extends Syncable {
                     }
                     sql = "select * from FEED_ENDPOINT_ADDRS where FEEDID = " + feed.feedid;
                     try (ResultSet rs = stmt.executeQuery(sql)) {
-                        Collection<String> acoll = feed.getAuthorization().getEndpoint_addrs();
+                        Collection<String> acoll = feed.getAuthorization().getEndpointAddrs();
                         while (rs.next()) {
                             acoll.add(rs.getString("ADDR"));
                         }
@@ -413,9 +413,9 @@ public class Feed extends Syncable {
                     //Fortify scan fixes - Privacy Violation
                     throw new InvalidObjectException("password field is too long (" + fid.getPassword() + ")");
                 }
-                this.authorization.getEndpoint_ids().add(fid);
+                this.authorization.getEndpointIDS().add(fid);
             }
-            if (this.authorization.getEndpoint_ids().isEmpty()) {
+            if (this.authorization.getEndpointIDS().isEmpty()) {
                 throw new InvalidObjectException("need to specify at least one endpoint_id");
             }
             endPointIds = jauth.getJSONArray("endpoint_addrs");
@@ -424,7 +424,7 @@ public class Feed extends Syncable {
                 if (!JSONUtilities.validIPAddrOrSubnet(addr)) {
                     throw new InvalidObjectException("bad IP addr or subnet mask: " + addr);
                 }
-                this.authorization.getEndpoint_addrs().add(addr);
+                this.authorization.getEndpointAddrs().add(addr);
             }
 
             this.publisher = jo.optString("publisher", "");
@@ -651,7 +651,7 @@ public class Feed extends Syncable {
             FeedAuthorization auth = getAuthorization();
             String sql = "insert into FEED_ENDPOINT_IDS values (?, ?, ?)";
             try (PreparedStatement ps2 = conn.prepareStatement(sql)) {
-                for (FeedEndpointID fid : auth.getEndpoint_ids()) {
+                for (FeedEndpointID fid : auth.getEndpointIDS()) {
                     ps2.setInt(1, feedid);
                     ps2.setString(2, fid.getId());
                     ps2.setString(3, fid.getPassword());
@@ -662,7 +662,7 @@ public class Feed extends Syncable {
             // Create FEED_ENDPOINT_ADDRS rows
             sql = "insert into FEED_ENDPOINT_ADDRS values (?, ?)";
             try (PreparedStatement ps2 = conn.prepareStatement(sql)) {
-                for (String t : auth.getEndpoint_addrs()) {
+                for (String t : auth.getEndpointAddrs()) {
                     ps2.setInt(1, feedid);
                     ps2.setString(2, t);
                     ps2.executeUpdate();
@@ -705,8 +705,8 @@ public class Feed extends Syncable {
         Feed oldobj = getFeedById(feedid);
         PreparedStatement ps = null;
         try {
-            Set<FeedEndpointID> newset = getAuthorization().getEndpoint_ids();
-            Set<FeedEndpointID> oldset = oldobj.getAuthorization().getEndpoint_ids();
+            Set<FeedEndpointID> newset = getAuthorization().getEndpointIDS();
+            Set<FeedEndpointID> oldset = oldobj.getAuthorization().getEndpointIDS();
 
             // Insert new FEED_ENDPOINT_IDS rows
             String sql = "insert into FEED_ENDPOINT_IDS values (?, ?, ?)";
@@ -735,8 +735,8 @@ public class Feed extends Syncable {
             ps.close();
 
             // Insert new FEED_ENDPOINT_ADDRS rows
-            Set<String> newset2 = getAuthorization().getEndpoint_addrs();
-            Set<String> oldset2 = oldobj.getAuthorization().getEndpoint_addrs();
+            Set<String> newset2 = getAuthorization().getEndpointAddrs();
+            Set<String> oldset2 = oldobj.getAuthorization().getEndpointAddrs();
             sql = "insert into FEED_ENDPOINT_ADDRS values (?, ?)";
             ps = conn.prepareStatement(sql);
             for (String t : newset2) {
