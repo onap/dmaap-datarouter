@@ -125,7 +125,6 @@ public class StatisticsServletTest {
   @Test
   public void Given_Request_Is_HTTP_GET_With_GroupId_But_No_FeedId_Parameters_Then_Request_Succeeds()
       throws Exception {
-    addAliasForSubstringIndex();
     ServletOutputStream outStream = mock(ServletOutputStream.class);
     when(response.getOutputStream()).thenReturn(outStream);
     statisticsServlet.doGet(request, response);
@@ -135,7 +134,6 @@ public class StatisticsServletTest {
   @Test
   public void Given_Request_Is_HTTP_GET_With_GroupId_And_FeedId_Parameters_Then_Request_Succeeds()
       throws Exception {
-    addAliasForSubstringIndex();
     when(request.getParameter("feedid")).thenReturn("1");
     when(request.getParameter("statusCode")).thenReturn("500");
     ServletOutputStream outStream = mock(ServletOutputStream.class);
@@ -157,11 +155,5 @@ public class StatisticsServletTest {
     when(request.getParameter("time")).thenReturn("10");
     when(request.getParameter("groupid")).thenReturn("1");
     when(request.getParameter("subid")).thenReturn("1");
-  }
-  private void addAliasForSubstringIndex() throws SQLException {
-    String sql = "CREATE ALIAS IF NOT EXISTS `SUBSTRING_INDEX`AS $$ String Function(String one, String two, String three){ return \"url\"; }$$;";
-    Connection conn = db.getConnection();
-    PreparedStatement pst = conn.prepareStatement(sql);
-    pst.execute();
   }
 }
