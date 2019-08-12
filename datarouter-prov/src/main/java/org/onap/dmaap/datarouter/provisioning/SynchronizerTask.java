@@ -99,6 +99,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
  * @author Robert Eby
  * @version $Id: SynchronizerTask.java,v 1.10 2014/03/21 13:50:10 eby Exp $
  */
+
 public class SynchronizerTask extends TimerTask {
 
     /**
@@ -186,8 +187,8 @@ public class SynchronizerTask extends TimerTask {
         // Run once every 5 seconds to check DNS, etc.
         long interval;
         try {
-            String s = props.getProperty("org.onap.dmaap.datarouter.provserver.sync_interval", "5000");
-            interval = Long.parseLong(s);
+            String str = props.getProperty("org.onap.dmaap.datarouter.provserver.sync_interval", "5000");
+            interval = Long.parseLong(str);
         } catch (NumberFormatException e) {
             interval = 5000L;
         }
@@ -342,8 +343,8 @@ public class SynchronizerTask extends TimerTask {
         Collection<Syncable> coll = new ArrayList<>();
         for (int n = 0; n < ja.length(); n++) {
             try {
-                Feed f = new Feed(ja.getJSONObject(n));
-                coll.add(f);
+                Feed feed = new Feed(ja.getJSONObject(n));
+                coll.add(feed);
             } catch (Exception e) {
                 logger.warn("PROV5004: Invalid object in feed: " + ja.optJSONObject(n), e);
             }
@@ -361,10 +362,10 @@ public class SynchronizerTask extends TimerTask {
         for (int n = 0; n < ja.length(); n++) {
             try {
                 //Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
-                JSONObject j = ja.getJSONObject(n);
-                j.put("sync", "true");
-                Subscription s = new Subscription(j);
-                coll.add(s);
+                JSONObject jsonObject = ja.getJSONObject(n);
+                jsonObject.put("sync", "true");
+                Subscription sub = new Subscription(jsonObject);
+                coll.add(sub);
             } catch (Exception e) {
                 logger.warn("PROV5004: Invalid object in subscription: " + ja.optJSONObject(n), e);
             }
@@ -381,8 +382,8 @@ public class SynchronizerTask extends TimerTask {
         Collection<Syncable> coll = new ArrayList<>();
         for (int n = 0; n < ja.length(); n++) {
             try {
-                Group g = new Group(ja.getJSONObject(n));
-                coll.add(g);
+                Group group = new Group(ja.getJSONObject(n));
+                coll.add(group);
             } catch (Exception e) {
                 logger.warn("PROV5004: Invalid object in group: " + ja.optJSONObject(n), e);
             }
@@ -399,25 +400,25 @@ public class SynchronizerTask extends TimerTask {
     private void syncParams(JSONObject jo) {
         Collection<Syncable> coll = new ArrayList<>();
         for (String k : jo.keySet()) {
-            String v = "";
+            String val = "";
             try {
-                v = jo.getString(k);
+                val = jo.getString(k);
             } catch (JSONException e) {
                 logger.warn("PROV5004: Invalid object in parameters: " + jo.optJSONObject(k), e);
                 try {
-                    v = "" + jo.getInt(k);
+                    val = "" + jo.getInt(k);
                 } catch (JSONException e1) {
                     logger.warn("PROV5004: Invalid object in parameters: " + jo.optInt(k), e1);
                     JSONArray ja = jo.getJSONArray(k);
                     for (int i = 0; i < ja.length(); i++) {
                         if (i > 0) {
-                            v += "|";
+                            val += "|";
                         }
-                        v += ja.getString(i);
+                        val += ja.getString(i);
                     }
                 }
             }
-            coll.add(new Parameters(k, v));
+            coll.add(new Parameters(k, val));
         }
         if (sync(coll, Parameters.getParameterCollection())) {
             BaseServlet.provisioningDataChanged();
@@ -526,9 +527,9 @@ public class SynchronizerTask extends TimerTask {
         return newobj.doInsert(conn);
     }
 
-    private Map<String, Syncable> getMap(Collection<? extends Syncable> c) {
+    private Map<String, Syncable> getMap(Collection<? extends Syncable> coll) {
         Map<String, Syncable> map = new HashMap<>();
-        for (Syncable v : c) {
+        for (Syncable v : coll) {
             map.put(v.getKey(), v);
         }
         return map;
@@ -650,11 +651,11 @@ public class SynchronizerTask extends TimerTask {
         String url = URLUtilities.generatePeerLogsURL();
         HttpPost post = new HttpPost(url);
         try {
-            String t = bs.toString();
-            HttpEntity body = new ByteArrayEntity(t.getBytes(), ContentType.create(TEXT_CT));
+            String str = bs.toString();
+            HttpEntity body = new ByteArrayEntity(str.getBytes(), ContentType.create(TEXT_CT));
             post.setEntity(body);
             if (logger.isDebugEnabled()) {
-                logger.debug("Requesting records: " + t);
+                logger.debug("Requesting records: " + str);
             }
 
             HttpResponse response = httpclient.execute(post);

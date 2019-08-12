@@ -23,6 +23,8 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
@@ -36,12 +38,10 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
-
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+
 import org.onap.dmaap.datarouter.provisioning.beans.EgressRoute;
 import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.beans.Group;
@@ -58,10 +58,11 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  * @author Robert Eby
  * @version $Id: Poker.java,v 1.11 2014/01/08 16:13:47 eby Exp $
  */
+
 public class Poker extends TimerTask {
 
     /**
-     * Template used to generate the URL to issue the GET against
+     * Template used to generate the URL to issue the GET against.
      */
     private static final String POKE_URL_TEMPLATE = "http://%s/internal/fetchProv";
 
@@ -69,7 +70,7 @@ public class Poker extends TimerTask {
     private static final String CARRIAGE_RETURN = "\n],\n";
 
     /**
-     * This is a singleton -- there is only one Poker object in the server
+     * This is a singleton -- there is only one Poker object in the server.
      */
     private static Poker poker;
     private long timer1;
@@ -81,7 +82,6 @@ public class Poker extends TimerTask {
 
     private Poker() {
         timer1 = timer2 = 0;
-        Timer rolex = new Timer();
         logger = EELFManager.getInstance().getLogger("InternalLog");
         try {
             thisPod = InetAddress.getLocalHost().getHostName();
@@ -90,7 +90,7 @@ public class Poker extends TimerTask {
             logger.info("UnknownHostException: Setting thisPod to \"*UNKNOWN_POD*\"", e);
         }
         provString = buildProvisioningString();
-
+        Timer rolex = new Timer();
         rolex.scheduleAtFixedRate(this, 0L, 1000L);    // Run once a second to check the timers
     }
 
@@ -186,7 +186,7 @@ public class Poker extends TimerTask {
     private void pokeNode(final String nodename) {
         logger.debug("PROV0012 Poking node " + nodename + " ...");
         String nodeUrl = String.format(POKE_URL_TEMPLATE, nodename + ":" + DB.getHttpPort());
-        Runnable r = () -> {
+        Runnable runn = () -> {
             try {
                 URL url = new URL(nodeUrl);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -203,7 +203,7 @@ public class Poker extends TimerTask {
                         .getMessage(), e);
             }
         };
-        r.run();
+        runn.run();
     }
 
     private String buildProvisioningString() {
@@ -251,15 +251,15 @@ public class Poker extends TimerTask {
             ivals.addAll(Arrays.asList(intv.split("\\|")));
         }
         for (String key : new TreeSet<String>(props.keySet())) {
-            String v = props.get(key);
+            String val = props.get(key);
             sb.append(pfx);
             sb.append("  \"").append(key).append("\": ");
             if (ivals.contains(key)) {
                 // integer value
-                sb.append(v);
+                sb.append(val);
             } else if (key.endsWith("S")) {
                 // Split and append array of strings
-                String[] pp = v.split("\\|");
+                String[] pp = val.split("\\|");
                 String p2 = "";
                 sb.append("[");
                 for (String t : pp) {
@@ -268,7 +268,7 @@ public class Poker extends TimerTask {
                 }
                 sb.append("]");
             } else {
-                sb.append("\"").append(quote(v)).append("\"");
+                sb.append("\"").append(quote(val)).append("\"");
             }
             pfx = ",\n";
         }
@@ -288,9 +288,9 @@ public class Poker extends TimerTask {
         sb.append("\"egress\": {");
         for (EgressRoute eg : EgressRoute.getAllEgressRoutes()) {
             sb.append(pfx);
-            String t = eg.asJSONObject().toString();
-            t = t.substring(1, t.length() - 1);
-            sb.append(t);
+            String str = eg.asJSONObject().toString();
+            str = str.substring(1, str.length() - 1);
+            sb.append(str);
             pfx = ",\n";
         }
         sb.append("\n},\n");
@@ -315,9 +315,9 @@ public class Poker extends TimerTask {
         return tempProvString;
     }
 
-    private String quote(String s) {
+    private String quote(String str) {
         StringBuilder sb = new StringBuilder();
-        for (char ch : s.toCharArray()) {
+        for (char ch : str.toCharArray()) {
             if (ch == '\\' || ch == '"') {
                 sb.append('\\');
             }

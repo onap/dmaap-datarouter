@@ -31,6 +31,7 @@ package org.onap.dmaap.datarouter.provisioning;
  * @version $Id: FeedLogServlet.java,v 1.1 2013/04/26 21:00:24 eby Exp $
  */
 @SuppressWarnings("serial")
+
 public class FeedLogServlet extends LogServlet {
 
     public FeedLogServlet() {

@@ -24,22 +24,24 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
+import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.sendResponseError;
+
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
+
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.eelf.EelfMsgs;
 import org.onap.dmaap.datarouter.provisioning.utils.JSONUtilities;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.util.List;
 
-import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.sendResponseError;
 
 /**
  * This servlet handles provisioning for the &lt;drFeedsURL&gt; which is the URL on the provisioning server used to
@@ -63,7 +65,8 @@ public class DRFeedsServlet extends ProxyServlet {
         setIpFqdnRequestIDandInvocationIDForEelf("doDelete", req);
         eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID,
+                    req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             String message = "DELETE not allowed for the drFeedsURL.";
             EventLogRecord elr = new EventLogRecord(req);
             elr.setMessage(message);
@@ -84,7 +87,8 @@ public class DRFeedsServlet extends ProxyServlet {
         setIpFqdnRequestIDandInvocationIDForEelf("doGet", req);
         eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID,
+                    req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             EventLogRecord elr = new EventLogRecord(req);
             String message = isAuthorizedForProvisioning(req);
             if (message != null) {
@@ -165,14 +169,14 @@ public class DRFeedsServlet extends ProxyServlet {
                 } else {
                     list = Feed.getFilteredFeedUrlList("all", null);
                 }
-                String t = JSONUtilities.createJSONArray(list);
+                String strList = JSONUtilities.createJSONArray(list);
                 // send response
                 elr.setResult(HttpServletResponse.SC_OK);
                 eventlogger.info(elr.toString());
                 resp.setStatus(HttpServletResponse.SC_OK);
                 resp.setContentType(FEEDLIST_CONTENT_TYPE);
                 try {
-                    resp.getOutputStream().print(t);
+                    resp.getOutputStream().print(strList);
                 } catch (IOException ioe) {
                     eventlogger.error("PROV0112 DRFeedServlet.doGet " + ioe.getMessage(), ioe);
                 }
@@ -190,7 +194,8 @@ public class DRFeedsServlet extends ProxyServlet {
         setIpFqdnRequestIDandInvocationIDForEelf("doPut", req);
         eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID,
+                    req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             String message = "PUT not allowed for the drFeedsURL.";
             EventLogRecord elr = new EventLogRecord(req);
             elr.setMessage(message);
@@ -295,7 +300,8 @@ public class DRFeedsServlet extends ProxyServlet {
              */
             String aafInstance = feed.getAafInstance();
             if (Boolean.parseBoolean(isCadiEnabled)) {
-                if ((aafInstance == null || "".equals(aafInstance) || ("legacy".equalsIgnoreCase(aafInstance)) && "true".equalsIgnoreCase(req.getHeader(EXCLUDE_AAF_HEADER)))) {
+                if ((aafInstance == null || "".equals(aafInstance) || ("legacy".equalsIgnoreCase(aafInstance))
+                     && "true".equalsIgnoreCase(req.getHeader(EXCLUDE_AAF_HEADER)))) {
                     // Check with the Authorizer
                     AuthorizationResponse aresp = authz.decide(req);
                     if (!aresp.isAuthorized()) {
@@ -308,7 +314,8 @@ public class DRFeedsServlet extends ProxyServlet {
                     }
                 } else {
                     if ("true".equalsIgnoreCase(req.getHeader(EXCLUDE_AAF_HEADER))) {
-                        message = "DRFeedsServlet.doPost() -Invalid request exclude_AAF should not be true if passing AAF_Instance value= " + aafInstance;
+                        message = "DRFeedsServlet.doPost() -Invalid request exclude_AAF should not be true if passing "
+                                          + "AAF_Instance value= " + aafInstance;
                         elr.setMessage(message);
                         elr.setResult(HttpServletResponse.SC_FORBIDDEN);
                         eventlogger.error(elr.toString());

@@ -23,6 +23,8 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
+import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.sendResponseError;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -43,16 +45,16 @@ import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
 
-import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.sendResponseError;
 
 /**
  * This Servlet handles requests to the &lt;Statistics API&gt; and  &lt;Statistics consilidated
- * resultset&gt;,
+ * resultset&gt;.
  *
  * @author Manish Singh
  * @version $Id: StatisticsServlet.java,v 1.11 2016/08/10 17:27:02 Manish Exp $
  */
 @SuppressWarnings("serial")
+
 
 public class StatisticsServlet extends BaseServlet {
 
@@ -83,7 +85,8 @@ public class StatisticsServlet extends BaseServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         Map<String, String> map = buildMapFromRequest(req);
         if (map.get("err") != null) {
-            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments: " + map.get("err"), eventlogger);
+            sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST,
+                    "Invalid arguments: " + map.get("err"), eventlogger);
             return;
         }
         // check Accept: header??
@@ -159,10 +162,12 @@ public class StatisticsServlet extends BaseServlet {
 
 
     /**
-     * rsToJson - Converting RS to JSON object
+     * rsToJson - Converting RS to JSON object.
      *
-     * @param out ServletOutputStream, rs as ResultSet
-     * @throws IOException, SQLException
+     * @param out ServletOutputStream
+     * @param rs as ResultSet
+     * @throws IOException input/output exception
+     * @throws SQLException SQL exception
      */
     public void rsToCSV(ResultSet rs, ServletOutputStream out) throws IOException, SQLException {
         String header = "FEEDNAME,FEEDID,FILES_PUBLISHED,PUBLISH_LENGTH, FILES_DELIVERED, "
@@ -199,10 +204,12 @@ public class StatisticsServlet extends BaseServlet {
     }
 
     /**
-     * rsToJson - Converting RS to JSON object
+     * rsToJson - Converting RS to JSON object.
      *
-     * @param out ServletOutputStream, rs as ResultSet
-     * @throws IOException, SQLException
+     * @param out ServletOutputStream
+     * @param rs as ResultSet
+     * @throws IOException input/output exception
+     * @throws SQLException SQL exception
      */
     private void rsToJson(ResultSet rs, ServletOutputStream out) throws IOException, SQLException {
         String[] fields = {"FEEDNAME", FEEDID, "FILES_PUBLISHED", "PUBLISH_LENGTH", "FILES_DELIVERED",
@@ -213,9 +220,9 @@ public class StatisticsServlet extends BaseServlet {
         while (rs.next()) {
             LOGJSONObject j2 = new LOGJSONObject();
             for (String key : fields) {
-                Object v = rs.getString(key);
-                if (v != null) {
-                    j2.put(key.toLowerCase(), v);
+                Object val = rs.getString(key);
+                if (val != null) {
+                    j2.put(key.toLowerCase(), val);
                 } else {
                     j2.put(key.toLowerCase(), "");
                 }
@@ -271,7 +278,7 @@ public class StatisticsServlet extends BaseServlet {
 
 
     /**
-     * queryGeneretor - Generating sql query
+     * queryGeneretor - Generating sql query.
      *
      * @param map as key value pare of all user input fields
      */
@@ -307,11 +314,18 @@ public class StatisticsServlet extends BaseServlet {
         if (endTime == null && startTime == null) {
 
             sql = "SELECT (SELECT NAME FROM FEEDS AS f WHERE f.FEEDID in(" + feedids
-                + ") and f.FEEDID=e.FEEDID) AS FEEDNAME, e.FEEDID as FEEDID, (SELECT COUNT(*) FROM LOG_RECORDS AS c WHERE c.FEEDID in("
+                + ") and f.FEEDID=e.FEEDID) AS FEEDNAME, e.FEEDID as FEEDID, "
+                + "(SELECT COUNT(*) FROM LOG_RECORDS AS c WHERE c.FEEDID in("
                 + feedids
-                + ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS FILES_PUBLISHED,(SELECT SUM(content_length) FROM LOG_RECORDS AS c WHERE c.FEEDID in("
+                + ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS FILES_PUBLISHED,(SELECT SUM(content_length)"
+                + " FROM LOG_RECORDS AS c WHERE c.FEEDID in("
                 + feedids
-                + ")  and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS PUBLISH_LENGTH, COUNT(e.EVENT_TIME) as FILES_DELIVERED,  sum(m.content_length) as DELIVERED_LENGTH,SUBSTRING_INDEX(e.REQURI,'/',+3) as SUBSCRIBER_URL, e.DELIVERY_SUBID as SUBID, e.EVENT_TIME AS PUBLISH_TIME, m.EVENT_TIME AS DELIVERY_TIME,  AVG(e.EVENT_TIME - m.EVENT_TIME)/1000 as AverageDelay FROM LOG_RECORDS e JOIN LOG_RECORDS m ON m.PUBLISH_ID = e.PUBLISH_ID AND e.FEEDID IN ("
+                + ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS PUBLISH_LENGTH, COUNT(e.EVENT_TIME) as FILES_DELIVERED,"
+                + "sum(m.content_length) as DELIVERED_LENGTH,SUBSTRING_INDEX(e.REQURI,'/',+3) as SUBSCRIBER_URL,"
+                + " e.DELIVERY_SUBID as SUBID, "
+                + "e.EVENT_TIME AS PUBLISH_TIME, m.EVENT_TIME AS DELIVERY_TIME, "
+                + " AVG(e.EVENT_TIME - m.EVENT_TIME)/1000 as AverageDelay FROM LOG_RECORDS"
+                + " e JOIN LOG_RECORDS m ON m.PUBLISH_ID = e.PUBLISH_ID AND e.FEEDID IN ("
                 + feedids + ") " + subid + " AND m.STATUS=204 AND e.RESULT=204  group by SUBID";
 
             return sql;
@@ -323,11 +337,18 @@ public class StatisticsServlet extends BaseServlet {
             long compareTime = currentTimeInMilli - inputTimeInMilli;
 
             sql = "SELECT (SELECT NAME FROM FEEDS AS f WHERE f.FEEDID in(" + feedids
-                + ") and f.FEEDID=e.FEEDID) AS FEEDNAME, e.FEEDID as FEEDID, (SELECT COUNT(*) FROM LOG_RECORDS AS c WHERE c.FEEDID in("
+                + ") and f.FEEDID=e.FEEDID) AS FEEDNAME, e.FEEDID as FEEDID, "
+                + "(SELECT COUNT(*) FROM LOG_RECORDS AS c WHERE c.FEEDID in("
                 + feedids
-                + ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS FILES_PUBLISHED,(SELECT SUM(content_length) FROM LOG_RECORDS AS c WHERE c.FEEDID in("
+                + ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS FILES_PUBLISHED,"
+                + "(SELECT SUM(content_length) FROM LOG_RECORDS AS c WHERE c.FEEDID in("
                 + feedids
-                + ")  and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS PUBLISH_LENGTH, COUNT(e.EVENT_TIME) as FILES_DELIVERED,  sum(m.content_length) as DELIVERED_LENGTH,SUBSTRING_INDEX(e.REQURI,'/',+3) as SUBSCRIBER_URL, e.DELIVERY_SUBID as SUBID, e.EVENT_TIME AS PUBLISH_TIME, m.EVENT_TIME AS DELIVERY_TIME,  AVG(e.EVENT_TIME - m.EVENT_TIME)/1000 as AverageDelay FROM LOG_RECORDS e JOIN LOG_RECORDS m ON m.PUBLISH_ID = e.PUBLISH_ID AND e.FEEDID IN ("
+                + ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS PUBLISH_LENGTH, COUNT(e.EVENT_TIME) as FILES_DELIVERED,"
+                + "sum(m.content_length) as DELIVERED_LENGTH,SUBSTRING_INDEX(e.REQURI,'/',+3) as SUBSCRIBER_URL,"
+                + " e.DELIVERY_SUBID as SUBID, "
+                + "e.EVENT_TIME AS PUBLISH_TIME, m.EVENT_TIME AS DELIVERY_TIME,  "
+                + "AVG(e.EVENT_TIME - m.EVENT_TIME)/1000 as AverageDelay "
+                + "FROM LOG_RECORDS e JOIN LOG_RECORDS m ON m.PUBLISH_ID = e.PUBLISH_ID AND e.FEEDID IN ("
                 + feedids + ") " + subid + " AND m.STATUS=204 AND e.RESULT=204 and e.event_time>="
                 + compareTime + " group by SUBID";
 
@@ -342,12 +363,20 @@ public class StatisticsServlet extends BaseServlet {
             long endInMillis = endDate.getTime();
 
             sql = "SELECT (SELECT NAME FROM FEEDS AS f WHERE f.FEEDID in(" + feedids
-                + ") and f.FEEDID=e.FEEDID) AS FEEDNAME, e.FEEDID as FEEDID, (SELECT COUNT(*) FROM LOG_RECORDS AS c WHERE c.FEEDID in("
+                + ") and f.FEEDID=e.FEEDID) AS FEEDNAME, e.FEEDID as FEEDID, "
+                          + "(SELECT COUNT(*) FROM LOG_RECORDS AS c WHERE c.FEEDID in("
                 + feedids
-                + ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS FILES_PUBLISHED,(SELECT SUM(content_length) FROM LOG_RECORDS AS c WHERE c.FEEDID in("
+                + ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS FILES_PUBLISHED,"
+                          + "(SELECT SUM(content_length) FROM LOG_RECORDS AS c WHERE c.FEEDID in("
                 + feedids
-                + ")  and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS PUBLISH_LENGTH, COUNT(e.EVENT_TIME) as FILES_DELIVERED,  sum(m.content_length) as DELIVERED_LENGTH,SUBSTRING_INDEX(e.REQURI,'/',+3) as SUBSCRIBER_URL, e.DELIVERY_SUBID as SUBID, e.EVENT_TIME AS PUBLISH_TIME, m.EVENT_TIME AS DELIVERY_TIME,  AVG(e.EVENT_TIME - m.EVENT_TIME)/1000 as AverageDelay FROM LOG_RECORDS e JOIN LOG_RECORDS m ON m.PUBLISH_ID = e.PUBLISH_ID AND e.FEEDID IN ("
-                + feedids + ") " + subid + " AND m.STATUS=204 AND e.RESULT=204 and e.event_time between " + startInMillis
+                + ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS PUBLISH_LENGTH, COUNT(e.EVENT_TIME) as FILES_DELIVERED,"
+                          + "sum(m.content_length) as DELIVERED_LENGTH,"
+                          + "SUBSTRING_INDEX(e.REQURI,'/',+3) as SUBSCRIBER_URL,"
+                          + "e.DELIVERY_SUBID as SUBID, "
+                          + "e.EVENT_TIME AS PUBLISH_TIME, m.EVENT_TIME AS DELIVERY_TIME,  "
+                          + "AVG(e.EVENT_TIME - m.EVENT_TIME)/1000 as AverageDelay FROM LOG_RECORDS"
+                          + " e JOIN LOG_RECORDS m ON m.PUBLISH_ID = e.PUBLISH_ID AND e.FEEDID IN ("
+                + feedids + ")" + subid + " AND m.STATUS=204 AND e.RESULT=204 and e.event_time between " + startInMillis
                 + " and " + endInMillis + " group by SUBID";
 
 
@@ -384,10 +413,10 @@ public class StatisticsServlet extends BaseServlet {
 
     private Map<String, String> buildMapFromRequest(HttpServletRequest req) {
         Map<String, String> map = new HashMap<>();
-        String s = req.getParameter("type");
-        if (s != null) {
-            if ("pub".equals(s) || "del".equals(s) || "exp".equals(s)) {
-                map.put("type", s);
+        String str = req.getParameter("type");
+        if (str != null) {
+            if ("pub".equals(str) || "del".equals(str) || "exp".equals(str)) {
+                map.put("type", str);
             } else {
                 map.put("err", "bad type");
                 return map;
@@ -400,19 +429,19 @@ public class StatisticsServlet extends BaseServlet {
         map.put("resultSQL", "");
         map.put(REASON_SQL, "");
 
-        s = req.getParameter("publishId");
-        if (s != null) {
-            if (s.indexOf("'") >= 0) {
+        str = req.getParameter("publishId");
+        if (str != null) {
+            if (str.indexOf("'") >= 0) {
                 map.put("err", "bad publishId");
                 return map;
             }
-            map.put("publishSQL", " AND PUBLISH_ID = '" + s + "'");
+            map.put("publishSQL", " AND PUBLISH_ID = '" + str + "'");
         }
 
-        s = req.getParameter("statusCode");
-        if (s != null) {
+        str = req.getParameter("statusCode");
+        if (str != null) {
             String sql = null;
-            switch (s) {
+            switch (str) {
                 case "success":
                     sql = " AND STATUS >= 200 AND STATUS < 300";
                     break;
@@ -424,9 +453,9 @@ public class StatisticsServlet extends BaseServlet {
                     break;
                 default:
                     try {
-                        int n = Integer.parseInt(s);
-                        if ((n >= 100 && n < 600) || (n == -1)) {
-                            sql = " AND STATUS = " + n;
+                        int statusCode = Integer.parseInt(str);
+                        if ((statusCode >= 100 && statusCode < 600) || (statusCode == -1)) {
+                            sql = " AND STATUS = " + statusCode;
                         }
                     } catch (NumberFormatException e) {
                         eventlogger.error("Failed to parse input", e);
@@ -441,10 +470,10 @@ public class StatisticsServlet extends BaseServlet {
             map.put("resultSQL", sql.replaceAll("STATUS", "RESULT"));
         }
 
-        s = req.getParameter("expiryReason");
-        if (s != null) {
+        str = req.getParameter("expiryReason");
+        if (str != null) {
             map.put("type", "exp");
-            switch (s) {
+            switch (str) {
                 case "notRetryable":
                     map.put(REASON_SQL, " AND REASON = 'notRetryable'");
                     break;
@@ -485,30 +514,31 @@ public class StatisticsServlet extends BaseServlet {
         return map;
     }
 
-    private long getTimeFromParam(final String s) {
-        if (s == null) {
+    private long getTimeFromParam(final String str) {
+        if (str == null) {
             return 0;
         }
         try {
             // First, look for an RFC 3339 date
-            String fmt = (s.indexOf('.') > 0) ? FMT2 : FMT1;
+            String fmt = (str.indexOf('.') > 0) ? FMT2 : FMT1;
             SimpleDateFormat sdf = new SimpleDateFormat(fmt);
-            Date d = sdf.parse(s);
-            return d.getTime();
+            Date date = sdf.parse(str);
+            return date.getTime();
         } catch (ParseException e) {
             intlogger.error("Exception in getting Time :- " + e.getMessage(), e);
         }
         try {
             // Also allow a long (in ms); useful for testing
-            return Long.parseLong(s);
+            return Long.parseLong(str);
         } catch (NumberFormatException e) {
             intlogger.error("Exception in getting Time :- " + e.getMessage(), e);
         }
-        intlogger.info("Error parsing time=" + s);
+        intlogger.info("Error parsing time=" + str);
         return -1;
     }
 
-    private void getRecordsForSQL(Map<String, String> map, String outputType, ServletOutputStream out, HttpServletResponse resp) {
+    private void getRecordsForSQL(Map<String, String> map, String outputType, ServletOutputStream out,
+            HttpServletResponse resp) {
         try {
             String filterQuery = this.queryGeneretor(map);
             eventlogger.debug("SQL Query for Statistics resultset. " + filterQuery);

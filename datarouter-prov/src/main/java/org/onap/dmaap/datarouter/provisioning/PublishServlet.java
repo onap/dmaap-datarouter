@@ -28,7 +28,9 @@ import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -53,6 +55,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  * @version $Id: PublishServlet.java,v 1.8 2014/03/12 19:45:41 eby Exp $
  */
 @SuppressWarnings("serial")
+
 public class PublishServlet extends BaseServlet {
 
     private int nextNode;
@@ -78,7 +81,8 @@ public class PublishServlet extends BaseServlet {
         setUpEelfForPublishServlet(req, "doDelete");
         eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID,
+                    req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             redirect(req, resp);
         } finally {
             eelfLogger.info(EelfMsgs.EXIT);
@@ -90,8 +94,9 @@ public class PublishServlet extends BaseServlet {
         setUpEelfForPublishServlet(req, "doGet");
         eelfLogger.info(EelfMsgs.ENTRY);
         try {
-        eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
-        redirect(req, resp);
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID,
+                    req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            redirect(req, resp);
         } finally {
             eelfLogger.info(EelfMsgs.EXIT);
         }
@@ -102,8 +107,9 @@ public class PublishServlet extends BaseServlet {
         setUpEelfForPublishServlet(req, "doPut");
         eelfLogger.info(EelfMsgs.ENTRY);
         try {
-        eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
-        redirect(req, resp);
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID,
+                    req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            redirect(req, resp);
         } finally {
             eelfLogger.info(EelfMsgs.EXIT);
         }
@@ -114,8 +120,8 @@ public class PublishServlet extends BaseServlet {
         setUpEelfForPublishServlet(req, "doPost");
         eelfLogger.info(EelfMsgs.ENTRY);
         try {
-        eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
-        redirect(req, resp);
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF, req.getHeader(BEHALF_HEADER));
+            redirect(req, resp);
         } finally {
             eelfLogger.info(EelfMsgs.EXIT);
         }
@@ -123,7 +129,8 @@ public class PublishServlet extends BaseServlet {
     }
 
     private void setUpEelfForPublishServlet(HttpServletRequest req, String method) {
-        if (StringUtils.isBlank(req.getHeader("X-ONAP-RequestID")) || StringUtils.isBlank(req.getHeader("X-InvocationID"))) {
+        if (StringUtils.isBlank(req.getHeader("X-ONAP-RequestID"))
+                    || StringUtils.isBlank(req.getHeader("X-InvocationID"))) {
             setIpFqdnForEelf(method);
         } else {
             setIpFqdnRequestIDandInvocationIDForEelf(method, req);
@@ -175,12 +182,12 @@ public class PublishServlet extends BaseServlet {
 
     private String getRedirectNode(int feedid, HttpServletRequest req) {
         // Check to see if the IRT needs to be updated
-        Poker p = Poker.getPoker();
-        String s = p.getProvisioningString();
+        Poker pkr = Poker.getPoker();
+        String str = pkr.getProvisioningString();
         synchronized (lock) {
-            if (irt == null || (s.length() != provstring.length()) || !s.equals(provstring)) {
+            if (irt == null || (str.length() != provstring.length()) || !str.equals(provstring)) {
                 // Provisioning string has changed -- update the IRT
-                provstring = s;
+                provstring = str;
                 JSONObject jo = new JSONObject(new JSONTokener(provstring));
                 JSONArray ja = jo.getJSONArray("ingress");
                 List<IngressRoute> newlist = new ArrayList<>();
@@ -207,8 +214,7 @@ public class PublishServlet extends BaseServlet {
 
         // No IRT rule matches, do round robin of all active nodes
         String[] nodes = getNodes();
-        if (nextNode >= nodes.length)    // The list of nodes may have grown/shrunk
-        {
+        if (nextNode >= nodes.length) {   // The list of nodes may have grown/shrunk
             nextNode = 0;
         }
         return nodes[nextNode++];

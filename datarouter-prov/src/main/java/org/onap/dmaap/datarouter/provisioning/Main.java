@@ -24,11 +24,24 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
-
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.Security;
+import java.util.EnumSet;
+import java.util.Properties;
+import java.util.Timer;
+import javax.servlet.DispatcherType;
 import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.NCSARequestLog;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
@@ -39,15 +52,12 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.onap.aaf.cadi.PropAccess;
-import org.onap.dmaap.datarouter.provisioning.utils.*;
 
-import javax.servlet.DispatcherType;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.Security;
-import java.util.EnumSet;
-import java.util.Properties;
-import java.util.Timer;
+import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DRProvCadiFilter;
+import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
+import org.onap.dmaap.datarouter.provisioning.utils.PurgeLogDirTask;
+import org.onap.dmaap.datarouter.provisioning.utils.ThrottleFilter;
 
 /**
  * <p>
@@ -81,7 +91,7 @@ import java.util.Timer;
 public class Main {
 
     /**
-     * The truststore to use if none is specified
+     * The truststore to use if none is specified.
      */
     static final String DEFAULT_TRUSTSTORE = "/opt/java/jdk/jdk180/jre/lib/security/cacerts";
     static final String KEYSTORE_TYPE_PROPERTY = "org.onap.dmaap.datarouter.provserver.keystore.type";
@@ -89,10 +99,11 @@ public class Main {
     static final String KEYSTORE_PASS_PROPERTY = "org.onap.dmaap.datarouter.provserver.keystore.password";
     static final String TRUSTSTORE_PATH_PROPERTY = "org.onap.dmaap.datarouter.provserver.truststore.path";
     static final String TRUSTSTORE_PASS_PROPERTY = "org.onap.dmaap.datarouter.provserver.truststore.password";
-    public static final EELFLogger intlogger = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+    public static final EELFLogger intlogger = EELFManager.getInstance()
+                                                       .getLogger("org.onap.dmaap.datarouter.provisioning.internal");
 
     /**
-     * The one and only {@link Server} instance in this JVM
+     * The one and only {@link Server} instance in this JVM.
      */
     private static Server server;
 
@@ -116,7 +127,6 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
         Security.setProperty("networkaddress.cache.ttl", "4");
-        Properties provProperties = (new DB()).getProperties();
         // Check DB is accessible and contains the expected tables
         if (!checkDatabase()) {
             System.exit(1);
@@ -125,8 +135,11 @@ public class Main {
         intlogger.info("PROV0000 **** AT&T Data Router Provisioning Server starting....");
 
         Security.setProperty("networkaddress.cache.ttl", "4");
-        int httpPort = Integer.parseInt(provProperties.getProperty("org.onap.dmaap.datarouter.provserver.http.port", "8080"));
-        int httpsPort = Integer.parseInt(provProperties.getProperty("org.onap.dmaap.datarouter.provserver.https.port", "8443"));
+        Properties provProperties = (new DB()).getProperties();
+        int httpPort = Integer.parseInt(provProperties
+                                             .getProperty("org.onap.dmaap.datarouter.provserver.http.port", "8080"));
+        final int httpsPort = Integer.parseInt(provProperties
+                                             .getProperty("org.onap.dmaap.datarouter.provserver.https.port", "8443"));
 
         // Server's thread pool
         QueuedThreadPool queuedThreadPool = new QueuedThreadPool();
@@ -143,7 +156,9 @@ public class Main {
 
         // Request log configuration
         NCSARequestLog ncsaRequestLog = new NCSARequestLog();
-        ncsaRequestLog.setFilename(provProperties.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir") + "/request.log.yyyy_mm_dd");
+        ncsaRequestLog.setFilename(provProperties
+                                           .getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir")
+                                           + "/request.log.yyyy_mm_dd");
         ncsaRequestLog.setFilenameDateFormat("yyyyMMdd");
         ncsaRequestLog.setRetainDays(90);
         ncsaRequestLog.setAppend(true);
@@ -167,7 +182,8 @@ public class Main {
 
         //HTTP Connector
         HandlerCollection handlerCollection;
-        try (ServerConnector httpServerConnector = new ServerConnector(server, new HttpConnectionFactory(httpConfiguration))) {
+        try (ServerConnector httpServerConnector =
+                     new ServerConnector(server, new HttpConnectionFactory(httpConfiguration))) {
             httpServerConnector.setPort(httpPort);
             httpServerConnector.setAcceptQueueSize(2);
             httpServerConnector.setIdleTimeout(300000);
@@ -177,7 +193,8 @@ public class Main {
             sslContextFactory.setKeyStoreType(provProperties.getProperty(KEYSTORE_TYPE_PROPERTY, "jks"));
             sslContextFactory.setKeyStorePath(provProperties.getProperty(KEYSTORE_PATH_PROPERTY));
             sslContextFactory.setKeyStorePassword(provProperties.getProperty(KEYSTORE_PASS_PROPERTY));
-            sslContextFactory.setKeyManagerPassword(provProperties.getProperty("org.onap.dmaap.datarouter.provserver.keymanager.password"));
+            sslContextFactory.setKeyManagerPassword(provProperties
+                                          .getProperty("org.onap.dmaap.datarouter.provserver.keymanager.password"));
 
             String ts = provProperties.getProperty(TRUSTSTORE_PATH_PROPERTY);
             if (ts != null && ts.length() > 0) {
@@ -201,12 +218,17 @@ public class Main {
             );
             sslContextFactory.addExcludeProtocols("SSLv3");
             sslContextFactory.setIncludeProtocols(provProperties.getProperty(
-                    "org.onap.dmaap.datarouter.provserver.https.include.protocols", "TLSv1.1|TLSv1.2").trim().split("\\|"));
+                    "org.onap.dmaap.datarouter.provserver.https.include.protocols",
+                    "TLSv1.1|TLSv1.2").trim().split("\\|"));
 
-            intlogger.info("Not supported protocols prov server:-" + String.join(",", sslContextFactory.getExcludeProtocols()));
-            intlogger.info("Supported protocols prov server:-" + String.join(",", sslContextFactory.getIncludeProtocols()));
-            intlogger.info("Not supported ciphers prov server:-" + String.join(",", sslContextFactory.getExcludeCipherSuites()));
-            intlogger.info("Supported ciphers prov server:-" + String.join(",", sslContextFactory.getIncludeCipherSuites()));
+            intlogger.info("Not supported protocols prov server:-"
+                                   + String.join(",", sslContextFactory.getExcludeProtocols()));
+            intlogger.info("Supported protocols prov server:-"
+                                   + String.join(",", sslContextFactory.getIncludeProtocols()));
+            intlogger.info("Not supported ciphers prov server:-"
+                                   + String.join(",", sslContextFactory.getExcludeCipherSuites()));
+            intlogger.info("Supported ciphers prov server:-"
+                                   + String.join(",", sslContextFactory.getIncludeCipherSuites()));
 
             // HTTPS configuration
             HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
@@ -235,10 +257,12 @@ public class Main {
                 servletContextHandler.addServlet(new ServletHolder(new InternalServlet()), "/internal/*");
                 servletContextHandler.addServlet(new ServletHolder(new RouteServlet()), "/internal/route/*");
                 servletContextHandler.addServlet(new ServletHolder(new DRFeedsServlet()), "/");
-                servletContextHandler.addFilter(new FilterHolder(new ThrottleFilter()), "/publish/*", EnumSet.of(DispatcherType.REQUEST));
+                servletContextHandler.addFilter(new FilterHolder(new ThrottleFilter()),
+                        "/publish/*", EnumSet.of(DispatcherType.REQUEST));
 
                 //CADI Filter activation check
-                if (Boolean.parseBoolean(provProperties.getProperty("org.onap.dmaap.datarouter.provserver.cadi.enabled", "false"))) {
+                if (Boolean.parseBoolean(provProperties.getProperty(
+                        "org.onap.dmaap.datarouter.provserver.cadi.enabled", "false"))) {
                     //Get cadi properties
                     Properties cadiProperties = null;
                     try {
@@ -254,7 +278,8 @@ public class Main {
                     intlogger.info("PROV0001  aaf_url set to - " + cadiProperties.getProperty("aaf_url"));
 
                     PropAccess access = new PropAccess(cadiProperties);
-                    servletContextHandler.addFilter(new FilterHolder(new DRProvCadiFilter(true, access)), "/*", EnumSet.of(DispatcherType.REQUEST));
+                    servletContextHandler.addFilter(new FilterHolder(new DRProvCadiFilter(true, access)),
+                            "/*", EnumSet.of(DispatcherType.REQUEST));
                 }
 
                 ContextHandlerCollection contextHandlerCollection = new ContextHandlerCollection();

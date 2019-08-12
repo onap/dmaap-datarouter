@@ -24,6 +24,10 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
+import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.sendResponseError;
+
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -34,7 +38,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,10 +52,9 @@ import org.onap.dmaap.datarouter.provisioning.eelf.EelfMsgs;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
 
-import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.sendResponseError;
+
+
 
 /**
  * This servlet handles requests to the &lt;feedLogURL&gt; and  &lt;subLogURL&gt;,
@@ -62,6 +64,7 @@ import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.send
  * @version $Id: LogServlet.java,v 1.11 2014/03/28 17:27:02 eby Exp $
  */
 @SuppressWarnings("serial")
+
 public class LogServlet extends BaseServlet {
     //Adding EELF Logger Rally:US664892
     private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(LogServlet.class);
@@ -82,11 +85,22 @@ public class LogServlet extends BaseServlet {
         private final String[] fields;
         private boolean firstrow;
 
-        public RowHandler(ServletOutputStream out, String fieldparam, boolean b) {
+        /**
+         * Row setter.
+         * @param out ServletOutputStream
+         * @param fieldparam String field
+         * @param bool boolean
+         */
+        public RowHandler(ServletOutputStream out, String fieldparam, boolean bool) {
             this.out = out;
-            this.firstrow = b;
+            this.firstrow = bool;
             this.fields = (fieldparam != null) ? fieldparam.split(":") : null;
         }
+
+        /**
+         * Handling row from DB.
+         * @param rs DB Resultset
+         */
         public void handleRow(ResultSet rs) {
             try {
                 LOGJSONable js = buildJSONable(rs);
@@ -95,44 +109,52 @@ public class LogServlet extends BaseServlet {
                     // filter out unwanted fields
                     LOGJSONObject j2 = new LOGJSONObject();
                     for (String key : fields) {
-                        Object v = jo.opt(key);
-                        if (v != null)
-                            j2.put(key, v);
+                        Object val = jo.opt(key);
+                        if (val != null) {
+                            j2.put(key, val);
+                        }
                     }
                     jo = j2;
                 }
-                String t = firstrow ? "\n" : ",\n";
-                t += jo.toString();
-                out.print(t);
+                String str = firstrow ? "\n" : ",\n";
+                str += jo.toString();
+                out.print(str);
                 firstrow = false;
             } catch (Exception exception) {
                 intlogger.info("Failed to handle row. Exception = " + exception.getMessage(),exception);
             }
         }
+
         public abstract LOGJSONable buildJSONable(ResultSet rs) throws SQLException;
     }
+
     public class PublishRecordRowHandler extends RowHandler {
-        public PublishRecordRowHandler(ServletOutputStream out, String fields, boolean b) {
-            super(out, fields, b);
+        public PublishRecordRowHandler(ServletOutputStream out, String fields, boolean bool) {
+            super(out, fields, bool);
         }
+
         @Override
         public LOGJSONable buildJSONable(ResultSet rs) throws SQLException {
             return new PublishRecord(rs);
         }
     }
+
     public class DeliveryRecordRowHandler extends RowHandler {
-        public DeliveryRecordRowHandler(ServletOutputStream out, String fields, boolean b) {
-            super(out, fields, b);
+        public DeliveryRecordRowHandler(ServletOutputStream out, String fields, boolean bool) {
+            super(out, fields, bool);
         }
+
         @Override
         public LOGJSONable buildJSONable(ResultSet rs) throws SQLException {
             return new DeliveryRecord(rs);
         }
     }
+
     public class ExpiryRecordRowHandler extends RowHandler {
-        public ExpiryRecordRowHandler(ServletOutputStream out, String fields, boolean b) {
-            super(out, fields, b);
+        public ExpiryRecordRowHandler(ServletOutputStream out, String fields, boolean bool) {
+            super(out, fields, bool);
         }
+
         @Override
         public LOGJSONable buildJSONable(ResultSet rs) throws SQLException {
             return new ExpiryRecord(rs);
@@ -156,7 +178,8 @@ public class LogServlet extends BaseServlet {
         setIpFqdnRequestIDandInvocationIDForEelf("doDelete", req);
         eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID,
+                    req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             String message = "DELETE not allowed for the logURL.";
             EventLogRecord elr = new EventLogRecord(req);
             elr.setMessage(message);
@@ -167,6 +190,7 @@ public class LogServlet extends BaseServlet {
             eelfLogger.info(EelfMsgs.EXIT);
         }
     }
+
     /**
      * GET a logging URL -- retrieve logging data for a feed or subscription.
      * See the <b>Logging API</b> document for details on how this method should be invoked.
@@ -176,15 +200,18 @@ public class LogServlet extends BaseServlet {
         setIpFqdnRequestIDandInvocationIDForEelf("doGet", req);
         eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID,
+                    req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             int id = getIdFromPath(req);
             if (id < 0) {
-                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Missing or bad feed/subscription number.", eventlogger);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST,
+                        "Missing or bad feed/subscription number.", eventlogger);
                 return;
             }
             Map<String, String> map = buildMapFromRequest(req);
             if (map.get("err") != null) {
-                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid arguments: " + map.get("err"), eventlogger);
+                sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST,
+                        "Invalid arguments: " + map.get("err"), eventlogger);
                 return;
             }
             // check Accept: header??
@@ -238,6 +265,7 @@ public class LogServlet extends BaseServlet {
             eelfLogger.info(EelfMsgs.EXIT);
         }
     }
+
     /**
      * PUT a logging URL -- not supported.
      */
@@ -246,7 +274,8 @@ public class LogServlet extends BaseServlet {
         setIpFqdnRequestIDandInvocationIDForEelf("doPut", req);
         eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID, req.getHeader(BEHALF_HEADER),getIdFromPath(req)+"");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID,
+                    req.getHeader(BEHALF_HEADER),getIdFromPath(req) + "");
             String message = "PUT not allowed for the logURL.";
             EventLogRecord elr = new EventLogRecord(req);
             elr.setMessage(message);
@@ -257,6 +286,7 @@ public class LogServlet extends BaseServlet {
             eelfLogger.info(EelfMsgs.EXIT);
         }
     }
+
     /**
      * POST a logging URL -- not supported.
      */
@@ -279,10 +309,10 @@ public class LogServlet extends BaseServlet {
 
     private Map<String, String> buildMapFromRequest(HttpServletRequest req) {
         Map<String, String> map = new HashMap<>();
-        String s = req.getParameter("type");
-        if (s != null) {
-            if ("pub".equals(s) || "del".equals(s) || "exp".equals(s)) {
-                map.put("type", s);
+        String str = req.getParameter("type");
+        if (str != null) {
+            if ("pub".equals(str) || "del".equals(str) || "exp".equals(str)) {
+                map.put("type", str);
             } else {
                 map.put("err", "bad type");
                 return map;
@@ -296,24 +326,24 @@ public class LogServlet extends BaseServlet {
         map.put(REASON_SQL, "");
         map.put(FILENAMESQL, "");
 
-        s = req.getParameter("publishId");
-        if (s != null) {
-            if (s.indexOf("'") >= 0) {
+        str = req.getParameter("publishId");
+        if (str != null) {
+            if (str.indexOf("'") >= 0) {
                 map.put("err", "bad publishId");
                 return map;
             }
-            map.put(PUBLISHSQL, " AND PUBLISH_ID = '"+s+"'");
+            map.put(PUBLISHSQL, " AND PUBLISH_ID = '" + str + "'");
         }
 
-        s = req.getParameter("filename");
-        if (s != null) {
-            map.put(FILENAMESQL, " AND FILENAME = '" + s + "'");
+        str = req.getParameter("filename");
+        if (str != null) {
+            map.put(FILENAMESQL, " AND FILENAME = '" + str + "'");
         }
 
-        s = req.getParameter("statusCode");
-        if (s != null) {
+        str = req.getParameter("statusCode");
+        if (str != null) {
             String sql = null;
-            switch (s) {
+            switch (str) {
                 case "success":
                     sql = " AND STATUS >= 200 AND STATUS < 300";
                     break;
@@ -325,9 +355,9 @@ public class LogServlet extends BaseServlet {
                     break;
                 default:
                     try {
-                        int n = Integer.parseInt(s);
-                        if ((n >= 100 && n < 600) || (n == -1)) {
-                            sql = " AND STATUS = " + n;
+                        int statusCode = Integer.parseInt(str);
+                        if ((statusCode >= 100 && statusCode < 600) || (statusCode == -1)) {
+                            sql = " AND STATUS = " + statusCode;
                         }
                     } catch (NumberFormatException e) {
                         intlogger.error("Failed to parse input", e);
@@ -342,16 +372,16 @@ public class LogServlet extends BaseServlet {
             map.put(RESULTSQL, sql.replaceAll("STATUS", "RESULT"));
         }
 
-        s = req.getParameter("expiryReason");
-        if (s != null) {
+        str = req.getParameter("expiryReason");
+        if (str != null) {
             map.put("type", "exp");
-            if ("notRetryable".equals(s)) {
+            if ("notRetryable".equals(str)) {
                 map.put(REASON_SQL, " AND REASON = 'notRetryable'");
-            } else if ("retriesExhausted".equals(s)) {
+            } else if ("retriesExhausted".equals(str)) {
                 map.put(REASON_SQL, " AND REASON = 'retriesExhausted'");
-            } else if ("diskFull".equals(s)) {
+            } else if ("diskFull".equals(str)) {
                 map.put(REASON_SQL, " AND REASON = 'diskFull'");
-            } else if ("other".equals(s)) {
+            } else if ("other".equals(str)) {
                 map.put(REASON_SQL, " AND REASON = 'other'");
             } else {
                 map.put("err", "bad expiryReason");
@@ -380,25 +410,27 @@ public class LogServlet extends BaseServlet {
         map.put(TIMESQL, String.format(" AND EVENT_TIME >= %d AND EVENT_TIME <= %d", stime, etime));
         return map;
     }
-    private long getTimeFromParam(final String s) {
-        if (s == null)
+
+    private long getTimeFromParam(final String str) {
+        if (str == null) {
             return 0;
+        }
         try {
             // First, look for an RFC 3339 date
-            String fmt = (s.indexOf('.') > 0) ? FMT_2 : FMT_1;
+            String fmt = (str.indexOf('.') > 0) ? FMT_2 : FMT_1;
             SimpleDateFormat sdf = new SimpleDateFormat(fmt);
-            Date d = sdf.parse(s);
-            return d.getTime();
+            Date date = sdf.parse(str);
+            return date.getTime();
         } catch (ParseException parseException) {
             intlogger.error("Exception in getting Time :- " + parseException.getMessage(),parseException);
         }
         try {
             // Also allow a long (in ms); useful for testing
-            return Long.parseLong(s);
+            return Long.parseLong(str);
         } catch (NumberFormatException numberFormatException) {
             intlogger.error("Exception in getting Time :- " + numberFormatException.getMessage(),numberFormatException);
         }
-        intlogger.info("Error parsing time=" + s);
+        intlogger.info("Error parsing time=" + str);
         return -1;
     }
 
@@ -411,6 +443,7 @@ public class LogServlet extends BaseServlet {
             getRecordsForSQL(sql, rh);
         }
     }
+
     private void getDeliveryRecordsForFeed(int feedid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
         if ("all".equals(type) || "del".equals(type)) {
@@ -420,6 +453,7 @@ public class LogServlet extends BaseServlet {
             getRecordsForSQL(sql, rh);
         }
     }
+
     private void getDeliveryRecordsForSubscription(int subid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
         if ("all".equals(type) || "del".equals(type)) {
@@ -429,6 +463,7 @@ public class LogServlet extends BaseServlet {
             getRecordsForSQL(sql, rh);
         }
     }
+
     private void getExpiryRecordsForFeed(int feedid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
         if ("all".equals(type) || "exp".equals(type)) {
@@ -441,6 +476,7 @@ public class LogServlet extends BaseServlet {
             }
         }
     }
+
     private void getExpiryRecordsForSubscription(int subid, RowHandler rh, Map<String, String> map) {
         String type = map.get("type");
         if ("all".equals(type) || "exp".equals(type)) {
@@ -471,8 +507,9 @@ public class LogServlet extends BaseServlet {
         } catch (SQLException sqlException) {
             intlogger.info("Failed to get Records. Exception = " + sqlException.getMessage(),sqlException);
         } finally {
-            if (conn != null)
+            if (conn != null) {
                 db.release(conn);
+            }
         }
         intlogger.debug("Time: " + (System.currentTimeMillis() - start) + " ms");
     }

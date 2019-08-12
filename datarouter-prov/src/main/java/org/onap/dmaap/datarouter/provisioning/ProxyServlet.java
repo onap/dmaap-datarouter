@@ -65,6 +65,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
  * @version $Id: ProxyServlet.java,v 1.3 2014/03/24 18:47:10 eby Exp $
  */
 @SuppressWarnings("serial")
+
 public class ProxyServlet extends BaseServlet {
 
     private boolean inited = false;
@@ -80,11 +81,8 @@ public class ProxyServlet extends BaseServlet {
         try {
             // Set up keystore
             Properties props = (new DB()).getProperties();
-            String type = props.getProperty(Main.KEYSTORE_TYPE_PROPERTY, "jks");
             String store = props.getProperty(Main.KEYSTORE_PATH_PROPERTY);
             String pass = props.getProperty(Main.KEYSTORE_PASS_PROPERTY);
-            KeyStore keyStore = readStore(store, pass, type);
-
             store = props.getProperty(Main.TRUSTSTORE_PATH_PROPERTY);
             pass = props.getProperty(Main.TRUSTSTORE_PASS_PROPERTY);
             if (store == null || store.length() == 0) {
@@ -95,6 +93,8 @@ public class ProxyServlet extends BaseServlet {
 
             // We are connecting with the node name, but the certificate will have the CNAME
             // So we need to accept a non-matching certificate name
+            String type = props.getProperty(Main.KEYSTORE_TYPE_PROPERTY, "jks");
+            KeyStore keyStore = readStore(store, pass, type);
             SSLSocketFactory socketFactory = new SSLSocketFactory(keyStore,
                     props.getProperty(Main.KEYSTORE_PASS_PROPERTY), trustStore);
             socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
@@ -126,10 +126,10 @@ public class ProxyServlet extends BaseServlet {
      * @return true or false
      */
     boolean isProxyOK(final HttpServletRequest req) {
-        String t = req.getQueryString();
-        if (t != null) {
-            t = t.replaceAll("&amp;", "&");
-            for (String s : t.split("&")) {
+        String str = req.getQueryString();
+        if (str != null) {
+            str = str.replaceAll("&amp;", "&");
+            for (String s : str.split("&")) {
                 if ("noproxy".equals(s) || s.startsWith("noproxy=")) {
                     return false;
                 }
@@ -272,9 +272,9 @@ public class ProxyServlet extends BaseServlet {
         StringBuilder sb = new StringBuilder("https://");
         sb.append(URLUtilities.getPeerPodName());
         sb.append(req.getRequestURI());
-        String q = req.getQueryString();
-        if (q != null) {
-            sb.append("?").append(q);
+        String query = req.getQueryString();
+        if (query != null) {
+            sb.append("?").append(query);
         }
         return sb.toString();
     }

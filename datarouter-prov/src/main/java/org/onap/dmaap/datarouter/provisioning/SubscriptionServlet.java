@@ -73,7 +73,8 @@ public class SubscriptionServlet extends ProxyServlet {
         setIpFqdnRequestIDandInvocationIDForEelf("doDelete", req);
         eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID,
+                    req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             EventLogRecord elr = new EventLogRecord(req);
             String message = isAuthorizedForProvisioning(req);
             if (message != null) {
@@ -174,7 +175,8 @@ public class SubscriptionServlet extends ProxyServlet {
         setIpFqdnRequestIDandInvocationIDForEelf("doGet", req);
         eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID,
+                    req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             EventLogRecord elr = new EventLogRecord(req);
             String message = isAuthorizedForProvisioning(req);
             if (message != null) {
@@ -250,7 +252,8 @@ public class SubscriptionServlet extends ProxyServlet {
         setIpFqdnRequestIDandInvocationIDForEelf("doPut", req);
         eelfLogger.info(EelfMsgs.ENTRY);
         try {
-            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID, req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
+            eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_SUBID,
+                    req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             EventLogRecord elr = new EventLogRecord(req);
             String message = isAuthorizedForProvisioning(req);
             if (message != null) {
@@ -360,8 +363,8 @@ public class SubscriptionServlet extends ProxyServlet {
             sub.setSubid(oldsub.getSubid());
             sub.setFeedid(oldsub.getFeedid());
             sub.setSubscriber(bhdr);    // set from X-DMAAP-DR-ON-BEHALF-OF header
-
-            String subjectgroup = (req.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP")); //Adding for group feature:Rally US708115
+            //Adding for group feature:Rally US708115
+            String subjectgroup = (req.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP"));
             if (!oldsub.getSubscriber().equals(sub.getSubscriber()) && subjectgroup == null) {
                 message = "This subscriber must be modified by the same subscriber that created it.";
                 elr.setMessage(message);
@@ -485,12 +488,12 @@ public class SubscriptionServlet extends ProxyServlet {
             try {
                 // Only the active POD sends notifications
                 boolean active = SynchronizerTask.getSynchronizer().isActive();
-                boolean b = jo.getBoolean("failed");
-                if (active && !b) {
+                boolean bool = jo.getBoolean("failed");
+                if (active && !bool) {
                     // Notify all nodes to reset the subscription
-                    SubscriberNotifyThread t = new SubscriberNotifyThread();
-                    t.resetSubscription(subid);
-                    t.start();
+                    SubscriberNotifyThread thread = new SubscriberNotifyThread();
+                    thread.resetSubscription(subid);
+                    thread.start();
                 }
                 // send response
                 elr.setResult(HttpServletResponse.SC_ACCEPTED);
@@ -523,8 +526,8 @@ public class SubscriptionServlet extends ProxyServlet {
 
         void resetSubscription(int subid) {
             for (String nodename : BaseServlet.getNodes()) {
-                String u = String.format(URL_TEMPLATE, nodename, subid);
-                urls.add(u);
+                String url = String.format(URL_TEMPLATE, nodename, subid);
+                urls.add(url);
             }
         }
 

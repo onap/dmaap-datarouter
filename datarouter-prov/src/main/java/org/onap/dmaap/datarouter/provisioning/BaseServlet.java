@@ -123,7 +123,8 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     public static final String PROVFULL_CONTENT_TYPE2 = "application/vnd.dmaap-dr.provfeed-full; version=2.0";
     public static final String CERT_ATTRIBUTE = "javax.servlet.request.X509Certificate";
 
-    static final String DB_PROBLEM_MSG = "There has been a problem with the DB.  It is suggested you try the operation again.";
+    static final String DB_PROBLEM_MSG = "There has been a problem with the DB.  It is suggested you "
+                                                 + "try the operation again.";
 
     private static final int DEFAULT_MAX_FEEDS = 10000;
     private static final int DEFAULT_MAX_SUBS = 100000;
@@ -305,6 +306,11 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         }
     }
 
+    /**
+     * Get ID from Path.
+     * @param req HTTPServletRequest
+     * @return int ID
+     */
     public static int getIdFromPath(HttpServletRequest req) {
         String path = req.getPathInfo();
         if (path == null || path.length() < 2) {
@@ -466,18 +472,18 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * Check if an IP address matches a network address.
      *
      * @param ip the IP address
-     * @param s  the network address; a bare IP address may be matched also
+     * @param str  the network address; a bare IP address may be matched also
      * @return true if they intersect
      */
-    private static boolean addressMatchesNetwork(InetAddress ip, String s) {
+    private static boolean addressMatchesNetwork(InetAddress ip, String str) {
         int mlen = -1;
-        int n = s.indexOf('/');
-        if (n >= 0) {
-            mlen = Integer.parseInt(s.substring(n + 1));
-            s = s.substring(0, n);
+        int substr = str.indexOf('/');
+        if (substr >= 0) {
+            mlen = Integer.parseInt(str.substring(substr + 1));
+            str = str.substring(0, substr);
         }
         try {
-            InetAddress i2 = InetAddress.getByName(s);
+            InetAddress i2 = InetAddress.getByName(str);
             byte[] b1 = ip.getAddress();
             byte[] b2 = i2.getAddress();
             if (b1.length != b2.length) {
@@ -485,18 +491,18 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             }
             if (mlen > 0) {
                 byte[] masks = {
-                        (byte) 0x00, (byte) 0x80, (byte) 0xC0, (byte) 0xE0,
-                        (byte) 0xF0, (byte) 0xF8, (byte) 0xFC, (byte) 0xFE
+                    (byte) 0x00, (byte) 0x80, (byte) 0xC0, (byte) 0xE0,
+                    (byte) 0xF0, (byte) 0xF8, (byte) 0xFC, (byte) 0xFE
                 };
                 byte mask = masks[mlen % 8];
-                for (n = mlen / 8; n < b1.length; n++) {
-                    b1[n] &= mask;
-                    b2[n] &= mask;
+                for (substr = mlen / 8; substr < b1.length; substr++) {
+                    b1[substr] &= mask;
+                    b2[substr] &= mask;
                     mask = 0;
                 }
             }
-            for (n = 0; n < b1.length; n++) {
-                if (b1[n] != b2[n]) {
+            for (substr = 0; substr < b1.length; substr++) {
+                if (b1[substr] != b2[substr]) {
                     return false;
                 }
             }
@@ -513,8 +519,8 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     static void provisioningDataChanged() {
         long now = System.currentTimeMillis();
-        Poker p = Poker.getPoker();
-        p.setTimers(now + (pokeTimer1 * 1000L), now + (pokeTimer2 * 1000L));
+        Poker pkr = Poker.getPoker();
+        pkr.setTimers(now + (pokeTimer1 * 1000L), now + (pokeTimer2 * 1000L));
     }
 
     /**
@@ -653,7 +659,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     }
 
     /**
-     * Gets the FQDN of the initially STANDBY_POD provisioning server (POD). Note: this used to be called isStandbyPOD(),
+     * Gets the FQDN of the initially STANDBY_POD provisioning server (POD).Note: this used to be called isStandbyPOD(),
      * however, that is a misnomer, as the standby status could shift to the active POD without these parameters
      * changing.  Hence, the function names have been changed to more accurately reflect their purpose.
      *
@@ -736,19 +742,19 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     }
 
     private static boolean getBoolean(Map<String, String> map, String name) {
-        String s = map.get(name);
-        return "true".equalsIgnoreCase(s);
+        String str = map.get(name);
+        return "true".equalsIgnoreCase(str);
     }
 
     private static String getString(Map<String, String> map, String name, String dflt) {
-        String s = map.get(name);
-        return (s != null) ? s : dflt;
+        String str = map.get(name);
+        return (str != null) ? str : dflt;
     }
 
     private static int getInt(Map<String, String> map, String name, int dflt) {
         try {
-            String s = map.get(name);
-            return Integer.parseInt(s);
+            String str = map.get(name);
+            return Integer.parseInt(str);
         } catch (NumberFormatException e) {
             return dflt;
         }
@@ -756,9 +762,9 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
 
     private static Set<String> getSet(Map<String, String> map, String name) {
         Set<String> set = new HashSet<>();
-        String s = map.get(name);
-        if (s != null) {
-            String[] pp = s.split("\\|");
+        String str = map.get(name);
+        if (str != null) {
+            String[] pp = str.split("\\|");
             if (pp != null) {
                 for (String t : pp) {
                     String t2 = t.trim();
@@ -784,9 +790,9 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             this("", "1.0");
         }
 
-        ContentHeader(String t, String v) {
-            type = t.trim();
-            map.put("version", v);
+        ContentHeader(String headertype, String version) {
+            type = headertype.trim();
+            map.put("version", version);
         }
 
         public String getType() {
@@ -794,11 +800,11 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         }
 
         String getAttribute(String key) {
-            String s = map.get(key);
-            if (s == null) {
-                s = "";
+            String str = map.get(key);
+            if (str == null) {
+                str = "";
             }
-            return s;
+            return str;
         }
     }
 
@@ -810,16 +816,16 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     ContentHeader getContentHeader(HttpServletRequest req) {
         ContentHeader ch = new ContentHeader();
-        String s = req.getHeader("Content-Type");
-        if (s != null) {
-            String[] pp = s.split(";");
+        String str = req.getHeader("Content-Type");
+        if (str != null) {
+            String[] pp = str.split(";");
             ch.type = pp[0].trim();
             for (int i = 1; i < pp.length; i++) {
                 int ix = pp[i].indexOf('=');
                 if (ix > 0) {
-                    String k = pp[i].substring(0, ix).trim();
-                    String v = pp[i].substring(ix + 1).trim();
-                    ch.map.put(k, v);
+                    String type = pp[i].substring(0, ix).trim();
+                    String version = pp[i].substring(ix + 1).trim();
+                    ch.map.put(type, version);
                 } else {
                     ch.map.put(pp[i].trim(), "");
                 }
@@ -832,10 +838,10 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     @Override
     public String getFeedOwner(String feedId) {
         try {
-            int n = Integer.parseInt(feedId);
-            Feed f = Feed.getFeedById(n);
-            if (f != null) {
-                return f.getPublisher();
+            int intID = Integer.parseInt(feedId);
+            Feed feed = Feed.getFeedById(intID);
+            if (feed != null) {
+                return feed.getPublisher();
             }
         } catch (NumberFormatException e) {
             // ignore
@@ -846,10 +852,10 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     @Override
     public String getFeedClassification(String feedId) {
         try {
-            int n = Integer.parseInt(feedId);
-            Feed f = Feed.getFeedById(n);
-            if (f != null) {
-                return f.getAuthorization().getClassification();
+            int intID = Integer.parseInt(feedId);
+            Feed feed = Feed.getFeedById(intID);
+            if (feed != null) {
+                return feed.getAuthorization().getClassification();
             }
         } catch (NumberFormatException e) {
             // ignore
@@ -860,10 +866,10 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     @Override
     public String getSubscriptionOwner(String subId) {
         try {
-            int n = Integer.parseInt(subId);
-            Subscription s = Subscription.getSubscriptionById(n);
-            if (s != null) {
-                return s.getSubscriber();
+            int intID = Integer.parseInt(subId);
+            Subscription sub = Subscription.getSubscriptionById(intID);
+            if (sub != null) {
+                return sub.getSubscriber();
             }
         } catch (NumberFormatException e) {
             // ignore
@@ -879,9 +885,9 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     private boolean isUserMemberOfGroup(Group group, String user) {
 
         String groupDetails = group.getMembers().replace("]", "").replace("[", "");
-        String[] s = groupDetails.split("},");
+        String[] str = groupDetails.split("},");
 
-        for (String value : s) {
+        for (String value : str) {
             JSONObject jsonObj;
             try {
                 jsonObj = new JSONObject(value + "}");
@@ -904,9 +910,9 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     @Override
     public String getGroupByFeedGroupId(String owner, String feedId) {
         try {
-            Feed f = Feed.getFeedById(Integer.parseInt(feedId));
-            if (f != null) {
-                int groupid = f.getGroupid();
+            Feed feed = Feed.getFeedById(Integer.parseInt(feedId));
+            if (feed != null) {
+                int groupid = feed.getGroupid();
                 if (groupid > 0) {
                     Group group = Group.getGroupById(groupid);
                     if (group != null && isUserMemberOfGroup(group, owner)) {
@@ -928,10 +934,10 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     @Override
     public String getGroupBySubGroupId(String owner, String subId) {
         try {
-            int n = Integer.parseInt(subId);
-            Subscription s = Subscription.getSubscriptionById(n);
-            if (s != null) {
-                int groupid = s.getGroupid();
+            int intID = Integer.parseInt(subId);
+            Subscription sub = Subscription.getSubscriptionById(intID);
+            if (sub != null) {
+                int groupid = sub.getGroupid();
                 if (groupid > 0) {
                     Group group = Group.getGroupById(groupid);
                     if (group != null && isUserMemberOfGroup(group, owner)) {
@@ -1025,7 +1031,8 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
 
     /*
      * AAF changes: TDP EPIC US# 307413
-     * @Method - getSubscriberPermission - Forming permission string for subscription part to check AAF access in CADI Framework
+     * @Method - getSubscriberPermission - Forming permission string for subscription part to check
+     * AAF access in CADI Framework
      * @Params - aafInstance Passing aafInstance as it's used in permission string
      * @Params - userAction Passing CONST values to set different actions in permission string
      */
