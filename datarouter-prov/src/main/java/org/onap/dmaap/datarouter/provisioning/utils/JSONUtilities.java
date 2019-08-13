@@ -21,7 +21,6 @@
  * *
  ******************************************************************************/
 
-
 package org.onap.dmaap.datarouter.provisioning.utils;
 
 import com.att.eelf.configuration.EELFLogger;
@@ -43,24 +42,27 @@ public class JSONUtilities {
     private JSONUtilities(){
 
     }
+
     /**
      * Does the String <i>v</i> represent a valid Internet address (with or without a
      * mask length appended).
      *
-     * @param v the string to check
+     * @param str the string to check
      * @return true if valid, false otherwise
      */
-    public static boolean validIPAddrOrSubnet(String v) {
-        String[] pp = {v, ""};
-        if (v.indexOf('/') > 0)
-            pp = v.split("/");
+    public static boolean validIPAddrOrSubnet(String str) {
+        String[] pp = {str, ""};
+        if (str.indexOf('/') > 0) {
+            pp = str.split("/");
+        }
         try {
             InetAddress addr = InetAddress.getByName(pp[0]);
             if (pp[1].length() > 0) {
                 // check subnet mask
                 int mask = Integer.parseInt(pp[1]);
-                if (mask > (addr.getAddress().length * 8))
+                if (mask > (addr.getAddress().length * 8)) {
                     return false;
+                }
             }
             return true;
         } catch (UnknownHostException e) {
