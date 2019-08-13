@@ -21,7 +21,6 @@
  * *
  ******************************************************************************/
 
-
 package org.onap.dmaap.datarouter.provisioning.utils;
 
 import static java.lang.System.exit;
@@ -78,12 +77,12 @@ public class DB {
                 props.load(new FileInputStream(getProperty(
                     "org.onap.dmaap.datarouter.provserver.properties",
                     "/opt/app/datartr/etc/provserver.properties")));
-                String dbDriver = (String) props.get("org.onap.dmaap.datarouter.db.driver");
                 dbUrl = (String) props.get("org.onap.dmaap.datarouter.db.url");
                 dbLogin = (String) props.get("org.onap.dmaap.datarouter.db.login");
                 dbPassword = (String) props.get("org.onap.dmaap.datarouter.db.password");
                 httpsPort = (String) props.get("org.onap.dmaap.datarouter.provserver.https.port");
                 httpPort = (String) props.get("org.onap.dmaap.datarouter.provserver.http.port");
+                String dbDriver = (String) props.get("org.onap.dmaap.datarouter.db.driver");
                 Class.forName(dbDriver);
             } catch (IOException e) {
                 intlogger.error("PROV9003 Opening properties: " + e.getMessage(), e);
@@ -117,17 +116,18 @@ public class DB {
                     connection = queue.remove();
                 } catch (NoSuchElementException nseEx) {
                     intlogger.error("PROV9006 No connection on queue: " + nseEx.getMessage(), nseEx);
-                    int n = 0;
+                    int num = 0;
                     do {
                         // Try up to 3 times to get a connection
                         try {
                             connection = DriverManager.getConnection(dbUrl, dbLogin, dbPassword);
                         } catch (SQLException sqlEx) {
-                            if (++n >= 3) {
+                            if (++num >= 3) {
                                 throw sqlEx;
                             }
                         }
-                    } while (connection == null);
+                    }
+                    while (connection == null);
                 }
             }
             if (connection != null && !connection.isValid(1)) {

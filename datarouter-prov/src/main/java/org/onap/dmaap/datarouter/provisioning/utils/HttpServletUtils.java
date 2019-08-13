@@ -33,7 +33,15 @@ public class HttpServletUtils {
 
     }
 
-    public static void sendResponseError(HttpServletResponse response, int errorCode, String message, EELFLogger intlogger) {
+    /**
+     * Send response error.
+     * @param response HttpServletResponse
+     * @param errorCode errorcode int
+     * @param message String message
+     * @param intlogger Logger
+     */
+    public static void sendResponseError(HttpServletResponse response,
+            int errorCode, String message, EELFLogger intlogger) {
         try {
             response.sendError(errorCode, message);
         } catch (IOException ioe) {

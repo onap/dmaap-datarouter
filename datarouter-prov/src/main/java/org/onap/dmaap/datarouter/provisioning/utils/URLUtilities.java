@@ -39,6 +39,7 @@ import org.onap.dmaap.datarouter.provisioning.BaseServlet;
  */
 public class URLUtilities {
 
+
     private static final EELFLogger utilsLogger = EELFManager.getInstance().getLogger("UtilsLog");
     private static final String HTTPS = "https://";
     private static String otherPod;
