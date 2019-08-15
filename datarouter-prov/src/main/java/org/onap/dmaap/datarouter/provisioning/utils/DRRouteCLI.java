@@ -21,7 +21,6 @@
  * *
  ******************************************************************************/
 
-
 package org.onap.dmaap.datarouter.provisioning.utils;
 
 import com.att.eelf.configuration.EELFLogger;
@@ -77,10 +76,11 @@ public class DRRouteCLI {
         String server = System.getenv(ENV_VAR);
         if (args.length >= 2 && args[0].equals("-s")) {
             server = args[1];
-            String[] t = new String[args.length - 2];
-            if (t.length > 0)
-                System.arraycopy(args, 2, t, 0, t.length);
-            args = t;
+            String[] str = new String[args.length - 2];
+            if (str.length > 0) {
+                System.arraycopy(args, 2, str, 0, str.length);
+            }
+            args = str;
         }
         if (server == null || server.equals("")) {
             System.err.println("dr-route: you need to specify a server, either via $PROVSRVR or the '-s' option.");
@@ -88,8 +88,8 @@ public class DRRouteCLI {
         }
         DRRouteCLI cli = new DRRouteCLI(server);
         if (args.length > 0) {
-            boolean b = cli.runCommand(args);
-            System.exit(b ? 0 : 1);
+            boolean bool = cli.runCommand(args);
+            System.exit(bool ? 0 : 1);
         } else {
             cli.interactive();
             System.exit(0);
@@ -109,29 +109,30 @@ public class DRRouteCLI {
      * Create a DRRouteCLI object connecting to the specified server.
      *
      * @param server the server to send command to
-     * @throws Exception
+     * @throws Exception generic exception
      */
     public DRRouteCLI(String server) throws Exception {
         this.server = server;
         this.width = 120;
         this.httpclient = new DefaultHttpClient();
 
-        Properties p = (new DB()).getProperties();
-        String truststore_file = p.getProperty("org.onap.dmaap.datarouter.provserver.truststore.path");
-        String truststore_pw = p.getProperty("org.onap.dmaap.datarouter.provserver.truststore.password");
+        Properties prop = (new DB()).getProperties();
+        String truststoreFile = prop.getProperty("org.onap.dmaap.datarouter.provserver.truststore.path");
+        String truststorePw = prop.getProperty("org.onap.dmaap.datarouter.provserver.truststore.password");
 
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-        if (truststore_file == null || truststore_file.equals("")) {
+        if (truststoreFile == null || truststoreFile.equals("")) {
             String jhome = System.getenv("JAVA_HOME");
-            if (jhome == null || jhome.equals(""))
+            if (jhome == null || jhome.equals("")) {
                 jhome = "/opt/java/jdk/jdk180";
-            truststore_file = jhome + DEFAULT_TRUSTSTORE_PATH;
+            }
+            truststoreFile = jhome + DEFAULT_TRUSTSTORE_PATH;
         }
-        File f = new File(truststore_file);
-        if (f.exists()) {
-            FileInputStream instream = new FileInputStream(f);
+        File file = new File(truststoreFile);
+        if (file.exists()) {
+            FileInputStream instream = new FileInputStream(file);
             try {
-                trustStore.load(instream, truststore_pw.toCharArray());
+                trustStore.load(instream, truststorePw.toCharArray());
             } catch (Exception x) {
                 intlogger.error("Problem reading truststore: " + x.getMessage(), x);
                 throw x;
@@ -154,16 +155,20 @@ public class DRRouteCLI {
         while (true) {
             System.out.print(PROMPT);
             String line = in.readLine();
-            if (line == null)
+            if (line == null) {
                 return;
+            }
             line = line.trim();
-            if (line.equalsIgnoreCase("exit"))    // "exit" may only be used in interactive mode
+            if (line.equalsIgnoreCase("exit")) {    // "exit" may only be used in interactive mode
                 return;
-            if (line.equalsIgnoreCase("quit"))    // "quit" may only be used in interactive mode
+            }
+            if (line.equalsIgnoreCase("quit")) {   // "quit" may only be used in interactive mode
                 return;
+            }
             String[] args = line.split("[ \t]+");
-            if (args.length > 0)
+            if (args.length > 0) {
                 runCommand(args);
+            }
         }
     }
 
@@ -242,8 +247,9 @@ public class DRRouteCLI {
 
     private boolean addIngress(String[] args) {
         String url = String.format("https://%s/internal/route/ingress/?feed=%s&user=%s&subnet=%s&nodepatt=%s", server, args[2], args[3], args[4], args[5]);
-        if (args.length > 6)
+        if (args.length > 6) {
             url += "&seq=" + args[6];
+        }
         return doPost(url);
     }
 
@@ -285,31 +291,40 @@ public class DRRouteCLI {
         if (tbl.startsWith("al") || tbl.startsWith("in")) {
             // Display the IRT
             JSONArray irt = jo.optJSONArray("ingress");
-            int cw1 = 6, cw2 = 6, cw3 = 6, cw4 = 6;        // determine column widths for first 4 cols
+            int cw1 = 6;
+            int cw2 = 6;
+            int cw3 = 6;
+            int cw4 = 6;        // determine column widths for first 4 cols
             for (int i = 0; irt != null && i < irt.length(); i++) {
-                JSONObject e = irt.getJSONObject(i);
-                cw1 = Math.max(cw1, ("" + e.getInt("seq")).length());
-                cw2 = Math.max(cw2, ("" + e.getInt("feedid")).length());
-                String t = e.optString("user");
-                cw3 = Math.max(cw3, (t == null) ? 1 : t.length());
-                t = e.optString("subnet");
-                cw4 = Math.max(cw4, (t == null) ? 1 : t.length());
+                JSONObject jsonObject = irt.getJSONObject(i);
+                cw1 = Math.max(cw1, ("" + jsonObject.getInt("seq")).length());
+                cw2 = Math.max(cw2, ("" + jsonObject.getInt("feedid")).length());
+                String str = jsonObject.optString("user");
+                cw3 = Math.max(cw3, (str == null) ? 1 : str.length());
+                str = jsonObject.optString("subnet");
+                cw4 = Math.max(cw4, (str == null) ? 1 : str.length());
             }
 
             int nblank = cw1 + cw2 + cw3 + cw4 + 8;
             sb.append("Ingress Routing Table\n");
-            sb.append(String.format("%s  %s  %s  %s  Nodes\n", ext("Seq", cw1), ext("FeedID", cw2), ext("User", cw3), ext("Subnet", cw4)));
+            sb.append(String.format("%s  %s  %s  %s  Nodes\n", ext("Seq", cw1),
+                    ext("FeedID", cw2), ext("User", cw3), ext("Subnet", cw4)));
             for (int i = 0; irt != null && i < irt.length(); i++) {
-                JSONObject e = irt.getJSONObject(i);
-                String seq = "" + e.getInt("seq");
-                String feedid = "" + e.getInt("feedid");
-                String user = e.optString("user");
-                String subnet = e.optString("subnet");
-                if (user.equals("")) user = "-";
-                if (subnet.equals("")) subnet = "-";
-                JSONArray nodes = e.getJSONArray("node");
+                JSONObject jsonObject = irt.getJSONObject(i);
+                String seq = "" + jsonObject.getInt("seq");
+                String feedid = "" + jsonObject.getInt("feedid");
+                String user = jsonObject.optString("user");
+                String subnet = jsonObject.optString("subnet");
+                if (user.equals("")) {
+                    user = "-";
+                }
+                if (subnet.equals("")) {
+                    subnet = "-";
+                }
+                JSONArray nodes = jsonObject.getJSONArray("node");
                 int sol = sb.length();
-                sb.append(String.format("%s  %s  %s  %s  ", ext(seq, cw1), ext(feedid, cw2), ext(user, cw3), ext(subnet, cw4)));
+                sb.append(String.format("%s  %s  %s  %s  ", ext(seq, cw1),
+                        ext(feedid, cw2), ext(user, cw3), ext(subnet, cw4)));
                 for (int j = 0; j < nodes.length(); j++) {
                     String nd = nodes.getString(j);
                     int cursor = sb.length() - sol;
@@ -330,20 +345,22 @@ public class DRRouteCLI {
             // Display the ERT
             JSONObject ert = jo.optJSONObject("egress");
             String[] subs = (ert == null) ? new String[0] : JSONObject.getNames(ert);
-            if (subs == null)
+            if (subs == null) {
                 subs = new String[0];
+            }
             Arrays.sort(subs);
             int cw1 = 5;
             for (int i = 0; i < subs.length; i++) {
                 cw1 = Math.max(cw1, subs[i].length());
             }
 
-            if (sb.length() > 0)
+            if (sb.length() > 0) {
                 sb.append("\n");
+            }
             sb.append("Egress Routing Table\n");
             sb.append(String.format("%s  Node\n", ext("SubID", cw1)));
             for (int i = 0; i < subs.length; i++) {
-                if(ert!=null&&ert.length()!=0) {
+                if (ert != null && ert.length() != 0 ) {
                     String node = ert.getString(subs[i]);
                     sb.append(String.format("%s  %s\n", ext(subs[i], cw1), node));
                 }
@@ -353,24 +370,26 @@ public class DRRouteCLI {
         if (tbl.startsWith("al") || tbl.startsWith("ne")) {
             // Display the NRT
             JSONArray nrt = jo.optJSONArray("routing");
-            int cw1 = 4, cw2 = 4;
+            int cw1 = 4;
+            int cw2 = 4;
             for (int i = 0; nrt != null && i < nrt.length(); i++) {
-                JSONObject e = nrt.getJSONObject(i);
-                String from = e.getString("from");
-                String to = e.getString("to");
+                JSONObject jsonObject = nrt.getJSONObject(i);
+                String from = jsonObject.getString("from");
+                String to = jsonObject.getString("to");
                 cw1 = Math.max(cw1, from.length());
                 cw2 = Math.max(cw2, to.length());
             }
 
-            if (sb.length() > 0)
+            if (sb.length() > 0) {
                 sb.append("\n");
+            }
             sb.append("Network Routing Table\n");
             sb.append(String.format("%s  %s  Via\n", ext("From", cw1), ext("To", cw2)));
             for (int i = 0; nrt != null && i < nrt.length(); i++) {
-                JSONObject e = nrt.getJSONObject(i);
-                String from = e.getString("from");
-                String to = e.getString("to");
-                String via = e.getString("via");
+                JSONObject jsonObject = nrt.getJSONObject(i);
+                String from = jsonObject.getString("from");
+                String to = jsonObject.getString("to");
+                String via = jsonObject.getString("via");
                 sb.append(String.format("%s  %s  %s\n", ext(from, cw1), ext(to, cw2), via));
             }
         }
@@ -378,12 +397,14 @@ public class DRRouteCLI {
         return true;
     }
 
-    private String ext(String s, int n) {
-        if (s == null)
-            s = "-";
-        while (s.length() < n)
-            s += " ";
-        return s;
+    private String ext(String str, int num) {
+        if (str == null) {
+            str = "-";
+        }
+        while (str.length() < num) {
+            str += " ";
+        }
+        return str;
     }
 
     private boolean doDelete(String url) {
@@ -454,18 +475,20 @@ public class DRRouteCLI {
         // Look for and print only the part of the output between <pre>...</pre>
         InputStream is = entity.getContent();
         StringBuilder sb = new StringBuilder();
-        byte[] b = new byte[512];
-        int n = 0;
-        while ((n = is.read(b)) > 0) {
-            sb.append(new String(b, 0, n));
+        byte[] bite = new byte[512];
+        int num = 0;
+        while ((num = is.read(bite)) > 0) {
+            sb.append(new String(bite, 0, num));
         }
         is.close();
         int ix = sb.indexOf("<pre>");
-        if (ix > 0)
+        if (ix > 0) {
             sb.delete(0, ix + 5);
+        }
         ix = sb.indexOf("</pre>");
-        if (ix > 0)
+        if (ix > 0) {
             sb.delete(ix, sb.length());
+        }
         System.err.println(sb.toString());
     }
 }

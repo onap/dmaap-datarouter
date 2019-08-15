@@ -82,7 +82,8 @@ public class LogfileLoader extends Thread {
     /**
      * The PreparedStatement which is loaded by a <i>Loadable</i>.
      */
-    private static final String INSERT_SQL = "insert into LOG_RECORDS values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String INSERT_SQL = "insert into LOG_RECORDS "
+                                               + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     /**
      * Each server can assign this many IDs.
      */
@@ -126,17 +127,17 @@ public class LogfileLoader extends Thread {
     }
 
     private long getIdRange() {
-        long n;
+        long size;
         if (BaseServlet.isInitialActivePOD()) {
-            n = 0;
+            size = 0;
         } else if (BaseServlet.isInitialStandbyPOD()) {
-            n = SET_SIZE;
+            size = SET_SIZE;
         } else {
-            n = SET_SIZE * 2;
+            size = SET_SIZE * 2;
         }
-        String r = String.format("[%X .. %X]", n, n + SET_SIZE - 1);
-        logger.debug("This server shall assign RECORD_IDs in the range " + r);
-        return n;
+        String range = String.format("[%X .. %X]", size, size + SET_SIZE - 1);
+        logger.debug("This server shall assign RECORD_IDs in the range " + range);
+        return size;
     }
 
     /**
@@ -207,10 +208,10 @@ public class LogfileLoader extends Thread {
             logger.debug("PROV8001 Starting " + infile + " ...");
         }
         long time = System.currentTimeMillis();
-        int[] n = process(infile);
+        int[] array = process(infile);
         time = System.currentTimeMillis() - time;
         logger.info(String.format("PROV8000 Processed %s in %d ms; %d of %d records.",
-            infile.toString(), time, n[0], n[1]));
+            infile.toString(), time, array[0], array[1]));
         try {
             Files.delete(infile.toPath());
         } catch (IOException e) {
@@ -226,10 +227,10 @@ public class LogfileLoader extends Thread {
         Parameters provLogRetention = Parameters.getParameter(Parameters.PROV_LOG_RETENTION);
         if (provLogRetention != null) {
             try {
-                long n = Long.parseLong(provLogRetention.getValue());
+                long retention = Long.parseLong(provLogRetention.getValue());
                 // This check is to prevent inadvertent errors from wiping the table out
-                if (n > 1000000L) {
-                    threshold = n;
+                if (retention > 1000000L) {
+                    threshold = retention;
                 }
             } catch (NumberFormatException e) {
                 // ignore
@@ -260,7 +261,8 @@ public class LogfileLoader extends Thread {
             try {
                 // Limit to a million at a time to avoid typing up the DB for too long.
                 conn = db.getConnection();
-                try (PreparedStatement ps = conn.prepareStatement("DELETE from LOG_RECORDS where EVENT_TIME < ? limit 1000000")) {
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "DELETE from LOG_RECORDS where EVENT_TIME < ? limit 1000000")) {
                     ps.setLong(1, cutoff);
                     while (count > 0) {
                         if (!ps.execute()) {
@@ -310,7 +312,8 @@ public class LogfileLoader extends Thread {
         try (Connection conn = db.getConnection();
             Statement stmt = conn.createStatement()) {
             logger.debug("  LOG_RECORD table histogram...");
-            try (ResultSet rs = stmt.executeQuery("SELECT FLOOR(EVENT_TIME/86400000) AS DAY, COUNT(*) AS COUNT FROM LOG_RECORDS GROUP BY DAY")) {
+            try (ResultSet rs = stmt.executeQuery(
+                    "SELECT FLOOR(EVENT_TIME/86400000) AS DAY, COUNT(*) AS COUNT FROM LOG_RECORDS GROUP BY DAY")) {
                 while (rs.next()) {
                     long day = rs.getLong("DAY");
                     long cnt = rs.getLong("COUNT");
@@ -341,8 +344,8 @@ public class LogfileLoader extends Thread {
                     try (ResultSet rs = stmt.executeQuery(sql)) {
                         goAgain = false;
                         while (rs.next()) {
-                            long n = rs.getLong("RECORD_ID");
-                            nbs.set(n);
+                            long recordId = rs.getLong("RECORD_ID");
+                            nbs.set(recordId);
                             goAgain = true;
                         }
                     }
@@ -355,8 +358,8 @@ public class LogfileLoader extends Thread {
             RLEBitSet idset = new RLEBitSet();
             idset.set(setStart, setStart + SET_SIZE);
             tbs.and(idset);
-            long t = tbs.length();
-            nextId = (t == 0) ? setStart : (t - 1);
+            long bitLength = tbs.length();
+            nextId = (bitLength == 0) ? setStart : (bitLength - 1);
             if (nextId >= setStart + SET_SIZE) {
                 // Handle wraparound, when the IDs reach the end of our "range"
                 Long[] last = null;
@@ -366,8 +369,8 @@ public class LogfileLoader extends Thread {
                 }
                 if (last != null) {
                     tbs.clear(last[0], last[1] + 1);
-                    t = tbs.length();
-                    nextId = (t == 0) ? setStart : (t - 1);
+                    bitLength = tbs.length();
+                    nextId = (bitLength == 0) ? setStart : (bitLength - 1);
                 }
             }
             logger.debug(String.format("LogfileLoader.initializeNextid, next ID is %d (%x)", nextId, nextId));
@@ -379,16 +382,16 @@ public class LogfileLoader extends Thread {
     }
 
     @SuppressWarnings("resource")
-    int[] process(File f) {
+    int[] process(File file) {
         int ok = 0;
         int total = 0;
         try {
             Connection conn = db.getConnection();
             PreparedStatement ps = conn.prepareStatement(INSERT_SQL);
-            Reader r = f.getPath().endsWith(".gz")
-                ? new InputStreamReader(new GZIPInputStream(new FileInputStream(f)))
-                : new FileReader(f);
-            try (LineNumberReader in = new LineNumberReader(r)) {
+            Reader reader = file.getPath().endsWith(".gz")
+                ? new InputStreamReader(new GZIPInputStream(new FileInputStream(file)))
+                : new FileReader(file);
+            try (LineNumberReader in = new LineNumberReader(reader)) {
                 String line;
                 while ((line = in.readLine()) != null) {
                     try {
@@ -428,7 +431,7 @@ public class LogfileLoader extends Thread {
             ps.close();
             db.release(conn);
         } catch (SQLException | IOException e) {
-            logger.warn("PROV8007 Exception reading " + f + ": " + e);
+            logger.warn("PROV8007 Exception reading " + file + ": " + e);
         }
         return new int[]{ok, total};
     }
@@ -456,11 +459,12 @@ public class LogfileLoader extends Thread {
             }
             if ("EXP".equals(rtype) && pp.length == 11) {
                 // Fields are: date|EXP|pubid|feedid|subid|requrl|method|ctype|clen|reason|attempts
-                ExpiryRecord e = new ExpiryRecord(pp);
-                if ("other".equals(e.getReason())) {
-                    logger.info("Invalid reason '" + pp[9] + "' changed to 'other' for record: " + e.getPublishId());
+                ExpiryRecord expiryRecord = new ExpiryRecord(pp);
+                if ("other".equals(expiryRecord.getReason())) {
+                    logger.info("Invalid reason '" + pp[9] + "' changed to 'other' for record: "
+                                        + expiryRecord.getPublishId());
                 }
-                return new Loadable[]{e};
+                return new Loadable[]{expiryRecord};
             }
             if ("PBF".equals(rtype) && pp.length == 12) {
                 // Fields are: date|PBF|pubid|feedid|requrl|method|ctype|clen-expected|clen-received|srcip|user|error
@@ -471,7 +475,8 @@ public class LogfileLoader extends Thread {
                 return new Loadable[]{new DeliveryExtraRecord(pp)};
             }
             if ("LOG".equals(rtype) && (pp.length == 19 || pp.length == 20)) {
-                // Fields are: date|LOG|pubid|feedid|requrl|method|ctype|clen|type|feedFileid|remoteAddr|user|status|subid|fileid|result|attempts|reason|record_id
+                // Fields are: date|LOG|pubid|feedid|requrl|method|ctype|clen|type|
+                // feedFileid|remoteAddr|user|status|subid|fileid|result|attempts|reason|record_id
                 return new Loadable[]{new LogRecord(pp)};
             }
         }
@@ -482,9 +487,9 @@ public class LogfileLoader extends Thread {
     /**
      * The LogfileLoader can be run stand-alone by invoking the main() method of this class.
      *
-     * @param a ignored
+     * @param str ignored
      */
-    public static void main(String[] a) throws InterruptedException {
+    public static void main(String[] str) throws InterruptedException {
         LogfileLoader.getLoader();
         Thread.sleep(200000L);
     }

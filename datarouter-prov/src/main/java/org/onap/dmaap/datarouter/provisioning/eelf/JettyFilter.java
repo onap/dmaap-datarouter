@@ -20,6 +20,7 @@
  * * ECOMP is a trademark and service mark of AT&T Intellectual Property.
  * *
  ******************************************************************************/
+
 package org.onap.dmaap.datarouter.provisioning.eelf;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -27,6 +28,7 @@ import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.FilterReply;
 
 public class JettyFilter extends Filter<ILoggingEvent> {
+
     @Override
     public FilterReply decide(ILoggingEvent event) {
         if (event.getLoggerName().contains("org.eclipse.jetty")) {

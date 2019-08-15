@@ -48,18 +48,21 @@ public class PurgeLogDirTask extends TimerTask {
     private final long interval;
     private EELFLogger utilsLogger;
 
+    /**
+     * PurgeLogDirTask constructor.
+     */
     public PurgeLogDirTask() {
-        Properties p = (new DB()).getProperties();
-        logdir = p.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
-        String s = p.getProperty("org.onap.dmaap.datarouter.provserver.logretention", "30");
+        Properties prop = (new DB()).getProperties();
+        logdir = prop.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
+        String str = prop.getProperty("org.onap.dmaap.datarouter.provserver.logretention", "30");
         this.utilsLogger = EELFManager.getInstance().getLogger("UtilsLog");
-        long n = 30;
+        long retention = 30;
         try {
-            n = Long.parseLong(s);
+            retention = Long.parseLong(str);
         } catch (NumberFormatException e) {
             // ignore
         }
-        interval = n * ONEDAY;
+        interval = retention * ONEDAY;
     }
 
     @Override

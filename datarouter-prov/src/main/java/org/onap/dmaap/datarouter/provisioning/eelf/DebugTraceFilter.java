@@ -17,6 +17,7 @@
  * SPDX-License-Identifier: Apache-2.0
  * ============LICENSE_END=========================================================
  */
+
 package org.onap.dmaap.datarouter.provisioning.eelf;
 
 import ch.qos.logback.classic.Level;
@@ -27,7 +28,8 @@ import ch.qos.logback.core.spi.FilterReply;
 public class DebugTraceFilter extends Filter<ILoggingEvent> {
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        if (event.getLoggerName().contains("InternalLog") && (event.getLevel() == Level.DEBUG || event.getLevel() == Level.TRACE) ) {
+        if (event.getLoggerName().contains("InternalLog") && (event.getLevel() == Level.DEBUG
+             || event.getLevel() == Level.TRACE) ) {
             return FilterReply.ACCEPT;
         } else {
             return FilterReply.DENY;

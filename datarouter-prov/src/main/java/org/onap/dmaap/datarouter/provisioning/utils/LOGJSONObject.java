@@ -57,22 +57,22 @@ import org.json.JSONTokener;
  * returns a value if one can be found, and throws an exception if one cannot be
  * found. An <code>opt</code> method returns a default value instead of throwing
  * an exception, and so is useful for obtaining optional values.
- * <p>
- * The generic <code>get()</code> and <code>opt()</code> methods return an
+ *
+ * <p>The generic <code>get()</code> and <code>opt()</code> methods return an
  * object, which you can cast or query for type. There are also typed
  * <code>get</code> and <code>opt</code> methods that do type checking and type
  * coercion for you. The opt methods differ from the get methods in that they do
  * not throw. Instead, they return a specified value, such as null.
- * <p>
- * The <code>put</code> methods add or replace values in an object. For example,
+ *
+ * <p>The <code>put</code> methods add or replace values in an object. For example,
  *
  * <pre>
  * myString = new JSONObject().put(&quot;JSON&quot;, &quot;Hello, World!&quot;).toString();
  * </pre>
- * <p>
- * produces the string <code>{"JSON": "Hello, World"}</code>.
- * <p>
- * The texts produced by the <code>toString</code> methods strictly conform to
+ *
+ * <p>* produces the string <code>{"JSON": "Hello, World"}</code>.
+ *
+ * <p>The texts produced by the <code>toString</code> methods strictly conform to
  * the JSON syntax rules. The constructors are more forgiving in the texts they
  * will accept:
  * <ul>
@@ -95,6 +95,7 @@ import org.json.JSONTokener;
  * @author JSON.org
  * @version 2012-12-01
  */
+
 public class LOGJSONObject {
 
     /**
@@ -146,8 +147,8 @@ public class LOGJSONObject {
          * Returns a hash code value for the object. This method is
          * supported for the benefit of hash tables such as those provided by
          * {@link HashMap}.
-         * <p>
-         * The general contract of {@code hashCode} is:
+         *
+         * <p>* The general contract of {@code hashCode} is:
          * <ul>
          * <li>Whenever it is invoked on the same object more than once during
          * an execution of a Java application, the {@code hashCode} method
@@ -165,8 +166,8 @@ public class LOGJSONObject {
          * programmer should be aware that producing distinct integer results
          * for unequal objects may improve the performance of hash tables.
          * </ul>
-         * <p>
-         * As much as is reasonably practical, the hashCode method defined by
+         *
+         * <p>* As much as is reasonably practical, the hashCode method defined by
          * class {@code Object} does return distinct integers for distinct
          * objects. (This is typically implemented by converting the internal
          * address of the object into an integer, but this implementation
@@ -234,56 +235,56 @@ public class LOGJSONObject {
     /**
      * Construct a JSONObject from a JSONTokener.
      *
-     * @param x A JSONTokener object containing the source string.
+     * @param tokener A JSONTokener object containing the source string.
      * @throws JSONException If there is a syntax error in the source string
      *                       or a duplicated key.
      */
-    public LOGJSONObject(JSONTokener x) {
+    public LOGJSONObject(JSONTokener tokener) {
         this();
-        char c;
+        char chr;
         String key;
 
-        if (x.nextClean() != '{') {
-            throw x.syntaxError("A JSONObject text must begin with '{'");
+        if (tokener.nextClean() != '{') {
+            throw tokener.syntaxError("A JSONObject text must begin with '{'");
         }
         for (; ; ) {
-            c = x.nextClean();
-            switch (c) {
+            chr = tokener.nextClean();
+            switch (chr) {
                 case 0:
-                    throw x.syntaxError("A JSONObject text must end with '}'");
+                    throw tokener.syntaxError("A JSONObject text must end with '}'");
                 case '}':
                     return;
                 default:
-                    x.back();
-                    key = x.nextValue().toString();
+                    tokener.back();
+                    key = tokener.nextValue().toString();
             }
 
-// The key is followed by ':'. We will also tolerate '=' or '=>'.
+            // The key is followed by ':'. We will also tolerate '=' or '=>'.
 
-            c = x.nextClean();
-            if (c == '=') {
-                if (x.next() != '>') {
-                    x.back();
+            chr = tokener.nextClean();
+            if (chr == '=') {
+                if (tokener.next() != '>') {
+                    tokener.back();
                 }
-            } else if (c != ':') {
-                throw x.syntaxError("Expected a ':' after a key");
+            } else if (chr != ':') {
+                throw tokener.syntaxError("Expected a ':' after a key");
             }
-            this.putOnce(key, x.nextValue());
+            this.putOnce(key, tokener.nextValue());
 
-// Pairs are separated by ','. We will also tolerate ';'.
+            // Pairs are separated by ','. We will also tolerate ';'.
 
-            switch (x.nextClean()) {
+            switch (tokener.nextClean()) {
                 case ';':
                 case ',':
-                    if (x.nextClean() == '}') {
+                    if (tokener.nextClean() == '}') {
                         return;
                     }
-                    x.back();
+                    tokener.back();
                     break;
                 case '}':
                     return;
                 default:
-                    throw x.syntaxError("Expected a ',' or '}'");
+                    throw tokener.syntaxError("Expected a ',' or '}'");
             }
         }
     }
@@ -293,17 +294,17 @@ public class LOGJSONObject {
      *
      * @param map A map object that can be used to initialize the contents of
      *            the JSONObject.
-     * @throws JSONException
+     * @throws JSONException json exception
      */
     public LOGJSONObject(Map<String, Object> map) {
         this.map = new LinkedHashMap<>();
         if (map != null) {
-            Iterator<Map.Entry<String, Object>> i = map.entrySet().iterator();
-            while (i.hasNext()) {
-                Map.Entry<String, Object> e = i.next();
-                Object value = e.getValue();
+            Iterator<Map.Entry<String, Object>> iterator = map.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, Object> entry = iterator.next();
+                Object value = entry.getValue();
                 if (value != null) {
-                    this.map.put(e.getKey(), wrap(value));
+                    this.map.put(entry.getKey(), wrap(value));
                 }
             }
         }
@@ -316,12 +317,12 @@ public class LOGJSONObject {
      * with <code>"get"</code> or <code>"is"</code> followed by an uppercase letter,
      * the method is invoked, and a key and the value returned from the getter method
      * are put into the new JSONObject.
-     * <p>
-     * The key is formed by removing the <code>"get"</code> or <code>"is"</code> prefix.
+     *
+     * <p>* The key is formed by removing the <code>"get"</code> or <code>"is"</code> prefix.
      * If the second remaining character is not upper case, then the first
      * character is converted to lower case.
-     * <p>
-     * For example, if an object has a method named <code>"getName"</code>, and
+     *
+     * <p>* For example, if an object has a method named <code>"getName"</code>, and
      * if the result of calling <code>object.getName()</code> is <code>"Larry Fine"</code>,
      * then the JSONObject will contain <code>"name": "Larry Fine"</code>.
      *
@@ -339,8 +340,8 @@ public class LOGJSONObject {
      * JSONArray is stored under the key to hold all of the accumulated values.
      * If there is already a JSONArray, then the new value is appended to it.
      * In contrast, the put method replaces the previous value.
-     * <p>
-     * If only one value is accumulated that is not a JSONArray, then the
+     *
+     * <p>* If only one value is accumulated that is not a JSONArray, then the
      * result will be the same as using put. But if multiple values are
      * accumulated, then the result will be like append.
      *
@@ -388,8 +389,8 @@ public class LOGJSONObject {
         } else if (object instanceof JSONArray) {
             this.put(key, ((JSONArray) object).put(value));
         } else {
-            throw new JSONException(JSON_OBJECT_CONST + key +
-                "] is not a JSONArray.");
+            throw new JSONException(JSON_OBJECT_CONST + key
+                + "] is not a JSONArray.");
         }
         return this;
     }
@@ -398,17 +399,17 @@ public class LOGJSONObject {
      * Produce a string from a double. The string "null" will be returned if
      * the number is not finite.
      *
-     * @param d A double.
+     * @param dub A double.
      * @return A String.
      */
-    public static String doubleToString(double d) {
-        if (Double.isInfinite(d) || Double.isNaN(d)) {
+    public static String doubleToString(double dub) {
+        if (Double.isInfinite(dub) || Double.isNaN(dub)) {
             return "null";
         }
 
-// Shave off trailing zeros and decimal point, if possible.
+        // Shave off trailing zeros and decimal point, if possible.
 
-        String string = Double.toString(d);
+        String string = Double.toString(dub);
         if (string.indexOf('.') > 0 && string.indexOf('e') < 0
             && string.indexOf('E') < 0) {
             while (string.endsWith("0")) {
@@ -434,8 +435,8 @@ public class LOGJSONObject {
         }
         Object object = this.opt(key);
         if (object == null) {
-            throw new JSONException(JSON_OBJECT_CONST + quote(key) +
-                "] not found.");
+            throw new JSONException(JSON_OBJECT_CONST + quote(key)
+                + "] not found.");
         }
         return object;
     }
@@ -449,17 +450,17 @@ public class LOGJSONObject {
      */
     public boolean getBoolean(String key) {
         Object object = this.get(key);
-        if (object.equals(Boolean.FALSE) ||
-            (object instanceof String &&
-                "false".equalsIgnoreCase((String) object))) {
+        if (object.equals(Boolean.FALSE)
+            || (object instanceof String
+            && "false".equalsIgnoreCase((String) object))) {
             return false;
-        } else if (object.equals(Boolean.TRUE) ||
-            (object instanceof String &&
-                "true".equalsIgnoreCase((String) object))) {
+        } else if (object.equals(Boolean.TRUE)
+            || (object instanceof String
+                && "true".equalsIgnoreCase((String) object))) {
             return true;
         }
-        throw new JSONException(JSON_OBJECT_CONST + quote(key) +
-            "] is not a Boolean.");
+        throw new JSONException(JSON_OBJECT_CONST + quote(key)
+            + "] is not a Boolean.");
     }
 
     /**
@@ -515,8 +516,8 @@ public class LOGJSONObject {
         if (object instanceof JSONArray) {
             return (JSONArray) object;
         }
-        throw new JSONException(JSON_OBJECT_CONST + quote(key) +
-            "] is not a JSONArray.");
+        throw new JSONException(JSON_OBJECT_CONST + quote(key)
+            + "] is not a JSONArray.");
     }
 
     /**
@@ -532,8 +533,8 @@ public class LOGJSONObject {
         if (object instanceof LOGJSONObject) {
             return (LOGJSONObject) object;
         }
-        throw new JSONException(JSON_OBJECT_CONST + quote(key) +
-            "] is not a JSONObject.");
+        throw new JSONException(JSON_OBJECT_CONST + quote(key)
+            + "] is not a JSONObject.");
     }
 
     /**
@@ -568,10 +569,10 @@ public class LOGJSONObject {
         }
         Iterator<String> iterator = jo.keys();
         String[] names = new String[length];
-        int i = 0;
+        int iter = 0;
         while (iterator.hasNext()) {
-            names[i] = iterator.next();
-            i += 1;
+            names[iter] = iterator.next();
+            iter += 1;
         }
         return names;
     }
@@ -588,8 +589,8 @@ public class LOGJSONObject {
         if (object instanceof String) {
             return (String) object;
         }
-        throw new JSONException(JSON_OBJECT_CONST + quote(key) +
-            "] not a string.");
+        throw new JSONException(JSON_OBJECT_CONST + quote(key)
+            + "] not a string.");
     }
 
     /**
@@ -680,18 +681,17 @@ public class LOGJSONObject {
      * @return A String.
      * @throws JSONException If n is a non-finite number.
      */
-    public static String numberToString(Number number)
-        {
+    public static String numberToString(Number number) {
         if (number == null) {
             throw new JSONException("Null pointer");
         }
         testValidity(number);
 
-// Shave off trailing zeros and decimal point, if possible.
+        // Shave off trailing zeros and decimal point, if possible.
 
         String string = number.toString();
-        if (string.indexOf('.') > 0 && string.indexOf('e') < 0 &&
-            string.indexOf('E') < 0) {
+        if (string.indexOf('.') > 0 && string.indexOf('e') < 0
+            && string.indexOf('E') < 0) {
             while (string.endsWith("0")) {
                 string = string.substring(0, string.length() - 1);
             }
@@ -803,7 +803,7 @@ public class LOGJSONObject {
     private void populateMap(Object bean) {
         Class<?> klass = bean.getClass();
 
-// If klass is a System class then set includeSuperClass to false.
+        // If klass is a System class then set includeSuperClass to false.
 
         boolean includeSuperClass = klass.getClassLoader() != null;
 
@@ -817,8 +817,8 @@ public class LOGJSONObject {
                     String name = method.getName();
                     String key = "";
                     if (name.startsWith("get")) {
-                        if ("getClass".equals(name) ||
-                            "getDeclaringClass".equals(name)) {
+                        if ("getClass".equals(name)
+                            || "getDeclaringClass".equals(name)) {
                             key = "";
                         } else {
                             key = name.substring(3);
@@ -826,14 +826,14 @@ public class LOGJSONObject {
                     } else if (name.startsWith("is")) {
                         key = name.substring(2);
                     }
-                    if (key.length() > 0 &&
-                        Character.isUpperCase(key.charAt(0)) &&
-                        method.getParameterTypes().length == 0) {
+                    if (key.length() > 0
+                        && Character.isUpperCase(key.charAt(0))
+                        && method.getParameterTypes().length == 0) {
                         if (key.length() == 1) {
                             key = key.toLowerCase();
                         } else if (!Character.isUpperCase(key.charAt(1))) {
-                            key = key.substring(0, 1).toLowerCase() +
-                                key.substring(1);
+                            key = key.substring(0, 1).toLowerCase()
+                                + key.substring(1);
                         }
 
                         Object result = method.invoke(bean, (Object[]) null);
@@ -927,9 +927,9 @@ public class LOGJSONObject {
      * value are both non-null, and only if there is not already a member
      * with that name.
      *
-     * @param key
-     * @param value
-     * @return his.
+     * @param key string key
+     * @param value obj value
+     * @return this LOGJSONObject
      * @throws JSONException if the key is a duplicate
      */
     public LOGJSONObject putOnce(String key, Object value) {
@@ -944,8 +944,7 @@ public class LOGJSONObject {
 
     /**
      * Produce a string in double quotes with backslash sequences in all the
-     * right places. A backslash will be inserted within </, producing <\/,
-     * allowing JSON text to be delivered in HTML. In JSON text, a string
+     * right places. In JSON text, a string
      * cannot contain a control character or an unescaped quote or backslash.
      *
      * @param string A String
@@ -963,63 +962,69 @@ public class LOGJSONObject {
         }
     }
 
-    public static Writer quote(String string, Writer w) throws IOException {
+    /**
+     * Writer method.
+     * @param string string
+     * @param writer writer
+     * @return A writer
+     * @throws IOException input/output exception
+     */
+    public static Writer quote(String string, Writer writer) throws IOException {
         if (string == null || string.length() == 0) {
-            w.write("\"\"");
-            return w;
+            writer.write("\"\"");
+            return writer;
         }
 
-        char b;
-        char c = 0;
+        char char1;
+        char char2 = 0;
         String hhhh;
-        int i;
         int len = string.length();
 
-        w.write('"');
-        for (i = 0; i < len; i += 1) {
-            b = c;
-            c = string.charAt(i);
-            switch (c) {
+        writer.write('"');
+        for (int i = 0; i < len; i += 1) {
+            char1 = char2;
+            char2 = string.charAt(i);
+            switch (char2) {
                 case '\\':
                 case '"':
-                    w.write('\\');
-                    w.write(c);
+                    writer.write('\\');
+                    writer.write(char2);
                     break;
                 case '/':
-                    if (b == '<') {
-                        w.write('\\');
+                    if (char1 == '<') {
+                        writer.write('\\');
                     }
-                    w.write(c);
+                    writer.write(char2);
                     break;
                 case '\b':
-                    w.write("\\b");
+                    writer.write("\\b");
                     break;
                 case '\t':
-                    w.write("\\t");
+                    writer.write("\\t");
                     break;
                 case '\n':
-                    w.write("\\n");
+                    writer.write("\\n");
                     break;
                 case '\f':
-                    w.write("\\f");
+                    writer.write("\\f");
                     break;
                 case '\r':
-                    w.write("\\r");
+                    writer.write("\\r");
                     break;
                 default:
-                    if (c < ' ' || (c >= '\u0080' && c < '\u00a0')
-                        || (c >= '\u2000' && c < '\u2100')) {
-                        w.write("\\u");
-                        hhhh = Integer.toHexString(c);
-                        w.write("0000", 0, 4 - hhhh.length());
-                        w.write(hhhh);
+                    if (char2 < ' ' || (char2 >= '\u0080' && char2 < '\u00a0')
+                        || (char2 >= '\u2000' && char2 < '\u2100')) {
+                        writer.write("\\u");
+                        hhhh = Integer.toHexString(char2);
+                        writer.write("0000", 0, 4 - hhhh.length());
+                        writer.write(hhhh);
                     } else {
-                        w.write(c);
+                        writer.write(char2);
                     }
             }
         }
-        w.write('"');
-        return w;
+        writer.write('"');
+        return writer;
     }
 
     /**
@@ -1041,7 +1046,7 @@ public class LOGJSONObject {
      * @return A simple JSON value.
      */
     public static Object stringToValue(String string) {
-        Double d;
+        Double dub;
         if ("".equals(string)) {
             return string;
         }
@@ -1063,14 +1068,14 @@ public class LOGJSONObject {
          * non-JSON forms as long as it accepts all correct JSON forms.
          */
 
-        char b = string.charAt(0);
-        if ((b >= '0' && b <= '9') || b == '.' || b == '-' || b == '+') {
+        char chr = string.charAt(0);
+        if ((chr >= '0' && chr <= '9') || chr == '.' || chr == '-' || chr == '+') {
             try {
                 if (string.indexOf('.') > -1 || string.indexOf('e') > -1
                     || string.indexOf('E') > -1) {
-                    d = Double.valueOf(string);
-                    if (!d.isInfinite() && !d.isNaN()) {
-                        return d;
+                    dub = Double.valueOf(string);
+                    if (!dub.isInfinite() && !dub.isNaN()) {
+                        return dub;
                     }
                 } else {
                     Long myLong = new Long(string);
@@ -1090,17 +1095,17 @@ public class LOGJSONObject {
     /**
      * Throw an exception if the object is a NaN or infinite number.
      *
-     * @param o The object to test.
+     * @param obj The object to test.
      * @throws JSONException If o is a non-finite number.
      */
-    public static void testValidity(Object o) {
-        if (o != null) {
-            if (o instanceof Double) {
-                if (((Double) o).isInfinite() || ((Double) o).isNaN()) {
+    public static void testValidity(Object obj) {
+        if (obj != null) {
+            if (obj instanceof Double) {
+                if (((Double) obj).isInfinite() || ((Double) obj).isNaN()) {
                     throw new JSONException(
                         "JSON does not allow non-finite numbers.");
                 }
-            } else if (o instanceof Float && (((Float) o).isInfinite() || ((Float) o).isNaN())) {
+            } else if (obj instanceof Float && (((Float) obj).isInfinite() || ((Float) obj).isNaN())) {
                 throw new JSONException(
                     "JSON does not allow non-finite numbers.");
             }
@@ -1131,8 +1136,8 @@ public class LOGJSONObject {
      * Make a JSON text of this JSONObject. For compactness, no whitespace
      * is added. If this would not result in a syntactically correct JSON text,
      * then null will be returned instead.
-     * <p>
-     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * <p>* Warning: This method assumes that the data structure is acyclical.
      *
      * @return a printable, displayable, portable, transmittable
      * representation of the object, beginning
@@ -1150,8 +1155,8 @@ public class LOGJSONObject {
 
     /**
      * Make a prettyprinted JSON text of this JSONObject.
-     * <p>
-     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * <p>* Warning: This method assumes that the data structure is acyclical.
      *
      * @param indentFactor The number of spaces to add to each level of
      *                     indentation.
@@ -1162,9 +1167,9 @@ public class LOGJSONObject {
      * @throws JSONException If the object contains an invalid number.
      */
     public String toString(int indentFactor) {
-        StringWriter w = new StringWriter();
-        synchronized (w.getBuffer()) {
-            return this.write(w, indentFactor, 0).toString();
+        StringWriter writer = new StringWriter();
+        synchronized (writer.getBuffer()) {
+            return this.write(writer, indentFactor, 0).toString();
         }
     }
 
@@ -1180,8 +1185,7 @@ public class LOGJSONObject {
      * from it and its toJSONString method will be called. Otherwise, the
      * value's toString method will be called, and the result will be quoted.
      *
-     * <p>
-     * Warning: This method assumes that the data structure is acyclical.
+     * <p>* Warning: This method assumes that the data structure is acyclical.
      *
      * @param value The value to be serialized.
      * @return a printable, displayable, transmittable
@@ -1244,13 +1248,13 @@ public class LOGJSONObject {
             if (object == null) {
                 return NULL;
             }
-            if (object instanceof LOGJSONObject || object instanceof JSONArray ||
-                NULL.equals(object) || object instanceof JSONString ||
-                object instanceof Byte || object instanceof Character ||
-                object instanceof Short || object instanceof Integer ||
-                object instanceof Long || object instanceof Boolean ||
-                object instanceof Float || object instanceof Double ||
-                object instanceof String) {
+            if (object instanceof LOGJSONObject || object instanceof JSONArray
+                || NULL.equals(object) || object instanceof JSONString
+                || object instanceof Byte || object instanceof Character
+                || object instanceof Short || object instanceof Integer
+                || object instanceof Long || object instanceof Boolean
+                || object instanceof Float || object instanceof Double
+                || object instanceof String) {
                 return object;
             }
 
@@ -1268,9 +1272,9 @@ public class LOGJSONObject {
                 ? objectPackage.getName()
                 : "";
             if (
-                objectPackageName.startsWith("java.") ||
-                    objectPackageName.startsWith("javax.") ||
-                    object.getClass().getClassLoader() == null
+                objectPackageName.startsWith("java.")
+                    || objectPackageName.startsWith("javax.")
+                    || object.getClass().getClassLoader() == null
             ) {
                 return object.toString();
             }
@@ -1300,13 +1304,13 @@ public class LOGJSONObject {
         } else if (value instanceof Boolean) {
             writer.write(value.toString());
         } else if (value instanceof JSONString) {
-            Object o;
+            Object obj;
             try {
-                o = ((JSONString) value).toJSONString();
+                obj = ((JSONString) value).toJSONString();
             } catch (Exception e) {
                 throw new JSONException(e);
             }
-            writer.write(o != null ? o.toString() : quote(value.toString()));
+            writer.write(obj != null ? obj.toString() : quote(value.toString()));
         } else {
             quote(value.toString(), writer);
         }
@@ -1322,14 +1326,13 @@ public class LOGJSONObject {
     /**
      * Write the contents of the JSONObject as JSON text to a writer. For
      * compactness, no whitespace is added.
-     * <p>
-     * Warning: This method assumes that the data structure is acyclical.
+     *
+     * <p>* Warning: This method assumes that the data structure is acyclical.
      *
      * @return The writer.
-     * @throws JSONException
+     * @throws JSONException JSON exception
      */
-    Writer write(Writer writer, int indentFactor, int indent)
-        {
+    Writer write(Writer writer, int indentFactor, int indent) {
         try {
             boolean commanate = false;
             final int length = this.length();
@@ -1347,7 +1350,6 @@ public class LOGJSONObject {
             } else if (length != 0) {
                 final int newindent = indent + indentFactor;
                 while (keys.hasNext()) {
-                    Object key = keys.next();
                     if (commanate) {
                         writer.write(',');
                     }
@@ -1355,6 +1357,7 @@ public class LOGJSONObject {
                         writer.write('\n');
                     }
                     indent(writer, newindent);
+                    Object key = keys.next();
                     writer.write(quote(key.toString()));
                     writer.write(':');
                     if (indentFactor > 0) {

@@ -70,23 +70,30 @@ public class RLEBitSet {
             return start + nbits - 1;
         }
 
+
         public boolean intersects(RLE b2) {
-            if (b2.lastBit() < this.firstBit())
+            if (b2.lastBit() < this.firstBit()) {
                 return false;
-            if (b2.firstBit() > this.lastBit())
+            }
+            if (b2.firstBit() > this.lastBit()) {
                 return false;
+            }
             return true;
         }
 
         public boolean isSubset(RLE b2) {
-            if (firstBit() < b2.firstBit())
+            if (firstBit() < b2.firstBit()) {
                 return false;
-            if (firstBit() > b2.lastBit())
+            }
+            if (firstBit() > b2.lastBit()) {
                 return false;
-            if (lastBit() < b2.firstBit())
+            }
+            if (lastBit() < b2.firstBit()) {
                 return false;
-            if (lastBit() > b2.lastBit())
+            }
+            if (lastBit() > b2.lastBit()) {
                 return false;
+            }
             return true;
         }
 
@@ -97,8 +104,9 @@ public class RLEBitSet {
                 b2 = this;
             }
             long end = b1.lastBit();
-            if (b2.lastBit() > b1.lastBit())
+            if (b2.lastBit() > b1.lastBit()) {
                 end = b2.lastBit();
+            }
             return new RLE(b1.firstBit(), end - b1.firstBit() + 1);
         }
 
@@ -112,17 +120,18 @@ public class RLEBitSet {
         }
 
         @Override
-        public int compareTo(RLE o) {
-            if (this.equals(o))
+        public int compareTo(RLE rle) {
+            if (this.equals(rle)) {
                 return 0;
-            return (start < o.start) ? -1 : 1;
+            }
+            return (start < rle.start) ? -1 : 1;
         }
 
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof RLE) {
-                RLE b = (RLE) obj;
-                return (start == b.start) && (nbits == b.nbits);
+                RLE rle = (RLE) obj;
+                return (start == rle.start) && (nbits == rle.nbits);
             }
             return false;
         }
@@ -150,11 +159,11 @@ public class RLEBitSet {
     /**
      * Creates a new bit set, with bits set according to the value of <code>s</code>.
      *
-     * @param s the initialization String
+     * @param str the initialization String
      */
-    public RLEBitSet(String s) {
+    public RLEBitSet(String str) {
         bitsets = new TreeSet<>();
-        set(s);
+        set(str);
     }
 
     /**
@@ -164,8 +173,9 @@ public class RLEBitSet {
      * @return the logical size of this {@code RLEBitSet}
      */
     public long length() {
-        if (isEmpty())
+        if (isEmpty()) {
             return 0;
+        }
         return bitsets.last().lastBit() + 1;
     }
 
@@ -179,8 +189,9 @@ public class RLEBitSet {
     public boolean get(long bit) {
         synchronized (bitsets) {
             for (RLE bs : bitsets) {
-                if (bit >= bs.firstBit() && bit <= bs.lastBit())
+                if (bit >= bs.firstBit() && bit <= bs.lastBit()) {
                     return true;
+                }
             }
         }
         return false;
@@ -189,24 +200,25 @@ public class RLEBitSet {
     /**
      * Set one or more bits to true, based on the value of <code>s</code>.
      *
-     * @param s the initialization String, which consists of a comma or space separated list of
+     * @param str the initialization String, which consists of a comma or space separated list of
      *          non-negative numbers and ranges.  An individual number represents the bit index to set.
      *          A range (two numbers separated by a dash) causes all bit indexes between the two numbers
      *          (inclusive) to be set.
      * @throws NumberFormatException     - if a number is incorrectly formatted
      * @throws IndexOutOfBoundsException - if an index is negative
      */
-    public void set(String s) {
-        s = s.trim();
-        if (!s.isEmpty()) {
-            for (String s2 : s.split("[, \n]+")) {
+    public void set(String str) {
+        str = str.trim();
+        if (!str.isEmpty()) {
+            for (String s2 : str.split("[, \n]+")) {
                 if (s2.indexOf('-') >= 0) {
                     String[] pp = s2.split("-");
-                    long f = Long.parseLong(pp[0]);
-                    long t = Long.parseLong(pp[1]);
-                    set(f, t + 1);
-                } else
+                    long l1 = Long.parseLong(pp[0]);
+                    long l2 = Long.parseLong(pp[1]);
+                    set(l1, l2 + 1);
+                } else {
                     set(Long.parseLong(s2));
+                }
             }
         }
     }
@@ -286,11 +298,13 @@ public class RLEBitSet {
                 if (bs.intersects(newbits)) {
                     // preserve the bits that are not being cleared
                     long len = newbits.firstBit() - bs.firstBit();
-                    if (len > 0)
+                    if (len > 0) {
                         newranges.add(new RLE(bs.firstBit(), len));
+                    }
                     len = bs.lastBit() - newbits.lastBit();
-                    if (len > 0)
+                    if (len > 0) {
                         newranges.add(new RLE(newbits.lastBit() + 1, len));
+                    }
                     bs.nbits = 0;
                 }
             }
@@ -328,12 +342,15 @@ public class RLEBitSet {
      * Checks that fromIndex ... toIndex is a valid range of bit indices.
      */
     private static void checkRange(long from, long to) {
-        if (from < 0)
+        if (from < 0) {
             throw new IndexOutOfBoundsException("fromIndex < 0: " + from);
-        if (to < 0)
+        }
+        if (to < 0) {
             throw new IndexOutOfBoundsException("toIndex < 0: " + to);
-        if (from > to)
+        }
+        if (from > to) {
             throw new IndexOutOfBoundsException("fromIndex: " + from + " > toIndex: " + to);
+        }
     }
 
     /**
@@ -385,13 +402,13 @@ public class RLEBitSet {
      * @return the number of bits set to {@code true} in this {@code RLEBitSet}.
      */
     public int cardinality() {
-        int n = 0;
+        int trueCount = 0;
         synchronized (bitsets) {
             for (RLE bs : bitsets) {
-                n += bs.cardinality();
+                trueCount += bs.cardinality();
             }
         }
-        return n;
+        return trueCount;
     }
 
     /**
@@ -427,11 +444,12 @@ public class RLEBitSet {
             for (RLE bs : bitsets) {
                 sb.append(prefix);
                 prefix = ",";
-                long s = bs.firstBit();
-                long e = bs.lastBit();
-                sb.append(s);
-                if (s != e)
-                    sb.append('-').append(e);
+                long bit1 = bs.firstBit();
+                long bit2 = bs.lastBit();
+                sb.append(bit1);
+                if (bit1 != bit2) {
+                    sb.append('-').append(bit2);
+                }
             }
         }
         return sb.toString();
@@ -445,16 +463,16 @@ public class RLEBitSet {
      */
     public Iterator<Long[]> getRangeIterator() {
         return new Iterator<Long[]>() {
-            private Iterator<RLE> i = bitsets.iterator();
+            private Iterator<RLE> iterator = bitsets.iterator();
 
             @Override
             public boolean hasNext() {
-                return i.hasNext();
+                return iterator.hasNext();
             }
 
             @Override
             public Long[] next() {
-                RLE bs = i.next();
+                RLE bs = iterator.next();
                 return new Long[]{bs.firstBit(), bs.lastBit()};
             }
 
