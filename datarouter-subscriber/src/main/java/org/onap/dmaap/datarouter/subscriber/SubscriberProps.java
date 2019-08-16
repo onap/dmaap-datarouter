@@ -34,14 +34,19 @@ public class SubscriberProps {
     private static Logger subLogger = Logger.getLogger("org.onap.dmaap.datarouter.subscriber.internal");
     private Properties properties;
 
-    private SubscriberProps(String propsPath) throws IOException{
+    private SubscriberProps(String propsPath) throws IOException {
         properties = new Properties();
         properties.load(getClass().getClassLoader().getResourceAsStream(propsPath));
 
     }
 
+    /**
+     * Get instance of subscriber properties.
+     * @param propsPath path to properties file
+     * @return SubscriberProps object
+     */
     public static SubscriberProps getInstance(String propsPath) {
-        if(instance == null) {
+        if (instance == null) {
             try {
                 instance = new SubscriberProps(propsPath);
             } catch (IOException ioe) {

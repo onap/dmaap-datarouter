@@ -53,7 +53,6 @@ import org.jetbrains.annotations.Nullable;
  * delivery fails while the delay was active, it will not change the delay
  * or change the duration of any subsequent delay.
  * If, however, it succeeds, it will cancel the delay.
- *
  * The queue maintains 3 collections of files to deliver: A todoList of
  * files that will be attempted, a working set of files that are being
  * attempted, and a retry set of files that were attempted and failed.

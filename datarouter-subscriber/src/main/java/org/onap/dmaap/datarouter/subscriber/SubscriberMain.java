@@ -23,19 +23,30 @@
 
 package org.onap.dmaap.datarouter.subscriber;
 
+import java.util.Arrays;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpVersion;
-import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
-import java.util.Arrays;
 
 public class SubscriberMain {
 
     private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.subscriber.SubscriberMain");
 
+    /**
+     * Main class for Subscriber.
+     * @param args standard args array
+     * @throws Exception generic exception
+     */
     public static void main(String[] args) throws Exception {
         SubscriberProps props = SubscriberProps.getInstance(
                 System.getProperty("org.onap.dmaap.datarouter.subscriber.properties", "subscriber.properties"));
@@ -69,7 +80,8 @@ public class SubscriberMain {
 
             /*Skip SSLv3 Fixes*/
             sslContextFactory.addExcludeProtocols("SSLv3");
-            logger.info("Excluded protocols for SubscriberMain:" + Arrays.toString(sslContextFactory.getExcludeProtocols()));
+            logger.info("Excluded protocols for SubscriberMain:"
+                                + Arrays.toString(sslContextFactory.getExcludeProtocols()));
             /*End of SSLv3 Fixes*/
 
             // HTTPS Configuration
@@ -89,10 +101,10 @@ public class SubscriberMain {
         try {
             server.start();
         } catch ( Exception e ) {
-            logger.info("Jetty failed to start. Reporting will be unavailable-"+e);
+            logger.info("Jetty failed to start. Reporting will be unavailable-" + e);
         }
         server.join();
-        logger.info("org.onap.dmaap.datarouter.subscriber.SubscriberMain started-"+ server.getState());
+        logger.info("org.onap.dmaap.datarouter.subscriber.SubscriberMain started-" + server.getState());
 
     }
 }

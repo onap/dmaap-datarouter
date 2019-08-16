@@ -403,7 +403,7 @@ public class FeedServlet extends ProxyServlet {
                 }
 
 
-                /**Change Owner ship of Feed //Adding for group feature:Rally US708115*/
+                /**Change Owner ship of Feed //Adding for group feature. :Rally US708115*/
                 if (jo.has("changeowner") && subjectgroup != null) {
                     try {
                         Boolean changeowner = (Boolean) jo.get("changeowner");
@@ -415,7 +415,7 @@ public class FeedServlet extends ProxyServlet {
                         eventlogger.error("PROV0103 FeedServlet.doPut: " + je.getMessage(), je);
                     }
                 }
-                /***End of change ownership*/
+                /***End of change ownership.*/
 
                 provisioningDataChanged();
             } else {

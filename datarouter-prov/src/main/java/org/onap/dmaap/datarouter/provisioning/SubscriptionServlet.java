@@ -387,7 +387,7 @@ public class SubscriptionServlet extends ProxyServlet {
                     eventlogger.error("PROV0192 SubscriptionServlet.doPut: " + ioe.getMessage(), ioe);
                 }
 
-                /**Change Owner ship of Subscriber     Adding for group feature:Rally US708115*/
+                /**Change Owner ship of Subscriber.     Adding for group feature:Rally US708115*/
                 if (jo.has("changeowner") && subjectgroup != null) {
                     try {
                         Boolean changeowner = (Boolean) jo.get("changeowner");
@@ -399,7 +399,7 @@ public class SubscriptionServlet extends ProxyServlet {
                         eventlogger.error("PROV0193 SubscriptionServlet.doPut: " + je.getMessage(), je);
                     }
                 }
-                /***End of change ownership*/
+                /***End of change ownership.*/
 
                 provisioningDataChanged();
             } else {
