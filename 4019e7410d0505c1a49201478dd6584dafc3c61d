@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "458a0bc2_08ed605f",
+        "filename": "pom.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-08-22T10:20:04Z",
+      "side": 1,
+      "message": "may be env specific but this fails when I try build.",
+      "range": {
+        "startLine": 305,
+        "startChar": 44,
+        "endLine": 305,
+        "endChar": 74
+      },
+      "revId": "4019e7410d0505c1a49201478dd6584dafc3c61d",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
