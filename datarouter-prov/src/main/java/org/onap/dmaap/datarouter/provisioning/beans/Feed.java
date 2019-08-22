@@ -57,8 +57,13 @@ import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 public class Feed extends Syncable {
 
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
-    private static int next_feedid = getMaxFeedID() + 1;
+    private static int nextFeedID = getMaxFeedID() + 1;
     private static final String SQLEXCEPTION = "SQLException: ";
+    private static final String FEEDID = "FEEDID";
+    private static final String feedIDStr = "feedid";
+    private static final String deletedStr = "deleted";
+    private static final String lastModStr = "last_mod";
+    private static final String createdDateStr ="created_date";
 
     private int feedid;
     private int groupid; //New field is added - Groups feature Rally:US708115 - 1610
@@ -74,6 +79,143 @@ public class Feed extends Syncable {
     private Date lastMod;
     private Date createdDate;
     private String aafInstance;
+
+    public Feed() {
+        this("", "", "", "");
+    }
+
+    /**
+     * Feed constructor.
+     * @param name feed name
+     * @param version feed version
+     * @param desc feed description
+     * @param businessDescription feed business description
+     */
+    public Feed(String name, String version, String desc, String businessDescription) {
+        this.feedid = -1;
+        this.groupid = -1; //New field is added - Groups feature Rally:US708115 - 1610
+        this.name = name;
+        this.version = version;
+        this.description = desc;
+        this.businessDescription = businessDescription; // New field is added - Groups feature Rally:US708102 - 1610
+        this.authorization = new FeedAuthorization();
+        this.publisher = "";
+        this.links = new FeedLinks();
+        this.deleted = false;
+        this.suspended = false;
+        this.lastMod = new Date();
+        this.createdDate = new Date();
+        this.aafInstance = "";
+    }
+
+    /**
+     * Feed Constructor from ResultSet.
+     * @param rs ResultSet
+     * @throws SQLException in case of SQL statement error
+     */
+    public Feed(ResultSet rs) throws SQLException {
+        this.feedid = rs.getInt(FEEDID);
+        //New field is added - Groups feature Rally:US708115 - 1610
+        this.groupid = rs.getInt("GROUPID");
+        this.name = rs.getString("NAME");
+        this.version = rs.getString("VERSION");
+        this.description = rs.getString("DESCRIPTION");
+        // New field is added - Groups feature Rally:US708102 - 1610
+        this.businessDescription = rs.getString("BUSINESS_DESCRIPTION");
+        this.authorization = new FeedAuthorization();
+        this.authorization.setClassification(rs.getString("AUTH_CLASS"));
+        this.publisher = rs.getString("PUBLISHER");
+        this.links = new FeedLinks();
+        this.links.setSelf(rs.getString("SELF_LINK"));
+        this.links.setPublish(rs.getString("PUBLISH_LINK"));
+        this.links.setSubscribe(rs.getString("SUBSCRIBE_LINK"));
+        this.links.setLog(rs.getString("LOG_LINK"));
+        this.deleted = rs.getBoolean("DELETED");
+        this.suspended = rs.getBoolean("SUSPENDED");
+        this.lastMod = rs.getDate("LAST_MOD");
+        this.createdDate = rs.getTimestamp("CREATED_DATE");
+        this.aafInstance = rs.getString("AAF_INSTANCE");
+    }
+
+    /**
+     * Feed constructor from JSONObject.
+     * @param jo JSONObject
+     * @throws InvalidObjectException in case of JSON error
+     */
+    public Feed(JSONObject jo) throws InvalidObjectException {
+        this("", "", "", "");
+        try {
+            // The JSONObject is assumed to contain a vnd.dmaap-dr.feed representation
+            this.feedid = jo.optInt(feedIDStr, -1);
+            this.groupid = jo.optInt("groupid");
+            this.name = jo.getString("name");
+            this.aafInstance = jo.optString("aaf_instance", "legacy");
+            if (!(aafInstance.equalsIgnoreCase("legacy")) && aafInstance.length() > 255) {
+                throw new InvalidObjectException("aaf_instance field is too long");
+            }
+            if (name.length() > 255) {
+                throw new InvalidObjectException("name field is too long");
+            }
+            try {
+                this.version = jo.getString("version");
+            } catch (JSONException e) {
+                intlogger.warn("PROV0023 Feed.Feed: " + e.getMessage(), e);
+                this.version = null;
+            }
+            if (version != null && version.length() > 20) {
+                throw new InvalidObjectException("version field is too long");
+            }
+            this.description = jo.optString("description");
+            this.businessDescription = jo.optString("business_description");
+            if (description.length() > 1000) {
+                throw new InvalidObjectException("technical description field is too long");
+            }
+            if (businessDescription.length() > 1000) {
+                throw new InvalidObjectException("business description field is too long");
+            }
+            this.authorization = new FeedAuthorization();
+            JSONObject jauth = jo.getJSONObject("authorization");
+            this.authorization.setClassification(jauth.getString("classification"));
+            if (this.authorization.getClassification().length() > 32) {
+                throw new InvalidObjectException("classification field is too long");
+            }
+            JSONArray endPointIds = jauth.getJSONArray("endpoint_ids");
+            for (int i = 0; i < endPointIds.length(); i++) {
+                JSONObject id = endPointIds.getJSONObject(i);
+                FeedEndpointID fid = new FeedEndpointID(id.getString("id"), id.getString("password"));
+                if (fid.getId().length() > 60) {
+                    throw new InvalidObjectException("id field is too long (" + fid.getId() + ")");
+                }
+                if (fid.getPassword().length() > 32) {
+                    //Fortify scan fixes - Privacy Violation
+                    throw new InvalidObjectException("password field is too long (" + fid.getPassword() + ")");
+                }
+                this.authorization.getEndpointIDS().add(fid);
+            }
+            if (this.authorization.getEndpointIDS().isEmpty()) {
+                throw new InvalidObjectException("need to specify at least one endpoint_id");
+            }
+            endPointIds = jauth.getJSONArray("endpoint_addrs");
+            for (int i = 0; i < endPointIds.length(); i++) {
+                String addr = endPointIds.getString(i);
+                if (!JSONUtilities.validIPAddrOrSubnet(addr)) {
+                    throw new InvalidObjectException("bad IP addr or subnet mask: " + addr);
+                }
+                this.authorization.getEndpointAddrs().add(addr);
+            }
+
+            this.publisher = jo.optString("publisher", "");
+            this.deleted = jo.optBoolean(deletedStr, false);
+            this.suspended = jo.optBoolean("suspend", false);
+            JSONObject jol = jo.optJSONObject("links");
+            this.links = (jol == null) ? (new FeedLinks()) : (new FeedLinks(jol));
+        } catch (InvalidObjectException e) {
+            throw e;
+        } catch (Exception e) {
+            intlogger.warn("Invalid JSON: " + e.getMessage(), e);
+            throw new InvalidObjectException("Invalid JSON: " + e.getMessage());
+        }
+    }
 
     /**
      * Check if a feed ID is valid.
@@ -196,7 +338,7 @@ public class Feed extends Syncable {
                 String sql = "select * from FEED_ENDPOINT_IDS";
                 try (ResultSet rs = stmt.executeQuery(sql)) {
                     while (rs.next()) {
-                        int id = rs.getInt("FEEDID");
+                        int id = rs.getInt(FEEDID);
                         Feed feed = map.get(id);
                         if (feed != null) {
                             FeedEndpointID epi = new FeedEndpointID(rs);
@@ -209,7 +351,7 @@ public class Feed extends Syncable {
                 sql = "select * from FEED_ENDPOINT_ADDRS";
                 try (ResultSet rs = stmt.executeQuery(sql)) {
                     while (rs.next()) {
-                        int id = rs.getInt("FEEDID");
+                        int id = rs.getInt(FEEDID);
                         Feed feed = map.get(id);
                         if (feed != null) {
                             Collection<String> acoll = feed.getAuthorization().getEndpointAddrs();
@@ -303,142 +445,7 @@ public class Feed extends Syncable {
         return feed;
     }
 
-    public Feed() {
-        this("", "", "", "");
-    }
 
-    /**
-     * Feed constructor.
-     * @param name feed name
-     * @param version feed version
-     * @param desc feed description
-     * @param businessDescription feed business description
-     */
-    public Feed(String name, String version, String desc, String businessDescription) {
-        this.feedid = -1;
-        this.groupid = -1; //New field is added - Groups feature Rally:US708115 - 1610
-        this.name = name;
-        this.version = version;
-        this.description = desc;
-        this.businessDescription = businessDescription; // New field is added - Groups feature Rally:US708102 - 1610
-        this.authorization = new FeedAuthorization();
-        this.publisher = "";
-        this.links = new FeedLinks();
-        this.deleted = false;
-        this.suspended = false;
-        this.lastMod = new Date();
-        this.createdDate = new Date();
-        this.aafInstance = "";
-    }
-
-    /**
-     * Feed Constructor from ResultSet.
-     * @param rs ResultSet
-     * @throws SQLException in case of SQL statement error
-     */
-    public Feed(ResultSet rs) throws SQLException {
-        this.feedid = rs.getInt("FEEDID");
-        //New field is added - Groups feature Rally:US708115 - 1610
-        this.groupid = rs.getInt("GROUPID");
-        this.name = rs.getString("NAME");
-        this.version = rs.getString("VERSION");
-        this.description = rs.getString("DESCRIPTION");
-        // New field is added - Groups feature Rally:US708102 - 1610
-        this.businessDescription = rs.getString("BUSINESS_DESCRIPTION");
-        this.authorization = new FeedAuthorization();
-        this.authorization.setClassification(rs.getString("AUTH_CLASS"));
-        this.publisher = rs.getString("PUBLISHER");
-        this.links = new FeedLinks();
-        this.links.setSelf(rs.getString("SELF_LINK"));
-        this.links.setPublish(rs.getString("PUBLISH_LINK"));
-        this.links.setSubscribe(rs.getString("SUBSCRIBE_LINK"));
-        this.links.setLog(rs.getString("LOG_LINK"));
-        this.deleted = rs.getBoolean("DELETED");
-        this.suspended = rs.getBoolean("SUSPENDED");
-        this.lastMod = rs.getDate("LAST_MOD");
-        this.createdDate = rs.getTimestamp("CREATED_DATE");
-        this.aafInstance = rs.getString("AAF_INSTANCE");
-    }
-
-    /**
-     * Feed constructor from JSONObject.
-     * @param jo JSONObject
-     * @throws InvalidObjectException in case of JSON error
-     */
-    public Feed(JSONObject jo) throws InvalidObjectException {
-        this("", "", "", "");
-        try {
-            // The JSONObject is assumed to contain a vnd.dmaap-dr.feed representation
-            this.feedid = jo.optInt("feedid", -1);
-            this.groupid = jo.optInt("groupid");
-            this.name = jo.getString("name");
-            this.aafInstance = jo.optString("aaf_instance", "legacy");
-            if (!(aafInstance.equalsIgnoreCase("legacy")) && aafInstance.length() > 255) {
-                throw new InvalidObjectException("aaf_instance field is too long");
-            }
-            if (name.length() > 255) {
-                throw new InvalidObjectException("name field is too long");
-            }
-            try {
-                this.version = jo.getString("version");
-            } catch (JSONException e) {
-                intlogger.warn("PROV0023 Feed.Feed: " + e.getMessage(), e);
-                this.version = null;
-            }
-            if (version != null && version.length() > 20) {
-                throw new InvalidObjectException("version field is too long");
-            }
-            this.description = jo.optString("description");
-            this.businessDescription = jo.optString("business_description");
-            if (description.length() > 1000) {
-                throw new InvalidObjectException("technical description field is too long");
-            }
-            if (businessDescription.length() > 1000) {
-                throw new InvalidObjectException("business description field is too long");
-            }
-            this.authorization = new FeedAuthorization();
-            JSONObject jauth = jo.getJSONObject("authorization");
-            this.authorization.setClassification(jauth.getString("classification"));
-            if (this.authorization.getClassification().length() > 32) {
-                throw new InvalidObjectException("classification field is too long");
-            }
-            JSONArray endPointIds = jauth.getJSONArray("endpoint_ids");
-            for (int i = 0; i < endPointIds.length(); i++) {
-                JSONObject id = endPointIds.getJSONObject(i);
-                FeedEndpointID fid = new FeedEndpointID(id.getString("id"), id.getString("password"));
-                if (fid.getId().length() > 60) {
-                    throw new InvalidObjectException("id field is too long (" + fid.getId() + ")");
-                }
-                if (fid.getPassword().length() > 32) {
-                    //Fortify scan fixes - Privacy Violation
-                    throw new InvalidObjectException("password field is too long (" + fid.getPassword() + ")");
-                }
-                this.authorization.getEndpointIDS().add(fid);
-            }
-            if (this.authorization.getEndpointIDS().isEmpty()) {
-                throw new InvalidObjectException("need to specify at least one endpoint_id");
-            }
-            endPointIds = jauth.getJSONArray("endpoint_addrs");
-            for (int i = 0; i < endPointIds.length(); i++) {
-                String addr = endPointIds.getString(i);
-                if (!JSONUtilities.validIPAddrOrSubnet(addr)) {
-                    throw new InvalidObjectException("bad IP addr or subnet mask: " + addr);
-                }
-                this.authorization.getEndpointAddrs().add(addr);
-            }
-
-            this.publisher = jo.optString("publisher", "");
-            this.deleted = jo.optBoolean("deleted", false);
-            this.suspended = jo.optBoolean("suspend", false);
-            JSONObject jol = jo.optJSONObject("links");
-            this.links = (jol == null) ? (new FeedLinks()) : (new FeedLinks(jol));
-        } catch (InvalidObjectException e) {
-            throw e;
-        } catch (Exception e) {
-            intlogger.warn("Invalid JSON: " + e.getMessage(), e);
-            throw new InvalidObjectException("Invalid JSON: " + e.getMessage());
-        }
-    }
 
     public int getFeedid() {
         return feedid;
@@ -463,7 +470,7 @@ public class Feed extends Syncable {
         return aafInstance;
     }
 
-    public void setAaf_instance(String aafInstance) {
+    public void setAafInstance(String aafInstance) {
         this.aafInstance = aafInstance;
     }
 
@@ -501,11 +508,11 @@ public class Feed extends Syncable {
     }
 
     // New field is added - Groups feature Rally:US708102 - 1610
-    public String getBusiness_description() {
+    public String getBusinessDescription() {
         return businessDescription;
     }
 
-    public void setBusiness_description(String businessDescription) {
+    public void setBusinessDescription(String businessDescription) {
         this.businessDescription = businessDescription;
     }
 
@@ -561,7 +568,7 @@ public class Feed extends Syncable {
     @Override
     public JSONObject asJSONObject() {
         JSONObject jo = new JSONObject();
-        jo.put("feedid", feedid);
+        jo.put(feedIDStr, feedid);
         //New field is added - Groups feature Rally:US708115 - 1610
         jo.put("groupid", groupid);
         jo.put("name", name);
@@ -572,10 +579,10 @@ public class Feed extends Syncable {
         jo.put("authorization", authorization.asJSONObject());
         jo.put("publisher", publisher);
         jo.put("links", links.asJSONObject());
-        jo.put("deleted", deleted);
+        jo.put(deletedStr, deleted);
         jo.put("suspend", suspended);
-        jo.put("last_mod", lastMod.getTime());
-        jo.put("created_date", createdDate.getTime());
+        jo.put(lastModStr, lastMod.getTime());
+        jo.put(createdDateStr, createdDate.getTime());
         jo.put("aaf_instance", aafInstance);
         return jo;
     }
@@ -588,10 +595,10 @@ public class Feed extends Syncable {
     public JSONObject asJSONObject(boolean hidepasswords) {
         JSONObject jo = asJSONObject();
         if (hidepasswords) {
-            jo.remove("feedid");    // we no longer hide passwords, however we do hide these
-            jo.remove("deleted");
-            jo.remove("last_mod");
-            jo.remove("created_date");
+            jo.remove(feedIDStr);    // we no longer hide passwords, however we do hide these
+            jo.remove(deletedStr);
+            jo.remove(lastModStr);
+            jo.remove(createdDateStr);
         }
         return jo;
     }
@@ -602,10 +609,10 @@ public class Feed extends Syncable {
      */
     public JSONObject asLimitedJSONObject() {
         JSONObject jo = asJSONObject();
-        jo.remove("deleted");
-        jo.remove("feedid");
-        jo.remove("last_mod");
-        jo.remove("created_date");
+        jo.remove(deletedStr);
+        jo.remove(feedIDStr);
+        jo.remove(lastModStr);
+        jo.remove(createdDateStr);
         return jo;
     }
 
@@ -640,11 +647,11 @@ public class Feed extends Syncable {
         boolean rv = true;
         try {
             if (feedid == -1) {
-                setFeedid(next_feedid++);
+                setFeedid(nextFeedID++);
             }
             // In case we insert a feed from synchronization
-            if (feedid > next_feedid) {
-                next_feedid = feedid + 1;
+            if (feedid > nextFeedID) {
+                nextFeedID = feedid + 1;
             }
 
             // Create FEED_ENDPOINT_IDS rows
@@ -687,7 +694,7 @@ public class Feed extends Syncable {
                 ps2.setString(10, getLinks().getLog());
                 ps2.setBoolean(11, isDeleted());
                 ps2.setBoolean(12, isSuspended());
-                ps2.setString(13, getBusiness_description());
+                ps2.setString(13, getBusinessDescription());
                 ps2.setInt(14, groupid);
                 ps2.setString(15, getAafInstance());
                 ps2.executeUpdate();
@@ -768,7 +775,7 @@ public class Feed extends Syncable {
             ps.setString(2, getAuthorization().getClassification());
             ps.setInt(3, deleted ? 1 : 0);
             ps.setInt(4, suspended ? 1 : 0);
-            ps.setString(5, getBusiness_description());
+            ps.setString(5, getBusinessDescription());
             ps.setInt(6, groupid);
             ps.setInt(7, feedid);
             ps.executeUpdate();
