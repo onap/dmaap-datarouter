@@ -57,6 +57,69 @@ public class LogRecord extends BaseLogRecord {
      * @throws IOException in case of I/O error
      */
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
+    private final String type;
+    private final String feedFileID;
+    private final String remoteAddr;
+    private final String user;
+    private final int status;
+    private final int subID;
+    private final String fileID;
+    private final int result;
+    private final int attempts;
+    private final String reason;
+    private final long recordId;
+    private final long clength2;
+    private final String fileName;
+
+    /**
+     * LogRecord constructor.
+     * @param rs ResultSet from SQL statement
+     * @throws SQLException in case of SQL error
+     */
+    public LogRecord(ResultSet rs) throws SQLException {
+        super(rs);
+        this.type = rs.getString("TYPE");
+        this.feedFileID = rs.getString("FEED_FILEID");
+        this.remoteAddr = rs.getString("REMOTE_ADDR");
+        this.user = rs.getString("USER");
+        this.status = rs.getInt("STATUS");
+
+        this.subID = rs.getInt("DELIVERY_SUBID");
+        this.fileID = rs.getString("DELIVERY_FILEID");
+        this.result = rs.getInt("RESULT");
+
+        this.attempts = rs.getInt("ATTEMPTS");
+        this.reason = rs.getString("REASON");
+
+        this.recordId = rs.getLong("RECORD_ID");
+        this.clength2 = rs.getLong("CONTENT_LENGTH_2");
+        this.fileName = rs.getString("FILENAME");
+    }
+
+    /**
+     * LogRecord Constructor from string array.
+     * @param pp string array of LogRecord attributes
+     * @throws ParseException in case of parse error
+     */
+    public LogRecord(String[] pp) throws ParseException {
+        super(pp);
+        this.type = pp[8];
+        this.feedFileID = pp[9];
+        this.remoteAddr = pp[10];
+        this.user = pp[11];
+        this.status = Integer.parseInt(pp[12]);
+
+        this.subID = Integer.parseInt(pp[13]);
+        this.fileID = pp[14];
+        this.result = Integer.parseInt(pp[15]);
+
+        this.attempts = Integer.parseInt(pp[16]);
+        this.reason = pp[17];
+
+        this.recordId = Long.parseLong(pp[18]);
+        this.clength2 = (pp.length == 21) ? Long.parseLong(pp[19]) : 0;
+        this.fileName = pp[20];
+    }
 
     /**
      * Get Log Records.
@@ -88,70 +151,6 @@ public class LogRecord extends BaseLogRecord {
         }
     }
 
-    private final String type;
-    private final String feedFileid;
-    private final String remoteAddr;
-    private final String user;
-    private final int status;
-    private final int subid;
-    private final String fileid;
-    private final int result;
-    private final int attempts;
-    private final String reason;
-    private final long recordId;
-    private final long clength2;
-    private final String fileName;
-
-    /**
-     * LogRecord constructor.
-     * @param rs ResultSet from SQL statement
-     * @throws SQLException in case of SQL error
-     */
-    public LogRecord(ResultSet rs) throws SQLException {
-        super(rs);
-        this.type = rs.getString("TYPE");
-        this.feedFileid = rs.getString("FEED_FILEID");
-        this.remoteAddr = rs.getString("REMOTE_ADDR");
-        this.user = rs.getString("USER");
-        this.status = rs.getInt("STATUS");
-
-        this.subid = rs.getInt("DELIVERY_SUBID");
-        this.fileid = rs.getString("DELIVERY_FILEID");
-        this.result = rs.getInt("RESULT");
-
-        this.attempts = rs.getInt("ATTEMPTS");
-        this.reason = rs.getString("REASON");
-
-        this.recordId = rs.getLong("RECORD_ID");
-        this.clength2 = rs.getLong("CONTENT_LENGTH_2");
-        this.fileName = rs.getString("FILENAME");
-    }
-
-    /**
-     * LogRecord Constructor from string array.
-     * @param pp string array of LogRecord attributes
-     * @throws ParseException in case of parse error
-     */
-    public LogRecord(String[] pp) throws ParseException {
-        super(pp);
-        this.type = pp[8];
-        this.feedFileid = pp[9];
-        this.remoteAddr = pp[10];
-        this.user = pp[11];
-        this.status = Integer.parseInt(pp[12]);
-
-        this.subid = Integer.parseInt(pp[13]);
-        this.fileid = pp[14];
-        this.result = Integer.parseInt(pp[15]);
-
-        this.attempts = Integer.parseInt(pp[16]);
-        this.reason = pp[17];
-
-        this.recordId = Long.parseLong(pp[18]);
-        this.clength2 = (pp.length == 21) ? Long.parseLong(pp[19]) : 0;
-        this.fileName = pp[20];
-    }
-
     public long getRecordId() {
         return recordId;
     }
@@ -168,12 +167,12 @@ public class LogRecord extends BaseLogRecord {
                         + getContentType() + "|"
                         + getContentLength() + "|"
                         + type + "|"
-                        + feedFileid + "|"
+                        + feedFileID + "|"
                         + remoteAddr + "|"
                         + user + "|"
                         + status + "|"
-                        + subid + "|"
-                        + fileid + "|"
+                        + subID + "|"
+                        + fileID + "|"
                         + result + "|"
                         + attempts + "|"
                         + reason + "|"
@@ -187,7 +186,7 @@ public class LogRecord extends BaseLogRecord {
         ps.setString(1, type);
         super.load(ps);                // loads fields 2-8
         if (type.equals("pub")) {
-            ps.setString(9, feedFileid);
+            ps.setString(9, feedFileID);
             ps.setString(10, remoteAddr);
             ps.setString(11, user);
             ps.setInt(12, status);
@@ -204,8 +203,8 @@ public class LogRecord extends BaseLogRecord {
             ps.setNull(10, Types.VARCHAR);
             ps.setString(11, user);
             ps.setNull(12, Types.INTEGER);
-            ps.setInt(13, subid);
-            ps.setString(14, fileid);
+            ps.setInt(13, subID);
+            ps.setString(14, fileID);
             ps.setInt(15, result);
             ps.setNull(16, Types.INTEGER);
             ps.setNull(17, Types.VARCHAR);
@@ -217,8 +216,8 @@ public class LogRecord extends BaseLogRecord {
             ps.setNull(10, Types.VARCHAR);
             ps.setNull(11, Types.VARCHAR);
             ps.setNull(12, Types.INTEGER);
-            ps.setInt(13, subid);
-            ps.setString(14, fileid);
+            ps.setInt(13, subID);
+            ps.setString(14, fileID);
             ps.setNull(15, Types.INTEGER);
             ps.setInt(16, attempts);
             ps.setString(17, reason);
@@ -226,7 +225,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setNull(19, Types.BIGINT);
             ps.setString(20, fileName);
         } else if (type.equals("pbf")) {
-            ps.setString(9, feedFileid);
+            ps.setString(9, feedFileID);
             ps.setString(10, remoteAddr);
             ps.setString(11, user);
             ps.setNull(12, Types.INTEGER);
@@ -243,7 +242,7 @@ public class LogRecord extends BaseLogRecord {
             ps.setNull(10, Types.VARCHAR);
             ps.setNull(11, Types.VARCHAR);
             ps.setNull(12, Types.INTEGER);
-            ps.setInt(13, subid);
+            ps.setInt(13, subID);
             ps.setNull(14, Types.VARCHAR);
             ps.setNull(15, Types.INTEGER);
             ps.setNull(16, Types.INTEGER);
