@@ -83,6 +83,16 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     private List<DeliveryTask> todoList = new ArrayList<>();
 
     /**
+     * Create a delivery queue for a given destination info.
+     */
+    DeliveryQueue(DeliveryQueueHelper deliveryQueueHelper, DestInfo destinationInfo) {
+        this.deliveryQueueHelper = deliveryQueueHelper;
+        this.destinationInfo = destinationInfo;
+        dir = new File(destinationInfo.getSpool());
+        dir.mkdirs();
+    }
+
+    /**
      * Try to cancel a delivery task.
      *
      * @return The length of the task in bytes or 0 if the task cannot be cancelled.
@@ -225,16 +235,6 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
             return null;
 
         }
-    }
-
-    /**
-     * Create a delivery queue for a given destination info.
-     */
-    DeliveryQueue(DeliveryQueueHelper deliveryQueueHelper, DestInfo destinationInfo) {
-        this.deliveryQueueHelper = deliveryQueueHelper;
-        this.destinationInfo = destinationInfo;
-        dir = new File(destinationInfo.getSpool());
-        dir.mkdirs();
     }
 
     /**

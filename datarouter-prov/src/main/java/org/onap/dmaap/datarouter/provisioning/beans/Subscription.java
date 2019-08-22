@@ -75,6 +75,110 @@ public class Subscription extends Syncable {
     private String aafInstance;
     private boolean decompress;
 
+    public Subscription() {
+        this("", "", "");
+    }
+
+    /**
+     * Subscription constructor.
+     * @param url url string
+     * @param user user string
+     * @param password password string
+     */
+    public Subscription(String url, String user, String password) {
+        this.subid = -1;
+        this.feedid = -1;
+        this.groupid = -1; //New field is added - Groups feature Rally:US708115 - 1610
+        this.delivery = new SubDelivery(url, user, password, false);
+        this.metadataOnly = false;
+        this.followRedirect = false;
+        this.subscriber = "";
+        this.links = new SubLinks();
+        this.suspended = false;
+        this.lastMod = new Date();
+        this.createdDate = new Date();
+        this.privilegedSubscriber = false;
+        this.aafInstance = "";
+        this.decompress = false;
+    }
+
+    /**
+     * Subscription constructor.
+     * @param rs resultset from SQL
+     * @throws SQLException in case of SQL error
+     */
+    public Subscription(ResultSet rs) throws SQLException {
+        this.subid = rs.getInt(SUBID_COL);
+        this.feedid = rs.getInt("FEEDID");
+        this.groupid = rs.getInt("GROUPID"); //New field is added - Groups feature Rally:US708115 - 1610
+        this.delivery = new SubDelivery(rs);
+        this.metadataOnly = rs.getBoolean("METADATA_ONLY");
+        this.followRedirect = rs.getBoolean("FOLLOW_REDIRECTS");
+        this.subscriber = rs.getString("SUBSCRIBER");
+        this.links = new SubLinks(rs.getString("SELF_LINK"), URLUtilities.generateFeedURL(feedid),
+                rs.getString("LOG_LINK"));
+        this.suspended = rs.getBoolean("SUSPENDED");
+        this.lastMod = rs.getDate("LAST_MOD");
+        this.createdDate = rs.getDate("CREATED_DATE");
+        this.privilegedSubscriber = rs.getBoolean("PRIVILEGED_SUBSCRIBER");
+        this.aafInstance = rs.getString("AAF_INSTANCE");
+        this.decompress  = rs.getBoolean("DECOMPRESS");
+    }
+
+    /**
+     * Subscription constructor.
+     * @param jo JSONObject
+     * @throws InvalidObjectException in case of object error
+     */
+    public Subscription(JSONObject jo) throws InvalidObjectException {
+        this("", "", "");
+        try {
+            // The JSONObject is assumed to contain a vnd.dmaap-dr.subscription representation
+            this.subid = jo.optInt(SUBID_KEY, -1);
+            this.feedid = jo.optInt(FEEDID_KEY, -1);
+            this.groupid = jo.optInt(GROUPID_KEY, -1); //New field is added - Groups feature Rally:US708115 - 1610
+            this.aafInstance = jo.optString("aaf_instance", "legacy");
+            if (!(aafInstance.equalsIgnoreCase("legacy")) && aafInstance.length() > 255) {
+                throw new InvalidObjectException("aaf_instance field is too long");
+            }
+            JSONObject jdeli = jo.getJSONObject("delivery");
+            String url = jdeli.getString("url");
+            String user = jdeli.getString("user");
+            final String password = jdeli.getString("password");
+            final boolean use100 = jdeli.getBoolean("use100");
+
+            //Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
+            Properties prop = (new DB()).getProperties();
+            if (!url.startsWith("https://") && isHttpsRelaxationFalseAndHasSyncKey(jo, prop)) {
+                throw new InvalidObjectException("delivery URL is not HTTPS");
+            }
+
+            if (url.length() > 256) {
+                throw new InvalidObjectException("delivery url field is too long");
+            }
+            if (user.length() > 60) {
+                throw new InvalidObjectException("delivery user field is too long");
+            }
+            if (password.length() > 32) {
+                throw new InvalidObjectException("delivery password field is too long");
+            }
+            this.delivery = new SubDelivery(url, user, password, use100);
+            this.metadataOnly = jo.getBoolean("metadataOnly");
+            this.followRedirect = jo.optBoolean("follow_redirect", false);
+            this.suspended = jo.optBoolean("suspend", false);
+            this.privilegedSubscriber = jo.optBoolean("privilegedSubscriber", false);
+            this.decompress = jo.optBoolean("decompress", false);
+            this.subscriber = jo.optString("subscriber", "");
+            JSONObject jol = jo.optJSONObject("links");
+            this.links = (jol == null) ? (new SubLinks()) : (new SubLinks(jol));
+        } catch (InvalidObjectException e) {
+            throw e;
+        } catch (Exception e) {
+            intlogger.warn("Invalid JSON: " + e.getMessage(), e);
+            throw new InvalidObjectException("Invalid JSON: " + e.getMessage());
+        }
+    }
+
     /**
      * Get specific subscription.
      * @param sub subscription object
@@ -215,110 +319,6 @@ public class Subscription extends Syncable {
             intlogger.warn("PROV0008 countActiveSubscriptions: " + e.getMessage(), e);
         }
         return count;
-    }
-
-    public Subscription() {
-        this("", "", "");
-    }
-
-    /**
-     * Subscription constructor.
-     * @param url url string
-     * @param user user string
-     * @param password password string
-     */
-    public Subscription(String url, String user, String password) {
-        this.subid = -1;
-        this.feedid = -1;
-        this.groupid = -1; //New field is added - Groups feature Rally:US708115 - 1610
-        this.delivery = new SubDelivery(url, user, password, false);
-        this.metadataOnly = false;
-        this.followRedirect = false;
-        this.subscriber = "";
-        this.links = new SubLinks();
-        this.suspended = false;
-        this.lastMod = new Date();
-        this.createdDate = new Date();
-        this.privilegedSubscriber = false;
-        this.aafInstance = "";
-        this.decompress = false;
-    }
-
-    /**
-     * Subscription constructor.
-     * @param rs resultset from SQL
-     * @throws SQLException in case of SQL error
-     */
-    public Subscription(ResultSet rs) throws SQLException {
-        this.subid = rs.getInt(SUBID_COL);
-        this.feedid = rs.getInt("FEEDID");
-        this.groupid = rs.getInt("GROUPID"); //New field is added - Groups feature Rally:US708115 - 1610
-        this.delivery = new SubDelivery(rs);
-        this.metadataOnly = rs.getBoolean("METADATA_ONLY");
-        this.followRedirect = rs.getBoolean("FOLLOW_REDIRECTS");
-        this.subscriber = rs.getString("SUBSCRIBER");
-        this.links = new SubLinks(rs.getString("SELF_LINK"), URLUtilities.generateFeedURL(feedid),
-                rs.getString("LOG_LINK"));
-        this.suspended = rs.getBoolean("SUSPENDED");
-        this.lastMod = rs.getDate("LAST_MOD");
-        this.createdDate = rs.getDate("CREATED_DATE");
-        this.privilegedSubscriber = rs.getBoolean("PRIVILEGED_SUBSCRIBER");
-        this.aafInstance = rs.getString("AAF_INSTANCE");
-        this.decompress  = rs.getBoolean("DECOMPRESS");
-    }
-
-    /**
-     * Subscription constructor.
-     * @param jo JSONObject
-     * @throws InvalidObjectException in case of object error
-     */
-    public Subscription(JSONObject jo) throws InvalidObjectException {
-        this("", "", "");
-        try {
-            // The JSONObject is assumed to contain a vnd.dmaap-dr.subscription representation
-            this.subid = jo.optInt(SUBID_KEY, -1);
-            this.feedid = jo.optInt(FEEDID_KEY, -1);
-            this.groupid = jo.optInt(GROUPID_KEY, -1); //New field is added - Groups feature Rally:US708115 - 1610
-            this.aafInstance = jo.optString("aaf_instance", "legacy");
-            if (!(aafInstance.equalsIgnoreCase("legacy")) && aafInstance.length() > 255) {
-                throw new InvalidObjectException("aaf_instance field is too long");
-            }
-            JSONObject jdeli = jo.getJSONObject("delivery");
-            String url = jdeli.getString("url");
-            String user = jdeli.getString("user");
-            final String password = jdeli.getString("password");
-            final boolean use100 = jdeli.getBoolean("use100");
-
-            //Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
-            Properties prop = (new DB()).getProperties();
-            if (!url.startsWith("https://") && isHttpsRelaxationFalseAndHasSyncKey(jo, prop)) {
-                throw new InvalidObjectException("delivery URL is not HTTPS");
-            }
-
-            if (url.length() > 256) {
-                throw new InvalidObjectException("delivery url field is too long");
-            }
-            if (user.length() > 60) {
-                throw new InvalidObjectException("delivery user field is too long");
-            }
-            if (password.length() > 32) {
-                throw new InvalidObjectException("delivery password field is too long");
-            }
-            this.delivery = new SubDelivery(url, user, password, use100);
-            this.metadataOnly = jo.getBoolean("metadataOnly");
-            this.followRedirect = jo.optBoolean("follow_redirect", false);
-            this.suspended = jo.optBoolean("suspend", false);
-            this.privilegedSubscriber = jo.optBoolean("privilegedSubscriber", false);
-            this.decompress = jo.optBoolean("decompress", false);
-            this.subscriber = jo.optString("subscriber", "");
-            JSONObject jol = jo.optJSONObject("links");
-            this.links = (jol == null) ? (new SubLinks()) : (new SubLinks(jol));
-        } catch (InvalidObjectException e) {
-            throw e;
-        } catch (Exception e) {
-            intlogger.warn("Invalid JSON: " + e.getMessage(), e);
-            throw new InvalidObjectException("Invalid JSON: " + e.getMessage());
-        }
     }
 
     private boolean isHttpsRelaxationFalseAndHasSyncKey(JSONObject jo, Properties prop) {

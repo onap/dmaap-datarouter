@@ -104,6 +104,7 @@ public class ThrottleFilter extends TimerTask implements Filter {
 
     private static EELFLogger logger = EELFManager.getInstance().getLogger("InternalLog");
     private static Map<String, Counter> map = new HashMap<>();
+    private Map<String, List<Continuation>> suspendedRequests = new HashMap<>();
     private static final Timer rolex = new Timer();
 
     @Override
@@ -228,8 +229,6 @@ public class ThrottleFilter extends TimerTask implements Filter {
             resume(id);
         }
     }
-
-    private Map<String, List<Continuation>> suspendedRequests = new HashMap<>();
 
     private void register(String id, Continuation continuation) {
         synchronized (suspendedRequests) {

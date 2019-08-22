@@ -161,7 +161,7 @@ public class FeedTest {
         feed.setVersion("v1.0");
         feed.setGroupid(1);
         feed.setDescription("test feed");
-        feed.setBusiness_description("test feed");
+        feed.setBusinessDescription("test feed");
         feed.setSuspended(false);
         feed.setPublisher("publish");
 
@@ -169,7 +169,7 @@ public class FeedTest {
         Assert.assertEquals(feed.getVersion(), "v1.0");
         Assert.assertEquals(feed.getGroupid(), 1);
         Assert.assertEquals(feed.getDescription(), "test feed");
-        Assert.assertEquals(feed.getBusiness_description(), "test feed");
+        Assert.assertEquals(feed.getBusinessDescription(), "test feed");
         Assert.assertEquals(feed.isSuspended(), false);
         Assert.assertEquals(feed.getPublisher(), "publish");
     }
