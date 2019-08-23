@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "acc24cc7_3ae7cc8a",
+        "filename": "datarouter-node/pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5697
+      },
+      "writtenOn": "2019-08-23T15:10:36Z",
+      "side": 1,
+      "message": "BUILD SUCCESS :)",
+      "range": {
+        "startLine": 151,
+        "startChar": 24,
+        "endLine": 151,
+        "endChar": 61
+      },
+      "revId": "7c98cd36702869d4b0c3ed11d874f595c2c8a5dd",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
