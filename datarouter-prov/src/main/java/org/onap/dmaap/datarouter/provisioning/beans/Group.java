@@ -394,27 +394,30 @@ public class Group extends Syncable {
         if (!(obj instanceof Group)) {
             return false;
         }
+
         Group os = (Group) obj;
         if (groupid != os.groupid) {
             return false;
         }
-        if (authid != os.authid) {
+        else if (authid != os.authid) {
             return false;
         }
-        if (!name.equals(os.name)) {
+        else if (!name.equals(os.name)) {
             return false;
         }
-        if (description != os.description) {
+        else if (description != os.description) {
             return false;
         }
-        if (!classification.equals(os.classification)) {
+        else if (!classification.equals(os.classification)) {
             return false;
         }
-        if (!members.equals(os.members)) {
+        else if (!members.equals(os.members)) {
             return false;
+        }
+        else{
+            return true;
         }
 
-        return true;
     }
 
     @Override

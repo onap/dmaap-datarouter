@@ -104,17 +104,19 @@ public class SubLinks implements JSONable {
         if (!(obj instanceof SubLinks)) {
             return false;
         }
+
         SubLinks os = (SubLinks) obj;
         if (!self.equals(os.self)) {
             return false;
         }
-        if (!feed.equals(os.feed)) {
+        else if (!feed.equals(os.feed)) {
             return false;
         }
-        if (!log.equals(os.log)) {
+        else if (!log.equals(os.log)) {
             return false;
+        }else{
+            return true;
         }
-        return true;
     }
 
     @Override

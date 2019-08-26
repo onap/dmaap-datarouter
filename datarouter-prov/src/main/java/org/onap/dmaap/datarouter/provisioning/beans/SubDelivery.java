@@ -114,20 +114,23 @@ public class SubDelivery implements JSONable {
         if (!(obj instanceof SubDelivery)) {
             return false;
         }
+
         SubDelivery os = (SubDelivery) obj;
         if (!url.equals(os.url)) {
             return false;
         }
-        if (!user.equals(os.user)) {
+        else if (!user.equals(os.user)) {
             return false;
         }
-        if (!password.equals(os.password)) {
+        else if (!password.equals(os.password)) {
             return false;
         }
-        if (use100 != os.use100) {
+        else if (use100 != os.use100) {
             return false;
         }
-        return true;
+        else {
+            return true;
+        }
     }
 
     @Override

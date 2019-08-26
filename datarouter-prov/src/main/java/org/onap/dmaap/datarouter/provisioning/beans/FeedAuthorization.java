@@ -98,17 +98,20 @@ public class FeedAuthorization implements JSONable {
         if (!(obj instanceof FeedAuthorization)) {
             return false;
         }
+
         FeedAuthorization of = (FeedAuthorization) obj;
         if (!classification.equals(of.classification)) {
             return false;
         }
-        if (!endpointIds.equals(of.endpointIds)) {
+        else if (!endpointIds.equals(of.endpointIds)) {
             return false;
         }
-        if (!endpointAddrs.equals(of.endpointAddrs)) {
+        else if (!endpointAddrs.equals(of.endpointAddrs)) {
             return false;
         }
-        return true;
+        else{
+            return true;
+        }
     }
 
     @Override

@@ -75,26 +75,28 @@ public class RLEBitSet {
             if (b2.lastBit() < this.firstBit()) {
                 return false;
             }
-            if (b2.firstBit() > this.lastBit()) {
+            else if (b2.firstBit() > this.lastBit()) {
                 return false;
+            }else {
+                return true;
             }
-            return true;
         }
 
         public boolean isSubset(RLE b2) {
             if (firstBit() < b2.firstBit()) {
                 return false;
             }
-            if (firstBit() > b2.lastBit()) {
+            else if (firstBit() > b2.lastBit()) {
                 return false;
             }
-            if (lastBit() < b2.firstBit()) {
+            else if (lastBit() < b2.firstBit()) {
                 return false;
             }
-            if (lastBit() > b2.lastBit()) {
+            else if (lastBit() > b2.lastBit()) {
                 return false;
+            }else {
+                return true;
             }
-            return true;
         }
 
         public RLE union(RLE b2) {

@@ -103,20 +103,23 @@ public class FeedLinks implements JSONable {
         if (!(obj instanceof FeedLinks)) {
             return false;
         }
+
         FeedLinks of = (FeedLinks) obj;
         if (!self.equals(of.self)) {
             return false;
         }
-        if (!publish.equals(of.publish)) {
+        else if (!publish.equals(of.publish)) {
             return false;
         }
-        if (!subscribe.equals(of.subscribe)) {
+        else if (!subscribe.equals(of.subscribe)) {
             return false;
         }
-        if (!log.equals(of.log)) {
+        else if (!log.equals(of.log)) {
             return false;
         }
-        return true;
+        else{
+            return true;
+        }
     }
 
     @Override
