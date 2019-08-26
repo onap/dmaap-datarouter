@@ -22,6 +22,30 @@
       "revId": "f4bde2fbced5677abd6930bed56419da2d5a2b14",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "75d9e2dd_270154f7",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/beans/FeedAuthorization.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-08-26T13:57:44Z",
+      "side": 1,
+      "message": "Can do something like this for all the equals methods:\n\n...\n   }\n        FeedAuthorization of \u003d (FeedAuthorization) obj;\n        return (!classification.equals(of.classification) || !endpointIds.equals(of.endpointIds) \n            || !endpointAddrs.equals(of.endpointAddrs));\n    }\n\nJust be sure to run the unit test suite to verify.",
+      "parentUuid": "f22cf09d_4344ec71",
+      "range": {
+        "startLine": 113,
+        "startChar": 12,
+        "endLine": 113,
+        "endChar": 24
+      },
+      "revId": "f4bde2fbced5677abd6930bed56419da2d5a2b14",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
