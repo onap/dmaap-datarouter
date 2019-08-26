@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e81240ca_46b02c79",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-08-26T10:13:24Z",
+      "side": 1,
+      "message": "Can all be private",
+      "range": {
+        "startLine": 67,
+        "startChar": 4,
+        "endLine": 67,
+        "endChar": 10
+      },
+      "revId": "4f075a720736d3a79b3233e2e991a087fa4b4a9e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d88d8851_8ff22efe",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-08-26T10:13:24Z",
+      "side": 1,
+      "message": "Missing whitespace around the \"\u003d\".\n\nFew other places below aswell",
+      "range": {
+        "startLine": 70,
+        "startChar": 42,
+        "endLine": 70,
+        "endChar": 44
+      },
+      "revId": "4f075a720736d3a79b3233e2e991a087fa4b4a9e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "543d01ef_14eebac2",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-08-26T10:13:24Z",
+      "side": 1,
+      "message": "Lower case \"S\" for all.\n\nUse \"camelCase\" in Java",
+      "range": {
+        "startLine": 75,
+        "startChar": 31,
+        "endLine": 75,
+        "endChar": 32
+      },
+      "revId": "4f075a720736d3a79b3233e2e991a087fa4b4a9e",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
