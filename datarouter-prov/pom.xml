@@ -36,10 +36,7 @@
         <sitePath>/content/sites/site/${project.groupId}/${project.artifactId}/${project.version}</sitePath>
         <docker.location>${basedir}/target/${project.artifactId}</docker.location>
         <datarouter.prov.image.name>${docker.image.root}${project.artifactId}</datarouter.prov.image.name>
-        <sonar.exclusions>**/src/main/java/org/onap/dmaap/datarouter/reports/**,
-            src/main/java/org/onap/dmaap/datarouter/authz/impl/AuthRespSupplementImpl.java,
-            src/main/java/org/onap/dmaap/datarouter/provisioning/Main.java,
-            src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DRRouteCLI.java</sonar.exclusions>
+        <sonar.exclusions>**/src/main/java/org/onap/dmaap/datarouter/reports/**</sonar.exclusions>
         <sonar.language>java</sonar.language>
         <sonar.skip>false</sonar.skip>
     </properties>
@@ -159,7 +156,7 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>2.3.0</version>
+            <version>2.2.5</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -168,8 +165,8 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.4.2.Final</version>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>5.2.9.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>dom4j</groupId>
@@ -438,9 +435,6 @@
                 <configuration>
                     <excludes>
                         <exclude>**/src/main/java/org/onap/dmaap/datarouter/reports/**</exclude>
-                        <exclude>src/main/java/org/onap/dmaap/datarouter/authz/impl/AuthRespSupplementImpl.java</exclude>
-                        <exclude>src/main/java/org/onap/dmaap/datarouter/provisioning/Main.java</exclude>
-                        <exclude>src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DRRouteCLI.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>

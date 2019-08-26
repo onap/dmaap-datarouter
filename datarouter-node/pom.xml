@@ -36,7 +36,6 @@
         <sitePath>/content/sites/site/${project.groupId}/${project.artifactId}/${project.version}</sitePath>
         <docker.location>${basedir}/target/${project.artifactId}</docker.location>
         <datarouter.node.image.name>${docker.image.root}${project.artifactId}</datarouter.node.image.name>
-        <sonar.exclusions>src/main/java/org/onap/dmaap/datarouter/node/NodeMain.java</sonar.exclusions>
         <sonar.language>java</sonar.language>
         <sonar.skip>false</sonar.skip>
     </properties>
@@ -52,10 +51,6 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -134,9 +129,9 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
-            <version>3.1.6</version>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <profiles>
@@ -373,11 +368,6 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>src/main/java/org/onap/dmaap/datarouter/node/NodeMain.java</exclude>
-                    </excludes>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

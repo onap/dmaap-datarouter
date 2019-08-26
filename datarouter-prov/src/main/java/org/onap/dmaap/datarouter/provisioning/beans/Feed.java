@@ -63,7 +63,7 @@ public class Feed extends Syncable {
     private static final String feedIDStr = "feedid";
     private static final String deletedStr = "deleted";
     private static final String lastModStr = "last_mod";
-    private static final String createdDateStr ="created_date";
+    private static final String createdDateStr = "created_date";
 
     private int feedid;
     private int groupid; //New field is added - Groups feature Rally:US708115 - 1610
