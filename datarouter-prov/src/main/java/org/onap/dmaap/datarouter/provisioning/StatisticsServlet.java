@@ -63,6 +63,21 @@ public class StatisticsServlet extends BaseServlet {
     private static final String FMT2 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
     public static final String FEEDID = "FEEDID";
 
+    //sql Strings
+    private static final String sqlSelectName = "SELECT (SELECT NAME FROM FEEDS AS f WHERE f.FEEDID in(";
+    private static final String sqlFeedID = ") and f.FEEDID=e.FEEDID) AS FEEDNAME, e.FEEDID as FEEDID, ";
+    private static final String sqlSelectCount = "(SELECT COUNT(*) FROM LOG_RECORDS AS c WHERE c.FEEDID in(";
+    private static final String sqlTypePub = ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS FILES_PUBLISHED,";
+    private static final String sqlSelectSum = "(SELECT SUM(content_length) FROM LOG_RECORDS AS c WHERE c.FEEDID in(";
+    private static final String sqlPublishLength = ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS PUBLISH_LENGTH, COUNT(e.EVENT_TIME) as FILES_DELIVERED,";
+    private static final String sqlSubscriberUrl = " sum(m.content_length) as DELIVERED_LENGTH,SUBSTRING_INDEX(e.REQURI,'/',+3) as SUBSCRIBER_URL,";
+    private static final String sqlSubId = " e.DELIVERY_SUBID as SUBID, ";
+    private static final String sqlDeliveryTime = " e.EVENT_TIME AS PUBLISH_TIME, m.EVENT_TIME AS DELIVERY_TIME, ";
+    private static final String sqlAverageDelay = " AVG(e.EVENT_TIME - m.EVENT_TIME)/1000 as AverageDelay FROM LOG_RECORDS";
+    private static final String sqlJoinRecords = " e JOIN LOG_RECORDS m ON m.PUBLISH_ID = e.PUBLISH_ID AND e.FEEDID IN (";
+    private static final String sqlStatus204 = " AND m.STATUS=204 AND e.RESULT=204 ";
+    private static final String sqlGroupSubId = " group by SUBID";
+
 
     /**
      * DELETE a logging URL -- not supported.
@@ -313,20 +328,10 @@ public class StatisticsServlet extends BaseServlet {
 
         if (endTime == null && startTime == null) {
 
-            sql = "SELECT (SELECT NAME FROM FEEDS AS f WHERE f.FEEDID in(" + feedids
-                + ") and f.FEEDID=e.FEEDID) AS FEEDNAME, e.FEEDID as FEEDID, "
-                + "(SELECT COUNT(*) FROM LOG_RECORDS AS c WHERE c.FEEDID in("
-                + feedids
-                + ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS FILES_PUBLISHED,(SELECT SUM(content_length)"
-                + " FROM LOG_RECORDS AS c WHERE c.FEEDID in("
-                + feedids
-                + ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS PUBLISH_LENGTH, COUNT(e.EVENT_TIME) as FILES_DELIVERED,"
-                + "sum(m.content_length) as DELIVERED_LENGTH,SUBSTRING_INDEX(e.REQURI,'/',+3) as SUBSCRIBER_URL,"
-                + " e.DELIVERY_SUBID as SUBID, "
-                + "e.EVENT_TIME AS PUBLISH_TIME, m.EVENT_TIME AS DELIVERY_TIME, "
-                + " AVG(e.EVENT_TIME - m.EVENT_TIME)/1000 as AverageDelay FROM LOG_RECORDS"
-                + " e JOIN LOG_RECORDS m ON m.PUBLISH_ID = e.PUBLISH_ID AND e.FEEDID IN ("
-                + feedids + ") " + subid + " AND m.STATUS=204 AND e.RESULT=204  group by SUBID";
+            sql =  sqlSelectName + feedids + sqlFeedID + sqlSelectCount + feedids + sqlTypePub + sqlSelectSum
+                    + feedids + sqlPublishLength
+                + sqlSubscriberUrl + sqlSubId + sqlDeliveryTime + sqlAverageDelay + sqlJoinRecords + feedids + ") " + subid
+                    + sqlStatus204 + sqlGroupSubId;
 
             return sql;
         } else if (startTime != null && endTime == null) {
@@ -336,22 +341,10 @@ public class StatisticsServlet extends BaseServlet {
             long currentTimeInMilli = cal.getTimeInMillis();
             long compareTime = currentTimeInMilli - inputTimeInMilli;
 
-            sql = "SELECT (SELECT NAME FROM FEEDS AS f WHERE f.FEEDID in(" + feedids
-                + ") and f.FEEDID=e.FEEDID) AS FEEDNAME, e.FEEDID as FEEDID, "
-                + "(SELECT COUNT(*) FROM LOG_RECORDS AS c WHERE c.FEEDID in("
-                + feedids
-                + ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS FILES_PUBLISHED,"
-                + "(SELECT SUM(content_length) FROM LOG_RECORDS AS c WHERE c.FEEDID in("
-                + feedids
-                + ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS PUBLISH_LENGTH, COUNT(e.EVENT_TIME) as FILES_DELIVERED,"
-                + "sum(m.content_length) as DELIVERED_LENGTH,SUBSTRING_INDEX(e.REQURI,'/',+3) as SUBSCRIBER_URL,"
-                + " e.DELIVERY_SUBID as SUBID, "
-                + "e.EVENT_TIME AS PUBLISH_TIME, m.EVENT_TIME AS DELIVERY_TIME,  "
-                + "AVG(e.EVENT_TIME - m.EVENT_TIME)/1000 as AverageDelay "
-                + "FROM LOG_RECORDS e JOIN LOG_RECORDS m ON m.PUBLISH_ID = e.PUBLISH_ID AND e.FEEDID IN ("
-                + feedids + ") " + subid + " AND m.STATUS=204 AND e.RESULT=204 and e.event_time>="
-                + compareTime + " group by SUBID";
-
+            sql = sqlSelectName + feedids + sqlFeedID + sqlSelectCount + feedids + sqlTypePub + sqlSelectSum
+                    + feedids + sqlPublishLength
+                + sqlSubscriberUrl + sqlSubId + sqlDeliveryTime + sqlAverageDelay + sqlJoinRecords + feedids + ") " + subid
+                + sqlStatus204 + " and e.event_time>=" + compareTime + sqlGroupSubId;
             return sql;
 
         } else {
@@ -362,23 +355,10 @@ public class StatisticsServlet extends BaseServlet {
             long startInMillis = startDate.getTime();
             long endInMillis = endDate.getTime();
 
-            sql = "SELECT (SELECT NAME FROM FEEDS AS f WHERE f.FEEDID in(" + feedids
-                + ") and f.FEEDID=e.FEEDID) AS FEEDNAME, e.FEEDID as FEEDID, "
-                          + "(SELECT COUNT(*) FROM LOG_RECORDS AS c WHERE c.FEEDID in("
-                + feedids
-                + ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS FILES_PUBLISHED,"
-                          + "(SELECT SUM(content_length) FROM LOG_RECORDS AS c WHERE c.FEEDID in("
-                + feedids
-                + ") and c.FEEDID=e.FEEDID AND c.TYPE='PUB') AS PUBLISH_LENGTH, COUNT(e.EVENT_TIME) as FILES_DELIVERED,"
-                          + "sum(m.content_length) as DELIVERED_LENGTH,"
-                          + "SUBSTRING_INDEX(e.REQURI,'/',+3) as SUBSCRIBER_URL,"
-                          + "e.DELIVERY_SUBID as SUBID, "
-                          + "e.EVENT_TIME AS PUBLISH_TIME, m.EVENT_TIME AS DELIVERY_TIME,  "
-                          + "AVG(e.EVENT_TIME - m.EVENT_TIME)/1000 as AverageDelay FROM LOG_RECORDS"
-                          + " e JOIN LOG_RECORDS m ON m.PUBLISH_ID = e.PUBLISH_ID AND e.FEEDID IN ("
-                + feedids + ")" + subid + " AND m.STATUS=204 AND e.RESULT=204 and e.event_time between " + startInMillis
-                + " and " + endInMillis + " group by SUBID";
-
+            sql = sqlSelectName + feedids + sqlFeedID + sqlSelectCount + feedids + sqlTypePub + sqlSelectSum
+                    + feedids + sqlPublishLength + sqlSubscriberUrl
+                    + sqlSubId + sqlDeliveryTime + sqlAverageDelay + sqlJoinRecords + feedids + ")" + subid + sqlStatus204
+                    +" and e.event_time between " + startInMillis + " and " + endInMillis + sqlGroupSubId;
 
             return sql;
         }
