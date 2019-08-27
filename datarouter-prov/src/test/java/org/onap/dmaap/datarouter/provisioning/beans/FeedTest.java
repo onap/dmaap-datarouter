@@ -68,7 +68,7 @@ public class FeedTest {
     public void setUp() throws Exception {
         db = new DB();
         feed = new Feed("Feed1","v0.1", "First Feed for testing", "First Feed for testing");
-        feed.setFeedid(1);
+        feed.setFeedIdInt(1);
         feed.setGroupid(1);
         feed.setPublisher("pub");
         feed.setDeleted(false);

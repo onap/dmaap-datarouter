@@ -60,12 +60,12 @@ public class Feed extends Syncable {
     private static int nextFeedID = getMaxFeedID() + 1;
     private static final String SQLEXCEPTION = "SQLException: ";
     private static final String FEEDID = "FEEDID";
-    private static final String feedIDStr = "feedid";
-    private static final String deletedStr = "deleted";
-    private static final String lastModStr = "last_mod";
-    private static final String createdDateStr ="created_date";
+    private static final String FEED_ID_STR = "feedid";
+    private static final String DELETED_STR = "deleted";
+    private static final String LAST_MOD_STR = "last_mod";
+    private static final String CREATED_DATE_STR = "created_date";
 
-    private int feedid;
+    private int feedIdInt;
     private int groupid; //New field is added - Groups feature Rally:US708115 - 1610
     private String name;
     private String version;
@@ -92,7 +92,7 @@ public class Feed extends Syncable {
      * @param businessDescription feed business description
      */
     public Feed(String name, String version, String desc, String businessDescription) {
-        this.feedid = -1;
+        this.feedIdInt = -1;
         this.groupid = -1; //New field is added - Groups feature Rally:US708115 - 1610
         this.name = name;
         this.version = version;
@@ -114,7 +114,7 @@ public class Feed extends Syncable {
      * @throws SQLException in case of SQL statement error
      */
     public Feed(ResultSet rs) throws SQLException {
-        this.feedid = rs.getInt(FEEDID);
+        this.feedIdInt = rs.getInt(FEEDID);
         //New field is added - Groups feature Rally:US708115 - 1610
         this.groupid = rs.getInt("GROUPID");
         this.name = rs.getString("NAME");
@@ -146,7 +146,7 @@ public class Feed extends Syncable {
         this("", "", "", "");
         try {
             // The JSONObject is assumed to contain a vnd.dmaap-dr.feed representation
-            this.feedid = jo.optInt(feedIDStr, -1);
+            this.feedIdInt = jo.optInt(FEED_ID_STR, -1);
             this.groupid = jo.optInt("groupid");
             this.name = jo.getString("name");
             this.aafInstance = jo.optString("aaf_instance", "legacy");
@@ -205,7 +205,7 @@ public class Feed extends Syncable {
             }
 
             this.publisher = jo.optString("publisher", "");
-            this.deleted = jo.optBoolean(deletedStr, false);
+            this.deleted = jo.optBoolean(DELETED_STR, false);
             this.suspended = jo.optBoolean("suspend", false);
             JSONObject jol = jo.optJSONObject("links");
             this.links = (jol == null) ? (new FeedLinks()) : (new FeedLinks(jol));
@@ -331,7 +331,7 @@ public class Feed extends Syncable {
                 try (ResultSet rs = stmt.executeQuery("select * from FEEDS")) {
                     while (rs.next()) {
                         Feed feed = new Feed(rs);
-                        map.put(feed.getFeedid(), feed);
+                        map.put(feed.getFeedIdInt(), feed);
                     }
                 }
 
@@ -421,7 +421,7 @@ public class Feed extends Syncable {
                     }
                 }
                 if (feed != null) {
-                    sql = "select * from FEED_ENDPOINT_IDS where FEEDID = " + feed.feedid;
+                    sql = "select * from FEED_ENDPOINT_IDS where FEEDID = " + feed.feedIdInt;
                     try (ResultSet rs = stmt.executeQuery(sql)) {
                         Collection<FeedEndpointID> ecoll = feed.getAuthorization().getEndpointIDS();
                         while (rs.next()) {
@@ -429,7 +429,7 @@ public class Feed extends Syncable {
                             ecoll.add(epi);
                         }
                     }
-                    sql = "select * from FEED_ENDPOINT_ADDRS where FEEDID = " + feed.feedid;
+                    sql = "select * from FEED_ENDPOINT_ADDRS where FEEDID = " + feed.feedIdInt;
                     try (ResultSet rs = stmt.executeQuery(sql)) {
                         Collection<String> acoll = feed.getAuthorization().getEndpointAddrs();
                         while (rs.next()) {
@@ -447,23 +447,23 @@ public class Feed extends Syncable {
 
 
 
-    public int getFeedid() {
-        return feedid;
+    public int getFeedIdInt() {
+        return feedIdInt;
     }
 
     /**
      *  Set feedid with FeedLinks.
-      * @param feedid Feedid to set to
+      * @param feedIdInt Feedid to set to
      */
-    public void setFeedid(int feedid) {
-        this.feedid = feedid;
+    public void setFeedIdInt(int feedIdInt) {
+        this.feedIdInt = feedIdInt;
 
         // Create link URLs
         FeedLinks fl = getLinks();
-        fl.setSelf(URLUtilities.generateFeedURL(feedid));
-        fl.setPublish(URLUtilities.generatePublishURL(feedid));
-        fl.setSubscribe(URLUtilities.generateSubscribeURL(feedid));
-        fl.setLog(URLUtilities.generateFeedLogURL(feedid));
+        fl.setSelf(URLUtilities.generateFeedURL(feedIdInt));
+        fl.setPublish(URLUtilities.generatePublishURL(feedIdInt));
+        fl.setSubscribe(URLUtilities.generateSubscribeURL(feedIdInt));
+        fl.setLog(URLUtilities.generateFeedLogURL(feedIdInt));
     }
 
     public String getAafInstance() {
@@ -568,7 +568,7 @@ public class Feed extends Syncable {
     @Override
     public JSONObject asJSONObject() {
         JSONObject jo = new JSONObject();
-        jo.put(feedIDStr, feedid);
+        jo.put(FEED_ID_STR, feedIdInt);
         //New field is added - Groups feature Rally:US708115 - 1610
         jo.put("groupid", groupid);
         jo.put("name", name);
@@ -579,10 +579,10 @@ public class Feed extends Syncable {
         jo.put("authorization", authorization.asJSONObject());
         jo.put("publisher", publisher);
         jo.put("links", links.asJSONObject());
-        jo.put(deletedStr, deleted);
+        jo.put(DELETED_STR, deleted);
         jo.put("suspend", suspended);
-        jo.put(lastModStr, lastMod.getTime());
-        jo.put(createdDateStr, createdDate.getTime());
+        jo.put(LAST_MOD_STR, lastMod.getTime());
+        jo.put(CREATED_DATE_STR, createdDate.getTime());
         jo.put("aaf_instance", aafInstance);
         return jo;
     }
@@ -595,10 +595,10 @@ public class Feed extends Syncable {
     public JSONObject asJSONObject(boolean hidepasswords) {
         JSONObject jo = asJSONObject();
         if (hidepasswords) {
-            jo.remove(feedIDStr);    // we no longer hide passwords, however we do hide these
-            jo.remove(deletedStr);
-            jo.remove(lastModStr);
-            jo.remove(createdDateStr);
+            jo.remove(FEED_ID_STR);    // we no longer hide passwords, however we do hide these
+            jo.remove(DELETED_STR);
+            jo.remove(LAST_MOD_STR);
+            jo.remove(CREATED_DATE_STR);
         }
         return jo;
     }
@@ -609,10 +609,10 @@ public class Feed extends Syncable {
      */
     public JSONObject asLimitedJSONObject() {
         JSONObject jo = asJSONObject();
-        jo.remove(deletedStr);
-        jo.remove(feedIDStr);
-        jo.remove(lastModStr);
-        jo.remove(createdDateStr);
+        jo.remove(DELETED_STR);
+        jo.remove(FEED_ID_STR);
+        jo.remove(LAST_MOD_STR);
+        jo.remove(CREATED_DATE_STR);
         return jo;
     }
 
@@ -625,7 +625,7 @@ public class Feed extends Syncable {
         try {
             String sql = "delete from FEEDS where FEEDID = ?";
             ps = conn.prepareStatement(sql);
-            ps.setInt(1, feedid);
+            ps.setInt(1, feedIdInt);
             ps.execute();
         } catch (SQLException e) {
             rv = false;
@@ -646,12 +646,12 @@ public class Feed extends Syncable {
     public synchronized boolean doInsert(Connection conn) {
         boolean rv = true;
         try {
-            if (feedid == -1) {
-                setFeedid(nextFeedID++);
+            if (feedIdInt == -1) {
+                setFeedIdInt(nextFeedID++);
             }
             // In case we insert a feed from synchronization
-            if (feedid > nextFeedID) {
-                nextFeedID = feedid + 1;
+            if (feedIdInt > nextFeedID) {
+                nextFeedID = feedIdInt + 1;
             }
 
             // Create FEED_ENDPOINT_IDS rows
@@ -659,7 +659,7 @@ public class Feed extends Syncable {
             String sql = "insert into FEED_ENDPOINT_IDS values (?, ?, ?)";
             try (PreparedStatement ps2 = conn.prepareStatement(sql)) {
                 for (FeedEndpointID fid : auth.getEndpointIDS()) {
-                    ps2.setInt(1, feedid);
+                    ps2.setInt(1, feedIdInt);
                     ps2.setString(2, fid.getId());
                     ps2.setString(3, fid.getPassword());
                     ps2.executeUpdate();
@@ -670,7 +670,7 @@ public class Feed extends Syncable {
             sql = "insert into FEED_ENDPOINT_ADDRS values (?, ?)";
             try (PreparedStatement ps2 = conn.prepareStatement(sql)) {
                 for (String t : auth.getEndpointAddrs()) {
-                    ps2.setInt(1, feedid);
+                    ps2.setInt(1, feedIdInt);
                     ps2.setString(2, t);
                     ps2.executeUpdate();
                 }
@@ -682,7 +682,7 @@ public class Feed extends Syncable {
                           + "BUSINESS_DESCRIPTION, GROUPID, AAF_INSTANCE) "
                           + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement ps2 = conn.prepareStatement(sql)) {
-                ps2.setInt(1, feedid);
+                ps2.setInt(1, feedIdInt);
                 ps2.setString(2, getName());
                 ps2.setString(3, getVersion());
                 ps2.setString(4, getDescription());
@@ -709,7 +709,7 @@ public class Feed extends Syncable {
     @Override
     public boolean doUpdate(Connection conn) {
         boolean rv = true;
-        Feed oldobj = getFeedById(feedid);
+        Feed oldobj = getFeedById(feedIdInt);
         PreparedStatement ps = null;
         try {
             Set<FeedEndpointID> newset = getAuthorization().getEndpointIDS();
@@ -720,7 +720,7 @@ public class Feed extends Syncable {
             ps = conn.prepareStatement(sql);
             for (FeedEndpointID fid : newset) {
                 if (!oldset.contains(fid)) {
-                    ps.setInt(1, feedid);
+                    ps.setInt(1, feedIdInt);
                     ps.setString(2, fid.getId());
                     ps.setString(3, fid.getPassword());
                     ps.executeUpdate();
@@ -733,7 +733,7 @@ public class Feed extends Syncable {
             ps = conn.prepareStatement(sql);
             for (FeedEndpointID fid : oldset) {
                 if (!newset.contains(fid)) {
-                    ps.setInt(1, feedid);
+                    ps.setInt(1, feedIdInt);
                     ps.setString(2, fid.getId());
                     ps.setString(3, fid.getPassword());
                     ps.executeUpdate();
@@ -748,7 +748,7 @@ public class Feed extends Syncable {
             ps = conn.prepareStatement(sql);
             for (String t : newset2) {
                 if (!oldset2.contains(t)) {
-                    ps.setInt(1, feedid);
+                    ps.setInt(1, feedIdInt);
                     ps.setString(2, t);
                     ps.executeUpdate();
                 }
@@ -760,7 +760,7 @@ public class Feed extends Syncable {
             ps = conn.prepareStatement(sql);
             for (String t : oldset2) {
                 if (!newset2.contains(t)) {
-                    ps.setInt(1, feedid);
+                    ps.setInt(1, feedIdInt);
                     ps.setString(2, t);
                     ps.executeUpdate();
                 }
@@ -777,7 +777,7 @@ public class Feed extends Syncable {
             ps.setInt(4, suspended ? 1 : 0);
             ps.setString(5, getBusinessDescription());
             ps.setInt(6, groupid);
-            ps.setInt(7, feedid);
+            ps.setInt(7, feedIdInt);
             ps.executeUpdate();
             ps.close();
         } catch (SQLException e) {
@@ -810,7 +810,7 @@ public class Feed extends Syncable {
             String sql = "update FEEDS set PUBLISHER = ? where FEEDID = ?";
             ps = conn.prepareStatement(sql);
             ps.setString(1, this.publisher);
-            ps.setInt(2, feedid);
+            ps.setInt(2, feedIdInt);
             ps.execute();
             ps.close();
         } catch (SQLException e) {
@@ -831,7 +831,7 @@ public class Feed extends Syncable {
 
     @Override
     public String getKey() {
-        return "" + getFeedid();
+        return "" + getFeedIdInt();
     }
 
     @Override
@@ -840,7 +840,7 @@ public class Feed extends Syncable {
             return false;
         }
         Feed of = (Feed) obj;
-        if (feedid != of.feedid) {
+        if (feedIdInt != of.feedIdInt) {
             return false;
         }
         if (groupid != of.groupid) {
@@ -883,7 +883,7 @@ public class Feed extends Syncable {
 
     @Override
     public String toString() {
-        return "FEED: feedid=" + feedid + ", name=" + name + ", version=" + version;
+        return "FEED: feedid=" + feedIdInt + ", name=" + name + ", version=" + version;
     }
 
     @Override
