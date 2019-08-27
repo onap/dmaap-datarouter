@@ -324,7 +324,7 @@ public class FeedServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
-            feed.setFeedid(feedid);
+            feed.setFeedIdInt(feedid);
             feed.setPublisher(bhdr);    // set from X-DMAAP-DR-ON-BEHALF-OF header
 
             //Adding for group feature:Rally US708115

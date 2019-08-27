@@ -531,7 +531,7 @@ public class FeedServletTest extends DrServletTestBase {
 
     private void reinsertFeedIntoDb() throws SQLException {
         Feed feed = new Feed("Feed1","v0.1", "First Feed for testing", "First Feed for testing");
-        feed.setFeedid(1);
+        feed.setFeedIdInt(1);
         feed.setGroupid(1);
         feed.setDeleted(false);
         feed.doUpdate(db.getConnection());
