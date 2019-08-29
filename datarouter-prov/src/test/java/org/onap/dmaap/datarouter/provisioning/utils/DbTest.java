@@ -35,7 +35,7 @@ public class DbTest {
     private static EntityManagerFactory emf;
     private static EntityManager em;
 
-    private DB db = new DB();
+    private DbUtils db = new DbUtils();
 
     @BeforeClass
     public static void init() {
@@ -55,7 +55,7 @@ public class DbTest {
 
     @Test
     public void Verify_DB_Is_Initialised_Successfully() {
-        Assert.assertTrue(db.runRetroFits());
+        Assert.assertTrue(db.retroFit1());
     }
 
 }

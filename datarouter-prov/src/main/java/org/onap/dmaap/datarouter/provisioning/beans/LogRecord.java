@@ -35,8 +35,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.text.ParseException;
 import java.util.Iterator;
-
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
 
 
@@ -129,8 +128,7 @@ public class LogRecord extends BaseLogRecord {
      */
     public static void printLogRecords(OutputStream os, RLEBitSet bs) throws IOException {
         final String sql = "select * from LOG_RECORDS where RECORD_ID >= ? AND RECORD_ID <= ?";
-        DB db = new DB();
-        try (Connection conn = db.getConnection()) {
+        try (Connection conn = DataSource.getConnection()) {
             Iterator<Long[]> iter = bs.getRangeIterator();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 while (iter.hasNext()) {

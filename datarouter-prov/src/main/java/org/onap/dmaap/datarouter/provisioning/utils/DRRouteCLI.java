@@ -116,7 +116,7 @@ public class DRRouteCLI {
         this.width = 120;
         this.httpclient = new DefaultHttpClient();
 
-        Properties prop = (new DB()).getProperties();
+        Properties prop = DbUtils.getProperties();
         String truststoreFile = prop.getProperty("org.onap.dmaap.datarouter.provserver.truststore.path");
         String truststorePw = prop.getProperty("org.onap.dmaap.datarouter.provserver.truststore.password");
 

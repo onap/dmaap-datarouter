@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.binary.Base64;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 
 /**
  * The representation of one route in the Ingress Route Table.
@@ -143,15 +143,13 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
     private static SortedSet<IngressRoute> getAllIngressRoutesForSQL(String sql) {
         SortedSet<IngressRoute> set = new TreeSet<>();
         try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery(sql)) {
                     addIngressRouteToSet(set, rs);
                 }
             }
-            db.release(conn);
+            DataSource.returnConnection(conn);
         } catch (SQLException e) {
             intlogger.error("PROV0001 getAllIngressRoutesForSQL: " + e.getMessage(), e);
         }
@@ -189,15 +187,14 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
 
     private static int getMax(String sql) {
         int rv = 0;
-        DB db = new DB();
-        try (Connection conn = db.getConnection();
+        try (Connection conn = DataSource.getConnection();
                 Statement stmt = conn.createStatement()) {
             try (ResultSet rs = stmt.executeQuery(sql)) {
                 if (rs.next()) {
                     rv = rs.getInt("MAX");
                 }
             }
-            db.release(conn);
+            DataSource.returnConnection(conn);
         } catch (SQLException e) {
             intlogger.error("PROV0002 getMax: " + e.getMessage(), e);
         }
@@ -214,9 +211,8 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
      */
     public static IngressRoute getIngressRoute(int feedid, String user, String subnet) {
         IngressRoute ir = null;
-        DB db = new DB();
         String sql = "select SEQUENCE, NODESET from INGRESS_ROUTES where FEEDID = ? AND USERID = ? and SUBNET = ?";
-        try (Connection conn = db.getConnection();
+        try (Connection conn = DataSource.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, feedid);
             ps.setString(2, user);
@@ -228,7 +224,7 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
                     ir = new IngressRoute(seq, feedid, user, subnet, nodeset);
                 }
             }
-            db.release(conn);
+            DataSource.returnConnection(conn);
         } catch (SQLException e) {
             intlogger.error("PROV0003 getIngressRoute: " + e.getMessage(), e);
         }
@@ -359,14 +355,13 @@ public class IngressRoute extends NodeClass implements Comparable<IngressRoute> 
 
     private Collection<String> readNodes() {
         Collection<String> set = new TreeSet<>();
-        DB db = new DB();
         String sql = "select NODEID from NODESETS where SETID = ?";
-        try (Connection conn = db.getConnection()) {
+        try (Connection conn = DataSource.getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, nodelist);
                 addNodeToSet(set, ps);
             }
-            db.release(conn);
+            DataSource.returnConnection(conn);
         } catch (SQLException e) {
             intlogger.error(SQLEXCEPTION + e.getMessage(), e);
         }

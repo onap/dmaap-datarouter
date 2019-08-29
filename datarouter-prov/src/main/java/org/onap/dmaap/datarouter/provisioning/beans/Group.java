@@ -37,7 +37,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import org.json.JSONObject;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 
 /**
  * The representation of a Subscription.  Subscriptions can be retrieved from the DB, or stored/updated in the DB.
@@ -186,9 +186,7 @@ public class Group extends Syncable {
     private static List<Group> getGroupsForSQL(String sql) {
         List<Group> list = new ArrayList<>();
         try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery(sql)) {
                     while (rs.next()) {
@@ -197,7 +195,7 @@ public class Group extends Syncable {
                     }
                 }
             }
-            db.release(conn);
+            DataSource.returnConnection(conn);
         } catch (SQLException e) {
             intlogger.error("PROV0009 getGroupsForSQL: " + e.getMessage(), e);
         }
@@ -207,9 +205,7 @@ public class Group extends Syncable {
     private static int getMaxGroupID() {
         int max = 0;
         try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery("select MAX(groupid) from GROUPS")) {
                     if (rs.next()) {
@@ -217,7 +213,7 @@ public class Group extends Syncable {
                     }
                 }
             }
-            db.release(conn);
+            DataSource.returnConnection(conn);
         } catch (SQLException e) {
             intlogger.info("PROV0001 getMaxSubID: " + e.getMessage(), e);
         }

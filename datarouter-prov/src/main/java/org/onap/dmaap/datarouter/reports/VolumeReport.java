@@ -38,7 +38,7 @@ import java.util.TreeSet;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 
 /**
  * Generate a traffic volume report. The report is a .csv file containing the following columns:
@@ -59,7 +59,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
 public class VolumeReport extends ReportBase {
     private static final String SELECT_SQL = "select EVENT_TIME, TYPE, FEEDID, CONTENT_LENGTH, RESULT" +
             " from LOG_RECORDS where EVENT_TIME >= ? and EVENT_TIME <= ? LIMIT ?, ?";
-    private EELFLogger loggerVolumeReport= EELFManager.getInstance().getLogger("ReportLog");;
+    private EELFLogger loggerVolumeReport= EELFManager.getInstance().getLogger("ReportLog");
     private class Counters {
         int filespublished, filesdelivered, filesexpired;
         long bytespublished, bytesdelivered, bytesexpired;
@@ -78,9 +78,7 @@ public class VolumeReport extends ReportBase {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         long start = System.currentTimeMillis();
         try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             // We need to run this SELECT in stages, because otherwise we run out of memory!
             final long stepsize = 6000000L;
             boolean go_again = true;
@@ -127,8 +125,8 @@ public class VolumeReport extends ReportBase {
                 }
             }
 
-            db.release(conn);
-        } catch (SQLException e) {
+            DataSource.returnConnection(conn);
+        } catch (Exception e) {
             loggerVolumeReport.error("SQLException: " + e.getMessage());
         }
         logger.debug("Query time: " + (System.currentTimeMillis() - start) + " ms");

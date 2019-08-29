@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import org.json.JSONObject;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 
 /**
  * Methods to provide access to Provisioning parameters in the DB. This class also provides constants of the standard
@@ -108,9 +108,8 @@ public class Parameters extends Syncable {
      */
     public static Collection<Parameters> getParameterCollection() {
         Collection<Parameters> coll = new ArrayList<>();
-        DB db = new DB();
         String sql = "select * from PARAMETERS";
-        try (Connection conn = db.getConnection();
+        try (Connection conn = DataSource.getConnection();
                 Statement stmt = conn.createStatement()) {
             try (ResultSet rs = stmt.executeQuery(sql)) {
                 while (rs.next()) {
@@ -118,7 +117,7 @@ public class Parameters extends Syncable {
                     coll.add(param);
                 }
             }
-            db.release(conn);
+            DataSource.returnConnection(conn);
         } catch (SQLException e) {
             intlogger.error(SQLEXCEPTION + e.getMessage(), e);
         }
@@ -133,9 +132,8 @@ public class Parameters extends Syncable {
      */
     public static Parameters getParameter(String key) {
         Parameters val = null;
-        DB db = new DB();
         String sql = "select KEYNAME, VALUE from PARAMETERS where KEYNAME = ?";
-        try (Connection conn = db.getConnection();
+        try (Connection conn = DataSource.getConnection();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, key);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -143,7 +141,7 @@ public class Parameters extends Syncable {
                     val = new Parameters(rs);
                 }
             }
-            db.release(conn);
+            DataSource.returnConnection(conn);
         } catch (SQLException e) {
             intlogger.error(SQLEXCEPTION + e.getMessage(), e);
         }

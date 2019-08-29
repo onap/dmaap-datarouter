@@ -22,8 +22,28 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.contains;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
+
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -39,26 +59,11 @@ import org.onap.dmaap.datarouter.provisioning.beans.Deleteable;
 import org.onap.dmaap.datarouter.provisioning.beans.SubDelivery;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 import org.onap.dmaap.datarouter.provisioning.utils.PasswordProcessor;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.*;
-import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 
 @RunWith(PowerMockRunner.class)
@@ -67,7 +72,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
     private static EntityManagerFactory emf;
     private static EntityManager em;
     private SubscriptionServlet subscriptionServlet;
-    private DB db;
+    private DataSource ds;
     private final String URL= "https://172.100.0.5";
     private final String USER = "user1";
     private final String PASSWORD="password1";
@@ -100,7 +105,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
     public void setUp() throws Exception {
         listAppender = setTestLogger(SubscriptionServlet.class);
         subscriptionServlet = new SubscriptionServlet();
-        db = new DB();
         setAuthoriserToReturnRequestIsAuthorized();
         setPokerToNotCreateTimersWhenDeleteSubscriptionIsCalled();
         setupValidAuthorisedRequest();
@@ -597,7 +601,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         setValidPathInfoInHttpHeader();
     }
 
-    private void changeSubscriptionBackToNormal() throws SQLException {
+    private void changeSubscriptionBackToNormal() throws SQLException, ClassNotFoundException {
         Subscription subscription = new Subscription("https://172.100.0.5", "user1", "password1");
         subscription.setSubid(1);
         subscription.setSubscriber("user1");
@@ -610,10 +614,10 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setPrivilegedSubscriber(false);
         subscription.setDecompress(false);
         subscription.changeOwnerShip();
-        subscription.doUpdate(db.getConnection());
+        subscription.doUpdate(ds.getConnection());
     }
 
-    private void resetAafSubscriptionInDB() throws SQLException {
+    private void resetAafSubscriptionInDB() throws SQLException, ClassNotFoundException {
         Subscription subscription = new Subscription("https://172.100.0.5:8080", "user2", "password2");
         subscription.setSubid(2);
         subscription.setSubscriber("user2");
@@ -626,10 +630,10 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setAafInstance("https://aaf-onap-test.osaaf.org:8095");
         subscription.setDecompress(false);
         subscription.setPrivilegedSubscriber(false);
-        subscription.doUpdate(db.getConnection());
+        subscription.doUpdate(ds.getConnection());
     }
 
-    private void addNewSubscriptionInDB() throws SQLException {
+    private void addNewSubscriptionInDB() throws SQLException, ClassNotFoundException {
         Subscription subscription = new Subscription("https://172.100.0.6:8080", "user3", "password3");
         subscription.setSubid(3);
         subscription.setSubscriber("user3");
@@ -640,6 +644,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setMetadataOnly(false);
         subscription.setSuspended(false);
         subscription.setDecompress(false);
-        subscription.doInsert(db.getConnection());
+        subscription.doInsert(ds.getConnection());
     }
 }

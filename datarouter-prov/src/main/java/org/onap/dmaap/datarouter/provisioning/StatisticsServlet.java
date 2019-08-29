@@ -42,7 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
 
 
@@ -255,14 +255,12 @@ public class StatisticsServlet extends BaseServlet {
      * @throws SQLException Query SQLException.
      */
     private StringBuilder getFeedIdsByGroupId(int groupIds) throws SQLException {
-        DB db = null;
         Connection conn = null;
         ResultSet resultSet = null;
         String sqlGoupid = null;
         StringBuilder feedIds = new StringBuilder();
         try {
-            db = new DB();
-            conn = db.getConnection();
+            conn = DataSource.getConnection();
             sqlGoupid = " SELECT FEEDID from FEEDS  WHERE GROUPID = ?";
             try (PreparedStatement prepareStatement = conn.prepareStatement(sqlGoupid)) {
                 prepareStatement.setInt(1, groupIds);
@@ -282,7 +280,7 @@ public class StatisticsServlet extends BaseServlet {
                     resultSet.close();
                 }
                 if (conn != null) {
-                    db.release(conn);
+                    DataSource.returnConnection(conn);
                 }
             } catch (Exception e) {
                 eventlogger.error("PROV0176 StatisticsServlet.getFeedIdsByGroupId: " + e.getMessage(), e);
@@ -523,8 +521,7 @@ public class StatisticsServlet extends BaseServlet {
             eventlogger.debug("SQL Query for Statistics resultset. " + filterQuery);
             intlogger.debug(filterQuery);
             long start = System.currentTimeMillis();
-            DB db = new DB();
-            try (Connection conn = db.getConnection()) {
+            try (Connection conn = DataSource.getConnection()) {
                 try (ResultSet rs = conn.prepareStatement(filterQuery).executeQuery()) {
                     if ("csv".equals(outputType)) {
                         resp.setContentType("application/octet-stream");
@@ -539,7 +536,7 @@ public class StatisticsServlet extends BaseServlet {
                         this.rsToJson(rs, out);
                     }
                 }
-                db.release(conn);
+                DataSource.returnConnection(conn);
             } catch (SQLException e) {
                 eventlogger.error("SQLException:" + e);
             }

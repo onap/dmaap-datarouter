@@ -23,32 +23,33 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
+import java.io.FileNotFoundException;
+import java.net.InetAddress;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-
-import java.io.FileNotFoundException;
-import java.net.InetAddress;
-
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * Created by ezcoxem on 21/08/2018.
@@ -67,7 +68,6 @@ public class PublishServletTest extends DrServletTestBase {
 
     private static EntityManagerFactory emf;
     private static EntityManager em;
-    private DB db;
 
     ListAppender<ILoggingEvent> listAppender;
 
@@ -92,7 +92,6 @@ public class PublishServletTest extends DrServletTestBase {
     public void setUp() throws Exception {
         listAppender = setTestLogger(PublishServlet.class);
         publishServlet = new PublishServlet();
-        db = new DB();
     }
 
     @Test
