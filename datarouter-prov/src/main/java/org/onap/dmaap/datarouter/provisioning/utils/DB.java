@@ -35,15 +35,11 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
 import java.util.Properties;
-import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -56,33 +52,42 @@ public class DB {
 
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
 
-    private static String dbUrl;
-    private static String dbLogin;
-    private static String dbPassword;
+    public String dbUrl;
+    public String dbLogin;
+    public String dbPassword;
+    public String dbDriver;
     private static Properties props;
-    private static final Queue<Connection> queue = new LinkedList<>();
-
     private static String httpsPort;
     private static String httpPort;
+
+
+    public DB() {
+        init();
+    }
+
+    private static DB db = new DB();
+
+    public static DB getInstance() {
+        return db;
+    }
 
     /**
      * Construct a DB object.  If this is the very first creation of this object, it will load a copy of the properties
      * for the server, and attempt to load the JDBC driver for the database. If a fatal error occurs (e.g. either the
      * properties file or the DB driver is missing), the JVM will exit.
      */
-    public DB() {
+    private void init() {
         if (props == null) {
             props = new Properties();
             try {
-                props.load(new FileInputStream(getProperty(
-                    "org.onap.dmaap.datarouter.provserver.properties",
-                    "/opt/app/datartr/etc/provserver.properties")));
+                props.load(new FileInputStream(getProperty("org.onap.dmaap.datarouter.provserver.properties",
+                        "/opt/app/datartr/etc/provserver.properties")));
                 dbUrl = (String) props.get("org.onap.dmaap.datarouter.db.url");
                 dbLogin = (String) props.get("org.onap.dmaap.datarouter.db.login");
                 dbPassword = (String) props.get("org.onap.dmaap.datarouter.db.password");
                 httpsPort = (String) props.get("org.onap.dmaap.datarouter.provserver.https.port");
                 httpPort = (String) props.get("org.onap.dmaap.datarouter.provserver.http.port");
-                String dbDriver = (String) props.get("org.onap.dmaap.datarouter.db.driver");
+                dbDriver = (String) props.get("org.onap.dmaap.datarouter.db.driver");
                 Class.forName(dbDriver);
             } catch (IOException e) {
                 intlogger.error("PROV9003 Opening properties: " + e.getMessage(), e);
@@ -101,56 +106,6 @@ public class DB {
      */
     public Properties getProperties() {
         return props;
-    }
-
-    /**
-     * Get a JDBC connection to the DB from the pool.  Creates a new one if none are available.
-     *
-     * @return the Connection
-     */
-    public Connection getConnection() throws SQLException {
-        Connection connection = null;
-        while (connection == null) {
-            synchronized (queue) {
-                try {
-                    connection = queue.remove();
-                } catch (NoSuchElementException nseEx) {
-                    intlogger.error("PROV9006 No connection on queue: " + nseEx.getMessage(), nseEx);
-                    int num = 0;
-                    do {
-                        // Try up to 3 times to get a connection
-                        try {
-                            connection = DriverManager.getConnection(dbUrl, dbLogin, dbPassword);
-                        } catch (SQLException sqlEx) {
-                            if (++num >= 3) {
-                                throw sqlEx;
-                            }
-                        }
-                    }
-                    while (connection == null);
-                }
-            }
-            if (connection != null && !connection.isValid(1)) {
-                connection.close();
-                connection = null;
-            }
-        }
-        return connection;
-    }
-
-    /**
-     * Returns a JDBC connection to the pool.
-     *
-     * @param connection the Connection to return
-     */
-    public void release(Connection connection) {
-        if (connection != null) {
-            synchronized (queue) {
-                if (!queue.contains(connection)) {
-                    queue.add(connection);
-                }
-            }
-        }
     }
 
     /**
@@ -178,14 +133,12 @@ public class DB {
      * @return true if the retrofit worked, false otherwise
      */
     private boolean retroFit1() {
-        final String[] expectedTables = {
-            "FEEDS", "FEED_ENDPOINT_ADDRS", "FEED_ENDPOINT_IDS", "PARAMETERS",
-            "SUBSCRIPTIONS", "LOG_RECORDS", "INGRESS_ROUTES", "EGRESS_ROUTES",
-            "NETWORK_ROUTES", "NODESETS", "NODES", "GROUPS"
-        };
+        final String[] expectedTables =
+                {"FEEDS", "FEED_ENDPOINT_ADDRS", "FEED_ENDPOINT_IDS", "PARAMETERS", "SUBSCRIPTIONS", "LOG_RECORDS",
+                        "INGRESS_ROUTES", "EGRESS_ROUTES", "NETWORK_ROUTES", "NODESETS", "NODES", "GROUPS"};
         Connection connection = null;
         try {
-            connection = getConnection();
+            connection = DataSource.getConnection();
             Set<String> actualTables = getTableSet(connection);
             boolean initialize = false;
             for (String tableName : expectedTables) {
@@ -195,12 +148,14 @@ public class DB {
                 intlogger.info("PROV9001: First time startup; The database is being initialized.");
                 runInitScript(connection, 1);
             }
+        } catch (ClassNotFoundException cnfe) {
+            intlogger.error(cnfe.getMessage());
         } catch (SQLException e) {
             intlogger.error("PROV9000: The database credentials are not working: " + e.getMessage(), e);
             return false;
         } finally {
             if (connection != null) {
-                release(connection);
+                DataSource.returnConnection(connection);
             }
         }
         return true;
@@ -235,7 +190,7 @@ public class DB {
      * sql_init_NN.sql
      *
      * @param connection a DB connection
-     * @param scriptId the number of the sql_init_NN.sql script to run
+     * @param scriptId   the number of the sql_init_NN.sql script to run
      */
     private void runInitScript(Connection connection, int scriptId) {
         String scriptDir = (String) props.get("org.onap.dmaap.datarouter.provserver.dbscripts");
@@ -245,7 +200,7 @@ public class DB {
             exit(1);
         }
         try (LineNumberReader lineReader = new LineNumberReader(new FileReader(scriptFile));
-                Statement statement = connection.createStatement()) {
+             Statement statement = connection.createStatement()) {
             StringBuilder strBuilder = new StringBuilder();
             String line;
             while ((line = lineReader.readLine()) != null) {
@@ -270,4 +225,10 @@ public class DB {
             statement.execute(sql);
         }
     }
+
+    public String getDbUrl() {
+        return dbUrl;
+    }
+
+
 }
