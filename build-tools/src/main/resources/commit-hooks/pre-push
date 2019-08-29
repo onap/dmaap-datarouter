@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "Running unit test suite before push to gerrit. Please be patient :)"
+mvn clean test

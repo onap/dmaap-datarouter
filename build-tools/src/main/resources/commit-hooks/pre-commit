@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo "Checking for checkstyle errors"
+mvn clean compile
+
+
