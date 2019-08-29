@@ -22,24 +22,26 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning.beans;
 
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
-import org.powermock.modules.junit4.PowerMockRunner;
-
+import java.util.Collection;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 public class GroupTest {
   private static EntityManagerFactory emf;
   private static EntityManager em;
   private Group group;
-  private DB db;
 
   @BeforeClass
   public static void init() {
@@ -59,9 +61,8 @@ public class GroupTest {
 
   @Before
   public void setUp() throws Exception {
-    db = new DB();
     group = new Group("GroupTest", "", "");
-    group.doInsert(db.getConnection());
+    group.doInsert(DataSource.getConnection());
   }
 
   @Test
@@ -79,10 +80,10 @@ public class GroupTest {
   public void Given_Group_Inserted_With_Same_Name_GetGroupMatching_With_Id_Returns_Correct_Group()
       throws Exception {
     Group sameGroupName = new Group("GroupTest", "This group has a description", "");
-    sameGroupName.doInsert(db.getConnection());
+    sameGroupName.doInsert(DataSource.getConnection());
     Assert.assertEquals(
         "This group has a description", Group.getGroupMatching(group, 2).getDescription());
-    sameGroupName.doDelete(db.getConnection());
+    sameGroupName.doDelete(DataSource.getConnection());
   }
 
   @Test
@@ -93,12 +94,12 @@ public class GroupTest {
   @Test
   public void Given_Group_AuthId_Updated_GetGroupByAuthId_Returns_Correct_Group() throws Exception {
     group.setAuthid("Basic TmFtZTp6Z04wMFkyS3gybFppbXltNy94ZDhuMkdEYjA9");
-    group.doUpdate(db.getConnection());
+    group.doUpdate(DataSource.getConnection());
     Assert.assertEquals(group, Group.getGroupByAuthId("Basic TmFtZTp6Z04wMFkyS3gybFppbXltNy94ZDhuMkdEYjA9"));
   }
 
   @After
   public void tearDown() throws Exception {
-    group.doDelete(db.getConnection());
+    group.doDelete(DataSource.getConnection());
   }
 }

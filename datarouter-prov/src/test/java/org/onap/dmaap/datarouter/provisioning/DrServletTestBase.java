@@ -23,20 +23,19 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
-import org.slf4j.LoggerFactory;
-
-import java.util.Properties;
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import java.util.Properties;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.onap.dmaap.datarouter.provisioning.utils.DbConnectionPool;
+import org.slf4j.LoggerFactory;
 
 public class DrServletTestBase {
 
@@ -48,7 +47,7 @@ public class DrServletTestBase {
         props.setProperty("org.onap.dmaap.datarouter.provserver.spooldir", "unit-test-logs/spool");
         props.setProperty("org.onap.dmaap.datarouter.provserver.https.relaxation", "false");
         props.setProperty("org.onap.dmaap.datarouter.provserver.passwordencryption", "PasswordEncryptionKey#@$%^&1234#");
-        FieldUtils.writeDeclaredStaticField(DB.class, "props", props, true);
+        FieldUtils.writeDeclaredStaticField(DbConnectionPool.class, "props", props, true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsgFlag", false, true);
         SynchronizerTask synchronizerTask = mock(SynchronizerTask.class);
         when(synchronizerTask.getPodState()).thenReturn(SynchronizerTask.UNKNOWN_POD);

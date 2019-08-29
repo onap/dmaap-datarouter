@@ -22,8 +22,27 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.contains;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
+
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -38,23 +57,8 @@ import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.*;
-import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 
 @RunWith(PowerMockRunner.class)
@@ -69,7 +73,6 @@ public class FeedServletTest extends DrServletTestBase {
 
     private static EntityManagerFactory emf;
     private static EntityManager em;
-    private DB db;
 
     private ListAppender<ILoggingEvent> listAppender;
 
@@ -93,7 +96,6 @@ public class FeedServletTest extends DrServletTestBase {
     public void setUp() throws Exception {
         listAppender = setTestLogger(FeedServlet.class);
         feedServlet = new FeedServlet();
-        db = new DB();
         setAuthoriserToReturnRequestIsAuthorized();
         setUpValidAuthorisedRequest();
         setUpValidSecurityOnHttpRequest();
@@ -529,11 +531,11 @@ public class FeedServletTest extends DrServletTestBase {
         when(request.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
     }
 
-    private void reinsertFeedIntoDb() throws SQLException {
+    private void reinsertFeedIntoDb() throws SQLException, ClassNotFoundException {
         Feed feed = new Feed("Feed1","v0.1", "First Feed for testing", "First Feed for testing");
         feed.setFeedid(1);
         feed.setGroupid(1);
         feed.setDeleted(false);
-        feed.doUpdate(db.getConnection());
+        feed.doUpdate(DataSource.getConnection());
     }
 }
