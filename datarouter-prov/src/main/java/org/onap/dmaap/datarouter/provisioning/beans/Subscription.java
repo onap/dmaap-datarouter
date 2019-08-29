@@ -37,7 +37,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import org.json.JSONObject;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
+import org.onap.dmaap.datarouter.provisioning.utils.DbUtils;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 
 
@@ -58,7 +59,7 @@ public class Subscription extends Syncable {
     private static final String LAST_MOD_KEY = "last_mod";
     private static final String CREATED_DATE = "created_date";
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
-    private static int nextSubid = getMaxSubID() + 1;
+    private int nextSubid = getMaxSubID() + 1;
 
     private int subid;
     private int feedid;
@@ -148,7 +149,7 @@ public class Subscription extends Syncable {
             final boolean use100 = jdeli.getBoolean("use100");
 
             //Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
-            Properties prop = (new DB()).getProperties();
+            Properties prop = DbUtils.getProperties();
             if (!url.startsWith("https://") && isHttpsRelaxationFalseAndHasSyncKey(jo, prop)) {
                 throw new InvalidObjectException("delivery URL is not HTTPS");
             }
@@ -225,9 +226,7 @@ public class Subscription extends Syncable {
     private static List<Subscription> getSubscriptionsForSQL(String sql) {
         List<Subscription> list = new ArrayList<>();
         try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery(sql)) {
                     while (rs.next()) {
@@ -236,7 +235,7 @@ public class Subscription extends Syncable {
                     }
                 }
             }
-            db.release(conn);
+            DataSource.returnConnection(conn);
         } catch (SQLException e) {
             intlogger.error("PROV0001 getSubscriptionsForSQL: " + e.toString(), e);
         }
@@ -250,9 +249,7 @@ public class Subscription extends Syncable {
     public static int getMaxSubID() {
         int max = 0;
         try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery("select MAX(subid) from SUBSCRIPTIONS")) {
                     if (rs.next()) {
@@ -260,7 +257,7 @@ public class Subscription extends Syncable {
                     }
                 }
             }
-            db.release(conn);
+            DataSource.returnConnection(conn);
         } catch (SQLException e) {
             intlogger.info("getMaxSubID: " + e.getMessage(), e);
         }
@@ -277,9 +274,7 @@ public class Subscription extends Syncable {
         String sql = "select SUBID from SUBSCRIPTIONS where FEEDID = ?";
 
         try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, String.valueOf(feedid));
                 try (ResultSet rs = stmt.executeQuery()) {
@@ -289,7 +284,7 @@ public class Subscription extends Syncable {
                     }
                 }
             }
-            db.release(conn);
+            DataSource.returnConnection(conn);
         } catch (SQLException e) {
             intlogger.error(SQLEXCEPTION + e.getMessage(), e);
         }
@@ -304,9 +299,7 @@ public class Subscription extends Syncable {
     public static int countActiveSubscriptions() {
         int count = 0;
         try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery("select count(*) from SUBSCRIPTIONS")) {
                     if (rs.next()) {
@@ -314,7 +307,7 @@ public class Subscription extends Syncable {
                     }
                 }
             }
-            db.release(conn);
+            DataSource.returnConnection(conn);
         } catch (SQLException e) {
             intlogger.warn("PROV0008 countActiveSubscriptions: " + e.getMessage(), e);
         }
@@ -602,10 +595,7 @@ public class Subscription extends Syncable {
         boolean rv = true;
         PreparedStatement ps = null;
         try {
-
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             String sql = "update SUBSCRIPTIONS set SUBSCRIBER = ? where SUBID = ?";
             ps = conn.prepareStatement(sql);
             ps.setString(1, this.subscriber);

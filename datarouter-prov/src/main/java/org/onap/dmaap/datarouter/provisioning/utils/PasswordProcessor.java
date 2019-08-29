@@ -40,7 +40,7 @@ public class PasswordProcessor {
 
     private static final String SECRET_KEY_FACTORY_TYPE = "PBEWithMD5AndDES";
     private static final String PASSWORD_ENCRYPTION_STRING =
-            (new DB()).getProperties().getProperty("org.onap.dmaap.datarouter.provserver.passwordencryption");
+            DbUtils.getProperties().getProperty("org.onap.dmaap.datarouter.provserver.passwordencryption");
     private static final char[] PASSWORD = PASSWORD_ENCRYPTION_STRING.toCharArray();
     private static final byte[] SALT = {(byte) 0xde, (byte) 0x33, (byte) 0x10,
         (byte) 0x12, (byte) 0xde, (byte) 0x33, (byte) 0x10, (byte) 0x12,};

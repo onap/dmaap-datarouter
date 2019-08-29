@@ -53,7 +53,7 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DbUtils;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 
 /**
@@ -80,7 +80,7 @@ public class ProxyServlet extends BaseServlet {
         super.init(config);
         try {
             // Set up keystore
-            Properties props = (new DB()).getProperties();
+            Properties props = DbUtils.getProperties();
             String store = props.getProperty(Main.TRUSTSTORE_PATH_PROPERTY);
             String pass = props.getProperty(Main.TRUSTSTORE_PASS_PROPERTY);
             if (store == null || store.length() == 0) {

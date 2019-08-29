@@ -53,7 +53,6 @@ import org.mockito.Mock;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 
@@ -62,7 +61,6 @@ public class SubscribeServletTest extends DrServletTestBase {
     private static SubscribeServlet subscribeServlet;
     private static EntityManagerFactory emf;
     private static EntityManager em;
-    private DB db;
 
     @Mock
     private HttpServletRequest request;
@@ -89,7 +87,6 @@ public class SubscribeServletTest extends DrServletTestBase {
 
     @Before
     public void setUp() throws Exception {
-        db = new DB();
         listAppender = setTestLogger(SubscribeServlet.class);
         subscribeServlet = new SubscribeServlet();
         setAuthoriserToReturnRequestIsAuthorized();

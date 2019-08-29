@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 
 /**
  * Generate a subscribers report.  The report is a .CSV file.  It contains information per-day and per-subscriber,
@@ -96,13 +96,12 @@ public class SubscriberReport extends ReportBase {
 
     @Override
     public void run() {
-        Map<String, Counters> map = new HashMap<String, Counters>();
+        Map<String, Counters> map = new HashMap<>();
         long start = System.currentTimeMillis();
 
         try {
-            DB db = new DB();
             @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try(PreparedStatement ps = conn.prepareStatement(SELECT_SQL)) {
                 ps.setLong(1, from);
                 ps.setLong(2, to);
@@ -142,7 +141,7 @@ public class SubscriberReport extends ReportBase {
                   }
            }
 
-            db.release(conn);
+            DataSource.returnConnection(conn);
         } catch (SQLException e) {
             logger.error("SQLException: " + e.getMessage());
         }

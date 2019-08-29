@@ -36,7 +36,6 @@ import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -66,7 +65,8 @@ import org.onap.dmaap.datarouter.provisioning.beans.NodeClass;
 import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
+import org.onap.dmaap.datarouter.provisioning.utils.DbUtils;
 import org.onap.dmaap.datarouter.provisioning.utils.PasswordProcessor;
 import org.onap.dmaap.datarouter.provisioning.utils.ThrottleFilter;
 import org.slf4j.MDC;
@@ -259,10 +259,10 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     private InetAddress loopback;
 
     //DMAAP-597 (Tech Dept) REST request source IP auth relaxation to accommodate OOM kubernetes deploy
-    private static String isAddressAuthEnabled = (new DB()).getProperties()
+    private static String isAddressAuthEnabled = (DbUtils.getProperties())
             .getProperty("org.onap.dmaap.datarouter.provserver.isaddressauthenabled", "false");
 
-    static String isCadiEnabled = (new DB()).getProperties()
+    static String isCadiEnabled = (DbUtils.getProperties())
             .getProperty("org.onap.dmaap.datarouter.provserver.cadi.enabled", "false");
 
     /**
@@ -670,17 +670,13 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     protected boolean doInsert(Insertable bean) {
         boolean rv;
-        DB db = new DB();
         Connection conn = null;
         try {
-            conn = db.getConnection();
+            conn = DataSource.getConnection();
             rv = bean.doInsert(conn);
-        } catch (SQLException e) {
-            rv = false;
-            intlogger.warn("PROV0005 doInsert: " + e.getMessage(), e);
         } finally {
             if (conn != null) {
-                db.release(conn);
+                DataSource.returnConnection(conn);
             }
         }
         return rv;
@@ -694,17 +690,13 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     protected boolean doUpdate(Updateable bean) {
         boolean rv;
-        DB db = new DB();
         Connection conn = null;
         try {
-            conn = db.getConnection();
+            conn = DataSource.getConnection();
             rv = bean.doUpdate(conn);
-        } catch (SQLException e) {
-            rv = false;
-            intlogger.warn("PROV0006 doUpdate: " + e.getMessage(), e);
         } finally {
             if (conn != null) {
-                db.release(conn);
+                DataSource.returnConnection(conn);
             }
         }
         return rv;
@@ -718,17 +710,13 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     protected boolean doDelete(Deleteable bean) {
         boolean rv;
-        DB db = new DB();
         Connection conn = null;
         try {
-            conn = db.getConnection();
+            conn = DataSource.getConnection();
             rv = bean.doDelete(conn);
-        } catch (SQLException e) {
-            rv = false;
-            intlogger.warn("PROV0007 doDelete: " + e.getMessage(), e);
         } finally {
             if (conn != null) {
-                db.release(conn);
+                DataSource.returnConnection(conn);
             }
         }
         return rv;
@@ -987,7 +975,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     String getFeedPermission(String aafInstance, String userAction) {
         try {
-            Properties props = (new DB()).getProperties();
+            Properties props = (DbUtils.getProperties());
             String type = props.getProperty(AAF_CADI_FEED_TYPE, AAF_CADI_FEED);
             String action;
             switch (userAction) {
@@ -1031,7 +1019,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     String getSubscriberPermission(String aafInstance, String userAction) {
         try {
-            Properties props = (new DB()).getProperties();
+            Properties props = (DbUtils.getProperties());
             String type = props.getProperty(AAF_CADI_SUB_TYPE, AAF_CADI_SUB);
             String action;
             switch (userAction) {
