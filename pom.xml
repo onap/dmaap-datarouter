@@ -87,6 +87,7 @@
         <annotations.version>12.0</annotations.version>
     </properties>
     <modules>
+        <module>build-tools</module>
         <module>datarouter-prov</module>
         <module>datarouter-node</module>
         <module>datarouter-subscriber</module>
@@ -265,6 +266,33 @@
     <build>
         <plugins>
             <plugin>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>onap-java-style</id>
+                        <configuration combine.self="override">
+                            <configLocation>checkstyle/onap-style-java.xml</configLocation>
+                            <suppressionsLocation>checkstyle/suppressedFilesForStyleCheck.xml/</suppressionsLocation>
+                            <sourceDirectories>${project.build.sourceDirectory}</sourceDirectories>
+                            <includeResources>false</includeResources>
+                            <includeTestSourceDirectory>false</includeTestSourceDirectory>
+                            <includeTestResources>false</includeTestResources>
+                            <excludes>**/org/onap/dmaap/datarouter/reports/**</excludes>
+                            <consoleOutput>true</consoleOutput>
+                            <failOnViolation>true</failOnViolation>
+                            <violationSeverity>warning</violationSeverity>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.onap.dmaap.datarouter</groupId>
+                        <artifactId>build-tools</artifactId>
+                        <version>1.0</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
@@ -288,17 +316,6 @@
                         <goals>
                             <goal>flatten</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>onap-java-style</id>
-                        <configuration>
-                            <consoleOutput>false</consoleOutput>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
