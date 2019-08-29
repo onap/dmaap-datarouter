@@ -40,6 +40,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.SubDelivery;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 import org.onap.dmaap.datarouter.provisioning.utils.PasswordProcessor;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -68,6 +69,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
     private static EntityManager em;
     private SubscriptionServlet subscriptionServlet;
     private DB db;
+    private DataSource ds;
     private final String URL= "https://172.100.0.5";
     private final String USER = "user1";
     private final String PASSWORD="password1";
@@ -597,7 +599,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         setValidPathInfoInHttpHeader();
     }
 
-    private void changeSubscriptionBackToNormal() throws SQLException {
+    private void changeSubscriptionBackToNormal() throws SQLException, ClassNotFoundException {
         Subscription subscription = new Subscription("https://172.100.0.5", "user1", "password1");
         subscription.setSubid(1);
         subscription.setSubscriber("user1");
@@ -610,10 +612,10 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setPrivilegedSubscriber(false);
         subscription.setDecompress(false);
         subscription.changeOwnerShip();
-        subscription.doUpdate(db.getConnection());
+        subscription.doUpdate(ds.getConnection());
     }
 
-    private void resetAafSubscriptionInDB() throws SQLException {
+    private void resetAafSubscriptionInDB() throws SQLException, ClassNotFoundException {
         Subscription subscription = new Subscription("https://172.100.0.5:8080", "user2", "password2");
         subscription.setSubid(2);
         subscription.setSubscriber("user2");
@@ -626,10 +628,10 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setAafInstance("https://aaf-onap-test.osaaf.org:8095");
         subscription.setDecompress(false);
         subscription.setPrivilegedSubscriber(false);
-        subscription.doUpdate(db.getConnection());
+        subscription.doUpdate(ds.getConnection());
     }
 
-    private void addNewSubscriptionInDB() throws SQLException {
+    private void addNewSubscriptionInDB() throws SQLException, ClassNotFoundException {
         Subscription subscription = new Subscription("https://172.100.0.6:8080", "user3", "password3");
         subscription.setSubid(3);
         subscription.setSubscriber("user3");
@@ -640,6 +642,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setMetadataOnly(false);
         subscription.setSuspended(false);
         subscription.setDecompress(false);
-        subscription.doInsert(db.getConnection());
+        subscription.doInsert(ds.getConnection());
     }
 }

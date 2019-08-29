@@ -50,6 +50,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.PublishRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.eelf.EelfMsgs;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
 
 
@@ -493,10 +494,9 @@ public class LogServlet extends BaseServlet {
     private void getRecordsForSQL(String sql, RowHandler rh) {
         intlogger.debug(sql);
         long start = System.currentTimeMillis();
-        DB db = new DB();
         Connection conn = null;
         try {
-            conn = db.getConnection();
+            conn = DataSource.getConnection();
             try (Statement  stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery(sql)) {
                     while (rs.next()) {
@@ -504,11 +504,11 @@ public class LogServlet extends BaseServlet {
                     }
                 }
             }
-        } catch (SQLException sqlException) {
+        } catch (SQLException | ClassNotFoundException sqlException) {
             intlogger.info("Failed to get Records. Exception = " + sqlException.getMessage(),sqlException);
         } finally {
             if (conn != null) {
-                db.release(conn);
+                DataSource.returnConnection(conn);
             }
         }
         intlogger.debug("Time: " + (System.currentTimeMillis() - start) + " ms");
