@@ -22,6 +22,30 @@
       "revId": "b7f6b0e41ea30357e145ed39b430abd57edab07f",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0b8adab_438a4e12",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5697
+      },
+      "writtenOn": "2019-08-30T14:13:42Z",
+      "side": 1,
+      "message": "ya sound. I\u0027ll refactor to that",
+      "parentUuid": "5f790d49_925f3bc4",
+      "range": {
+        "startLine": 67,
+        "startChar": 32,
+        "endLine": 67,
+        "endChar": 45
+      },
+      "revId": "b7f6b0e41ea30357e145ed39b430abd57edab07f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
