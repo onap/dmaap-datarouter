@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f790d49_925f3bc4",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/StatisticsServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-08-30T14:09:31Z",
+      "side": 1,
+      "message": "I think we need to use the const naming convention:\nlike so - \"SQL_SELECT_NAME\"",
+      "range": {
+        "startLine": 67,
+        "startChar": 32,
+        "endLine": 67,
+        "endChar": 45
+      },
+      "revId": "b7f6b0e41ea30357e145ed39b430abd57edab07f",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
