@@ -59,11 +59,11 @@ public class Feed extends Syncable {
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
     private static int nextFeedID = getMaxFeedID() + 1;
     private static final String SQLEXCEPTION = "SQLException: ";
-    private static final String FEEDID = "FEEDID";
-    private static final String feedIDStr = "feedid";
-    private static final String deletedStr = "deleted";
-    private static final String lastModStr = "last_mod";
-    private static final String createdDateStr ="created_date";
+    private static final String FEED_ID_SQL = "FEEDID";
+    private static final String FEED_ID = "feedid";
+    private static final String DEL = "deleted";
+    private static final String LAST_MOD = "last_mod";
+    private static final String CREATED_DATE = "created_date";
 
     private int feedid;
     private int groupid; //New field is added - Groups feature Rally:US708115 - 1610
@@ -114,7 +114,7 @@ public class Feed extends Syncable {
      * @throws SQLException in case of SQL statement error
      */
     public Feed(ResultSet rs) throws SQLException {
-        this.feedid = rs.getInt(FEEDID);
+        this.feedid = rs.getInt(FEED_ID_SQL);
         //New field is added - Groups feature Rally:US708115 - 1610
         this.groupid = rs.getInt("GROUPID");
         this.name = rs.getString("NAME");
@@ -146,7 +146,7 @@ public class Feed extends Syncable {
         this("", "", "", "");
         try {
             // The JSONObject is assumed to contain a vnd.dmaap-dr.feed representation
-            this.feedid = jo.optInt(feedIDStr, -1);
+            this.feedid = jo.optInt(FEED_ID, -1);
             this.groupid = jo.optInt("groupid");
             this.name = jo.getString("name");
             this.aafInstance = jo.optString("aaf_instance", "legacy");
@@ -205,7 +205,7 @@ public class Feed extends Syncable {
             }
 
             this.publisher = jo.optString("publisher", "");
-            this.deleted = jo.optBoolean(deletedStr, false);
+            this.deleted = jo.optBoolean(DEL, false);
             this.suspended = jo.optBoolean("suspend", false);
             JSONObject jol = jo.optJSONObject("links");
             this.links = (jol == null) ? (new FeedLinks()) : (new FeedLinks(jol));
@@ -338,7 +338,7 @@ public class Feed extends Syncable {
                 String sql = "select * from FEED_ENDPOINT_IDS";
                 try (ResultSet rs = stmt.executeQuery(sql)) {
                     while (rs.next()) {
-                        int id = rs.getInt(FEEDID);
+                        int id = rs.getInt(FEED_ID_SQL);
                         Feed feed = map.get(id);
                         if (feed != null) {
                             FeedEndpointID epi = new FeedEndpointID(rs);
@@ -351,7 +351,7 @@ public class Feed extends Syncable {
                 sql = "select * from FEED_ENDPOINT_ADDRS";
                 try (ResultSet rs = stmt.executeQuery(sql)) {
                     while (rs.next()) {
-                        int id = rs.getInt(FEEDID);
+                        int id = rs.getInt(FEED_ID_SQL);
                         Feed feed = map.get(id);
                         if (feed != null) {
                             Collection<String> acoll = feed.getAuthorization().getEndpointAddrs();
@@ -568,7 +568,7 @@ public class Feed extends Syncable {
     @Override
     public JSONObject asJSONObject() {
         JSONObject jo = new JSONObject();
-        jo.put(feedIDStr, feedid);
+        jo.put(FEED_ID, feedid);
         //New field is added - Groups feature Rally:US708115 - 1610
         jo.put("groupid", groupid);
         jo.put("name", name);
@@ -579,10 +579,10 @@ public class Feed extends Syncable {
         jo.put("authorization", authorization.asJSONObject());
         jo.put("publisher", publisher);
         jo.put("links", links.asJSONObject());
-        jo.put(deletedStr, deleted);
+        jo.put(DEL, deleted);
         jo.put("suspend", suspended);
-        jo.put(lastModStr, lastMod.getTime());
-        jo.put(createdDateStr, createdDate.getTime());
+        jo.put(LAST_MOD, lastMod.getTime());
+        jo.put(CREATED_DATE, createdDate.getTime());
         jo.put("aaf_instance", aafInstance);
         return jo;
     }
@@ -595,10 +595,10 @@ public class Feed extends Syncable {
     public JSONObject asJSONObject(boolean hidepasswords) {
         JSONObject jo = asJSONObject();
         if (hidepasswords) {
-            jo.remove(feedIDStr);    // we no longer hide passwords, however we do hide these
-            jo.remove(deletedStr);
-            jo.remove(lastModStr);
-            jo.remove(createdDateStr);
+            jo.remove(FEED_ID);    // we no longer hide passwords, however we do hide these
+            jo.remove(DEL);
+            jo.remove(LAST_MOD);
+            jo.remove(CREATED_DATE);
         }
         return jo;
     }
@@ -609,10 +609,10 @@ public class Feed extends Syncable {
      */
     public JSONObject asLimitedJSONObject() {
         JSONObject jo = asJSONObject();
-        jo.remove(deletedStr);
-        jo.remove(feedIDStr);
-        jo.remove(lastModStr);
-        jo.remove(createdDateStr);
+        jo.remove(DEL);
+        jo.remove(FEED_ID);
+        jo.remove(LAST_MOD);
+        jo.remove(CREATED_DATE);
         return jo;
     }
 
