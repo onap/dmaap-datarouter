@@ -1,0 +1,349 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfc64dd1_d1d5d505",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DB.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-02T10:49:17Z",
+      "side": 1,
+      "message": "Might be better to use a singleton here instead of statics.",
+      "range": {
+        "startLine": 64,
+        "startChar": 4,
+        "endLine": 72,
+        "endChar": 5
+      },
+      "revId": "2dc3e0138c57c4f9cff5082613a0ff5010cceeff",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dcab9ab2_c6cd2612",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DB.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-02T10:49:17Z",
+      "side": 1,
+      "message": "You could potentially move these db setup methods to their own class as \"DbInitializer\" or the like.\n\nThen merge the DB.java and DataSource.java and refactor a bit.",
+      "range": {
+        "startLine": 135,
+        "startChar": 3,
+        "endLine": 135,
+        "endChar": 33
+      },
+      "revId": "2dc3e0138c57c4f9cff5082613a0ff5010cceeff",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2a1265f9_f9ddbe6f",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DBConnectionPool.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-02T10:49:17Z",
+      "side": 1,
+      "message": "I would make everything private by default and then increase access as needed.\nConstructors, methods, vars, etc.",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 6
+      },
+      "revId": "2dc3e0138c57c4f9cff5082613a0ff5010cceeff",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4282f5f7_21bf269c",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DBConnectionPool.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-02T10:49:17Z",
+      "side": 1,
+      "message": "whitespace missing",
+      "range": {
+        "startLine": 41,
+        "startChar": 12,
+        "endLine": 41,
+        "endChar": 14
+      },
+      "revId": "2dc3e0138c57c4f9cff5082613a0ff5010cceeff",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "21572c30_2b577836",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DBConnectionPool.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-02T10:49:17Z",
+      "side": 1,
+      "message": "I think we should prob have a max, min and initial size and grow as needed.\n\nWill take a bit more logic ao new methods to handle it.\n\nAlso maybe get the MAX from the props file.",
+      "range": {
+        "startLine": 47,
+        "startChar": 18,
+        "endLine": 47,
+        "endChar": 31
+      },
+      "revId": "2dc3e0138c57c4f9cff5082613a0ff5010cceeff",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d13a278_d02384d0",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DBConnectionPool.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-02T10:49:17Z",
+      "side": 1,
+      "message": "whitespace",
+      "range": {
+        "startLine": 49,
+        "startChar": 10,
+        "endLine": 49,
+        "endChar": 11
+      },
+      "revId": "2dc3e0138c57c4f9cff5082613a0ff5010cceeff",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "99d95514_5675c0a8",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DBConnectionPool.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-02T10:49:17Z",
+      "side": 1,
+      "message": "This I think is setup in the \"init\" method in DB.java",
+      "range": {
+        "startLine": 59,
+        "startChar": 12,
+        "endLine": 59,
+        "endChar": 41
+      },
+      "revId": "2dc3e0138c57c4f9cff5082613a0ff5010cceeff",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "34446d13_ba9ab8fa",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DBConnectionPool.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-02T10:49:17Z",
+      "side": 1,
+      "message": "dbPassword",
+      "range": {
+        "startLine": 60,
+        "startChar": 83,
+        "endLine": 60,
+        "endChar": 92
+      },
+      "revId": "2dc3e0138c57c4f9cff5082613a0ff5010cceeff",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0699c696_8d03ba1b",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DBConnectionPool.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-02T10:49:17Z",
+      "side": 1,
+      "message": "Unfortunately the exceptions are getting lost here and ideally should be propagated up to the \"getConnection\" call.\n\nWould have to refactor \"createNewConnectionForPool\" to allow the exceptions up the call stack.",
+      "range": {
+        "startLine": 61,
+        "startChar": 8,
+        "endLine": 61,
+        "endChar": 59
+      },
+      "revId": "2dc3e0138c57c4f9cff5082613a0ff5010cceeff",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3d94b3e1_34a18d88",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DBConnectionPool.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-02T10:49:17Z",
+      "side": 1,
+      "message": "Ideally use a logger.",
+      "range": {
+        "startLine": 62,
+        "startChar": 12,
+        "endLine": 62,
+        "endChar": 15
+      },
+      "revId": "2dc3e0138c57c4f9cff5082613a0ff5010cceeff",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d21d7328_9ca2f9e4",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DBConnectionPool.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-02T10:49:17Z",
+      "side": 1,
+      "message": "Bit concerned that we aren\u0027t closing the connections at all.\nGoes against best practice for JDBC connection pooling.",
+      "range": {
+        "startLine": 77,
+        "startChar": 16,
+        "endLine": 77,
+        "endChar": 37
+      },
+      "revId": "2dc3e0138c57c4f9cff5082613a0ff5010cceeff",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d5a21bc4_fddccc54",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DataSource.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-02T10:49:17Z",
+      "side": 1,
+      "message": "Needs a private constuctor",
+      "range": {
+        "startLine": 29,
+        "startChar": 13,
+        "endLine": 29,
+        "endChar": 22
+      },
+      "revId": "2dc3e0138c57c4f9cff5082613a0ff5010cceeff",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f14dd94f_1ba7c7e0",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DataSource.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-02T10:49:17Z",
+      "side": 1,
+      "message": "Can be private",
+      "range": {
+        "startLine": 30,
+        "startChar": 28,
+        "endLine": 30,
+        "endChar": 31
+      },
+      "revId": "2dc3e0138c57c4f9cff5082613a0ff5010cceeff",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b2763f48_5d364a37",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DataSource.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-02T10:49:17Z",
+      "side": 1,
+      "message": "Exceptions are being caught up the callstack so won\u0027t get thrown here.",
+      "range": {
+        "startLine": 32,
+        "startChar": 45,
+        "endLine": 32,
+        "endChar": 88
+      },
+      "revId": "2dc3e0138c57c4f9cff5082613a0ff5010cceeff",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "59ff6231_fd1d2684",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DataSource.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-02T10:49:17Z",
+      "side": 1,
+      "message": "Can return the getConnectionFromPool directly.",
+      "range": {
+        "startLine": 34,
+        "startChar": 15,
+        "endLine": 34,
+        "endChar": 25
+      },
+      "revId": "2dc3e0138c57c4f9cff5082613a0ff5010cceeff",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
