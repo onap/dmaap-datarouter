@@ -31,6 +31,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
@@ -41,6 +42,7 @@ public class NetworkRouteTest {
     private static EntityManagerFactory emf;
     private static EntityManager em;
     private DB db;
+    private DataSource ds;
 
     @BeforeClass
     public static void init() {
@@ -64,17 +66,17 @@ public class NetworkRouteTest {
     }
 
     @Test
-    public void Verify_NetworkRoute_Is_Removed_Successfully() throws SQLException {
+    public void Verify_NetworkRoute_Is_Removed_Successfully() throws SQLException, ClassNotFoundException {
         Assert.assertEquals(1, NetworkRoute.getAllNetworkRoutes().size());
         NetworkRoute networkRoute = new NetworkRoute("stub_from.", "stub_to.");
-        networkRoute.doDelete(db.getConnection());
+        networkRoute.doDelete(ds.getConnection());
         Assert.assertEquals(0, NetworkRoute.getAllNetworkRoutes().size());
     }
 
     @Test
-    public void Verify_NetworkRoute_Is_Updated_Successfully() throws SQLException {
+    public void Verify_NetworkRoute_Is_Updated_Successfully() throws SQLException, ClassNotFoundException {
         NetworkRoute networkRoute = new NetworkRoute("stub_from.", "stub_to.", "node02.");
-        networkRoute.doUpdate(db.getConnection());
+        networkRoute.doUpdate(ds.getConnection());
         //Assert.assertTrue(NetworkRoute.getAllNetworkRoutes().contains(networkRoute));
         for (NetworkRoute net :
             NetworkRoute.getAllNetworkRoutes()) {
