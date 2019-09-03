@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c73538fa_8bff893c",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/reports/FeedReport.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5697
+      },
+      "writtenOn": "2019-09-03T09:40:12Z",
+      "side": 1,
+      "message": "is this still needed?",
+      "range": {
+        "startLine": 70,
+        "startChar": 12,
+        "endLine": 70,
+        "endChar": 41
+      },
+      "revId": "612aa94c1817354fd68bf720572540731964bcfc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aad6206e_a9a10817",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/reports/LatencyReport.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5697
+      },
+      "writtenOn": "2019-09-03T09:40:12Z",
+      "side": 1,
+      "message": "is this still needed?",
+      "range": {
+        "startLine": 146,
+        "startChar": 12,
+        "endLine": 146,
+        "endChar": 41
+      },
+      "revId": "612aa94c1817354fd68bf720572540731964bcfc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aac7bb6d_bddfa303",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/reports/SubscriberReport.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5697
+      },
+      "writtenOn": "2019-09-03T09:40:12Z",
+      "side": 1,
+      "message": "is this still needed?",
+      "range": {
+        "startLine": 103,
+        "startChar": 12,
+        "endLine": 103,
+        "endChar": 41
+      },
+      "revId": "612aa94c1817354fd68bf720572540731964bcfc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d05ae6b7_e550703e",
+        "filename": "datarouter-prov/src/test/java/org/onap/dmaap/datarouter/provisioning/beans/LogRecordTest.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5697
+      },
+      "writtenOn": "2019-09-03T09:40:12Z",
+      "side": 1,
+      "message": "is this unused now? (cant see beyond line 78 in code view)",
+      "range": {
+        "startLine": 44,
+        "startChar": 4,
+        "endLine": 44,
+        "endChar": 18
+      },
+      "revId": "612aa94c1817354fd68bf720572540731964bcfc",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
