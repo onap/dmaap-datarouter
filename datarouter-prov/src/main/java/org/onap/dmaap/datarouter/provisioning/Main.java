@@ -55,6 +55,7 @@ import org.onap.aaf.cadi.PropAccess;
 
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.DRProvCadiFilter;
+import org.onap.dmaap.datarouter.provisioning.utils.DbItialization;
 import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
 import org.onap.dmaap.datarouter.provisioning.utils.PurgeLogDirTask;
 import org.onap.dmaap.datarouter.provisioning.utils.ThrottleFilter;
@@ -313,7 +314,7 @@ public class Main {
     }
 
     private static boolean checkDatabase() {
-        DB db = new DB();
+        DbItialization db = new DbItialization();
         return db.runRetroFits();
     }
 

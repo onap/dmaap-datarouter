@@ -67,6 +67,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 import org.onap.dmaap.datarouter.provisioning.utils.PasswordProcessor;
 import org.onap.dmaap.datarouter.provisioning.utils.ThrottleFilter;
 import org.slf4j.MDC;
@@ -677,17 +678,16 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     protected boolean doInsert(Insertable bean) {
         boolean rv;
-        DB db = new DB();
         Connection conn = null;
         try {
-            conn = db.getConnection();
+            conn = DataSource.getConnection();
             rv = bean.doInsert(conn);
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             rv = false;
             intlogger.warn("PROV0005 doInsert: " + e.getMessage(), e);
         } finally {
             if (conn != null) {
-                db.release(conn);
+                DataSource.returnConnection(conn);
             }
         }
         return rv;
@@ -701,17 +701,16 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     protected boolean doUpdate(Updateable bean) {
         boolean rv;
-        DB db = new DB();
         Connection conn = null;
         try {
-            conn = db.getConnection();
+            conn = DataSource.getConnection();
             rv = bean.doUpdate(conn);
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage(), e);
         } finally {
             if (conn != null) {
-                db.release(conn);
+                DataSource.returnConnection(conn);
             }
         }
         return rv;
@@ -725,17 +724,16 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     protected boolean doDelete(Deleteable bean) {
         boolean rv;
-        DB db = new DB();
         Connection conn = null;
         try {
-            conn = db.getConnection();
+            conn = DataSource.getConnection();
             rv = bean.doDelete(conn);
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             rv = false;
             intlogger.warn("PROV0007 doDelete: " + e.getMessage(), e);
         } finally {
             if (conn != null) {
-                db.release(conn);
+                DataSource.returnConnection(conn);
             }
         }
         return rv;

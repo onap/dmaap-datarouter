@@ -42,7 +42,7 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 import org.onap.dmaap.datarouter.provisioning.utils.JSONUtilities;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 
@@ -227,8 +227,7 @@ public class Feed extends Syncable {
     public static boolean isFeedValid(int id) {
         int count = 0;
         try {
-            DB db = new DB();
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try (PreparedStatement stmt = conn.prepareStatement("select COUNT(*) from FEEDS where FEEDID = ?")) {
                 stmt.setInt(1, id);
                 try (ResultSet rs = stmt.executeQuery()) {
@@ -237,8 +236,8 @@ public class Feed extends Syncable {
                     }
                 }
             }
-            db.release(conn);
-        } catch (SQLException e) {
+            DataSource.returnConnection(conn);
+        } catch (SQLException | ClassNotFoundException e) {
             intlogger.warn("PROV0024 Feed.isFeedValid: " + e.getMessage(), e);
         }
         return count != 0;
@@ -277,8 +276,7 @@ public class Feed extends Syncable {
     public static int countActiveFeeds() {
         int count = 0;
         try {
-            DB db = new DB();
-            @SuppressWarnings("resource") Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery("select count(*) from FEEDS where DELETED = 0")) {
                     if (rs.next()) {
@@ -286,8 +284,8 @@ public class Feed extends Syncable {
                     }
                 }
             }
-            db.release(conn);
-        } catch (SQLException e) {
+            DataSource.returnConnection(conn);
+        } catch (SQLException | ClassNotFoundException e) {
             intlogger.warn("PROV0025 Feed.countActiveFeeds: " + e.getMessage(), e);
         }
         return count;
@@ -300,9 +298,7 @@ public class Feed extends Syncable {
     public static int getMaxFeedID() {
         int max = 0;
         try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery("select MAX(feedid) from FEEDS")) {
                     if (rs.next()) {
@@ -310,8 +306,8 @@ public class Feed extends Syncable {
                     }
                 }
             }
-            db.release(conn);
-        } catch (SQLException e) {
+            DataSource.returnConnection(conn);
+        } catch (SQLException | ClassNotFoundException e) {
             intlogger.warn("PROV0026 Feed.getMaxFeedID: " + e.getMessage(), e);
         }
         return max;
@@ -324,9 +320,7 @@ public class Feed extends Syncable {
     public static Collection<Feed> getAllFeeds() {
         Map<Integer, Feed> map = new HashMap<>();
         try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery("select * from FEEDS")) {
                     while (rs.next()) {
@@ -360,8 +354,8 @@ public class Feed extends Syncable {
                     }
                 }
             }
-            db.release(conn);
-        } catch (SQLException e) {
+            DataSource.returnConnection(conn);
+        } catch (SQLException | ClassNotFoundException e) {
             intlogger.warn("PROV0027 Feed.getAllFeeds: " + e.getMessage(), e);
         }
         return map.values();
@@ -387,9 +381,7 @@ public class Feed extends Syncable {
                           + "and SUBSCRIPTIONS.SUBSCRIBER = ?";
         }
         try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 if (sql.indexOf('?') >= 0) {
                     ps.setString(1, val);
@@ -401,8 +393,8 @@ public class Feed extends Syncable {
                     }
                 }
             }
-            db.release(conn);
-        } catch (SQLException e) {
+            DataSource.returnConnection(conn);
+        } catch (SQLException | ClassNotFoundException e) {
             intlogger.warn("PROV0028 Feed.getFilteredFeedUrlList: " + e.getMessage(), e);
         }
         return list;
@@ -412,8 +404,7 @@ public class Feed extends Syncable {
     private static Feed getFeedBySQL(String sql) {
         Feed feed = null;
         try {
-            DB db = new DB();
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery(sql)) {
                     if (rs.next()) {
@@ -438,8 +429,8 @@ public class Feed extends Syncable {
                     }
                 }
             }
-            db.release(conn);
-        } catch (SQLException e) {
+            DataSource.returnConnection(conn);
+        } catch (SQLException | ClassNotFoundException e) {
             intlogger.warn("PROV0029 Feed.getFeedBySQL: " + e.getMessage(), e);
         }
         return feed;
@@ -804,16 +795,14 @@ public class Feed extends Syncable {
         PreparedStatement ps = null;
         try {
 
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             String sql = "update FEEDS set PUBLISHER = ? where FEEDID = ?";
             ps = conn.prepareStatement(sql);
             ps.setString(1, this.publisher);
             ps.setInt(2, feedid);
             ps.execute();
             ps.close();
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             rv = false;
             intlogger.warn("PROV0008 changeOwnerShip: " + e.getMessage(), e);
         } finally {
