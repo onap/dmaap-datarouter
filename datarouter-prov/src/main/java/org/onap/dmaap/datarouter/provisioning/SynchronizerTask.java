@@ -78,6 +78,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Syncable;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
 import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
@@ -482,9 +483,8 @@ public class SynchronizerTask extends TimerTask {
             Map<String, Syncable> oldmap = getMap(oldc);
             Set<String> union = new TreeSet<>(newmap.keySet());
             union.addAll(oldmap.keySet());
-            DB db = new DB();
             @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             for (String n : union) {
                 Syncable newobj = newmap.get(n);
                 Syncable oldobj = oldmap.get(n);
@@ -496,8 +496,8 @@ public class SynchronizerTask extends TimerTask {
                     changes = updateRecord(conn, newobj, oldobj);
                 }
             }
-            db.release(conn);
-        } catch (SQLException e) {
+            DataSource.returnConnection(conn);
+        } catch (SQLException | ClassNotFoundException e) {
             logger.warn("PROV5009: problem during sync, exception: " + e);
         }
         return changes;

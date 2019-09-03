@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 
 /**
  * This class is used to aid in the mapping of node names from/to node IDs.
@@ -86,17 +86,16 @@ public abstract class NodeClass extends Syncable {
     }
 
     private static void insertNodesToTable(int nextid, String node) {
-        DB db = new DB();
-        try (Connection conn = db.getConnection()) {
+        try (Connection conn = DataSource.getConnection()) {
             try (PreparedStatement ps = conn
                     .prepareStatement("insert into NODES (NODEID, NAME, ACTIVE) values (?, ?, 1)")) {
                 ps.setInt(1, nextid);
                 ps.setString(2, node);
                 ps.execute();
             } finally {
-                db.release(conn);
+                DataSource.returnConnection(conn);
             }
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             intLogger.error(PROV_0005_DO_INSERT + e.getMessage(), e);
         }
     }
@@ -104,8 +103,7 @@ public abstract class NodeClass extends Syncable {
     private static void reload() {
         Map<String, Integer> hmap = new HashMap<>();
         String sql = "select NODEID, NAME from NODES";
-        DB db = new DB();
-        try (Connection conn = db.getConnection();
+        try (Connection conn = DataSource.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -114,9 +112,9 @@ public abstract class NodeClass extends Syncable {
                     hmap.put(name, id);
                 }
             } finally {
-                db.release(conn);
+                DataSource.returnConnection(conn);
             }
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             intLogger.error(PROV_0005_DO_INSERT + e.getMessage(),e);
         }
         map = hmap;

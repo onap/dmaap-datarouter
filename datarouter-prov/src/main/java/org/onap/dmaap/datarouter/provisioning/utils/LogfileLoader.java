@@ -260,7 +260,7 @@ public class LogfileLoader extends Thread {
             Connection conn = null;
             try {
                 // Limit to a million at a time to avoid typing up the DB for too long.
-                conn = db.getConnection();
+                conn = DataSource.getConnection();
                 try (PreparedStatement ps = conn.prepareStatement(
                         "DELETE from LOG_RECORDS where EVENT_TIME < ? limit 1000000")) {
                     ps.setLong(1, cutoff);
@@ -283,8 +283,10 @@ public class LogfileLoader extends Thread {
                 }
             } catch (SQLException e) {
                 logger.error("LogfileLoader.pruneRecords: " + e.getMessage(), e);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
             } finally {
-                db.release(conn);
+                DataSource.returnConnection(conn);
             }
         }
         return did1;
@@ -292,24 +294,26 @@ public class LogfileLoader extends Thread {
 
     private long countRecords() {
         long count = 0;
-        try (Connection conn = db.getConnection();
+        try (Connection conn = DataSource.getConnection();
             Statement stmt = conn.createStatement()) {
             try (ResultSet rs = stmt.executeQuery("SELECT COUNT(*) as COUNT from LOG_RECORDS")) {
                 if (rs.next()) {
                     count = rs.getLong("COUNT");
                 }
             } finally {
-                db.release(conn);
+                DataSource.returnConnection(conn);
             }
         } catch (SQLException e) {
             logger.error("LogfileLoader.countRecords: " + e.getMessage(), e);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
         return count;
     }
 
     private Map<Long, Long> getHistogram() {
         Map<Long, Long> map = new HashMap<>();
-        try (Connection conn = db.getConnection();
+        try (Connection conn = DataSource.getConnection();
             Statement stmt = conn.createStatement()) {
             logger.debug("  LOG_RECORD table histogram...");
             try (ResultSet rs = stmt.executeQuery(
@@ -321,10 +325,12 @@ public class LogfileLoader extends Thread {
                     logger.debug("  " + day + "  " + cnt);
                 }
             } finally {
-                db.release(conn);
+                DataSource.returnConnection(conn);
             }
         } catch (SQLException e) {
             logger.error("LogfileLoader.getHistogram: " + e.getMessage(), e);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
         return map;
     }
@@ -332,7 +338,7 @@ public class LogfileLoader extends Thread {
     private void initializeNextid() {
         Connection conn = null;
         try {
-            conn = db.getConnection();
+            conn = DataSource.getConnection();
             RLEBitSet nbs = new RLEBitSet();
             try (Statement stmt = conn.createStatement()) {
                 // Build a bitset of all records in the LOG_RECORDS table
@@ -376,8 +382,10 @@ public class LogfileLoader extends Thread {
             logger.debug(String.format("LogfileLoader.initializeNextid, next ID is %d (%x)", nextId, nextId));
         } catch (SQLException e) {
             logger.error("LogfileLoader.initializeNextid: " + e.getMessage(), e);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } finally {
-            db.release(conn);
+            DataSource.returnConnection(conn);
         }
     }
 
@@ -386,7 +394,7 @@ public class LogfileLoader extends Thread {
         int ok = 0;
         int total = 0;
         try {
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             PreparedStatement ps = conn.prepareStatement(INSERT_SQL);
             Reader reader = file.getPath().endsWith(".gz")
                 ? new InputStreamReader(new GZIPInputStream(new FileInputStream(file)))
@@ -429,8 +437,8 @@ public class LogfileLoader extends Thread {
                 }
             }
             ps.close();
-            db.release(conn);
-        } catch (SQLException | IOException e) {
+            DataSource.returnConnection(conn);
+        } catch (SQLException | IOException | ClassNotFoundException e) {
             logger.warn("PROV8007 Exception reading " + file + ": " + e);
         }
         return new int[]{ok, total};
