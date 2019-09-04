@@ -39,6 +39,7 @@ import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import javax.persistence.EntityManager;
@@ -70,6 +71,7 @@ public class FeedServletTest extends DrServletTestBase {
     private static EntityManagerFactory emf;
     private static EntityManager em;
     private DB db;
+    private DataSource ds;
 
     private ListAppender<ILoggingEvent> listAppender;
 
@@ -93,7 +95,6 @@ public class FeedServletTest extends DrServletTestBase {
     public void setUp() throws Exception {
         listAppender = setTestLogger(FeedServlet.class);
         feedServlet = new FeedServlet();
-        db = new DB();
         setAuthoriserToReturnRequestIsAuthorized();
         setUpValidAuthorisedRequest();
         setUpValidSecurityOnHttpRequest();
@@ -529,11 +530,11 @@ public class FeedServletTest extends DrServletTestBase {
         when(request.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
     }
 
-    private void reinsertFeedIntoDb() throws SQLException {
+    private void reinsertFeedIntoDb() throws SQLException, ClassNotFoundException {
         Feed feed = new Feed("Feed1","v0.1", "First Feed for testing", "First Feed for testing");
         feed.setFeedid(1);
         feed.setGroupid(1);
         feed.setDeleted(false);
-        feed.doUpdate(db.getConnection());
+        feed.doUpdate(ds.getConnection());
     }
 }

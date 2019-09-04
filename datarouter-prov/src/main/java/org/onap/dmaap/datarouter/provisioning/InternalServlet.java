@@ -49,6 +49,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.LogRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.eelf.EelfMsgs;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DbConnectionPool;
 import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
 import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
 
@@ -231,7 +232,7 @@ public class InternalServlet extends ProxyServlet {
             eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID,
                     req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             String path = req.getPathInfo();
-            Properties props = (new DB()).getProperties();
+            Properties props = (DbConnectionPool.getProperties());
             if ("/halt".equals(path) && !req.isSecure()) {
                 // request to halt the server - can ONLY come from localhost
                 String remote = req.getRemoteAddr();
@@ -461,7 +462,7 @@ public class InternalServlet extends ProxyServlet {
                     return;
                 }
                 String spooldir =
-                        (new DB()).getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
+                        (DbConnectionPool.getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir"));
                 String spoolname = String.format("%d-%d-", System.currentTimeMillis(), Thread.currentThread().getId());
                 synchronized (lock) {
                     // perhaps unnecessary, but it helps make the name unique
@@ -570,7 +571,7 @@ public class InternalServlet extends ProxyServlet {
 
     private JSONArray generateLogfileList() {
         JSONArray ja = new JSONArray();
-        Properties prop = (new DB()).getProperties();
+        Properties prop = (DbConnectionPool.getProperties());
         String str = prop.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
         if (str != null) {
             String[] dirs = str.split(",");

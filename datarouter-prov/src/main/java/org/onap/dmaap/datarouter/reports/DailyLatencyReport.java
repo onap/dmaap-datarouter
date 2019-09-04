@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 
 /**
  * Generate a daily per feed latency report.  The report is a .csv file containing the following columns:
@@ -162,9 +162,8 @@ public class DailyLatencyReport extends ReportBase {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         long start = System.currentTimeMillis();
         try {
-            DB db = new DB();
             @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try (PreparedStatement ps = conn.prepareStatement(SELECT_SQL)) {
                 ps.setLong(1, from);
                 ps.setLong(2, to);
@@ -187,9 +186,9 @@ public class DailyLatencyReport extends ReportBase {
                     }
                 }
 
-                db.release(conn);
+                DataSource.returnConnection(conn);
             }
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             logger.error("SQLException: " + e.getMessage());
         }
         logger.debug("Query time: " + (System.currentTimeMillis() - start) + " ms");
