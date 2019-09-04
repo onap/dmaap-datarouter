@@ -35,7 +35,7 @@ import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.json.JSONObject;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 
 /**
  * The representation of one route in the Egress Route Table.
@@ -71,17 +71,16 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
      */
     public static SortedSet<EgressRoute> getAllEgressRoutes() {
         SortedSet<EgressRoute> set = new TreeSet<>();
-        DB db = new DB();
         String sql = "select SUBID, NODEID from EGRESS_ROUTES";
-        try (Connection conn = db.getConnection()) {
+        try (Connection conn = DataSource.getConnection()) {
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery(sql)) {
                     addEgressRouteToSet(set, rs);
                 }
             } finally {
-                db.release(conn);
+                DataSource.returnConnection(conn);
             }
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             intlogger.error("PROV0008 EgressRoute.getAllEgressRoutes: " + e.getMessage(), e);
         }
         return set;
@@ -103,9 +102,8 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
      */
     public static EgressRoute getEgressRoute(int sub) {
         EgressRoute er = null;
-        DB db = new DB();
         String sql = "select NODEID from EGRESS_ROUTES where SUBID = ?";
-        try (Connection conn = db.getConnection();
+        try (Connection conn = DataSource.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, sub);
             try (ResultSet rs = ps.executeQuery()) {
@@ -114,9 +112,9 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
                     er = new EgressRoute(sub, node);
                 }
             } finally {
-                db.release(conn);
+                DataSource.returnConnection(conn);
             }
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             intlogger.error("PROV0009 EgressRoute.getEgressRoute: " + e.getMessage(), e);
         }
         return er;

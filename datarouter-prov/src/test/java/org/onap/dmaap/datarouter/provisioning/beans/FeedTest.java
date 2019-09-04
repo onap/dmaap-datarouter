@@ -22,31 +22,33 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning.beans;
 
-import org.json.JSONObject;
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
-import org.powermock.modules.junit4.PowerMockRunner;
+import static org.mockito.Matchers.anyString;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import java.io.InvalidObjectException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.mockito.Matchers.anyString;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import org.json.JSONObject;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 public class FeedTest {
     private static EntityManagerFactory emf;
     private static EntityManager em;
     private Feed feed;
-    private DB db;
 
     @BeforeClass
     public static void init() {
@@ -66,7 +68,6 @@ public class FeedTest {
 
     @Before
     public void setUp() throws Exception {
-        db = new DB();
         feed = new Feed("Feed1","v0.1", "First Feed for testing", "First Feed for testing");
         feed.setFeedid(1);
         feed.setGroupid(1);
@@ -93,8 +94,9 @@ public class FeedTest {
     }
 
     @Test
-    public void Given_doDelete_Succeeds_Then_doInsert_To_Put_Feed_Back_And_Bool_Is_True() throws SQLException, InvalidObjectException {
-        Boolean bool = feed.doDelete(db.getConnection());
+    public void Given_doDelete_Succeeds_Then_doInsert_To_Put_Feed_Back_And_Bool_Is_True()
+            throws SQLException, InvalidObjectException, ClassNotFoundException {
+        Boolean bool = feed.doDelete(DataSource.getConnection());
         Assert.assertEquals(true, bool);
         JSONObject jo = new JSONObject();
         jo.put("self","self_link");
@@ -102,7 +104,7 @@ public class FeedTest {
         jo.put("subscribe","subscribe_link");
         jo.put("log","log_link");
         feed.setLinks(new FeedLinks(jo));
-        bool = feed.doInsert(db.getConnection());
+        bool = feed.doInsert(DataSource.getConnection());
         Assert.assertEquals(true, bool);
     }
 
@@ -126,15 +128,15 @@ public class FeedTest {
     }
 
     @Test
-    public void Given_doDelete_Throws_SQLException_Then_Returns_False() throws SQLException {
+    public void Given_doDelete_Throws_SQLException_Then_Returns_False() throws SQLException, ClassNotFoundException {
         Connection spyConnection = CreateSpyForDbConnection();
         Mockito.doThrow(new SQLException()).when(spyConnection).prepareStatement(anyString());
         Assert.assertEquals(feed.doDelete(spyConnection), false);
     }
 
     @Test
-    public void Given_doInsert_Throws_SQLException_Then_Returns_False() throws SQLException {
-        Connection connection = db.getConnection();
+    public void Given_doInsert_Throws_SQLException_Then_Returns_False() throws SQLException, ClassNotFoundException {
+        Connection connection = DataSource.getConnection();
         FeedAuthorization fa = new FeedAuthorization();
         Set setA = new HashSet();
         setA.add(new FeedEndpointID("1", "Name"));
@@ -148,7 +150,7 @@ public class FeedTest {
     }
 
     @Test
-    public void Given_doUpdate_Throws_SQLException_Then_Returns_False() throws SQLException {
+    public void Given_doUpdate_Throws_SQLException_Then_Returns_False() throws SQLException, ClassNotFoundException {
         Connection spyConnection = CreateSpyForDbConnection();
         Mockito.doThrow(new SQLException()).when(spyConnection).prepareStatement(anyString());
         Assert.assertEquals(feed.doUpdate(spyConnection), false);
@@ -179,8 +181,8 @@ public class FeedTest {
         Assert.assertEquals(feed.isFeedValid(1), true);
     }
 
-    private Connection CreateSpyForDbConnection() throws SQLException {
-        Connection conn = db.getConnection();
+    private Connection CreateSpyForDbConnection() throws SQLException, ClassNotFoundException {
+        Connection conn = DataSource.getConnection();
         return Mockito.spy(conn);
     }
 }

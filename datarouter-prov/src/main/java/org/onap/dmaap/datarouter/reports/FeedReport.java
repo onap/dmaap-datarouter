@@ -37,10 +37,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 
 /**
  * Generate a feeds report.  The report is a .CSV file.
@@ -66,9 +65,8 @@ public class FeedReport extends ReportBase {
         long start = System.currentTimeMillis();
         StringBuilder sb = new StringBuilder();
         try {
-            DB db = new DB();
             @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
            try( PreparedStatement ps = conn.prepareStatement(SELECT_SQL)) {
                try (ResultSet rs = ps.executeQuery()) {
                    while (rs.next()) {
@@ -81,8 +79,8 @@ public class FeedReport extends ReportBase {
                    }
                }
            }
-        db.release(conn);
-        } catch (SQLException e) {
+            DataSource.returnConnection(conn);
+        } catch (SQLException | ClassNotFoundException e) {
             logger.error(e.toString());
         }
         logger.debug("Query time: " + (System.currentTimeMillis() - start) + " ms");
@@ -100,9 +98,8 @@ public class FeedReport extends ReportBase {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         long start = System.currentTimeMillis();
         try {
-            DB db = new DB();
             @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try(PreparedStatement ps = conn.prepareStatement(SELECT_SQL_OLD)) {
                 ps.setLong(1, from);
                 ps.setLong(2, to);
@@ -145,8 +142,8 @@ public class FeedReport extends ReportBase {
                     }
                 }
             }
-             db.release(conn);
-        } catch (SQLException e) {
+            DataSource.returnConnection(conn);
+        } catch (SQLException | ClassNotFoundException e) {
             logger.error(e.toString());
         }
         logger.debug("Query time: " + (System.currentTimeMillis() - start) + " ms");

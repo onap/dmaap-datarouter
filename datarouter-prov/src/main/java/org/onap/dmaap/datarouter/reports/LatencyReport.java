@@ -33,7 +33,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 
 /**
  * Generate a per-file latency report.  It reports on the details related to one file published
@@ -80,7 +80,7 @@ public class LatencyReport extends ReportBase {
             feedid = fid;
             clen = c;
             fileid = s;
-            events = new ArrayList<Event>();
+            events = new ArrayList<>();
         }
 
         private long pubtime;
@@ -112,7 +112,8 @@ public class LatencyReport extends ReportBase {
         }
 
         public long avg() {
-            long total = 0, c = 0;
+            long total = 0;
+            long c = 0;
             for (Event e : events) {
                 if (e.type.equals("del")) {
                     total += e.time - pubtime;
@@ -142,9 +143,8 @@ public class LatencyReport extends ReportBase {
     public void run() {
         long start = System.currentTimeMillis();
         try {
-            DB db = new DB();
             @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try(PreparedStatement ps = conn.prepareStatement(SELECT_SQL)){
             ps.setLong(1, from);
             ps.setLong(2, to);
@@ -174,10 +174,10 @@ public class LatencyReport extends ReportBase {
                         c.addEvent(type, etime);
                     }
                 }
-             db.release(conn);
+                DataSource.returnConnection(conn);
             }
             }
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException | ClassNotFoundException e) {
             System.err.println("File cannot be written: " + outfile);
         } catch (SQLException e) {
             logger.error("SQLException: " + e.getMessage());

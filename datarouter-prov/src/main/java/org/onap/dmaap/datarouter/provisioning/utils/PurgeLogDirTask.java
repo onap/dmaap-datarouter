@@ -52,7 +52,7 @@ public class PurgeLogDirTask extends TimerTask {
      * PurgeLogDirTask constructor.
      */
     public PurgeLogDirTask() {
-        Properties prop = (new DB()).getProperties();
+        Properties prop = DbConnectionPool.getProperties();
         logdir = prop.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
         String str = prop.getProperty("org.onap.dmaap.datarouter.provserver.logretention", "30");
         this.utilsLogger = EELFManager.getInstance().getLogger("UtilsLog");

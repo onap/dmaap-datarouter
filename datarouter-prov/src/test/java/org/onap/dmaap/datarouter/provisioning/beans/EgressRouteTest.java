@@ -30,7 +30,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
@@ -40,7 +40,6 @@ public class EgressRouteTest {
 
     private static EntityManagerFactory emf;
     private static EntityManager em;
-    private DB db;
 
     @BeforeClass
     public static void init() {
@@ -59,15 +58,14 @@ public class EgressRouteTest {
     }
     @Before
     public void setUp() throws Exception {
-        db = new DB();
         egressRoute = new EgressRoute(2, 1);
     }
 
     @Test
-    public void Verify_EgressRoute_Is_Removed_Successfully() throws SQLException {
+    public void Verify_EgressRoute_Is_Removed_Successfully() throws SQLException, ClassNotFoundException {
         Assert.assertEquals(1, EgressRoute.getAllEgressRoutes().size());
         EgressRoute egressRoute = new EgressRoute(1, 1);
-        egressRoute.doDelete(db.getConnection());
+        egressRoute.doDelete(DataSource.getConnection());
         Assert.assertEquals(0, EgressRoute.getAllEgressRoutes().size());
     }
 

@@ -52,9 +52,9 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.onap.aaf.cadi.PropAccess;
-
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.DRProvCadiFilter;
+import org.onap.dmaap.datarouter.provisioning.utils.DbConnectionPool;
+import org.onap.dmaap.datarouter.provisioning.utils.DbItialization;
 import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
 import org.onap.dmaap.datarouter.provisioning.utils.PurgeLogDirTask;
 import org.onap.dmaap.datarouter.provisioning.utils.ThrottleFilter;
@@ -135,7 +135,7 @@ public class Main {
         intlogger.info("PROV0000 **** AT&T Data Router Provisioning Server starting....");
 
         Security.setProperty("networkaddress.cache.ttl", "4");
-        Properties provProperties = (new DB()).getProperties();
+        Properties provProperties = (DbConnectionPool.getProperties());
         int httpPort = Integer.parseInt(provProperties
                                              .getProperty("org.onap.dmaap.datarouter.provserver.http.port", "8080"));
         final int httpsPort = Integer.parseInt(provProperties
@@ -313,7 +313,7 @@ public class Main {
     }
 
     private static boolean checkDatabase() {
-        DB db = new DB();
+        DbItialization db = new DbItialization();
         return db.runRetroFits();
     }
 

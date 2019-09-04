@@ -20,13 +20,6 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
-import org.junit.*;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
-import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -34,13 +27,22 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.ParseException;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
+import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
 
 public class LogRecordTest {
 
     private LogRecord logRecord;
     private static EntityManagerFactory emf;
     private static EntityManager em;
-    private DB db;
     private static final String INSERT_SQL = "insert into LOG_RECORDS values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private PreparedStatement ps;
 
@@ -61,9 +63,8 @@ public class LogRecordTest {
     }
 
     @Before
-    public void setUp() throws ParseException, SQLException {
-        db = new DB();
-        Connection conn = db.getConnection();
+    public void setUp() throws ParseException, SQLException, ClassNotFoundException {
+        Connection conn = DataSource.getConnection();
         ps = conn.prepareStatement(INSERT_SQL);
     }
 
