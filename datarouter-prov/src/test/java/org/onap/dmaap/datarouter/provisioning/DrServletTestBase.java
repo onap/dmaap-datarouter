@@ -30,6 +30,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DbConnectionPool;
 import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
@@ -48,7 +49,7 @@ public class DrServletTestBase {
         props.setProperty("org.onap.dmaap.datarouter.provserver.spooldir", "unit-test-logs/spool");
         props.setProperty("org.onap.dmaap.datarouter.provserver.https.relaxation", "false");
         props.setProperty("org.onap.dmaap.datarouter.provserver.passwordencryption", "PasswordEncryptionKey#@$%^&1234#");
-        FieldUtils.writeDeclaredStaticField(DB.class, "props", props, true);
+        FieldUtils.writeDeclaredStaticField(DbConnectionPool.class, "props", props, true);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "startmsgFlag", false, true);
         SynchronizerTask synchronizerTask = mock(SynchronizerTask.class);
         when(synchronizerTask.getPodState()).thenReturn(SynchronizerTask.UNKNOWN_POD);

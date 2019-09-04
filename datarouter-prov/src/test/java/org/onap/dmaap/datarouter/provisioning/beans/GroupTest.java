@@ -25,6 +25,7 @@ package org.onap.dmaap.datarouter.provisioning.beans;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import javax.persistence.EntityManager;
@@ -40,6 +41,7 @@ public class GroupTest {
   private static EntityManager em;
   private Group group;
   private DB db;
+  private DataSource ds;
 
   @BeforeClass
   public static void init() {
@@ -60,8 +62,9 @@ public class GroupTest {
   @Before
   public void setUp() throws Exception {
     db = new DB();
+    ds = new DataSource();
     group = new Group("GroupTest", "", "");
-    group.doInsert(db.getConnection());
+    group.doInsert(ds.getConnection());
   }
 
   @Test
@@ -79,10 +82,10 @@ public class GroupTest {
   public void Given_Group_Inserted_With_Same_Name_GetGroupMatching_With_Id_Returns_Correct_Group()
       throws Exception {
     Group sameGroupName = new Group("GroupTest", "This group has a description", "");
-    sameGroupName.doInsert(db.getConnection());
+    sameGroupName.doInsert(ds.getConnection());
     Assert.assertEquals(
         "This group has a description", Group.getGroupMatching(group, 2).getDescription());
-    sameGroupName.doDelete(db.getConnection());
+    sameGroupName.doDelete(ds.getConnection());
   }
 
   @Test
@@ -93,12 +96,12 @@ public class GroupTest {
   @Test
   public void Given_Group_AuthId_Updated_GetGroupByAuthId_Returns_Correct_Group() throws Exception {
     group.setAuthid("Basic TmFtZTp6Z04wMFkyS3gybFppbXltNy94ZDhuMkdEYjA9");
-    group.doUpdate(db.getConnection());
+    group.doUpdate(ds.getConnection());
     Assert.assertEquals(group, Group.getGroupByAuthId("Basic TmFtZTp6Z04wMFkyS3gybFppbXltNy94ZDhuMkdEYjA9"));
   }
 
   @After
   public void tearDown() throws Exception {
-    group.doDelete(db.getConnection());
+    group.doDelete(ds.getConnection());
   }
 }

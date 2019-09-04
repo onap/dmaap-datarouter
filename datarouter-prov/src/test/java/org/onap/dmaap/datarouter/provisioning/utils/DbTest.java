@@ -35,7 +35,7 @@ public class DbTest {
     private static EntityManagerFactory emf;
     private static EntityManager em;
 
-    private DB db = new DB();
+    private DbItialization db = new DbItialization();
 
     @BeforeClass
     public static void init() {

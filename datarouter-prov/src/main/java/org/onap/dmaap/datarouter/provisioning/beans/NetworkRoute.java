@@ -36,6 +36,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
 
 /**
  * The representation of one route in the Network Route Table.
@@ -105,17 +106,15 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
     public static SortedSet<NetworkRoute> getAllNetworkRoutes() {
         SortedSet<NetworkRoute> set = new TreeSet<>();
         try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery("select FROMNODE, TONODE, VIANODE from NETWORK_ROUTES")) {
                     addNetworkRouteToSet(set, rs);
                 }
             } finally {
-                db.release(conn);
+                DataSource.returnConnection(conn);
             }
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             intlogger.error(SQLEXCEPTION + e.getMessage(), e);
         }
         return set;

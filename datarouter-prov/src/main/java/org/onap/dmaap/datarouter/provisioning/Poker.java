@@ -50,6 +50,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.NetworkRoute;
 import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DbConnectionPool;
 
 /**
  * This class handles the two timers (described in R1 Design Notes), and takes care of issuing the GET to each node of
@@ -185,7 +186,7 @@ public class Poker extends TimerTask {
 
     private void pokeNode(final String nodename) {
         logger.debug("PROV0012 Poking node " + nodename + " ...");
-        String nodeUrl = String.format(POKE_URL_TEMPLATE, nodename + ":" + DB.getHttpPort());
+        String nodeUrl = String.format(POKE_URL_TEMPLATE, nodename + ":" + DbConnectionPool.getHttpPort());
         Runnable runn = () -> {
             try {
                 URL url = new URL(nodeUrl);

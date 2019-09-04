@@ -78,6 +78,8 @@ import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Syncable;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.DataSource;
+import org.onap.dmaap.datarouter.provisioning.utils.DbConnectionPool;
 import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
 import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
@@ -137,14 +139,14 @@ public class SynchronizerTask extends TimerTask {
     private SynchronizerTask() {
         logger = EELFManager.getInstance().getLogger("InternalLog");
         rolex = new Timer();
-        spooldir = (new DB()).getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
+        spooldir = DbConnectionPool.getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
         podState = UNKNOWN_POD;
         doFetch = true;        // start off with a fetch
         nextsynctime = 0;
 
         logger.info("PROV5000: Sync task starting, server podState is UNKNOWN_POD");
         try {
-            Properties props = (new DB()).getProperties();
+            Properties props = DbConnectionPool.getProperties();
             String type = props.getProperty(Main.KEYSTORE_TYPE_PROPERTY, "jks");
             String store = props.getProperty(Main.KEYSTORE_PATH_PROPERTY);
             String pass = props.getProperty(Main.KEYSTORE_PASS_PROPERTY);
@@ -482,9 +484,8 @@ public class SynchronizerTask extends TimerTask {
             Map<String, Syncable> oldmap = getMap(oldc);
             Set<String> union = new TreeSet<>(newmap.keySet());
             union.addAll(oldmap.keySet());
-            DB db = new DB();
             @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+            Connection conn = DataSource.getConnection();
             for (String n : union) {
                 Syncable newobj = newmap.get(n);
                 Syncable oldobj = oldmap.get(n);
@@ -496,8 +497,8 @@ public class SynchronizerTask extends TimerTask {
                     changes = updateRecord(conn, newobj, oldobj);
                 }
             }
-            db.release(conn);
-        } catch (SQLException e) {
+            DataSource.returnConnection(conn);
+        } catch (SQLException | ClassNotFoundException e) {
             logger.warn("PROV5009: problem during sync, exception: " + e);
         }
         return changes;
