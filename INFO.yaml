@@ -60,17 +60,11 @@ committers:
       company: 'ATT'
       id: 'su622b'
       timezone: 'America/Louisville'
-    - name: 'Conor Ward'
-      email: 'conor.ward@ericsson.com'
-      company: 'ericsson'
-      id: 'econwar'
-      timezone: 'Europe/Dublin'
     - name: 'Fiachra Corcoran'
       email: 'fiachra.corcoran@est.tech'
       company: 'ericsson'
       id: 'efiacor'
       timezone: 'Europe/Dublin'
-      
 tsc:
     approval: 'https://lists.onap.org/pipermail/onap-tsc'
     changes:
@@ -80,3 +74,4 @@ tsc:
           name: 'Jing Wang'
           name: 'Ramdas Sawant'
           name: 'Varun Gudisena'
+          name: 'Conor Ward'
