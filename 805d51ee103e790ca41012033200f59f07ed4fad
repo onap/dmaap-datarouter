@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cc9e3fb1_588f8530",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DataSource.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-06T15:35:08Z",
+      "side": 1,
+      "message": "Can be private",
+      "range": {
+        "startLine": 30,
+        "startChar": 28,
+        "endLine": 30,
+        "endChar": 32
+      },
+      "revId": "805d51ee103e790ca41012033200f59f07ed4fad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f6171d36_6e3e34e1",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DataSource.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-06T15:35:08Z",
+      "side": 1,
+      "message": "logger here",
+      "range": {
+        "startLine": 36,
+        "startChar": 12,
+        "endLine": 36,
+        "endChar": 31
+      },
+      "revId": "805d51ee103e790ca41012033200f59f07ed4fad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fcccd8a8_6d5bae00",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DataSource.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-06T15:35:08Z",
+      "side": 1,
+      "message": "These aren\u0027t thrown here so will need to sort the Exception handling out up the call stack.",
+      "range": {
+        "startLine": 42,
+        "startChar": 45,
+        "endLine": 42,
+        "endChar": 88
+      },
+      "revId": "805d51ee103e790ca41012033200f59f07ed4fad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6203628c_6e9b932a",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DbConnectionPool.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-06T15:35:08Z",
+      "side": 1,
+      "message": "Not sure if you prefer to implement yourself (to avoid buggy dependencies) but I\u0027d recommend looking at JDBC driver for pooling and scrap the maunal way.\n\nSee here - https://mariadb.com/kb/en/library/pool-datasource-implementation/\n\nLooks relatively easy to setup.",
+      "range": {
+        "startLine": 41,
+        "startChar": 13,
+        "endLine": 41,
+        "endChar": 28
+      },
+      "revId": "805d51ee103e790ca41012033200f59f07ed4fad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6e401861_fe909fd2",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DbItialization.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-06T15:35:08Z",
+      "side": 1,
+      "message": "Recommend changing this to DbUtils and moving the utility methods from DbConnectionPool here.\n\neg. getHttpsPort etc.",
+      "range": {
+        "startLine": 39,
+        "startChar": 13,
+        "endLine": 39,
+        "endChar": 27
+      },
+      "revId": "805d51ee103e790ca41012033200f59f07ed4fad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "13744f8e_f7968ad5",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DbItialization.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-09-06T15:35:08Z",
+      "side": 1,
+      "message": "Can potentially scrap this and just call the one below.\nIf it\u0027s only going to be run on fresh start up, the retrofit use case is defunct.",
+      "range": {
+        "startLine": 52,
+        "startChar": 19,
+        "endLine": 52,
+        "endChar": 31
+      },
+      "revId": "805d51ee103e790ca41012033200f59f07ed4fad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
