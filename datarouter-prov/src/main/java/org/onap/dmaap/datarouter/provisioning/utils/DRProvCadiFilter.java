@@ -66,9 +66,9 @@ public class DRProvCadiFilter extends CadiFilter {
                 || pathUrl.contains("group"))) {
 
             String method = httpRequest.getMethod().toUpperCase();
-            if (!(method.equals("POST"))) {
+            if (!("POST".equals(method))) {
                 // if request method is PUT method (publish or Feed update) Needs to check for DELETE
-                if (method.equals("PUT") || method.equals("DELETE")) {
+                if ("PUT".equals(method) || "DELETE".equals(method)) {
                     if ((pathUrl.contains("subs"))) { //edit subscriber
                         int subId = BaseServlet.getIdFromPath(httpRequest);
                         if (subId <= 0) {
@@ -209,7 +209,7 @@ public class DRProvCadiFilter extends CadiFilter {
         try {
             Feed feed = Feed.getFeedById(feedId);
             if (feed != null) {
-                if (!((feed.getAafInstance().equalsIgnoreCase("legacy")) || feed.getAafInstance() == null
+                if (!(("legacy".equalsIgnoreCase(feed.getAafInstance())) || feed.getAafInstance() == null
                               || feed.getAafInstance().equals(""))) { //also apply null check and empty check too
                     aafInstance = feed.getAafInstance();
                     String message = "DRProvCadiFilter.isAAFFeed: aafInstance-:" + aafInstance + "; feedId:- " + feedId;
@@ -241,9 +241,9 @@ public class DRProvCadiFilter extends CadiFilter {
         try {
             Subscription subscriber = Subscription.getSubscriptionById(subId);
             if (subscriber != null) {
-                if (!((subscriber.getAafInstance().equalsIgnoreCase("legacy"))
+                if (!(("legacy".equalsIgnoreCase(subscriber.getAafInstance()))
                               || subscriber.getAafInstance() == null
-                              || subscriber.getAafInstance().equals(""))) { //also apply null check and empty check too
+                              || "".equals(subscriber.getAafInstance()))) { //also apply null check and empty check too
                     aafInstance = subscriber.getAafInstance();
                     String message = "DRProvCadiFilter.isAAFSubscriber: aafInstance-:" + aafInstance + "; subId:- "
                                              + subId;

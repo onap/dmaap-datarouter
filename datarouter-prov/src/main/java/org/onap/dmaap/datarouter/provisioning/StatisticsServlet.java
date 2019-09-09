@@ -300,14 +300,11 @@ public class StatisticsServlet extends BaseServlet {
     private String queryGeneretor(Map<String, String> map) throws ParseException {
 
         String sql;
-        String eventType = null;
         String feedids = null;
         String startTime = null;
         String endTime = null;
         String subid = " ";
-        if (map.get(EVENT_TYPE) != null) {
-            eventType =  map.get(EVENT_TYPE);
-        }
+
         if (map.get(FEEDIDS) != null) {
             feedids = map.get(FEEDIDS);
         }
@@ -316,9 +313,6 @@ public class StatisticsServlet extends BaseServlet {
         }
         if (map.get(END_TIME) != null) {
             endTime =  map.get(END_TIME);
-        }
-        if ("all".equalsIgnoreCase(eventType)) {
-            eventType = "PUB','DEL, EXP, PBF";
         }
         if (map.get(SUBID) != null) {
             subid = map.get(SUBID);

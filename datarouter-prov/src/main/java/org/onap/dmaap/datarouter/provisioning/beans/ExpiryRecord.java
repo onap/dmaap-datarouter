@@ -64,7 +64,7 @@ public class ExpiryRecord extends BaseLogRecord {
         this.fileid = thisFileid;
         this.deliveryAttempts = Integer.parseInt(pp[10]);
         this.reason = pp[9];
-        if (!reason.equals("notRetryable") && !reason.equals("retriesExhausted") && !reason.equals("diskFull")) {
+        if (!"notRetryable".equals(reason) && !"retriesExhausted".equals(reason) && !"diskFull".equals(reason)) {
             this.reason = "other";
         }
     }

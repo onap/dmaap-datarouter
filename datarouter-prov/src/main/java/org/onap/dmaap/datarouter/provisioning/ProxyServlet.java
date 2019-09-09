@@ -81,10 +81,8 @@ public class ProxyServlet extends BaseServlet {
         try {
             // Set up keystore
             Properties props = (new DB()).getProperties();
-            String store = props.getProperty(Main.KEYSTORE_PATH_PROPERTY);
-            String pass = props.getProperty(Main.KEYSTORE_PASS_PROPERTY);
-            store = props.getProperty(Main.TRUSTSTORE_PATH_PROPERTY);
-            pass = props.getProperty(Main.TRUSTSTORE_PASS_PROPERTY);
+            String store = props.getProperty(Main.TRUSTSTORE_PATH_PROPERTY);
+            String pass = props.getProperty(Main.TRUSTSTORE_PASS_PROPERTY);
             if (store == null || store.length() == 0) {
                 store = Main.DEFAULT_TRUSTSTORE;
                 pass = "changeit";

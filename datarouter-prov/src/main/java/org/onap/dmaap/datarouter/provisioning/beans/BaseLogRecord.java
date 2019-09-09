@@ -58,12 +58,12 @@ public class BaseLogRecord implements LOGJSONable, Loadable {
         this.eventTime     = dt.getTime();
         this.publishId     = pp[2];
         this.feedid        = Integer.parseInt(pp[3]);
-        if (pp[1].equals("DLX")) {
+        if ("DLX".equals(pp[1])) {
             this.requestUri    = "";
             this.method        = "GET";    // Note: we need a valid value in this field, even though unused
             this.contentType   = "";
             this.contentLength = Long.parseLong(pp[5]);
-        } else  if (pp[1].equals("PUB") || pp[1].equals("LOG") || pp[1].equals("PBF")) {
+        } else  if ("PUB".equals(pp[1]) || "LOG".equals(pp[1]) || "PBF".equals(pp[1])) {
             this.requestUri    = pp[4];
             this.method        = pp[5];
             this.contentType   = pp[6];

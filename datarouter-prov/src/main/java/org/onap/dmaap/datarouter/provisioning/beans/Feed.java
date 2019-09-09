@@ -150,7 +150,7 @@ public class Feed extends Syncable {
             this.groupid = jo.optInt("groupid");
             this.name = jo.getString("name");
             this.aafInstance = jo.optString("aaf_instance", "legacy");
-            if (!(aafInstance.equalsIgnoreCase("legacy")) && aafInstance.length() > 255) {
+            if (!("legacy".equalsIgnoreCase(aafInstance)) && aafInstance.length() > 255) {
                 throw new InvalidObjectException("aaf_instance field is too long");
             }
             if (name.length() > 255) {

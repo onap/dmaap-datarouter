@@ -130,7 +130,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     private static final int DEFAULT_MAX_SUBS = 100000;
     private static final int DEFAULT_POKETIMER1 = 5;
     private static final int DEFAULT_POKETIMER2 = 30;
-    private static final String DEFAULT_DOMAIN = "onap";
     private static final String DEFAULT_PROVSRVR_NAME = "dmaap-dr-prov";
 
     //Common Errors
@@ -227,11 +226,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * The current number of subscriptions in the system.
      */
     static int activeSubs = 0;
-
-    /**
-     * The domain used to generate a FQDN from the "bare" node names.
-     */
-    private static String provDomain = "web.att.com";
 
     /**
      * The standard FQDN of the provisioning server in this Data Router ecosystem.
@@ -539,7 +533,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         pokeTimer2 = getInt(map, Parameters.PROV_POKETIMER2, DEFAULT_POKETIMER2);
 
         // The domain used to generate a FQDN from the "bare" node names
-        provDomain = getString(map, Parameters.PROV_DOMAIN, DEFAULT_DOMAIN);
         provName = getString(map, Parameters.PROV_NAME, DEFAULT_PROVSRVR_NAME);
         activeProvName = getString(map, Parameters.PROV_ACTIVE_NAME, provName);
         initialActivePod = getString(map, Parameters.ACTIVE_POD, "");

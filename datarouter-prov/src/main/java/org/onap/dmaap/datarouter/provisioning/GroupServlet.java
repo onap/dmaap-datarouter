@@ -257,7 +257,7 @@ public class GroupServlet extends ProxyServlet {
         // check content type is SUB_CONTENT_TYPE, version 1.0
         ContentHeader ch = getContentHeader(req);
         String ver = ch.getAttribute("version");
-        if (!ch.getType().equals(GROUP_BASECONTENT_TYPE) || !(ver.equals("1.0") || ver.equals("2.0"))) {
+        if (!ch.getType().equals(GROUP_BASECONTENT_TYPE) || !("1.0".equals(ver) || "2.0".equals(ver))) {
             intlogger.debug("Content-type is: " + req.getHeader("Content-Type"));
             message = "Incorrect content-type";
             elr.setMessage(message);
