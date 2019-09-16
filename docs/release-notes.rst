@@ -7,13 +7,50 @@
 Release-notes
 ==============
 
+Version: 2.1.2 (El Alto)
+---------------------------
+
+:Release Date: 2019-09-05
+
+The DataRouter(DR) provisioning API is a HTTPS-based, REST-like API for creating and managing DR feeds and subscriptions.
+
+New Features:
+
++----------------+---------------------------------------------------------------------------------------------------------------------------------+
+| JIRA ID        | Description                                                                                                                     |
++================+=================================================================================================================================+
+| DMAAP-1227     | Updating logging functionality to log events into correct log files as specified in logging spec                                |                                                                        |
++----------------+---------------------------------------------------------------------------------------------------------------------------------+
+| DMAAP-1228     | Updating Logging pattern to match logging spec                                                                                  |
++----------------+---------------------------------------------------------------------------------------------------------------------------------+
+| DMAAP-1049     | [DR] Update DR logging to match Platform maturity Logging Spec                                                                  |
++----------------+---------------------------------------------------------------------------------------------------------------------------------+
+
+Bug Fixes:
+N/A
+
+Known Issues:
+N/A
+
+Security Issues:
+N/A
+
+Upgrade Notes:
+N/A
+
+Deprecation Notes:
+N/A
+
+Other:
+N/A
+
+
 Version: 2.1.0 (Dublin)
 ---------------------------
 
 :Release Date: 2019-06-06
 
-The DataRouter(DR) provisioning API is a HTTPS-based, REST-like API for creating and managing DR feeds and
-subscriptions.
+The DataRouter(DR) provisioning API is a HTTPS-based, REST-like API for creating and managing DR feeds and subscriptions.
 
 New Features:
 
@@ -43,10 +80,10 @@ Bug Fixes:
 | DMAAP-1161     | [DR] filebeat container on DR-Node and DR-Prov are unable to publish to kibana                   |
 +----------------+--------------------------------------------------------------------------------------------------+
 
-Known Issues
+Known Issues:
 N/A
 
-Security Issues
+Security Issues:
 
 *Fixed Security Issues*
 
@@ -64,13 +101,13 @@ Critical security vulnerabilities and their risk assessment have been documented
 - `Passing Badge information for DMAAP DataRouter <https://bestpractices.coreinfrastructure.org/en/projects/2192>`_
 - `Project Vulnerability Review Table for DMAAP <https://wiki.onap.org/pages/viewpage.action?pageId=42598688>`_
 
-Upgrade Notes
+Upgrade Notes:
 N/A
 
-Deprecation Notes
+Deprecation Notes:
 N/A
 
-Other
+Other:
 N/A
 
 
@@ -79,8 +116,7 @@ Version: 1.0.8 (Casablanca)
 
 :Release Date: 2019-02-28
 
-The DataRouter(DR) provisioning API is a HTTPS-based, REST-like API for creating and managing DR feeds and
-subscriptions.
+The DataRouter(DR) provisioning API is a HTTPS-based, REST-like API for creating and managing DR feeds and subscriptions.
 
 New Features:
 
@@ -97,10 +133,10 @@ Bug Fixes:
 | DMAAP-1065     | [DR] Casablanca - AAF certs expired on dmaap-dr-prov and dmaap-dr-node                           |
 +----------------+--------------------------------------------------------------------------------------------------+
 
-Known Issues
+Known Issues:
 N/A
 
-Security Issues
+Security Issues:
 DMAAP code has been formally scanned during build time using NexusIQ and all Critical vulnerabilities have been
 addressed, items that remain open have been assessed for risk and determined to be false positive. The DMAAP open
 Critical security vulnerabilities and their risk assessment have been documented as part of the `project <https://wiki.onap.org/pages/viewpage.action?pageId=42598688>`_.
@@ -109,13 +145,13 @@ Critical security vulnerabilities and their risk assessment have been documented
 - `Passing Badge information for DMAAP DataRouter <https://bestpractices.coreinfrastructure.org/en/projects/2192>`_
 - `Project Vulnerability Review Table for DMAAP <https://wiki.onap.org/pages/viewpage.action?pageId=42598688>`_
 
-Upgrade Notes
+Upgrade Notes:
 N/A
 
-Deprecation Notes
+Deprecation Notes:
 N/A
 
-Other
+Other:
 N/A
 
 
@@ -124,8 +160,7 @@ Version: 1.0.3 (Casablanca)
 
 :Release Date: 2018-11-30
 
-The DataRouter(DR) provisioning API is a HTTPS-based, REST-like API for creating and managing DR feeds and
-subscriptions.
+The DataRouter(DR) provisioning API is a HTTPS-based, REST-like API for creating and managing DR feeds and subscriptions.
 
 New Features:
 
@@ -151,10 +186,10 @@ Bug Fixes:
 | DMAAP-565      | Incorrect nexusUrl parameter in datarouter pom files                                                                            |
 +----------------+---------------------------------------------------------------------------------------------------------------------------------+
 
-Known Issues
+Known Issues:
 N/A
 
-Security Issues
+Security Issues:
 DMAAP code has been formally scanned during build time using NexusIQ and all Critical vulnerabilities have been
 addressed, items that remain open have been assessed for risk and determined to be false positive. The DMAAP open
 Critical security vulnerabilities and their risk assessment have been documented as part of the `project <https://wiki.onap.org/pages/viewpage.action?pageId=42598688>`_.
@@ -163,11 +198,11 @@ Critical security vulnerabilities and their risk assessment have been documented
 - `Passing Badge information for DMAAP DataRouter <https://bestpractices.coreinfrastructure.org/en/projects/2192>`_
 - `Project Vulnerability Review Table for DMAAP <https://wiki.onap.org/pages/viewpage.action?pageId=42598688>`_
 
-Upgrade Notes
+Upgrade Notes:
 N/A
 
-Deprecation Notes
+Deprecation Notes:
 N/A
 
-Other
+Other:
 N/A
