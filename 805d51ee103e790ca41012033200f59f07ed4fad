@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "22c57953_c08c6d48",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DataSource.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-09-17T08:33:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cc9e3fb1_588f8530",
+      "range": {
+        "startLine": 30,
+        "startChar": 28,
+        "endLine": 30,
+        "endChar": 32
+      },
+      "revId": "805d51ee103e790ca41012033200f59f07ed4fad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f6171d36_6e3e34e1",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DataSource.java",
         "patchSetId": 10
@@ -36,6 +60,30 @@
       "writtenOn": "2019-09-06T15:35:08Z",
       "side": 1,
       "message": "logger here",
+      "range": {
+        "startLine": 36,
+        "startChar": 12,
+        "endLine": 36,
+        "endChar": 31
+      },
+      "revId": "805d51ee103e790ca41012033200f59f07ed4fad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "51b8425f_c227bfc5",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DataSource.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-09-17T08:33:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f6171d36_6e3e34e1",
       "range": {
         "startLine": 36,
         "startChar": 12,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "731fc8d8_e1273ae2",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DataSource.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-09-17T08:33:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fcccd8a8_6d5bae00",
+      "range": {
+        "startLine": 42,
+        "startChar": 45,
+        "endLine": 42,
+        "endChar": 88
+      },
+      "revId": "805d51ee103e790ca41012033200f59f07ed4fad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6203628c_6e9b932a",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DbConnectionPool.java",
         "patchSetId": 10
@@ -82,6 +154,30 @@
       "writtenOn": "2019-09-06T15:35:08Z",
       "side": 1,
       "message": "Not sure if you prefer to implement yourself (to avoid buggy dependencies) but I\u0027d recommend looking at JDBC driver for pooling and scrap the maunal way.\n\nSee here - https://mariadb.com/kb/en/library/pool-datasource-implementation/\n\nLooks relatively easy to setup.",
+      "range": {
+        "startLine": 41,
+        "startChar": 13,
+        "endLine": 41,
+        "endChar": 28
+      },
+      "revId": "805d51ee103e790ca41012033200f59f07ed4fad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "48ebc717_17550645",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DbConnectionPool.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-09-17T08:33:38Z",
+      "side": 1,
+      "message": "Tried this but with no success",
+      "parentUuid": "6203628c_6e9b932a",
       "range": {
         "startLine": 41,
         "startChar": 13,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "79033d8c_ce1e9286",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DbItialization.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-09-17T08:33:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e401861_fe909fd2",
+      "range": {
+        "startLine": 39,
+        "startChar": 13,
+        "endLine": 39,
+        "endChar": 27
+      },
+      "revId": "805d51ee103e790ca41012033200f59f07ed4fad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "13744f8e_f7968ad5",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DbItialization.java",
         "patchSetId": 10
@@ -128,6 +248,30 @@
       "writtenOn": "2019-09-06T15:35:08Z",
       "side": 1,
       "message": "Can potentially scrap this and just call the one below.\nIf it\u0027s only going to be run on fresh start up, the retrofit use case is defunct.",
+      "range": {
+        "startLine": 52,
+        "startChar": 19,
+        "endLine": 52,
+        "endChar": 31
+      },
+      "revId": "805d51ee103e790ca41012033200f59f07ed4fad",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa57d1d7_ae314d19",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DbItialization.java",
+        "patchSetId": 10
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4893
+      },
+      "writtenOn": "2019-09-17T08:33:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "13744f8e_f7968ad5",
       "range": {
         "startLine": 52,
         "startChar": 19,
