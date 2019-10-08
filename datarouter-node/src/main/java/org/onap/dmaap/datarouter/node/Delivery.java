@@ -168,7 +168,9 @@ public class Delivery {
                 }
             }
             try {
-                Files.delete(sxf.toPath());  // won't if anything still in it
+                if (sxf.list().length == 0) {
+                    Files.delete(sxf.toPath());  // won't if anything still in it
+                }
             } catch (IOException e) {
                 logger.error("Failed to delete file: " + sxf.getPath(), e);
             }

@@ -1,0 +1,228 @@
+<!--
+  ============LICENSE_START==================================================
+  * org.onap.dmaap
+  * ===========================================================================
+  * Copyright © 2017 AT&T Intellectual Property. All rights reserved.
+  * ===========================================================================
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at
+  *
+  *      http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  * ============LICENSE_END====================================================
+  *
+  * ECOMP is a trademark and service mark of AT&T Intellectual Property.
+  *
+-->
+<configuration scan="true" scanPeriod="3 seconds" debug="false">
+
+  <property name="logDir" value="logs/EELF" />
+  <!--  log file names -->
+  <property name="auditLog" value="audit" />
+  <property name="errorLog" value="error" />
+  <property name="debugLog" value="debug" />
+  <property name="metricsLog" value="metrics" />
+  <property name="jettyLog" value="jetty" />
+
+  <!--  log file names -->
+  <property name="defaultPattern"    value="%d{MM/dd-HH:mm:ss.SSS}|%logger|%X{RequestId}|%X{InvocationId}|%X{ServiceInstanceId}|%thread|%X{ServiceName}|%X{InstanceUUID}|%.-5level|%X{AlertSeverity}|%X{ServerIPAddress}|%X{ServerFQDN}|%X{RemoteHost}|%X{Timer}%n|%msg%n" />
+  <property name="logDirectory" value="${logDir}" />
+
+
+  <!-- Example evaluator filter applied against console appender -->
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${defaultPattern}</pattern>
+    </encoder>
+  </appender>
+
+  <!-- ============================================================================ -->
+  <!-- EELF Appenders -->
+  <!-- ============================================================================ -->
+
+  <!-- The EELFAppender is used to record events to the general application
+    log -->
+
+
+  <appender name="Audit"
+    class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${logDirectory}/${auditLog}.log</file>
+     <filter class="org.onap.dmaap.datarouter.node.eelf.AuditFilter">
+    </filter>
+    <rollingPolicy
+      class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${logDirectory}/${auditLog}.%i.log.zip
+      </fileNamePattern>
+      <minIndex>1</minIndex>
+      <maxIndex>9</maxIndex>
+    </rollingPolicy>
+    <triggeringPolicy
+      class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>50MB</maxFileSize>
+    </triggeringPolicy>
+    <encoder>
+      <pattern>${defaultPattern}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="asyncAudit" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>256</queueSize>
+    <appender-ref ref="Audit" />
+  </appender>
+
+    <!-- ============================================================================ -->
+
+  <appender name="Metrics"
+            class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${logDirectory}/${metricsLog}.log</file>
+    <filter class="org.onap.dmaap.datarouter.node.eelf.MetricsFilter">
+    </filter>
+    <rollingPolicy
+            class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${logDirectory}/${metricsLog}.%i.log.zip
+      </fileNamePattern>
+      <minIndex>1</minIndex>
+      <maxIndex>9</maxIndex>
+    </rollingPolicy>
+    <triggeringPolicy
+            class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>50MB</maxFileSize>
+    </triggeringPolicy>
+    <encoder>
+      <pattern>${defaultPattern}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="asyncMetrics" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>256</queueSize>
+    <appender-ref ref="Metrics" />
+  </appender>
+
+  <!-- ============================================================================ -->
+
+
+  <appender name="Debug"
+            class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${logDirectory}/${debugLog}.log</file>
+    <filter class="org.onap.dmaap.datarouter.node.eelf.DebugFilter">
+    </filter>
+    <rollingPolicy
+            class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${logDirectory}/${debugLog}.%i.log.zip
+      </fileNamePattern>
+      <minIndex>1</minIndex>
+      <maxIndex>9</maxIndex>
+    </rollingPolicy>
+    <triggeringPolicy
+            class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>50MB</maxFileSize>
+    </triggeringPolicy>
+    <encoder>
+      <pattern>${defaultPattern}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="asyncDebug" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>256</queueSize>
+    <appender-ref ref="Debug" />
+  </appender>
+
+  <!-- ============================================================================ -->
+
+  <appender name="Error"
+    class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${logDirectory}/${errorLog}.log</file>
+    <filter class="org.onap.dmaap.datarouter.node.eelf.ErrorFilter">
+    </filter>
+    <rollingPolicy
+      class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${logDirectory}/${errorLog}.%i.log.zip
+      </fileNamePattern>
+      <minIndex>1</minIndex>
+      <maxIndex>9</maxIndex>
+    </rollingPolicy>
+    <triggeringPolicy
+      class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>50MB</maxFileSize>
+    </triggeringPolicy>
+    <encoder>
+      <pattern>${defaultPattern}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="asyncError" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>256</queueSize>
+    <appender-ref ref="Error"/>
+  </appender>
+
+  <!-- ============================================================================ -->
+   <appender name="Jetty"
+    class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${logDirectory}/${jettyLog}.log</file>
+     <filter class="org.onap.dmaap.datarouter.node.eelf.JettyFilter" />
+    <rollingPolicy
+      class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${logDirectory}/${jettyLog}.%i.log.zip
+      </fileNamePattern>
+      <minIndex>1</minIndex>
+      <maxIndex>9</maxIndex>
+    </rollingPolicy>
+    <triggeringPolicy
+      class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>50MB</maxFileSize>
+    </triggeringPolicy>
+    <encoder>
+      <pattern>${defaultPattern}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="asyncJettyLog" class="ch.qos.logback.classic.AsyncAppender">
+    <queueSize>256</queueSize>
+    <appender-ref ref="Jetty" />
+    <includeCallerData>true</includeCallerData>
+  </appender>
+
+   <!-- ============================================================================ -->
+
+
+  <!-- ============================================================================ -->
+  <!--  EELF loggers -->
+  <!-- ============================================================================ -->
+  <logger name="com.att.eelf" level="info" additivity="false">
+    <appender-ref ref="asyncAudit" />
+  </logger>
+
+  <logger name="com.att.eelf" additivity="false">
+    <appender-ref ref="asyncMetrics" />
+  </logger>
+
+  <logger name="com.att.eelf" additivity="false">
+    <appender-ref ref="asyncDebug" />
+  </logger>
+
+  <logger name="com.att.eelf.error" additivity="false">
+    <appender-ref ref="asyncError" />
+  </logger>
+
+  <logger name="log4j.logger.org.eclipse.jetty" additivity="false">
+    <appender-ref ref="asyncJettyLog"/>
+  </logger>
+
+
+
+
+  <root level="INFO">
+    <appender-ref ref="asyncAudit" />
+    <appender-ref ref="asyncMetrics" />
+    <appender-ref ref="asyncDebug" />
+    <appender-ref ref="asyncError" />
+    <appender-ref ref="asyncJettyLog" />
+  </root>
+
+</configuration>
