@@ -77,6 +77,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.NetworkRoute;
 import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Syncable;
+import org.onap.dmaap.datarouter.provisioning.utils.AafPropsUtils;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
 import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
@@ -144,20 +145,21 @@ public class SynchronizerTask extends TimerTask {
 
         logger.info("PROV5000: Sync task starting, server podState is UNKNOWN_POD");
         try {
-            Properties props = (new DB()).getProperties();
-            String type = props.getProperty(Main.KEYSTORE_TYPE_PROPERTY, "jks");
-            String store = props.getProperty(Main.KEYSTORE_PATH_PROPERTY);
-            String pass = props.getProperty(Main.KEYSTORE_PASS_PROPERTY);
+            // Set up keystore
+            String type = AafPropsUtils.KEYSTORE_TYPE_PROPERTY;
+            String store = Main.aafPropsUtils.getKeystorePathProperty();
+            String pass = Main.aafPropsUtils.getKeystorePassProperty();
             KeyStore keyStore = KeyStore.getInstance(type);
             try (FileInputStream instream = new FileInputStream(new File(store))) {
                 keyStore.load(instream, pass.toCharArray());
 
             }
-            store = props.getProperty(Main.TRUSTSTORE_PATH_PROPERTY);
-            pass = props.getProperty(Main.TRUSTSTORE_PASS_PROPERTY);
+            // Set up truststore
+            store = Main.aafPropsUtils.getTruststorePathProperty();
+            pass = Main.aafPropsUtils.getTruststorePassProperty();
             KeyStore trustStore = null;
             if (store != null && store.length() > 0) {
-                trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                trustStore = KeyStore.getInstance(AafPropsUtils.TRUESTSTORE_TYPE_PROPERTY);
                 try (FileInputStream instream = new FileInputStream(new File(store))) {
                     trustStore.load(instream, pass.toCharArray());
 
@@ -166,7 +168,7 @@ public class SynchronizerTask extends TimerTask {
 
             // We are connecting with the node name, but the certificate will have the CNAME
             // So we need to accept a non-matching certificate name
-            String keystorepass = props.getProperty(Main.KEYSTORE_PASS_PROPERTY);
+            String keystorepass = Main.aafPropsUtils.getKeystorePassProperty();
             try (AbstractHttpClient hc = new DefaultHttpClient()) {
                 SSLSocketFactory socketFactory =
                         (trustStore == null)
@@ -177,18 +179,18 @@ public class SynchronizerTask extends TimerTask {
                 hc.getConnectionManager().getSchemeRegistry().register(sch);
                 httpclient = hc;
             }
-            setSynchTimer(props);
+            setSynchTimer(new DB().getProperties().getProperty(
+                "org.onap.dmaap.datarouter.provserver.sync_interval", "5000"));
         } catch (Exception e) {
             logger.warn("PROV5005: Problem starting the synchronizer: " + e);
         }
     }
 
-    private void setSynchTimer(Properties props) {
+    private void setSynchTimer(String strInterval) {
         // Run once every 5 seconds to check DNS, etc.
         long interval;
         try {
-            String str = props.getProperty("org.onap.dmaap.datarouter.provserver.sync_interval", "5000");
-            interval = Long.parseLong(str);
+            interval = Long.parseLong(strInterval);
         } catch (NumberFormatException e) {
             interval = 5000L;
         }

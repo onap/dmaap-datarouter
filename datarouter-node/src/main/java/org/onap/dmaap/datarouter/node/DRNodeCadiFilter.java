@@ -35,7 +35,7 @@ import org.onap.aaf.cadi.filter.CadiFilter;
 
 public class DRNodeCadiFilter extends CadiFilter {
 
-    private static EELFLogger logger = EELFManager.getInstance().getLogger(NodeServlet.class);
+    private static EELFLogger logger = EELFManager.getInstance().getLogger(DRNodeCadiFilter.class);
 
     DRNodeCadiFilter(boolean init, PropAccess access) throws ServletException {
         super(init, access);

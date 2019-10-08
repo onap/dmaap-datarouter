@@ -53,6 +53,7 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.onap.dmaap.datarouter.provisioning.utils.AafPropsUtils;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 
@@ -80,21 +81,23 @@ public class ProxyServlet extends BaseServlet {
         super.init(config);
         try {
             // Set up keystore
-            Properties props = (new DB()).getProperties();
-            String store = props.getProperty(Main.TRUSTSTORE_PATH_PROPERTY);
-            String pass = props.getProperty(Main.TRUSTSTORE_PASS_PROPERTY);
+            String type = AafPropsUtils.KEYSTORE_TYPE_PROPERTY;
+            String store = Main.aafPropsUtils.getKeystorePathProperty();
+            String pass = Main.aafPropsUtils.getKeystorePassProperty();
+            KeyStore keyStore = readStore(store, pass, type);
+            // Set up truststore
+            store = Main.aafPropsUtils.getTruststorePathProperty();
+            pass = Main.aafPropsUtils.getTruststorePassProperty();
             if (store == null || store.length() == 0) {
-                store = Main.DEFAULT_TRUSTSTORE;
+                store = AafPropsUtils.DEFAULT_TRUSTSTORE;
                 pass = "changeit";
             }
-            KeyStore trustStore = readStore(store, pass, KeyStore.getDefaultType());
+            KeyStore trustStore = readStore(store, pass, AafPropsUtils.TRUESTSTORE_TYPE_PROPERTY);
 
             // We are connecting with the node name, but the certificate will have the CNAME
             // So we need to accept a non-matching certificate name
-            String type = props.getProperty(Main.KEYSTORE_TYPE_PROPERTY, "jks");
-            KeyStore keyStore = readStore(store, pass, type);
             SSLSocketFactory socketFactory = new SSLSocketFactory(keyStore,
-                    props.getProperty(Main.KEYSTORE_PASS_PROPERTY), trustStore);
+                    Main.aafPropsUtils.getKeystorePassProperty(), trustStore);
             socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
             sch = new Scheme("https", 443, socketFactory);
             inited = true;

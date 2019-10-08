@@ -114,8 +114,7 @@ public class DB {
             synchronized (queue) {
                 try {
                     connection = queue.remove();
-                } catch (NoSuchElementException nseEx) {
-                    intlogger.error("PROV9006 No connection on queue: " + nseEx.getMessage(), nseEx);
+                } catch (NoSuchElementException ignore) {
                     int num = 0;
                     do {
                         // Try up to 3 times to get a connection
