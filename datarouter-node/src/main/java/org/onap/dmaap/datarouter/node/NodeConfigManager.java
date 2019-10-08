@@ -105,6 +105,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private String aafAction;
     private String aafURL;
     private boolean cadiEnabled;
+    private NodeAafPropsUtils nodeAafPropsUtils;
 
 
     /**
@@ -124,6 +125,14 @@ public class NodeConfigManager implements DeliveryQueueHelper {
                             "/opt/app/datartr/etc/node.properties"));
         }
         provurl = drNodeProperties.getProperty("ProvisioningURL", "https://dmaap-dr-prov:8443/internal/prov");
+        String aafPropsFilePath = drNodeProperties
+            .getProperty("AAFPropsFilePath", "/opt/app/osaaf/local/org.onap.dmaap-dr.props");
+        try {
+            nodeAafPropsUtils = new NodeAafPropsUtils(new File(aafPropsFilePath));
+        } catch (IOException e) {
+            eelfLogger.error("NODE0314 Failed to load AAF props. Exiting", e);
+            exit(1);
+        }
         /*
          * START - AAF changes: TDP EPIC US# 307413
          * Pull AAF settings from node.properties
@@ -131,8 +140,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         aafType = drNodeProperties.getProperty("AAFType", "org.onap.dmaap-dr.feed");
         aafInstance = drNodeProperties.getProperty("AAFInstance", "legacy");
         aafAction = drNodeProperties.getProperty("AAFAction", "publish");
-        aafURL = drNodeProperties.getProperty("AafUrl", "https://aaf-onap-test.osaaf.org:8095");
         cadiEnabled = Boolean.parseBoolean(drNodeProperties.getProperty("CadiEnabled", "false"));
+        aafURL = nodeAafPropsUtils.getPropAccess().getProperty("aaf_locate_url", "https://aaf-locate:8095");
         /*
          * END - AAF changes: TDP EPIC US# 307413
          * Pull AAF settings from node.properties
@@ -168,13 +177,13 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         eventlogprefix = logdir + "/events";
         eventlogsuffix = ".log";
         redirfile = drNodeProperties.getProperty("RedirectionFile", "etc/redirections.dat");
-        kstype = drNodeProperties.getProperty("KeyStoreType", "jks");
-        ksfile = drNodeProperties.getProperty("KeyStoreFile", "etc/keystore");
-        kspass = drNodeProperties.getProperty("KeyStorePassword", CHANGE_ME);
-        kpass = drNodeProperties.getProperty("KeyPassword", CHANGE_ME);
+        kstype = drNodeProperties.getProperty("KeyStoreType", "PKCS12");
+        ksfile = nodeAafPropsUtils.getPropAccess().getProperty("cadi_keystore");
+        kspass = nodeAafPropsUtils.getDecryptedPass("cadi_keystore_password");
+        kpass = nodeAafPropsUtils.getDecryptedPass("cadi_keystore_password");
         tstype = drNodeProperties.getProperty("TrustStoreType", "jks");
-        tsfile = drNodeProperties.getProperty("TrustStoreFile");
-        tspass = drNodeProperties.getProperty("TrustStorePassword", CHANGE_ME);
+        tsfile = nodeAafPropsUtils.getPropAccess().getProperty("cadi_truststore");
+        tspass = nodeAafPropsUtils.getDecryptedPass("cadi_truststore_password");
         if (tsfile != null && tsfile.length() > 0) {
             System.setProperty("javax.net.ssl.trustStoreType", tstype);
             System.setProperty("javax.net.ssl.trustStore", tsfile);
@@ -800,6 +809,10 @@ public class NodeConfigManager implements DeliveryQueueHelper {
 
     public boolean getCadiEnabled() {
         return cadiEnabled;
+    }
+
+    public NodeAafPropsUtils getNodeAafPropsUtils() {
+        return nodeAafPropsUtils;
     }
 
     /**

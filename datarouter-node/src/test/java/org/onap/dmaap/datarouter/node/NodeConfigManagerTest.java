@@ -35,7 +35,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"javax.net.ssl.*", "javax.security.auth.x500.X500Principal"})
+@PowerMockIgnore({"javax.net.ssl.*", "javax.security.auth.x500.X500Principal", "javax.crypto.*"})
 @PrepareForTest({InetAddress.class, URL.class})
 public class NodeConfigManagerTest {
 
@@ -57,7 +57,7 @@ public class NodeConfigManagerTest {
         Assert.assertEquals("legacy", nodeConfigManager.getAafInstance());
         Assert.assertEquals("src/test/resources/spool/f", nodeConfigManager.getSpoolDir());
         Assert.assertEquals("src/test/resources/spool", nodeConfigManager.getSpoolBase());
-        Assert.assertEquals("jks", nodeConfigManager.getKSType());
+        Assert.assertEquals("PKCS12", nodeConfigManager.getKSType());
         Assert.assertEquals(8080, nodeConfigManager.getHttpPort());
         Assert.assertEquals(8443, nodeConfigManager.getHttpsPort());
         Assert.assertEquals(443, nodeConfigManager.getExtHttpsPort());
@@ -70,7 +70,7 @@ public class NodeConfigManagerTest {
         Assert.assertEquals(new String[] {"TLSv1.1", "TLSv1.2"}, nodeConfigManager.getEnabledprotocols());
         Assert.assertEquals("org.onap.dmaap-dr.feed", nodeConfigManager.getAafType());
         Assert.assertEquals("publish", nodeConfigManager.getAafAction());
-        Assert.assertEquals("https://aaf-onap-test.osaaf.org:8095", nodeConfigManager.getAafURL());
+        Assert.assertEquals("https://aaf-locate:8095", nodeConfigManager.getAafURL());
         Assert.assertFalse(nodeConfigManager.getCadiEnabled());
         Assert.assertFalse(nodeConfigManager.isShutdown());
         Assert.assertFalse(nodeConfigManager.isConfigured());
