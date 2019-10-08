@@ -42,8 +42,8 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-library</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -56,10 +56,6 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
@@ -76,10 +72,6 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.intellij</groupId>
-            <artifactId>annotations</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -106,37 +98,54 @@
             <artifactId>aaf-cadi-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.intellij</groupId>
+            <artifactId>annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.sonatype.http-testing-harness</groupId>
             <artifactId>junit-runner</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-junit4</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-mockito</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-support</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <version>3.1.6</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <profiles>
@@ -205,7 +214,7 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>**/EelfMessages.properties</include>
+                    <include>**/logback.xml</include>
                 </includes>
             </resource>
         </resources>
@@ -260,7 +269,7 @@
                                     <directory>${basedir}/src/main/resources/docker</directory>
                                     <filtering>true</filtering>
                                     <includes>
-                                        <include>**/*</include>
+                                        <include>Dockerfile</include>
                                     </includes>
                                 </resource>
                             </resources>
@@ -287,7 +296,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy-resources-2</id>
+                        <id>copy-resources-etc</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -301,59 +310,30 @@
                                         <include>misc/**</include>
                                         <include>**/**</include>
                                     </includes>
+                                    <excludes>
+                                        <exclude>aaf/**</exclude>
+                                        <exclude>docker/**</exclude>
+                                    </excludes>
                                 </resource>
                             </resources>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>copy-resources-3</id>
+                        <id>copy-aaf-props</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/docker-stage/opt/app/datartr</outputDirectory>
+                            <outputDirectory>${basedir}/target/docker-stage/opt/app/osaaf/local</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${basedir}/data</directory>
+                                    <directory>${basedir}/src/main/resources/aaf</directory>
                                     <includes>
-                                        <include>misc/**</include>
                                         <include>**/**</include>
                                     </includes>
                                 </resource>
                             </resources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>copy-resources-4</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/docker-stage/opt/app/datartr/aaf_certs</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/aaf_certs</directory>
-                                    <includes>
-                                        <include>misc/**</include>
-                                        <include>**/**</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/docker-stage/opt/app/datartr/lib</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

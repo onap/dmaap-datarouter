@@ -23,6 +23,8 @@
 
 package org.onap.dmaap.datarouter.provisioning.utils;
 
+import static java.lang.System.exit;
+
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.io.File;
@@ -96,9 +98,9 @@ public class DRRouteCLI {
         }
     }
 
-    public static final String ENV_VAR = "PROVSRVR";
-    public static final String PROMPT = "dr-route> ";
-    public static final String DEFAULT_TRUSTSTORE_PATH = /* $JAVA_HOME + */ "/jre/lib/security/cacerts";
+    private static final String ENV_VAR = "PROVSRVR";
+    private static final String PROMPT = "dr-route> ";
+    private static final String DEFAULT_TRUSTSTORE_PATH = /* $JAVA_HOME + */ "/jre/lib/security/cacerts";
     private static final EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
 
     private final String server;
@@ -113,12 +115,20 @@ public class DRRouteCLI {
      */
     public DRRouteCLI(String server) throws Exception {
         this.server = server;
-        this.width = 120;
         this.httpclient = new DefaultHttpClient();
 
-        Properties prop = (new DB()).getProperties();
-        String truststoreFile = prop.getProperty("org.onap.dmaap.datarouter.provserver.truststore.path");
-        String truststorePw = prop.getProperty("org.onap.dmaap.datarouter.provserver.truststore.password");
+        Properties provProperties = (new DB()).getProperties();
+        try {
+            AafPropsUtils.init(new File(provProperties.getProperty(
+                "org.onap.dmaap.datarouter.provserver.aafprops.path",
+                "/opt/app/osaaf/local/org.onap.dmaap-dr.props")));
+        } catch (IOException e) {
+            intlogger.error("NODE0314 Failed to load AAF props. Exiting", e);
+            exit(1);
+        }
+
+        String truststoreFile = AafPropsUtils.getInstance().getTruststorePathProperty();
+        String truststorePw = AafPropsUtils.getInstance().getTruststorePassProperty();
 
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
         if (truststoreFile == null || truststoreFile.equals("")) {
@@ -139,8 +149,8 @@ public class DRRouteCLI {
             } finally {
                 try {
                     instream.close();
-                } catch (Exception ignore) {
-                    intlogger.error("Ignore error closing input stream: " + ignore.getMessage(), ignore);
+                } catch (Exception e) {
+                    intlogger.error("Ignore error closing input stream: " + e.getMessage(), e);
                 }
             }
         }
@@ -178,7 +188,7 @@ public class DRRouteCLI {
      * @param args The command line arguments.
      * @return true if the command was valid and succeeded
      */
-    public boolean runCommand(String[] args) {
+    boolean runCommand(String[] args) {
         String cmd = args[0].trim().toLowerCase();
         if (cmd.equals("add")) {
             if (args.length > 2) {
@@ -471,12 +481,12 @@ public class DRRouteCLI {
         return rv;
     }
 
-    private void printErrorText(HttpEntity entity) throws IllegalStateException, IOException {
+    private void printErrorText(HttpEntity entity) throws IOException {
         // Look for and print only the part of the output between <pre>...</pre>
         InputStream is = entity.getContent();
         StringBuilder sb = new StringBuilder();
         byte[] bite = new byte[512];
-        int num = 0;
+        int num;
         while ((num = is.read(bite)) > 0) {
             sb.append(new String(bite, 0, num));
         }

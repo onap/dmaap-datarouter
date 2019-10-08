@@ -153,27 +153,6 @@
                     <include>**/*.properties</include>
                 </includes>
             </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/subscriber.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/log4j.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/test/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/log4j.properties</include>
-                </includes>
-            </resource>
         </resources>
         <plugins>
             <plugin>
@@ -225,7 +204,7 @@
                                     <directory>${basedir}/src/main/resources/docker</directory>
                                     <filtering>true</filtering>
                                     <includes>
-                                        <include>**/*</include>
+                                        <include>Dockerfile</include>
                                     </includes>
                                 </resource>
                             </resources>
@@ -267,19 +246,6 @@
                                     </includes>
                                 </resource>
                             </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/docker-stage/opt/app/subscriber/lib</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

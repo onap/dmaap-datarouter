@@ -25,12 +25,8 @@ package org.onap.dmaap.datarouter.node;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.EnumSet;
-import java.util.Properties;
 import javax.servlet.DispatcherType;
-import javax.servlet.ServletException;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -43,7 +39,6 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.onap.aaf.cadi.PropAccess;
 
 /**
  * The main starting point for the Data Router node.
@@ -144,7 +139,8 @@ public class NodeMain {
 
                 //CADI Filter activation check
                 if (nodeConfigManager.getCadiEnabled()) {
-                    enableCadi(servletContextHandler);
+                    servletContextHandler.addFilter(new FilterHolder(new DRNodeCadiFilter(true,
+                        nodeConfigManager.getNodeAafPropsUtils().getPropAccess())), "/*", EnumSet.of(DispatcherType.REQUEST));
                 }
 
                 server.setHandler(servletContextHandler);
@@ -161,24 +157,6 @@ public class NodeMain {
         }
         server.join();
         nodeMainLogger.debug("NODE00007 Node Server joined - " + server.getState());
-    }
-
-    private static void enableCadi(ServletContextHandler servletContextHandler) throws ServletException {
-        Properties cadiProperties = new Properties();
-        try {
-            Inner obj = new NodeMain().new Inner();
-            InputStream in = obj.getCadiProps();
-            cadiProperties.load(in);
-        } catch (IOException e1) {
-            nodeMainLogger
-                    .error("NODE00005 Exception in NodeMain.Main() loading CADI properties " + e1.getMessage(), e1);
-        }
-        cadiProperties.setProperty("aaf_locate_url", nodeConfigManager.getAafURL());
-        nodeMainLogger.debug("NODE00005  aaf_url set to - " + cadiProperties.getProperty("aaf_url"));
-
-        PropAccess access = new PropAccess(cadiProperties);
-        servletContextHandler.addFilter(new FilterHolder(new DRNodeCadiFilter(true, access)), "/*", EnumSet
-                .of(DispatcherType.REQUEST));
     }
 
     private static class WaitForConfig implements Runnable {
@@ -200,26 +178,12 @@ public class NodeMain {
                 try {
                     wait();
                 } catch (Exception exception) {
-                    nodeMainLogger
-                            .error("NodeMain: waitForConfig exception. Exception Message:- " + exception.toString(),
-                                    exception);
+                    nodeMainLogger.error("NodeMain: waitForConfig exception. Exception Message:- "
+                        + exception.toString(), exception);
                 }
             }
             localNodeConfigManager.deregisterConfigTask(this);
             nodeMainLogger.debug("NODE0004 Node Configuration Data Received");
-        }
-    }
-
-    class Inner {
-
-        InputStream getCadiProps() {
-            InputStream in = null;
-            try {
-                in = getClass().getClassLoader().getResourceAsStream("drNodeCadi.properties");
-            } catch (Exception e) {
-                nodeMainLogger.error("Exception in Inner.getCadiProps() method ", e);
-            }
-            return in;
         }
     }
 }
