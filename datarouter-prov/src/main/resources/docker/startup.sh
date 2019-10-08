@@ -13,4 +13,5 @@ java -classpath $CLASSPATH  org.onap.dmaap.datarouter.provisioning.Main
 
 runner_file="$LIB/datarouter-prov-jar-with-dependencies.jar"
 echo "Starting using" $runner_file
-java -Dorg.onap.dmaap.datarouter.provserver.properties=/opt/app/datartr/etc/provserver.properties -Dcom.att.eelf.logging.file=/opt/app/datartr/etc/logback.xml -Dcom.att.eelf.logging.path=/root -jar $runner_file
+java -Dorg.onap.dmaap.datarouter.provserver.properties=/opt/app/datartr/etc/provserver.properties \
+-Dcom.att.eelf.logging.file=/opt/app/datartr/etc/logback.xml -Dcom.att.eelf.logging.path=/root -jar $runner_file
