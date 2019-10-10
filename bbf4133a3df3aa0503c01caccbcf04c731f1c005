@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "4e4070f9_2eeb5479",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/AafPropsUtils.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-10-10T10:20:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "528f68dd_4609b469",
+      "range": {
+        "startLine": 57,
+        "startChar": 22,
+        "endLine": 57,
+        "endChar": 36
+      },
+      "revId": "bbf4133a3df3aa0503c01caccbcf04c731f1c005",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "51f3735c_e300c26f",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/AafPropsUtils.java",
         "patchSetId": 6
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "4214df5e_bf73f54c",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/AafPropsUtils.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-10-10T10:20:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51f3735c_e300c26f",
+      "range": {
+        "startLine": 64,
+        "startChar": 22,
+        "endLine": 64,
+        "endChar": 36
+      },
+      "revId": "bbf4133a3df3aa0503c01caccbcf04c731f1c005",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "63509b8d_0c7eb961",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/AafPropsUtils.java",
         "patchSetId": 6
@@ -59,6 +107,30 @@
       "writtenOn": "2019-10-10T08:42:51Z",
       "side": 1,
       "message": "ditto",
+      "range": {
+        "startLine": 81,
+        "startChar": 22,
+        "endLine": 81,
+        "endChar": 36
+      },
+      "revId": "bbf4133a3df3aa0503c01caccbcf04c731f1c005",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7b4f1458_dc55555d",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/AafPropsUtils.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2019-10-10T10:20:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "63509b8d_0c7eb961",
       "range": {
         "startLine": 81,
         "startChar": 22,
