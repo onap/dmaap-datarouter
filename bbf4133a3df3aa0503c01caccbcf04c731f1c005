@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "528f68dd_4609b469",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/AafPropsUtils.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4023
+      },
+      "writtenOn": "2019-10-10T08:42:51Z",
+      "side": 1,
+      "message": "Maybe this should be an IllegalStateException https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalStateException.html",
+      "range": {
+        "startLine": 57,
+        "startChar": 22,
+        "endLine": 57,
+        "endChar": 36
+      },
+      "revId": "bbf4133a3df3aa0503c01caccbcf04c731f1c005",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "51f3735c_e300c26f",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/AafPropsUtils.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 4023
+      },
+      "writtenOn": "2019-10-10T08:42:51Z",
+      "side": 1,
+      "message": "Similar query, should this be an IllegalStateException?",
+      "range": {
+        "startLine": 64,
+        "startChar": 22,
+        "endLine": 64,
+        "endChar": 36
+      },
+      "revId": "bbf4133a3df3aa0503c01caccbcf04c731f1c005",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "63509b8d_0c7eb961",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/AafPropsUtils.java",
+        "patchSetId": 6
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4023
+      },
+      "writtenOn": "2019-10-10T08:42:51Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 81,
+        "startChar": 22,
+        "endLine": 81,
+        "endChar": 36
+      },
+      "revId": "bbf4133a3df3aa0503c01caccbcf04c731f1c005",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
