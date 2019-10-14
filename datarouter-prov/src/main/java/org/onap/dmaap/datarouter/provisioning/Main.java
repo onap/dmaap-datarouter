@@ -24,10 +24,12 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
+import static java.lang.System.exit;
+
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.Security;
 import java.util.EnumSet;
 import java.util.Properties;
@@ -51,8 +53,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
-import org.onap.aaf.cadi.PropAccess;
-
+import org.onap.dmaap.datarouter.provisioning.utils.AafPropsUtils;
 import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.DRProvCadiFilter;
 import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
@@ -90,15 +91,6 @@ import org.onap.dmaap.datarouter.provisioning.utils.ThrottleFilter;
  */
 public class Main {
 
-    /**
-     * The truststore to use if none is specified.
-     */
-    static final String DEFAULT_TRUSTSTORE = "/opt/java/jdk/jdk180/jre/lib/security/cacerts";
-    static final String KEYSTORE_TYPE_PROPERTY = "org.onap.dmaap.datarouter.provserver.keystore.type";
-    static final String KEYSTORE_PATH_PROPERTY = "org.onap.dmaap.datarouter.provserver.keystore.path";
-    static final String KEYSTORE_PASS_PROPERTY = "org.onap.dmaap.datarouter.provserver.keystore.password";
-    static final String TRUSTSTORE_PATH_PROPERTY = "org.onap.dmaap.datarouter.provserver.truststore.path";
-    static final String TRUSTSTORE_PASS_PROPERTY = "org.onap.dmaap.datarouter.provserver.truststore.password";
     public static final EELFLogger intlogger = EELFManager.getInstance()
                                                        .getLogger("org.onap.dmaap.datarouter.provisioning.internal");
 
@@ -106,18 +98,7 @@ public class Main {
      * The one and only {@link Server} instance in this JVM.
      */
     private static Server server;
-
-    class Inner {
-        InputStream getCadiProps() {
-            InputStream in = null;
-            try {
-                in = getClass().getClassLoader().getResourceAsStream("drProvCadi.properties");
-            } catch (Exception e) {
-                intlogger.error("Exception in Main.getCadiProps(): " + e.getMessage(), e);
-            }
-            return in;
-        }
-    }
+    static AafPropsUtils aafPropsUtils;
 
     /**
      * Starts the Data Router Provisioning server.
@@ -129,10 +110,11 @@ public class Main {
         Security.setProperty("networkaddress.cache.ttl", "4");
         // Check DB is accessible and contains the expected tables
         if (!checkDatabase()) {
-            System.exit(1);
+            intlogger.error("Data Router Provisioning database init failure. Exiting.");
+            exit(1);
         }
 
-        intlogger.info("PROV0000 **** AT&T Data Router Provisioning Server starting....");
+        intlogger.info("PROV0000 **** Data Router Provisioning Server starting....");
 
         Security.setProperty("networkaddress.cache.ttl", "4");
         Properties provProperties = (new DB()).getProperties();
@@ -180,6 +162,16 @@ public class Main {
         httpConfiguration.setSendServerVersion(true);
         httpConfiguration.setSendDateHeader(false);
 
+        try {
+            AafPropsUtils.init(new File(provProperties.getProperty(
+                "org.onap.dmaap.datarouter.provserver.aafprops.path",
+                "/opt/app/osaaf/local/org.onap.dmaap-dr.props")));
+        } catch (IOException e) {
+            intlogger.error("NODE0314 Failed to load AAF props. Exiting", e);
+            exit(1);
+        }
+        aafPropsUtils = AafPropsUtils.getInstance();
+
         //HTTP Connector
         HandlerCollection handlerCollection;
         try (ServerConnector httpServerConnector =
@@ -190,19 +182,19 @@ public class Main {
 
             // SSL Context
             SslContextFactory sslContextFactory = new SslContextFactory();
-            sslContextFactory.setKeyStoreType(provProperties.getProperty(KEYSTORE_TYPE_PROPERTY, "jks"));
-            sslContextFactory.setKeyStorePath(provProperties.getProperty(KEYSTORE_PATH_PROPERTY));
-            sslContextFactory.setKeyStorePassword(provProperties.getProperty(KEYSTORE_PASS_PROPERTY));
-            sslContextFactory.setKeyManagerPassword(provProperties
-                                          .getProperty("org.onap.dmaap.datarouter.provserver.keymanager.password"));
+            sslContextFactory.setKeyStoreType(AafPropsUtils.KEYSTORE_TYPE_PROPERTY);
+            sslContextFactory.setKeyStorePath(aafPropsUtils.getKeystorePathProperty());
+            sslContextFactory.setKeyStorePassword(aafPropsUtils.getKeystorePassProperty());
+            sslContextFactory.setKeyManagerPassword(aafPropsUtils.getKeystorePassProperty());
 
-            String ts = provProperties.getProperty(TRUSTSTORE_PATH_PROPERTY);
-            if (ts != null && ts.length() > 0) {
-                intlogger.info("@@ TS -> " + ts);
-                sslContextFactory.setTrustStorePath(ts);
-                sslContextFactory.setTrustStorePassword(provProperties.getProperty(TRUSTSTORE_PASS_PROPERTY));
+            String truststorePathProperty = aafPropsUtils.getTruststorePathProperty();
+            if (truststorePathProperty != null && truststorePathProperty.length() > 0) {
+                intlogger.info("@@ TS -> " + truststorePathProperty);
+                sslContextFactory.setTrustStoreType(AafPropsUtils.TRUESTSTORE_TYPE_PROPERTY);
+                sslContextFactory.setTrustStorePath(truststorePathProperty);
+                sslContextFactory.setTrustStorePassword(aafPropsUtils.getTruststorePassProperty());
             } else {
-                sslContextFactory.setTrustStorePath(DEFAULT_TRUSTSTORE);
+                sslContextFactory.setTrustStorePath(AafPropsUtils.DEFAULT_TRUSTSTORE);
                 sslContextFactory.setTrustStorePassword("changeit");
             }
 
@@ -263,23 +255,9 @@ public class Main {
                 //CADI Filter activation check
                 if (Boolean.parseBoolean(provProperties.getProperty(
                         "org.onap.dmaap.datarouter.provserver.cadi.enabled", "false"))) {
-                    //Get cadi properties
-                    Properties cadiProperties = null;
-                    try {
-                        intlogger.info("PROV0001 Prov - Loading CADI properties");
-                        cadiProperties = new Properties();
-                        Inner obj = new Main().new Inner();
-                        InputStream in = obj.getCadiProps();
-                        cadiProperties.load(in);
-                    } catch (IOException ioe) {
-                        intlogger.error("PROV0001 Exception loading CADI properties: " + ioe.getMessage(), ioe);
-                    }
-                    cadiProperties.setProperty("aaf_locate_url", provProperties.getProperty("org.onap.dmaap.datarouter.provserver.cadi.aaf.url", "https://aaf-onap-test.osaaf.org:8095"));
-                    intlogger.info("PROV0001  aaf_url set to - " + cadiProperties.getProperty("aaf_url"));
-
-                    PropAccess access = new PropAccess(cadiProperties);
-                    servletContextHandler.addFilter(new FilterHolder(new DRProvCadiFilter(true, access)),
+                    servletContextHandler.addFilter(new FilterHolder(new DRProvCadiFilter(true, aafPropsUtils.getPropAccess())),
                             "/*", EnumSet.of(DispatcherType.REQUEST));
+                    intlogger.info("PROV0001 AAF CADI Auth enabled for ");
                 }
 
                 ContextHandlerCollection contextHandlerCollection = new ContextHandlerCollection();
@@ -306,7 +284,8 @@ public class Main {
             server.start();
             intlogger.info("Prov Server started-" + server.getState());
         } catch (Exception e) {
-            intlogger.info("Jetty failed to start. Reporting will we unavailable: " + e.getMessage(), e);
+            intlogger.error("Jetty failed to start. Exiting: " + e.getMessage(), e);
+            exit(1);
         }
         server.join();
         intlogger.info("PROV0001 **** AT&T Data Router Provisioning Server halted.");
@@ -325,7 +304,7 @@ public class Main {
             try {
                 server.stop();
                 Thread.sleep(5000L);
-                System.exit(0);
+                exit(0);
             } catch (Exception e) {
                 intlogger.error("Exception in Main.shutdown(): " + e.getMessage(), e);
             }

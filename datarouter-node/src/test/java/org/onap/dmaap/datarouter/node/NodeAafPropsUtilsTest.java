@@ -1,0 +1,39 @@
+/*
+ * ============LICENSE_START=======================================================
+ *  Copyright (C) 2019 Nordix Foundation.
+ * ================================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ * ============LICENSE_END=========================================================
+ */
+package org.onap.dmaap.datarouter.node;
+
+import java.io.File;
+import java.io.IOException;
+import org.junit.Assert;
+import org.junit.Test;
+
+public class NodeAafPropsUtilsTest {
+
+    @Test
+    public void Veirfy_Aaf_Pass_Decryp_Successful() {
+        NodeAafPropsUtils nodeAafPropsUtils = null;
+        try {
+            nodeAafPropsUtils = new NodeAafPropsUtils(new File("src/test/resources/aaf/org.onap.dmaap-dr.props"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Assert.assertEquals("tVac2#@Stx%tIOE^x[c&2fgZ", nodeAafPropsUtils.getDecryptedPass("cadi_keystore_password"));
+    }
+}
