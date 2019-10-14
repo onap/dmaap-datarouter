@@ -1,0 +1,8 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+2: Mandar Sawant <ms5838@att.com>
+Code-Review+2: sunil unnava <su622b@att.com>
+Submitted-by: sunil unnava <su622b@att.com>
+Submitted-at: Mon, 14 Oct 2019 03:10:02 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/dmaap/datarouter/+/96989
+Project: dmaap/datarouter
+Branch: refs/heads/elalto
