@@ -212,13 +212,12 @@
                         <configuration>
                             <images>
                                 <image>
-                                    <name>${datarouter.prov.image.name}</name>
+                                    <name>${datarouter.prov.image.name}:${dockertag1}</name>
                                     <build>
                                         <cleanup>try</cleanup>
                                         <dockerFileDir>${basedir}/target/docker-stage</dockerFileDir>
                                         <dockerFile>Dockerfile</dockerFile>
                                         <tags>
-                                            <tag>${dockertag1}</tag>
                                             <tag>${dockertag2}</tag>
                                         </tags>
                                     </build>
