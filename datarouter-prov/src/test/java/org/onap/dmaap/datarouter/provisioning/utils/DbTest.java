@@ -35,8 +35,6 @@ public class DbTest {
     private static EntityManagerFactory emf;
     private static EntityManager em;
 
-    private DB db = new DB();
-
     @BeforeClass
     public static void init() {
         emf = Persistence.createEntityManagerFactory("db-unit-tests");
@@ -55,7 +53,7 @@ public class DbTest {
 
     @Test
     public void Verify_DB_Is_Initialised_Successfully() {
-        Assert.assertTrue(db.runRetroFits());
+        Assert.assertTrue(ProvDbUtils.getInstance().initProvDB());
     }
 
 }

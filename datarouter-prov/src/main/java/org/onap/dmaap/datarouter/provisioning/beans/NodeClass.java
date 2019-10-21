@@ -3,7 +3,7 @@
  * * org.onap.dmaap
  * * ===========================================================================
  * * Copyright © 2017 AT&T Intellectual Property. All rights reserved.
-  * * ===========================================================================
+ * * ===========================================================================
  * * Licensed under the Apache License, Version 2.0 (the "License");
  * * you may not use this file except in compliance with the License.
  * * You may obtain a copy of the License at
@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 
 /**
  * This class is used to aid in the mapping of node names from/to node IDs.
@@ -46,12 +46,12 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
 public abstract class NodeClass extends Syncable {
 
     private static final String PROV_0005_DO_INSERT = "PROV0005 doInsert: ";
-    private static Map<String, Integer> map;
+    private static Map<String, Integer> nodesMap;
     private static EELFLogger intLogger = EELFManager.getInstance().getLogger("InternalLog");
 
     NodeClass() {
         // init on first use
-        if (map == null) {
+        if (nodesMap == null) {
             reload();
         }
     }
@@ -63,11 +63,11 @@ public abstract class NodeClass extends Syncable {
      * @param nodes a pipe separated list of the current nodes
      */
     public static void setNodes(String[] nodes) {
-        if (map == null) {
+        if (nodesMap == null) {
             reload();
         }
         int nextid = 0;
-        for (Integer n : map.values()) {
+        for (Integer n : nodesMap.values()) {
             if (n >= nextid) {
                 nextid = n + 1;
             }
@@ -76,9 +76,9 @@ public abstract class NodeClass extends Syncable {
 
         for (String node : nodes) {
             node = normalizeNodename(node);
-            if (!map.containsKey(node)) {
+            if (!nodesMap.containsKey(node)) {
                 intLogger.info("..adding " + node + " to NODES with index " + nextid);
-                map.put(node, nextid);
+                nodesMap.put(node, nextid);
                 insertNodesToTable(nextid, node);
                 nextid++;
             }
@@ -86,44 +86,35 @@ public abstract class NodeClass extends Syncable {
     }
 
     private static void insertNodesToTable(int nextid, String node) {
-        DB db = new DB();
-        try (Connection conn = db.getConnection()) {
-            try (PreparedStatement ps = conn
-                    .prepareStatement("insert into NODES (NODEID, NAME, ACTIVE) values (?, ?, 1)")) {
-                ps.setInt(1, nextid);
-                ps.setString(2, node);
-                ps.execute();
-            } finally {
-                db.release(conn);
-            }
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                "insert into NODES (NODEID, NAME, ACTIVE) values (?, ?, 1)")) {
+            ps.setInt(1, nextid);
+            ps.setString(2, node);
+            ps.execute();
         } catch (SQLException e) {
             intLogger.error(PROV_0005_DO_INSERT + e.getMessage(), e);
         }
     }
 
     private static void reload() {
-        Map<String, Integer> hmap = new HashMap<>();
-        String sql = "select NODEID, NAME from NODES";
-        DB db = new DB();
-        try (Connection conn = db.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    int id = rs.getInt("NODEID");
-                    String name = rs.getString("NAME");
-                    hmap.put(name, id);
-                }
-            } finally {
-                db.release(conn);
+        Map<String, Integer> tmpNodesMap = new HashMap<>();
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement("select NODEID, NAME from NODES");
+            ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                int id = rs.getInt("NODEID");
+                String name = rs.getString("NAME");
+                tmpNodesMap.put(name, id);
             }
         } catch (SQLException e) {
             intLogger.error(PROV_0005_DO_INSERT + e.getMessage(),e);
         }
-        map = hmap;
+        nodesMap = tmpNodesMap;
     }
 
     static Integer lookupNodeName(final String name) {
-        Integer nodeName = map.get(name);
+        Integer nodeName = nodesMap.get(name);
         if (nodeName == null) {
             throw new IllegalArgumentException("Invalid node name: " + name);
         }
@@ -137,7 +128,7 @@ public abstract class NodeClass extends Syncable {
      */
     public static Collection<String> lookupNodeNames(String patt) {
         Collection<String> coll = new TreeSet<>();
-        final Set<String> keyset = map.keySet();
+        final Set<String> keyset = nodesMap.keySet();
         for (String s : patt.toLowerCase().split(",")) {
             if (s.endsWith("*")) {
                 addNodeToCollection(coll, keyset, s);
@@ -181,7 +172,7 @@ public abstract class NodeClass extends Syncable {
     }
 
     String lookupNodeID(int node) {
-        for (Map.Entry<String, Integer> entry : map.entrySet()) {
+        for (Map.Entry<String, Integer> entry : nodesMap.entrySet()) {
             if (entry.getValue() == node) {
                 return entry.getKey();
             }

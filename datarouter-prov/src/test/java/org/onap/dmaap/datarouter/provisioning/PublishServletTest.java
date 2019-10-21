@@ -29,7 +29,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -67,9 +67,8 @@ public class PublishServletTest extends DrServletTestBase {
 
     private static EntityManagerFactory emf;
     private static EntityManager em;
-    private DB db;
 
-    ListAppender<ILoggingEvent> listAppender;
+    private ListAppender<ILoggingEvent> listAppender;
 
     @BeforeClass
     public static void init() {
@@ -92,7 +91,7 @@ public class PublishServletTest extends DrServletTestBase {
     public void setUp() throws Exception {
         listAppender = setTestLogger(PublishServlet.class);
         publishServlet = new PublishServlet();
-        db = new DB();
+        ProvDbUtils.getInstance().initProvDB();
     }
 
     @Test

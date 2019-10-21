@@ -34,6 +34,7 @@ import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
+import org.onap.dmaap.datarouter.provisioning.utils.Poker;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import javax.persistence.EntityManager;
@@ -294,7 +295,7 @@ public class GroupServletTest {
 
     private GroupServlet overideGetJSONFromInputToReturnAnInvalidGroup(Boolean invalidName) {
         GroupServlet groupServlet = new GroupServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject invalidGroup = new JSONObject();
                 String invalidEntry = "groupNameThatIsTooLongTooBeValidgroupNameThatIsTooLongTooBeValid";
                 invalidEntry = invalidEntry + invalidEntry + invalidEntry + invalidEntry + invalidEntry;
@@ -317,7 +318,7 @@ public class GroupServletTest {
 
     private GroupServlet overideGetJSONFromInputToReturnAValidGroupWithFail() {
         GroupServlet groupServlet = new GroupServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject validGroup = new JSONObject();
                 validGroup.put("name", "groupName");
                 validGroup.put("groupid", 2);
@@ -341,7 +342,7 @@ public class GroupServletTest {
 
     private GroupServlet overideGetJSONFromInputToReturnGroupInDb() {
         GroupServlet groupServlet = new GroupServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject validGroup = new JSONObject();
                 validGroup.put("name", "Group1");
                 validGroup.put("groupid", 2);
@@ -357,7 +358,7 @@ public class GroupServletTest {
 
     private GroupServlet overideGetJSONFromInputToReturnNewGroupToInsert() {
         GroupServlet groupServlet = new GroupServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject validGroup = new JSONObject();
                 validGroup.put("name", "Group2");
                 validGroup.put("groupid", 2);

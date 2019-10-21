@@ -20,13 +20,6 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
-import org.junit.*;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
-import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -34,15 +27,21 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.ParseException;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
+import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
 
 public class LogRecordTest {
 
-    private LogRecord logRecord;
     private static EntityManagerFactory emf;
     private static EntityManager em;
-    private DB db;
-    private static final String INSERT_SQL = "insert into LOG_RECORDS values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    private PreparedStatement ps;
 
     @BeforeClass
     public static void init() {
@@ -62,9 +61,7 @@ public class LogRecordTest {
 
     @Before
     public void setUp() throws ParseException, SQLException {
-        db = new DB();
-        Connection conn = db.getConnection();
-        ps = conn.prepareStatement(INSERT_SQL);
+
     }
 
     @Test
@@ -103,9 +100,14 @@ public class LogRecordTest {
 
     private void setArgsLoadAndAssertEquals(String type, String s) throws ParseException, SQLException {
         String[] args = {"2018-08-29-10-10-10-543.", "LOG", "ID", "1", "URL/file123", "PUT", "application/vnd.dmaap-.log-list; version=1.0", "100", type, "1", "172.0.0.8", "user", "204", "1", "1", "204", "0", "other", "1", "100", "file123"};
-        logRecord = new LogRecord(args);
-        logRecord.load(ps);
-        String compare_string = ps.toString().substring(ps.toString().indexOf("{1:"), ps.toString().indexOf("2:")) + ps.toString().substring(ps.toString().indexOf("3:"));
-        Assert.assertEquals(compare_string, s);
+        LogRecord logRecord = new LogRecord(args);
+        try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
+            PreparedStatement ps = conn.prepareStatement(
+                "insert into LOG_RECORDS values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            logRecord.load(ps);
+            String compare_string = ps.toString().substring(ps.toString().indexOf("{1:"), ps.toString().indexOf("2:")) + ps
+                .toString().substring(ps.toString().indexOf("3:"));
+            Assert.assertEquals(compare_string, s);
+        }
     }
 }

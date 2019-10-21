@@ -30,12 +30,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.json.JSONObject;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 
 /**
  * The representation of one route in the Network Route Table.
@@ -104,17 +103,10 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
      */
     public static SortedSet<NetworkRoute> getAllNetworkRoutes() {
         SortedSet<NetworkRoute> set = new TreeSet<>();
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery("select FROMNODE, TONODE, VIANODE from NETWORK_ROUTES")) {
-                    addNetworkRouteToSet(set, rs);
-                }
-            } finally {
-                db.release(conn);
-            }
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement("select FROMNODE, TONODE, VIANODE from NETWORK_ROUTES");
+            ResultSet rs = ps.executeQuery()) {
+            addNetworkRouteToSet(set, rs);
         } catch (SQLException e) {
             intlogger.error(SQLEXCEPTION + e.getMessage(), e);
         }
@@ -138,15 +130,15 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
         return tonode;
     }
 
-    public int getVianode() {
+    int getVianode() {
         return vianode;
     }
 
     @Override
     public boolean doDelete(Connection conn) {
         boolean rv = true;
-        String sql = "delete from NETWORK_ROUTES where FROMNODE = ? AND TONODE = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(
+            "delete from NETWORK_ROUTES where FROMNODE = ? AND TONODE = ?")) {
             ps.setInt(1, fromnode);
             ps.setInt(2, tonode);
             ps.execute();
@@ -160,9 +152,9 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
     @Override
     public boolean doInsert(Connection conn) {
         boolean rv = false;
-        String sql = "insert into NETWORK_ROUTES (FROMNODE, TONODE, VIANODE) values (?, ?, ?)";
         if (this.vianode >= 0) {
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (PreparedStatement ps = conn.prepareStatement(
+                "insert into NETWORK_ROUTES (FROMNODE, TONODE, VIANODE) values (?, ?, ?)")) {
                 // Create the NETWORK_ROUTES row
                 ps.setInt(1, this.fromnode);
                 ps.setInt(2, this.tonode);
@@ -179,8 +171,8 @@ public class NetworkRoute extends NodeClass implements Comparable<NetworkRoute> 
     @Override
     public boolean doUpdate(Connection conn) {
         boolean rv = true;
-        String sql = "update NETWORK_ROUTES set VIANODE = ? where FROMNODE = ? and TONODE = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement(
+            "update NETWORK_ROUTES set VIANODE = ? where FROMNODE = ? and TONODE = ?")) {
             ps.setInt(1, vianode);
             ps.setInt(2, fromnode);
             ps.setInt(3, tonode);

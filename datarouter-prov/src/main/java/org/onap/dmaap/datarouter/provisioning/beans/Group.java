@@ -30,14 +30,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import org.json.JSONObject;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 
 /**
  * The representation of a Subscription.  Subscriptions can be retrieved from the DB, or stored/updated in the DB.
@@ -51,7 +50,6 @@ public class Group extends Syncable {
     private static final String GROUP_ID_CONST = "groupid";
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
     private static int nextGroupid = getMaxGroupID() + 1;
-    private static final String SQLEXCEPTION = "SQLException: ";
 
     private int groupid;
     private String authid;
@@ -125,7 +123,7 @@ public class Group extends Syncable {
         } catch (InvalidObjectException e) {
             throw e;
         } catch (Exception e) {
-            intlogger.warn("Invalid JSON: " + e.getMessage(), e);
+            intlogger.error("Invalid JSON: " + e.getMessage(), e);
             throw new InvalidObjectException("Invalid JSON: " + e.getMessage());
         }
     }
@@ -137,8 +135,8 @@ public class Group extends Syncable {
      */
     public static Group getGroupMatching(Group gup) {
         String sql = String.format(
-                "select * from GROUPS where NAME='%s'",
-                gup.getName()
+            "select * from GROUPS where NAME='%s'",
+            gup.getName()
         );
         List<Group> list = getGroupsForSQL(sql);
         return !list.isEmpty() ? list.get(0) : null;
@@ -152,7 +150,7 @@ public class Group extends Syncable {
      */
     public static Group getGroupMatching(Group gup, int groupid) {
         String sql = String.format(
-                "select * from GROUPS where  NAME = '%s' and GROUPID != %d ", gup.getName(), gup.getGroupid());
+            "select * from GROUPS where  NAME = '%s' and GROUPID != %d ", gup.getName(), groupid);
         List<Group> list = getGroupsForSQL(sql);
         return !list.isEmpty() ? list.get(0) : null;
     }
@@ -185,19 +183,13 @@ public class Group extends Syncable {
 
     private static List<Group> getGroupsForSQL(String sql) {
         List<Group> list = new ArrayList<>();
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery(sql)) {
-                    while (rs.next()) {
-                        Group group = new Group(rs);
-                        list.add(group);
-                    }
-                }
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Group group = new Group(rs);
+                list.add(group);
             }
-            db.release(conn);
         } catch (SQLException e) {
             intlogger.error("PROV0009 getGroupsForSQL: " + e.getMessage(), e);
         }
@@ -206,20 +198,14 @@ public class Group extends Syncable {
 
     private static int getMaxGroupID() {
         int max = 0;
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery("select MAX(groupid) from GROUPS")) {
-                    if (rs.next()) {
-                        max = rs.getInt(1);
-                    }
-                }
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement("select MAX(groupid) from GROUPS");
+            ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                max = rs.getInt(1);
             }
-            db.release(conn);
         } catch (SQLException e) {
-            intlogger.info("PROV0001 getMaxSubID: " + e.getMessage(), e);
+            intlogger.error("PROV0001 getMaxSubID: " + e.getMessage(), e);
         }
         return max;
     }
@@ -292,21 +278,18 @@ public class Group extends Syncable {
     @Override
     public boolean doInsert(Connection conn) {
         boolean rv = true;
-        PreparedStatement ps = null;
-        try {
+        try (PreparedStatement ps = conn.prepareStatement(
+            "insert into GROUPS(GROUPID, AUTHID, NAME, DESCRIPTION, CLASSIFICATION, MEMBERS) "
+                + "values (?, ?, ?, ?, ?, ?)", new String[]{"GROUPID"})) {
             if (groupid == -1) {
                 // No feed ID assigned yet, so assign the next available one
                 setGroupid(nextGroupid++);
             }
-            // In case we insert a gropup from synchronization
+            // In case we insert a group from synchronization
             if (groupid > nextGroupid) {
                 nextGroupid = groupid + 1;
             }
-
             // Create the GROUPS row
-            String sql = "insert into GROUPS (GROUPID, AUTHID, NAME, DESCRIPTION, CLASSIFICATION, MEMBERS) "
-                                 + "values (?, ?, ?, ?, ?, ?)";
-            ps = conn.prepareStatement(sql, new String[]{"GROUPID"});
             ps.setInt(1, groupid);
             ps.setString(2, authid);
             ps.setString(3, name);
@@ -314,18 +297,9 @@ public class Group extends Syncable {
             ps.setString(5, classification);
             ps.setString(6, members);
             ps.execute();
-            ps.close();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0005 doInsert: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
+            intlogger.error("PROV0005 doInsert: " + e.getMessage(), e);
         }
         return rv;
     }
@@ -333,11 +307,8 @@ public class Group extends Syncable {
     @Override
     public boolean doUpdate(Connection conn) {
         boolean rv = true;
-        PreparedStatement ps = null;
-        try {
-            String sql = "update GROUPS set AUTHID = ?, NAME = ?, DESCRIPTION = ?, CLASSIFICATION = ? ,  MEMBERS = ? "
-                                 + "where GROUPID = ?";
-            ps = conn.prepareStatement(sql);
+        try (PreparedStatement ps = conn.prepareStatement(
+            "update GROUPS set AUTHID = ?, NAME = ?, DESCRIPTION = ?, CLASSIFICATION = ? ,  MEMBERS = ? where GROUPID = ?")) {
             ps.setString(1, authid);
             ps.setString(2, name);
             ps.setString(3, description);
@@ -347,15 +318,7 @@ public class Group extends Syncable {
             ps.executeUpdate();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0006 doUpdate: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
+            intlogger.error("PROV0006 doUpdate: " + e.getMessage(), e);
         }
         return rv;
     }
@@ -363,23 +326,12 @@ public class Group extends Syncable {
     @Override
     public boolean doDelete(Connection conn) {
         boolean rv = true;
-        PreparedStatement ps = null;
-        try {
-            String sql = "delete from GROUPS where GROUPID = ?";
-            ps = conn.prepareStatement(sql);
+        try (PreparedStatement ps = conn.prepareStatement("delete from GROUPS where GROUPID = ?")) {
             ps.setInt(1, groupid);
             ps.execute();
         } catch (SQLException e) {
             rv = false;
-            intlogger.warn("PROV0007 doDelete: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
+            intlogger.error("PROV0007 doDelete: " + e.getMessage(), e);
         }
         return rv;
     }
@@ -398,23 +350,19 @@ public class Group extends Syncable {
         if (groupid != os.groupid) {
             return false;
         }
-        if (authid != os.authid) {
+        if (!authid.equals(os.authid)) {
             return false;
         }
         if (!name.equals(os.name)) {
             return false;
         }
-        if (description != os.description) {
+        if (!description.equals(os.description)) {
             return false;
         }
         if (!classification.equals(os.classification)) {
             return false;
         }
-        if (!members.equals(os.members)) {
-            return false;
-        }
-
-        return true;
+        return members.equals(os.members);
     }
 
     @Override

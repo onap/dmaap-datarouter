@@ -9,7 +9,7 @@ CLASSPATH=$ETC
 for FILE in `find $LIB -name *.jar`; do
   CLASSPATH=$CLASSPATH:$FILE
 done
-java -classpath $CLASSPATH  org.onap.dmaap.datarouter.provisioning.Main
+java -classpath $CLASSPATH  org.onap.dmaap.datarouter.provisioning.ProvRunner
 
 runner_file="$LIB/datarouter-prov-jar-with-dependencies.jar"
 echo "Starting using" $runner_file

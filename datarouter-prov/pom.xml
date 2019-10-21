@@ -51,11 +51,12 @@
         <dependency>
             <groupId>org.mariadb.jdbc</groupId>
             <artifactId>mariadb-java-client</artifactId>
-            <version>2.3.0</version>
+            <version>2.5.0</version>
         </dependency>
         <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-library</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+            <version>2.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -279,7 +280,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.onap.dmaap.datarouter.provisioning.Main</mainClass>
+                            <mainClass>org.onap.dmaap.datarouter.provisioning.ProvRunner</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

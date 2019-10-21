@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
+import org.onap.dmaap.datarouter.provisioning.utils.SynchronizerTask;
 import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.eelf.EelfMsgs;

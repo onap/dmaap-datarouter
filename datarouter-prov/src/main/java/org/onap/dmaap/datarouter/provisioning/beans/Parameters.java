@@ -29,14 +29,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import org.json.JSONObject;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 
 /**
  * Methods to provide access to Provisioning parameters in the DB. This class also provides constants of the standard
@@ -54,7 +53,7 @@ public class Parameters extends Syncable {
     public static final String PROV_AUTH_SUBJECTS = "PROV_AUTH_SUBJECTS";
     public static final String PROV_NAME = "PROV_NAME";
     public static final String PROV_ACTIVE_NAME = "PROV_ACTIVE_NAME";
-    public static final String PROV_DOMAIN = "PROV_DOMAIN";
+    static final String PROV_DOMAIN = "PROV_DOMAIN";
     public static final String PROV_MAXFEED_COUNT = "PROV_MAXFEED_COUNT";
     public static final String PROV_MAXSUB_COUNT = "PROV_MAXSUB_COUNT";
     public static final String PROV_POKETIMER1 = "PROV_POKETIMER1";
@@ -108,17 +107,13 @@ public class Parameters extends Syncable {
      */
     public static Collection<Parameters> getParameterCollection() {
         Collection<Parameters> coll = new ArrayList<>();
-        DB db = new DB();
-        String sql = "select * from PARAMETERS";
-        try (Connection conn = db.getConnection();
-                Statement stmt = conn.createStatement()) {
-            try (ResultSet rs = stmt.executeQuery(sql)) {
-                while (rs.next()) {
-                    Parameters param = new Parameters(rs);
-                    coll.add(param);
-                }
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement("select * from PARAMETERS")) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Parameters param = new Parameters(rs);
+                coll.add(param);
             }
-            db.release(conn);
         } catch (SQLException e) {
             intlogger.error(SQLEXCEPTION + e.getMessage(), e);
         }
@@ -133,17 +128,14 @@ public class Parameters extends Syncable {
      */
     public static Parameters getParameter(String key) {
         Parameters val = null;
-        DB db = new DB();
-        String sql = "select KEYNAME, VALUE from PARAMETERS where KEYNAME = ?";
-        try (Connection conn = db.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement stmt = conn.prepareStatement(
+                "select KEYNAME, VALUE from PARAMETERS where KEYNAME = ?")) {
             stmt.setString(1, key);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    val = new Parameters(rs);
-                }
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                val = new Parameters(rs);
             }
-            db.release(conn);
         } catch (SQLException e) {
             intlogger.error(SQLEXCEPTION + e.getMessage(), e);
         }
@@ -173,8 +165,7 @@ public class Parameters extends Syncable {
     @Override
     public boolean doInsert(Connection conn) {
         boolean rv = true;
-        String sql = "insert into PARAMETERS values (?, ?)";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement("insert into PARAMETERS values (?, ?)")) {
             ps.setString(1, getKeyname());
             ps.setString(2, getValue());
             ps.execute();
@@ -188,8 +179,7 @@ public class Parameters extends Syncable {
     @Override
     public boolean doUpdate(Connection conn) {
         boolean rv = true;
-        String sql = "update PARAMETERS set VALUE = ? where KEYNAME = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement("update PARAMETERS set VALUE = ? where KEYNAME = ?")) {
             ps.setString(1, getValue());
             ps.setString(2, getKeyname());
             ps.executeUpdate();
@@ -203,8 +193,7 @@ public class Parameters extends Syncable {
     @Override
     public boolean doDelete(Connection conn) {
         boolean rv = true;
-        String sql = "delete from PARAMETERS where KEYNAME = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement("delete from PARAMETERS where KEYNAME = ?")) {
             ps.setString(1, getKeyname());
             ps.execute();
         } catch (SQLException e) {

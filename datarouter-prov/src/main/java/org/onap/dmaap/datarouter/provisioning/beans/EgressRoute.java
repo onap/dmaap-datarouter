@@ -35,7 +35,7 @@ import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import org.json.JSONObject;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 
 /**
  * The representation of one route in the Egress Route Table.
@@ -71,16 +71,10 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
      */
     public static SortedSet<EgressRoute> getAllEgressRoutes() {
         SortedSet<EgressRoute> set = new TreeSet<>();
-        DB db = new DB();
-        String sql = "select SUBID, NODEID from EGRESS_ROUTES";
-        try (Connection conn = db.getConnection()) {
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery(sql)) {
-                    addEgressRouteToSet(set, rs);
-                }
-            } finally {
-                db.release(conn);
-            }
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("select SUBID, NODEID from EGRESS_ROUTES")) {
+            addEgressRouteToSet(set, rs);
         } catch (SQLException e) {
             intlogger.error("PROV0008 EgressRoute.getAllEgressRoutes: " + e.getMessage(), e);
         }
@@ -103,18 +97,13 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
      */
     public static EgressRoute getEgressRoute(int sub) {
         EgressRoute er = null;
-        DB db = new DB();
-        String sql = "select NODEID from EGRESS_ROUTES where SUBID = ?";
-        try (Connection conn = db.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement("select NODEID from EGRESS_ROUTES where SUBID = ?")) {
             ps.setInt(1, sub);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    int node = rs.getInt("NODEID");
-                    er = new EgressRoute(sub, node);
-                }
-            } finally {
-                db.release(conn);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                int node = rs.getInt("NODEID");
+                er = new EgressRoute(sub, node);
             }
         } catch (SQLException e) {
             intlogger.error("PROV0009 EgressRoute.getEgressRoute: " + e.getMessage(), e);
@@ -125,8 +114,7 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
     @Override
     public boolean doDelete(Connection conn) {
         boolean rv = true;
-        String sql = "delete from EGRESS_ROUTES where SUBID = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement("delete from EGRESS_ROUTES where SUBID = ?")) {
             ps.setInt(1, subid);
             ps.execute();
         } catch (SQLException e) {
@@ -139,9 +127,7 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
     @Override
     public boolean doInsert(Connection conn) {
         boolean rv = false;
-        String sql = "insert into EGRESS_ROUTES (SUBID, NODEID) values (?, ?)";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            // Create the NETWORK_ROUTES row
+        try (PreparedStatement ps = conn.prepareStatement("insert into EGRESS_ROUTES (SUBID, NODEID) values (?, ?)")) {
             ps.setInt(1, this.subid);
             ps.setInt(2, this.nodeid);
             ps.execute();
@@ -155,8 +141,7 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
     @Override
     public boolean doUpdate(Connection conn) {
         boolean rv = true;
-        String sql = "update EGRESS_ROUTES set NODEID = ? where SUBID = ?";
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (PreparedStatement ps = conn.prepareStatement("update EGRESS_ROUTES set NODEID = ? where SUBID = ?")) {
             ps.setInt(1, nodeid);
             ps.setInt(2, subid);
             ps.executeUpdate();

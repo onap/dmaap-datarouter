@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 
 /**
  * Generate a daily per feed latency report.  The report is a .csv file containing the following columns:
@@ -64,10 +64,6 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  * @version $Id: DailyLatencyReport.java,v 1.2 2013/11/06 16:23:54 eby Exp $
  */
 public class DailyLatencyReport extends ReportBase {
-
-    private static final String SELECT_SQL =
-        "select EVENT_TIME, TYPE, PUBLISH_ID, FEED_FILEID, FEEDID, CONTENT_LENGTH from LOG_RECORDS" +
-            " where EVENT_TIME >= ? and EVENT_TIME <= ?";
 
     private class Job {
         private long pubtime = 0;
@@ -161,33 +157,29 @@ public class DailyLatencyReport extends ReportBase {
         Map<String, Counters> map = new HashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         long start = System.currentTimeMillis();
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (PreparedStatement ps = conn.prepareStatement(SELECT_SQL)) {
-                ps.setLong(1, from);
-                ps.setLong(2, to);
-                try (ResultSet rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        String id = rs.getString("PUBLISH_ID");
-                        int feed = rs.getInt("FEEDID");
-                        long etime = rs.getLong("EVENT_TIME");
-                        String type = rs.getString("TYPE");
-                        String fid = rs.getString("FEED_FILEID");
-                        long clen = rs.getLong("CONTENT_LENGTH");
-                        String date = sdf.format(new Date(getPstart(id)));
-                        String key = date + "," + feed;
-                        Counters c = map.get(key);
-                        if (c == null) {
-                            c = new Counters(date, feed);
-                            map.put(key, c);
-                        }
-                        c.addEvent(etime, type, id, fid, clen);
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                "select EVENT_TIME, TYPE, PUBLISH_ID, FEED_FILEID, FEEDID, "
+                    + "CONTENT_LENGTH from LOG_RECORDS where EVENT_TIME >= ? and EVENT_TIME <= ?")) {
+            ps.setLong(1, from);
+            ps.setLong(2, to);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String id = rs.getString("PUBLISH_ID");
+                    int feed = rs.getInt("FEEDID");
+                    long etime = rs.getLong("EVENT_TIME");
+                    String type = rs.getString("TYPE");
+                    String fid = rs.getString("FEED_FILEID");
+                    long clen = rs.getLong("CONTENT_LENGTH");
+                    String date = sdf.format(new Date(getPstart(id)));
+                    String key = date + "," + feed;
+                    Counters c = map.get(key);
+                    if (c == null) {
+                        c = new Counters(date, feed);
+                        map.put(key, c);
                     }
+                    c.addEvent(etime, type, id, fid, clen);
                 }
-
-                db.release(conn);
             }
         } catch (SQLException e) {
             logger.error("SQLException: " + e.getMessage());

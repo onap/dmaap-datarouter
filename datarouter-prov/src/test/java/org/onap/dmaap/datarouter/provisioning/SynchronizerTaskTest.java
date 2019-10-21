@@ -54,6 +54,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
+import org.onap.dmaap.datarouter.provisioning.utils.SynchronizerTask;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;

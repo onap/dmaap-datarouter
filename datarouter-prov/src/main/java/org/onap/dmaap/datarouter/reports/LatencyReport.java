@@ -32,8 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 
 /**
  * Generate a per-file latency report.  It reports on the details related to one file published
@@ -54,9 +53,6 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  * @version $Id: LatencyReport.java,v 1.1 2013/10/28 18:06:53 eby Exp $
  */
 public class LatencyReport extends ReportBase {
-    private static final String SELECT_SQL =
-            "select EVENT_TIME, TYPE, PUBLISH_ID, FEED_FILEID, FEEDID, CONTENT_LENGTH from LOG_RECORDS" +
-                    " where EVENT_TIME >= ? and EVENT_TIME <= ? order by PUBLISH_ID, EVENT_TIME";
 
     private class Event {
         public final String type;
@@ -80,7 +76,7 @@ public class LatencyReport extends ReportBase {
             feedid = fid;
             clen = c;
             fileid = s;
-            events = new ArrayList<Event>();
+            events = new ArrayList<>();
         }
 
         private long pubtime;
@@ -141,15 +137,14 @@ public class LatencyReport extends ReportBase {
     @Override
     public void run() {
         long start = System.currentTimeMillis();
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try(PreparedStatement ps = conn.prepareStatement(SELECT_SQL)){
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                "select EVENT_TIME, TYPE, PUBLISH_ID, FEED_FILEID, FEEDID, CONTENT_LENGTH from LOG_RECORDS where "
+                    + "EVENT_TIME >= ? and EVENT_TIME <= ? order by PUBLISH_ID, EVENT_TIME")) {
             ps.setLong(1, from);
             ps.setLong(2, to);
             try(ResultSet rs = ps.executeQuery()) {
-                try(PrintWriter os = new PrintWriter(outfile)) {
+                try (PrintWriter os = new PrintWriter(outfile)) {
                     os.println("recordid,feedid,uri,size,min,max,avg,fanout");
                     Counters c = null;
                     while (rs.next()) {
@@ -174,8 +169,6 @@ public class LatencyReport extends ReportBase {
                         c.addEvent(type, etime);
                     }
                 }
-             db.release(conn);
-            }
             }
         } catch (FileNotFoundException e) {
             System.err.println("File cannot be written: " + outfile);

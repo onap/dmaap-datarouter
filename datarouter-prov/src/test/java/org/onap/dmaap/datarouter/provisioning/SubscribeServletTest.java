@@ -53,7 +53,8 @@ import org.mockito.Mock;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.Poker;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 
@@ -62,7 +63,6 @@ public class SubscribeServletTest extends DrServletTestBase {
     private static SubscribeServlet subscribeServlet;
     private static EntityManagerFactory emf;
     private static EntityManager em;
-    private DB db;
 
     @Mock
     private HttpServletRequest request;
@@ -89,7 +89,7 @@ public class SubscribeServletTest extends DrServletTestBase {
 
     @Before
     public void setUp() throws Exception {
-        db = new DB();
+        ProvDbUtils.getInstance().initProvDB();
         listAppender = setTestLogger(SubscribeServlet.class);
         subscribeServlet = new SubscribeServlet();
         setAuthoriserToReturnRequestIsAuthorized();
@@ -192,7 +192,7 @@ public class SubscribeServletTest extends DrServletTestBase {
         when(request.getPathInfo()).thenReturn("/1");
         JSONObject JSObject = buildRequestJsonObject();
         SubscribeServlet subscribeServlet = new SubscribeServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+             public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "2.0");
@@ -216,7 +216,7 @@ public class SubscribeServletTest extends DrServletTestBase {
         when(request.getPathInfo()).thenReturn("/1");
         JSONObject JSObject = buildRequestJsonObject();
         SubscribeServlet subscribeServlet = new SubscribeServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "2.0");
@@ -243,7 +243,7 @@ public class SubscribeServletTest extends DrServletTestBase {
         when(request.getPathInfo()).thenReturn("/2");
         JSONObject JSObject = buildRequestJsonObject();
         SubscribeServlet subscribeServlet = new SubscribeServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "2.0");
@@ -265,7 +265,7 @@ public class SubscribeServletTest extends DrServletTestBase {
         when(request.getPathInfo()).thenReturn("/2");
         JSONObject JSObject = buildRequestJsonObject();
         SubscribeServlet subscribeServlet = new SubscribeServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "2.0");
@@ -290,7 +290,7 @@ public class SubscribeServletTest extends DrServletTestBase {
         when(request.isUserInRole("org.onap.dmaap-dr.feed|*|approveSub")).thenReturn(true);
         JSONObject JSObject = buildRequestJsonObject();
         SubscribeServlet subscribeServlet = new SubscribeServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "2.0");
@@ -334,7 +334,7 @@ public class SubscribeServletTest extends DrServletTestBase {
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "maxSubs", 0, true);
         when(request.getPathInfo()).thenReturn("/1");
         SubscribeServlet subscribeServlet = new SubscribeServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 return new JSONObject();
             }
         };
@@ -347,7 +347,7 @@ public class SubscribeServletTest extends DrServletTestBase {
         when(request.getPathInfo()).thenReturn("/2");
         JSONObject JSObject = buildRequestJsonObject();
         SubscribeServlet subscribeServlet = new SubscribeServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "2.0");

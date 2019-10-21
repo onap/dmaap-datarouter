@@ -24,6 +24,7 @@ package org.onap.dmaap.datarouter.provisioning;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import java.sql.Connection;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -39,8 +40,9 @@ import org.onap.dmaap.datarouter.provisioning.beans.Deleteable;
 import org.onap.dmaap.datarouter.provisioning.beans.SubDelivery;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.PasswordProcessor;
+import org.onap.dmaap.datarouter.provisioning.utils.Poker;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -67,7 +69,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
     private static EntityManagerFactory emf;
     private static EntityManager em;
     private SubscriptionServlet subscriptionServlet;
-    private DB db;
     private final String URL= "https://172.100.0.5";
     private final String USER = "user1";
     private final String PASSWORD="password1";
@@ -100,7 +101,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
     public void setUp() throws Exception {
         listAppender = setTestLogger(SubscriptionServlet.class);
         subscriptionServlet = new SubscriptionServlet();
-        db = new DB();
         setAuthoriserToReturnRequestIsAuthorized();
         setPokerToNotCreateTimersWhenDeleteSubscriptionIsCalled();
         setupValidAuthorisedRequest();
@@ -253,7 +253,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
         JSONObject JSObject = buildRequestJsonObject();
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "2.0");
@@ -278,7 +278,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         when(request.getPathInfo()).thenReturn("/3");
         JSONObject JSObject = buildRequestJsonObject();
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "2.0");
@@ -307,7 +307,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         PowerMockito.mockStatic(PasswordProcessor.class);
         JSONObject JSObject = buildRequestJsonObject();
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "2.0");
@@ -347,7 +347,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_PUT_And_Subscription_Object_Is_Invalid_Bad_Request_Response_Is_Generated() throws Exception {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 return jo;
             }
@@ -362,7 +362,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
         JSONObject JSObject = buildRequestJsonObject();
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "2.0");
@@ -388,7 +388,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
         JSONObject JSObject = buildRequestJsonObject();
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "2.0");
@@ -421,7 +421,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         PowerMockito.mockStatic(PasswordProcessor.class);
         JSONObject JSObject = buildRequestJsonObject();
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "2.0");
@@ -502,7 +502,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription-control; version=1.0");
         JSONObject JSObject = buildRequestJsonObject();
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "2.0");
@@ -524,7 +524,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription-control; version=1.0");
         JSONObject JSObject = buildRequestJsonObject();
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "2.0");
@@ -610,7 +610,9 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setPrivilegedSubscriber(false);
         subscription.setDecompress(false);
         subscription.changeOwnerShip();
-        subscription.doUpdate(db.getConnection());
+        try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
+            subscription.doUpdate(conn);
+        }
     }
 
     private void resetAafSubscriptionInDB() throws SQLException {
@@ -626,7 +628,9 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setAafInstance("https://aaf-onap-test.osaaf.org:8095");
         subscription.setDecompress(false);
         subscription.setPrivilegedSubscriber(false);
-        subscription.doUpdate(db.getConnection());
+        try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
+            subscription.doUpdate(conn);
+        }
     }
 
     private void addNewSubscriptionInDB() throws SQLException {
@@ -640,6 +644,8 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setMetadataOnly(false);
         subscription.setSuspended(false);
         subscription.setDecompress(false);
-        subscription.doInsert(db.getConnection());
+        try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
+            subscription.doInsert(conn);
+        }
     }
 }

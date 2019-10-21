@@ -35,9 +35,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
-import org.onap.dmaap.datarouter.authz.impl.ProvAuthorizer;
 import org.onap.dmaap.datarouter.provisioning.StatisticsServlet;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
@@ -53,7 +51,6 @@ public class ProvAuthTest {
 
     private static EntityManagerFactory emf;
     private static EntityManager em;
-    private DB db;
 
     @BeforeClass
     public static void init() {
@@ -73,7 +70,6 @@ public class ProvAuthTest {
 
     @Before
     public void setUp() throws Exception {
-        db = new DB();
         provAuthorizer = new ProvAuthorizer(statisticsServlet);
     }
 

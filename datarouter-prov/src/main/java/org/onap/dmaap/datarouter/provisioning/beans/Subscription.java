@@ -30,14 +30,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 import org.json.JSONObject;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.ProvRunner;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 
 
@@ -116,7 +116,7 @@ public class Subscription extends Syncable {
         this.followRedirect = rs.getBoolean("FOLLOW_REDIRECTS");
         this.subscriber = rs.getString("SUBSCRIBER");
         this.links = new SubLinks(rs.getString("SELF_LINK"), URLUtilities.generateFeedURL(feedid),
-                rs.getString("LOG_LINK"));
+            rs.getString("LOG_LINK"));
         this.suspended = rs.getBoolean("SUSPENDED");
         this.lastMod = rs.getDate("LAST_MOD");
         this.createdDate = rs.getDate("CREATED_DATE");
@@ -148,7 +148,7 @@ public class Subscription extends Syncable {
             final boolean use100 = jdeli.getBoolean("use100");
 
             //Data Router Subscriber HTTPS Relaxation feature USERSTORYID:US674047.
-            Properties prop = (new DB()).getProperties();
+            Properties prop = ProvRunner.getProvProperties();
             if (!url.startsWith("https://") && isHttpsRelaxationFalseAndHasSyncKey(jo, prop)) {
                 throw new InvalidObjectException("delivery URL is not HTTPS");
             }
@@ -187,16 +187,16 @@ public class Subscription extends Syncable {
     public static Subscription getSubscriptionMatching(Subscription sub) {
         SubDelivery deli = sub.getDelivery();
         String sql = String.format(
-                "select * from SUBSCRIPTIONS where FEEDID = %d and DELIVERY_URL = \"%s\" and DELIVERY_USER = \"%s\" "
-                        + "and DELIVERY_PASSWORD = \"%s\" and DELIVERY_USE100 = %d and METADATA_ONLY = %d "
-                        + "and FOLLOW_REDIRECTS = %d",
-                sub.getFeedid(),
-                deli.getUrl(),
-                deli.getUser(),
-                deli.getPassword(),
-                deli.isUse100() ? 1 : 0,
-                sub.isMetadataOnly() ? 1 : 0,
-                sub.isFollowRedirect() ? 1 : 0
+            "select * from SUBSCRIPTIONS where FEEDID = %d and DELIVERY_URL = \"%s\" and DELIVERY_USER = \"%s\" "
+                + "and DELIVERY_PASSWORD = \"%s\" and DELIVERY_USE100 = %d and METADATA_ONLY = %d "
+                + "and FOLLOW_REDIRECTS = %d",
+            sub.getFeedid(),
+            deli.getUrl(),
+            deli.getUser(),
+            deli.getPassword(),
+            deli.isUse100() ? 1 : 0,
+            sub.isMetadataOnly() ? 1 : 0,
+            sub.isFollowRedirect() ? 1 : 0
         );
         List<Subscription> list = getSubscriptionsForSQL(sql);
         return !list.isEmpty() ? list.get(0) : null;
@@ -224,19 +224,13 @@ public class Subscription extends Syncable {
      */
     private static List<Subscription> getSubscriptionsForSQL(String sql) {
         List<Subscription> list = new ArrayList<>();
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery(sql)) {
-                    while (rs.next()) {
-                        Subscription sub = new Subscription(rs);
-                        list.add(sub);
-                    }
-                }
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Subscription sub = new Subscription(rs);
+                list.add(sub);
             }
-            db.release(conn);
         } catch (SQLException e) {
             intlogger.error("PROV0001 getSubscriptionsForSQL: " + e.toString(), e);
         }
@@ -249,18 +243,12 @@ public class Subscription extends Syncable {
      */
     public static int getMaxSubID() {
         int max = 0;
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery("select MAX(subid) from SUBSCRIPTIONS")) {
-                    if (rs.next()) {
-                        max = rs.getInt(1);
-                    }
-                }
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement("select MAX(subid) from SUBSCRIPTIONS");
+            ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                max = rs.getInt(1);
             }
-            db.release(conn);
         } catch (SQLException e) {
             intlogger.info("getMaxSubID: " + e.getMessage(), e);
         }
@@ -274,22 +262,15 @@ public class Subscription extends Syncable {
      */
     public static Collection<String> getSubscriptionUrlList(int feedid) {
         List<String> list = new ArrayList<>();
-        String sql = "select SUBID from SUBSCRIPTIONS where FEEDID = ?";
-
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-                stmt.setString(1, String.valueOf(feedid));
-                try (ResultSet rs = stmt.executeQuery()) {
-                    while (rs.next()) {
-                        int subid = rs.getInt(SUBID_COL);
-                        list.add(URLUtilities.generateSubscriptionURL(subid));
-                    }
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement stmt = conn.prepareStatement("select SUBID from SUBSCRIPTIONS where FEEDID = ?")) {
+            stmt.setString(1, String.valueOf(feedid));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int subid = rs.getInt(SUBID_COL);
+                    list.add(URLUtilities.generateSubscriptionURL(subid));
                 }
             }
-            db.release(conn);
         } catch (SQLException e) {
             intlogger.error(SQLEXCEPTION + e.getMessage(), e);
         }
@@ -303,18 +284,12 @@ public class Subscription extends Syncable {
      */
     public static int countActiveSubscriptions() {
         int count = 0;
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery("select count(*) from SUBSCRIPTIONS")) {
-                    if (rs.next()) {
-                        count = rs.getInt(1);
-                    }
-                }
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement("select count(*) from SUBSCRIPTIONS");
+            ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                count = rs.getInt(1);
             }
-            db.release(conn);
         } catch (SQLException e) {
             intlogger.warn("PROV0008 countActiveSubscriptions: " + e.getMessage(), e);
         }
@@ -323,7 +298,7 @@ public class Subscription extends Syncable {
 
     private boolean isHttpsRelaxationFalseAndHasSyncKey(JSONObject jo, Properties prop) {
         return prop.get("org.onap.dmaap.datarouter.provserver.https.relaxation").toString().equals("false") && !jo
-                .has("sync");
+            .has("sync");
     }
 
     public int getSubid() {
@@ -514,9 +489,9 @@ public class Subscription extends Syncable {
 
             // Create the SUBSCRIPTIONS row
             String sql = "insert into SUBSCRIPTIONS (SUBID, FEEDID, DELIVERY_URL, DELIVERY_USER, DELIVERY_PASSWORD, "
-                                 + "DELIVERY_USE100, METADATA_ONLY, SUBSCRIBER, SUSPENDED, GROUPID, "
-                                 + "PRIVILEGED_SUBSCRIBER, FOLLOW_REDIRECTS, DECOMPRESS, AAF_INSTANCE) "
-                                 + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "DELIVERY_USE100, METADATA_ONLY, SUBSCRIBER, SUSPENDED, GROUPID, "
+                + "PRIVILEGED_SUBSCRIBER, FOLLOW_REDIRECTS, DECOMPRESS, AAF_INSTANCE) "
+                + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             ps = conn.prepareStatement(sql, new String[]{SUBID_COL});
             ps.setInt(1, subid);
             ps.setInt(2, feedid);
@@ -560,13 +535,10 @@ public class Subscription extends Syncable {
     @Override
     public boolean doUpdate(Connection conn) {
         boolean rv = true;
-        PreparedStatement ps = null;
-        try {
-            String sql = "update SUBSCRIPTIONS set DELIVERY_URL = ?, DELIVERY_USER = ?, DELIVERY_PASSWORD = ?, "
-                                 + "DELIVERY_USE100 = ?, METADATA_ONLY = ?, " + "SUSPENDED = ?, GROUPID = ?, "
-                                 + "PRIVILEGED_SUBSCRIBER = ?, "
-                                 + "FOLLOW_REDIRECTS = ?, DECOMPRESS = ? where SUBID = ?";
-            ps = conn.prepareStatement(sql);
+        try (PreparedStatement ps = conn.prepareStatement(
+            "update SUBSCRIPTIONS set DELIVERY_URL = ?, DELIVERY_USER = ?, DELIVERY_PASSWORD = ?, "
+            + "DELIVERY_USE100 = ?, METADATA_ONLY = ?, SUSPENDED = ?, GROUPID = ?, PRIVILEGED_SUBSCRIBER = ?, "
+            + "FOLLOW_REDIRECTS = ?, DECOMPRESS = ? where SUBID = ?")) {
             ps.setString(1, delivery.getUrl());
             ps.setString(2, delivery.getUser());
             ps.setString(3, delivery.getPassword());
@@ -582,14 +554,6 @@ public class Subscription extends Syncable {
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
         }
         return rv;
     }
@@ -600,29 +564,15 @@ public class Subscription extends Syncable {
      */
     public boolean changeOwnerShip() {
         boolean rv = true;
-        PreparedStatement ps = null;
-        try {
-
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            String sql = "update SUBSCRIPTIONS set SUBSCRIBER = ? where SUBID = ?";
-            ps = conn.prepareStatement(sql);
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                "update SUBSCRIPTIONS set SUBSCRIBER = ? where SUBID = ?")) {
             ps.setString(1, this.subscriber);
             ps.setInt(2, subid);
             ps.execute();
-            ps.close();
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
         }
         return rv;
     }
@@ -631,23 +581,12 @@ public class Subscription extends Syncable {
     @Override
     public boolean doDelete(Connection conn) {
         boolean rv = true;
-        PreparedStatement ps = null;
-        try {
-            String sql = "delete from SUBSCRIPTIONS where SUBID = ?";
-            ps = conn.prepareStatement(sql);
+        try (PreparedStatement ps = conn.prepareStatement("delete from SUBSCRIPTIONS where SUBID = ?")) {
             ps.setInt(1, subid);
             ps.execute();
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0007 doDelete: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
         }
         return rv;
     }

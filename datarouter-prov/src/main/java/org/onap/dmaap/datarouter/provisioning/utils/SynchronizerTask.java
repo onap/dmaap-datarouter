@@ -22,13 +22,12 @@
  ******************************************************************************/
 
 
-package org.onap.dmaap.datarouter.provisioning;
+package org.onap.dmaap.datarouter.provisioning.utils;
 
 import static org.onap.dmaap.datarouter.provisioning.BaseServlet.TEXT_CT;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,14 +46,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
-
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -69,6 +65,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.onap.dmaap.datarouter.provisioning.BaseServlet;
+import org.onap.dmaap.datarouter.provisioning.ProvRunner;
 import org.onap.dmaap.datarouter.provisioning.beans.EgressRoute;
 import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.beans.Group;
@@ -77,11 +75,6 @@ import org.onap.dmaap.datarouter.provisioning.beans.NetworkRoute;
 import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Syncable;
-import org.onap.dmaap.datarouter.provisioning.utils.AafPropsUtils;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
-import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
-import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
-import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 
 /**
  * This class handles synchronization between provisioning servers (PODs).  It has three primary functions:
@@ -138,7 +131,7 @@ public class SynchronizerTask extends TimerTask {
     private SynchronizerTask() {
         logger = EELFManager.getInstance().getLogger("InternalLog");
         rolex = new Timer();
-        spooldir = (new DB()).getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
+        spooldir = ProvRunner.getProvProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
         podState = UNKNOWN_POD;
         doFetch = true;        // start off with a fetch
         nextsynctime = 0;
@@ -147,16 +140,16 @@ public class SynchronizerTask extends TimerTask {
         try {
             // Set up keystore
             String type = AafPropsUtils.KEYSTORE_TYPE_PROPERTY;
-            String store = Main.aafPropsUtils.getKeystorePathProperty();
-            String pass = Main.aafPropsUtils.getKeystorePassProperty();
+            String store = ProvRunner.getAafPropsUtils().getKeystorePathProperty();
+            String pass = ProvRunner.getAafPropsUtils().getKeystorePassProperty();
             KeyStore keyStore = KeyStore.getInstance(type);
             try (FileInputStream instream = new FileInputStream(new File(store))) {
                 keyStore.load(instream, pass.toCharArray());
 
             }
             // Set up truststore
-            store = Main.aafPropsUtils.getTruststorePathProperty();
-            pass = Main.aafPropsUtils.getTruststorePassProperty();
+            store = ProvRunner.getAafPropsUtils().getTruststorePathProperty();
+            pass = ProvRunner.getAafPropsUtils().getTruststorePassProperty();
             KeyStore trustStore = null;
             if (store != null && store.length() > 0) {
                 trustStore = KeyStore.getInstance(AafPropsUtils.TRUESTSTORE_TYPE_PROPERTY);
@@ -168,7 +161,7 @@ public class SynchronizerTask extends TimerTask {
 
             // We are connecting with the node name, but the certificate will have the CNAME
             // So we need to accept a non-matching certificate name
-            String keystorepass = Main.aafPropsUtils.getKeystorePassProperty();
+            String keystorepass = ProvRunner.getAafPropsUtils().getKeystorePassProperty();
             try (AbstractHttpClient hc = new DefaultHttpClient()) {
                 SSLSocketFactory socketFactory =
                         (trustStore == null)
@@ -179,7 +172,7 @@ public class SynchronizerTask extends TimerTask {
                 hc.getConnectionManager().getSchemeRegistry().register(sch);
                 httpclient = hc;
             }
-            setSynchTimer(new DB().getProperties().getProperty(
+            setSynchTimer(ProvRunner.getProvProperties().getProperty(
                 "org.onap.dmaap.datarouter.provserver.sync_interval", "5000"));
         } catch (Exception e) {
             logger.warn("PROV5005: Problem starting the synchronizer: " + e);
@@ -231,7 +224,7 @@ public class SynchronizerTask extends TimerTask {
      * This method is used to signal that another POD (the active POD) has sent us a /fetchProv request, and that we
      * should re-synchronize with the master.
      */
-    void doFetch() {
+    public void doFetch() {
         doFetch = true;
     }
 
@@ -308,7 +301,7 @@ public class SynchronizerTask extends TimerTask {
      *
      * @return the current podState
      */
-    int lookupState() {
+    public int lookupState() {
         int newPodState = UNKNOWN_POD;
         try {
             InetAddress myaddr = InetAddress.getLocalHost();
@@ -484,21 +477,23 @@ public class SynchronizerTask extends TimerTask {
             Map<String, Syncable> oldmap = getMap(oldc);
             Set<String> union = new TreeSet<>(newmap.keySet());
             union.addAll(oldmap.keySet());
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
             for (String n : union) {
                 Syncable newobj = newmap.get(n);
                 Syncable oldobj = oldmap.get(n);
                 if (oldobj == null) {
-                    changes = insertRecord(conn, newobj);
+                    try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
+                        changes = insertRecord(conn, newobj);
+                    }
                 } else if (newobj == null) {
-                    changes = deleteRecord(conn, oldobj);
+                    try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
+                        changes = deleteRecord(conn, oldobj);
+                    }
                 } else if (!newobj.equals(oldobj)) {
-                    changes = updateRecord(conn, newobj, oldobj);
+                    try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
+                        changes = updateRecord(conn, newobj, oldobj);
+                    }
                 }
             }
-            db.release(conn);
         } catch (SQLException e) {
             logger.warn("PROV5009: problem during sync, exception: " + e);
         }
@@ -603,7 +598,7 @@ public class SynchronizerTask extends TimerTask {
      *
      * @return the bitset
      */
-    RLEBitSet readRemoteLoglist() {
+    public RLEBitSet readRemoteLoglist() {
         RLEBitSet bs = new RLEBitSet();
         String url = URLUtilities.generatePeerLogsURL();
 
@@ -649,7 +644,7 @@ public class SynchronizerTask extends TimerTask {
      *
      * @param bs the bitset (an RELBitSet) of log records to fetch
      */
-    void replicateDataRouterLogs(RLEBitSet bs) {
+    public void replicateDataRouterLogs(RLEBitSet bs) {
         String url = URLUtilities.generatePeerLogsURL();
         HttpPost post = new HttpPost(url);
         try {

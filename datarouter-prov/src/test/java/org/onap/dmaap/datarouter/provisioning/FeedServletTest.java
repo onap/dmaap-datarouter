@@ -22,8 +22,28 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.argThat;
+import static org.mockito.Mockito.contains;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
+
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -38,23 +58,8 @@ import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.*;
-import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 
 @RunWith(PowerMockRunner.class)
@@ -69,7 +74,6 @@ public class FeedServletTest extends DrServletTestBase {
 
     private static EntityManagerFactory emf;
     private static EntityManager em;
-    private DB db;
 
     private ListAppender<ILoggingEvent> listAppender;
 
@@ -93,7 +97,6 @@ public class FeedServletTest extends DrServletTestBase {
     public void setUp() throws Exception {
         listAppender = setTestLogger(FeedServlet.class);
         feedServlet = new FeedServlet();
-        db = new DB();
         setAuthoriserToReturnRequestIsAuthorized();
         setUpValidAuthorisedRequest();
         setUpValidSecurityOnHttpRequest();
@@ -277,7 +280,7 @@ public class FeedServletTest extends DrServletTestBase {
         when(request.getInputStream()).thenReturn(inStream);
         when(request.getPathInfo()).thenReturn("/2");
         FeedServlet feedServlet = new FeedServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 return null;
             }
         };
@@ -289,7 +292,7 @@ public class FeedServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_PUT_And_Request_Contains_Invalid_JSON_Then_Bad_Request_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn("/2");
         FeedServlet feedServlet = new FeedServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 return new JSONObject();
             }
         };
@@ -303,7 +306,7 @@ public class FeedServletTest extends DrServletTestBase {
         when(request.getPathInfo()).thenReturn("/2");
         JSONObject JSObject = buildRequestJsonObject();
         FeedServlet feedServlet = new FeedServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "1.0");
@@ -320,7 +323,7 @@ public class FeedServletTest extends DrServletTestBase {
         when(request.getPathInfo()).thenReturn("/2");
         JSONObject JSObject = buildRequestJsonObject();
         FeedServlet feedServlet = new FeedServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "not_stub_name");
                 jo.put("version", "1.0");
@@ -337,7 +340,7 @@ public class FeedServletTest extends DrServletTestBase {
         when(request.getPathInfo()).thenReturn("/2");
         JSONObject JSObject = buildRequestJsonObject();
         FeedServlet feedServlet = new FeedServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "AafFeed");
                 jo.put("version", "v0.2");
@@ -355,7 +358,7 @@ public class FeedServletTest extends DrServletTestBase {
         when(request.getPathInfo()).thenReturn("/2");
         JSONObject JSObject = buildRequestJsonObject();
         FeedServlet feedServlet = new FeedServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "AafFeed");
                 jo.put("version", "v0.1");
@@ -372,7 +375,7 @@ public class FeedServletTest extends DrServletTestBase {
         when(request.getPathInfo()).thenReturn("/2");
         JSONObject JSObject = buildRequestJsonObject();
         FeedServlet feedServlet = new FeedServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "AafFeed");
                 jo.put("version", "v0.1");
@@ -393,7 +396,7 @@ public class FeedServletTest extends DrServletTestBase {
         when(request.isUserInRole("org.onap.dmaap-dr.feed|*|edit")).thenReturn(true);
         JSONObject JSObject = buildRequestJsonObject();
         FeedServlet feedServlet = new FeedServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "AafFeed");
                 jo.put("version", "v0.1");
@@ -419,7 +422,7 @@ public class FeedServletTest extends DrServletTestBase {
         when(request.getPathInfo()).thenReturn("/2");
         JSONObject JSObject = buildRequestJsonObject();
         FeedServlet feedServlet = new FeedServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "AafFeed");
                 jo.put("version", "v0.1");
@@ -443,7 +446,7 @@ public class FeedServletTest extends DrServletTestBase {
         when(request.getPathInfo()).thenReturn("/2");
         JSONObject JSObject = buildRequestJsonObject();
         FeedServlet feedServlet = new FeedServlet() {
-            protected JSONObject getJSONfromInput(HttpServletRequest req) {
+            public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "AafFeed");
                 jo.put("version", "v0.1");
@@ -534,6 +537,8 @@ public class FeedServletTest extends DrServletTestBase {
         feed.setFeedid(1);
         feed.setGroupid(1);
         feed.setDeleted(false);
-        feed.doUpdate(db.getConnection());
+        try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
+            feed.doUpdate(conn);
+        }
     }
 }

@@ -24,6 +24,8 @@
 
 package org.onap.dmaap.datarouter.reports;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -35,10 +37,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
-
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 
 /**
  * Generate a traffic volume report. The report is a .csv file containing the following columns:
@@ -57,9 +56,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  * @version $Id: VolumeReport.java,v 1.3 2014/02/28 15:11:13 eby Exp $
  */
 public class VolumeReport extends ReportBase {
-    private static final String SELECT_SQL = "select EVENT_TIME, TYPE, FEEDID, CONTENT_LENGTH, RESULT" +
-            " from LOG_RECORDS where EVENT_TIME >= ? and EVENT_TIME <= ? LIMIT ?, ?";
-    private EELFLogger loggerVolumeReport= EELFManager.getInstance().getLogger("ReportLog");;
+    private EELFLogger loggerVolumeReport= EELFManager.getInstance().getLogger("ReportLog");
     private class Counters {
         int filespublished, filesdelivered, filesexpired;
         long bytespublished, bytesdelivered, bytesexpired;
@@ -67,33 +64,32 @@ public class VolumeReport extends ReportBase {
         @Override
         public String toString() {
             return String.format("%d,%d,%d,%d,%d,%d",
-                    filespublished, bytespublished, filesdelivered,
-                    bytesdelivered, filesexpired, bytesexpired);
+                filespublished, bytespublished, filesdelivered,
+                bytesdelivered, filesexpired, bytesexpired);
         }
     }
 
     @Override
     public void run() {
-        Map<String, Counters> map = new HashMap<String, Counters>();
+        Map<String, Counters> map = new HashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         long start = System.currentTimeMillis();
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+        try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
             // We need to run this SELECT in stages, because otherwise we run out of memory!
             final long stepsize = 6000000L;
-            boolean go_again = true;
-            for (long i = 0; go_again; i += stepsize) {
-                try (PreparedStatement ps = conn.prepareStatement(SELECT_SQL)) {
+            boolean goAgain = true;
+            for (long i = 0; goAgain; i += stepsize) {
+                try (PreparedStatement ps = conn.prepareStatement(
+                    "select EVENT_TIME, TYPE, FEEDID, CONTENT_LENGTH, RESULT from LOG_RECORDS "
+                        + "where EVENT_TIME >= ? and EVENT_TIME <= ? LIMIT ?, ?")) {
                     ps.setLong(1, from);
                     ps.setLong(2, to);
                     ps.setLong(3, i);
                     ps.setLong(4, stepsize);
-                    try(ResultSet rs = ps.executeQuery()) {
-                        go_again = false;
+                    try (ResultSet rs = ps.executeQuery()) {
+                        goAgain = false;
                         while (rs.next()) {
-                            go_again = true;
+                            goAgain = true;
                             long etime = rs.getLong("EVENT_TIME");
                             String type = rs.getString("TYPE");
                             int feed = rs.getInt("FEEDID");
@@ -120,14 +116,10 @@ public class VolumeReport extends ReportBase {
                             }
                         }
                     }
-                }
-                catch (SQLException sqlException)
-                {
-                    loggerVolumeReport.error("SqlException",sqlException);
+                } catch (SQLException sqlException) {
+                    loggerVolumeReport.error("SqlException", sqlException);
                 }
             }
-
-            db.release(conn);
         } catch (SQLException e) {
             loggerVolumeReport.error("SQLException: " + e.getMessage());
         }

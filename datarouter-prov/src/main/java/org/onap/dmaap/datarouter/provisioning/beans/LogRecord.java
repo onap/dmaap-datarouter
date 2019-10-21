@@ -35,8 +35,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.text.ParseException;
 import java.util.Iterator;
-
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
 
 
@@ -49,13 +48,6 @@ import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
  */
 public class LogRecord extends BaseLogRecord {
 
-    /**
-     * Print all log records whose RECORD_IDs are in the bit set provided.
-     *
-     * @param os the {@link OutputStream} to print the records on
-     * @param bs the {@link RLEBitSet} listing the record IDs to print
-     * @throws IOException in case of I/O error
-     */
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
     private final String type;
     private final String feedFileID;
@@ -76,7 +68,7 @@ public class LogRecord extends BaseLogRecord {
      * @param rs ResultSet from SQL statement
      * @throws SQLException in case of SQL error
      */
-    public LogRecord(ResultSet rs) throws SQLException {
+    private LogRecord(ResultSet rs) throws SQLException {
         super(rs);
         this.type = rs.getString("TYPE");
         this.feedFileID = rs.getString("FEED_FILEID");
@@ -122,28 +114,27 @@ public class LogRecord extends BaseLogRecord {
     }
 
     /**
-     * Get Log Records.
-     * @param os outputstream
-     * @param bs RLEBitSet object
+     * Print all log records whose RECORD_IDs are in the bit set provided.
+     *
+     * @param os the {@link OutputStream} to print the records on
+     * @param bs the {@link RLEBitSet} listing the record IDs to print
      * @throws IOException in case of I/O error
      */
     public static void printLogRecords(OutputStream os, RLEBitSet bs) throws IOException {
-        final String sql = "select * from LOG_RECORDS where RECORD_ID >= ? AND RECORD_ID <= ?";
-        DB db = new DB();
-        try (Connection conn = db.getConnection()) {
-            Iterator<Long[]> iter = bs.getRangeIterator();
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                while (iter.hasNext()) {
-                    Long[] nxt = iter.next();
-                    ps.setLong(1, nxt[0]);
-                    ps.setLong(2, nxt[1]);
-                    try (ResultSet rs = ps.executeQuery()) {
-                        while (rs.next()) {
-                            LogRecord lr = new LogRecord(rs);
-                            os.write(lr.toString().getBytes());
-                        }
-                        ps.clearParameters();
+        Iterator<Long[]> iter = bs.getRangeIterator();
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                "select * from LOG_RECORDS where RECORD_ID >= ? AND RECORD_ID <= ?")) {
+            while (iter.hasNext()) {
+                Long[] nxt = iter.next();
+                ps.setLong(1, nxt[0]);
+                ps.setLong(2, nxt[1]);
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        LogRecord lr = new LogRecord(rs);
+                        os.write(lr.toString().getBytes());
                     }
+                    ps.clearParameters();
                 }
             }
         } catch (SQLException e) {
@@ -158,27 +149,27 @@ public class LogRecord extends BaseLogRecord {
     @Override
     public String toString() {
         return
-                sdf.format(getEventTime()) + "|"
-                        + "LOG|"
-                        + getPublishId() + "|"
-                        + getFeedid() + "|"
-                        + getRequestUri() + "|"
-                        + getMethod() + "|"
-                        + getContentType() + "|"
-                        + getContentLength() + "|"
-                        + type + "|"
-                        + feedFileID + "|"
-                        + remoteAddr + "|"
-                        + user + "|"
-                        + status + "|"
-                        + subID + "|"
-                        + fileID + "|"
-                        + result + "|"
-                        + attempts + "|"
-                        + reason + "|"
-                        + recordId + "|"
-                        + clength2
-                        + "\n";
+            sdf.format(getEventTime()) + "|"
+                + "LOG|"
+                + getPublishId() + "|"
+                + getFeedid() + "|"
+                + getRequestUri() + "|"
+                + getMethod() + "|"
+                + getContentType() + "|"
+                + getContentLength() + "|"
+                + type + "|"
+                + feedFileID + "|"
+                + remoteAddr + "|"
+                + user + "|"
+                + status + "|"
+                + subID + "|"
+                + fileID + "|"
+                + result + "|"
+                + attempts + "|"
+                + reason + "|"
+                + recordId + "|"
+                + clength2
+                + "\n";
     }
 
     @Override
