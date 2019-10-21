@@ -66,8 +66,10 @@ import org.onap.dmaap.datarouter.provisioning.beans.NodeClass;
 import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.PasswordProcessor;
+import org.onap.dmaap.datarouter.provisioning.utils.Poker;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
+import org.onap.dmaap.datarouter.provisioning.utils.SynchronizerTask;
 import org.onap.dmaap.datarouter.provisioning.utils.ThrottleFilter;
 import org.slf4j.MDC;
 
@@ -110,13 +112,11 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     public static final String SUBFULL_CONTENT_TYPE = "application/vnd.dmaap-dr.subscription-full; version=2.0";
     static final String SUBLIST_CONTENT_TYPE = "application/vnd.dmaap-dr.subscription-list; version=1.0";
 
-
     //Adding groups functionality, ...1610
     static final String GROUP_BASECONTENT_TYPE = "application/vnd.dmaap-dr.group";
     static final String GROUP_CONTENT_TYPE = "application/vnd.dmaap-dr.group; version=2.0";
     static final String GROUPFULL_CONTENT_TYPE = "application/vnd.dmaap-dr.group-full; version=2.0";
     public static final String GROUPLIST_CONTENT_TYPE = "application/vnd.dmaap-dr.fegrouped-list; version=1.0";
-
 
     public static final String LOGLIST_CONTENT_TYPE = "application/vnd.dmaap-dr.log-list; version=1.0";
     public static final String PROVFULL_CONTENT_TYPE1 = "application/vnd.dmaap-dr.provfeed-full; version=1.0";
@@ -124,7 +124,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     public static final String CERT_ATTRIBUTE = "javax.servlet.request.X509Certificate";
 
     static final String DB_PROBLEM_MSG = "There has been a problem with the DB.  It is suggested you "
-                                                 + "try the operation again.";
+        + "try the operation again.";
 
     private static final int DEFAULT_MAX_FEEDS = 10000;
     private static final int DEFAULT_MAX_SUBS = 100000;
@@ -143,7 +143,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
 
     public static final String API = "/api/";
     static final String LOGS = "/logs/";
-    static final String TEXT_CT = "text/plain";
+    public static final String TEXT_CT = "text/plain";
     static final String INGRESS = "/ingress/";
     static final String EGRESS = "/egress/";
     static final String NETWORK = "/network/";
@@ -156,7 +156,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     static final String START_TIME = "start_time";
     static final String END_TIME = "end_time";
     static final String REASON_SQL = "reasonSQL";
-
 
     /**
      * A boolean to trigger one time "provisioning changed" event on startup.
@@ -259,24 +258,30 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     private InetAddress loopback;
 
     //DMAAP-597 (Tech Dept) REST request source IP auth relaxation to accommodate OOM kubernetes deploy
-    private static String isAddressAuthEnabled = (new DB()).getProperties()
-            .getProperty("org.onap.dmaap.datarouter.provserver.isaddressauthenabled", "false");
+    private static String isAddressAuthEnabled = ProvRunner.getProvProperties()
+        .getProperty("org.onap.dmaap.datarouter.provserver.isaddressauthenabled", "false");
 
-    static String isCadiEnabled = (new DB()).getProperties()
-            .getProperty("org.onap.dmaap.datarouter.provserver.cadi.enabled", "false");
+    static String isCadiEnabled = ProvRunner.getProvProperties()
+        .getProperty("org.onap.dmaap.datarouter.provserver.cadi.enabled", "false");
 
     /**
      * Initialize data common to all the provisioning server servlets.
      */
     protected BaseServlet() {
+        setUpFields();
+        if (authz == null) {
+            authz = new ProvAuthorizer(this);
+        }
+        String name = this.getClass().getName();
+        intlogger.info("PROV0002 Servlet " + name + " started.");
+    }
+
+    private static void setUpFields() {
         if (eventlogger == null) {
             eventlogger = EELFManager.getInstance().getLogger("EventLog");
         }
         if (intlogger == null) {
             intlogger = EELFManager.getInstance().getLogger("InternalLog");
-        }
-        if (authz == null) {
-            authz = new ProvAuthorizer(this);
         }
         if (startmsgFlag) {
             startmsgFlag = false;
@@ -285,8 +290,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         if (synctask == null) {
             synctask = SynchronizerTask.getSynchronizer();
         }
-        String name = this.getClass().getName();
-        intlogger.info("PROV0002 Servlet " + name + " started.");
     }
 
     @Override
@@ -359,7 +362,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     }
 
     private static void processPassword(String maskKey, boolean action, JSONArray endpointIds, int index,
-            String password) {
+        String password) {
         try {
             if (action) {
                 endpointIds.getJSONObject(index).put(maskKey, PasswordProcessor.encrypt(password));
@@ -511,7 +514,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * Something has changed in the provisioning data. Start the timers that will cause the pre-packaged JSON string to
      * be regenerated, and cause nodes and the other provisioning server to be notified.
      */
-    static void provisioningDataChanged() {
+    public static void provisioningDataChanged() {
         long now = System.currentTimeMillis();
         Poker pkr = Poker.getPoker();
         pkr.setTimers(now + (pokeTimer1 * 1000L), now + (pokeTimer2 * 1000L));
@@ -520,7 +523,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     /**
      * Something in the parameters has changed, reload all parameters from the DB.
      */
-    static void provisioningParametersChanged() {
+    public static void provisioningParametersChanged() {
         Map<String, String> map = Parameters.getParameters();
         requireSecure = getBoolean(map, Parameters.PROV_REQUIRE_SECURE);
         requireCert = getBoolean(map, Parameters.PROV_REQUIRE_CERT);
@@ -600,7 +603,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         return provName;
     }
 
-    static String getActiveProvName() {
+    public static String getActiveProvName() {
         return activeProvName;
     }
 
@@ -670,18 +673,11 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     protected boolean doInsert(Insertable bean) {
         boolean rv;
-        DB db = new DB();
-        Connection conn = null;
-        try {
-            conn = db.getConnection();
+        try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
             rv = bean.doInsert(conn);
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0005 doInsert: " + e.getMessage(), e);
-        } finally {
-            if (conn != null) {
-                db.release(conn);
-            }
         }
         return rv;
     }
@@ -694,18 +690,11 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     protected boolean doUpdate(Updateable bean) {
         boolean rv;
-        DB db = new DB();
-        Connection conn = null;
-        try {
-            conn = db.getConnection();
+        try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
             rv = bean.doUpdate(conn);
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage(), e);
-        } finally {
-            if (conn != null) {
-                db.release(conn);
-            }
         }
         return rv;
     }
@@ -718,18 +707,11 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     protected boolean doDelete(Deleteable bean) {
         boolean rv;
-        DB db = new DB();
-        Connection conn = null;
-        try {
-            conn = db.getConnection();
+        try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
             rv = bean.doDelete(conn);
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0007 doDelete: " + e.getMessage(), e);
-        } finally {
-            if (conn != null) {
-                db.release(conn);
-            }
         }
         return rv;
     }
@@ -987,7 +969,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     String getFeedPermission(String aafInstance, String userAction) {
         try {
-            Properties props = (new DB()).getProperties();
+            Properties props = ProvRunner.getProvProperties();
             String type = props.getProperty(AAF_CADI_FEED_TYPE, AAF_CADI_FEED);
             String action;
             switch (userAction) {
@@ -1031,7 +1013,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      */
     String getSubscriberPermission(String aafInstance, String userAction) {
         try {
-            Properties props = (new DB()).getProperties();
+            Properties props = ProvRunner.getProvProperties();
             String type = props.getProperty(AAF_CADI_SUB_TYPE, AAF_CADI_SUB);
             String action;
             switch (userAction) {

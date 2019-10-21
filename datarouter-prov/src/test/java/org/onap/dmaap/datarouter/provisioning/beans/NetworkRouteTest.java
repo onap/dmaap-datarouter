@@ -20,6 +20,7 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -30,17 +31,18 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 public class NetworkRouteTest {
 
-    private NetworkRoute networkRoute;
+    private NetworkRoute networkRoute = new NetworkRoute("node01.","node03.","node02.");
+    private ProvDbUtils provDbUtils = ProvDbUtils.getInstance();
+
 
     private static EntityManagerFactory emf;
     private static EntityManager em;
-    private DB db;
 
     @BeforeClass
     public static void init() {
@@ -59,23 +61,22 @@ public class NetworkRouteTest {
     }
     @Before
     public void setUp() throws Exception {
-        db = new DB();
-        networkRoute = new NetworkRoute("node01.","node03.","node02.");
+        try (Connection conn = provDbUtils.getConnection()) {
+            networkRoute.doInsert(conn);
+        }
     }
 
     @Test
     public void Verify_NetworkRoute_Is_Removed_Successfully() throws SQLException {
+        Assert.assertEquals(2, NetworkRoute.getAllNetworkRoutes().size());
+        networkRoute.doDelete(provDbUtils.getConnection());
         Assert.assertEquals(1, NetworkRoute.getAllNetworkRoutes().size());
-        NetworkRoute networkRoute = new NetworkRoute("stub_from.", "stub_to.");
-        networkRoute.doDelete(db.getConnection());
-        Assert.assertEquals(0, NetworkRoute.getAllNetworkRoutes().size());
     }
 
     @Test
     public void Verify_NetworkRoute_Is_Updated_Successfully() throws SQLException {
         NetworkRoute networkRoute = new NetworkRoute("stub_from.", "stub_to.", "node02.");
-        networkRoute.doUpdate(db.getConnection());
-        //Assert.assertTrue(NetworkRoute.getAllNetworkRoutes().contains(networkRoute));
+        networkRoute.doUpdate(provDbUtils.getConnection());
         for (NetworkRoute net :
             NetworkRoute.getAllNetworkRoutes()) {
             Assert.assertEquals(5, net.getVianode());

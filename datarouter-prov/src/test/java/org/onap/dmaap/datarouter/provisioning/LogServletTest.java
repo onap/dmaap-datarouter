@@ -60,9 +60,9 @@ public class LogServletTest extends DrServletTestBase {
     private HttpServletResponse response;
 
     @Mock
-    private ServletOutputStream s;
+    private ServletOutputStream servletOutputStream;
 
-    ListAppender<ILoggingEvent> listAppender;
+    private ListAppender<ILoggingEvent> listAppender;
 
     @BeforeClass
     public static void init() {
@@ -153,8 +153,7 @@ public class LogServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_GET_And_Is_FeedLog_A_STATUS_OK_Response_Is_Generated()
-            throws Exception {
+    public void Given_Request_Is_HTTP_GET_And_Is_FeedLog_A_STATUS_OK_Response_Is_Generated() {
         logServlet.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
         verifyEnteringExitCalled(listAppender);
@@ -177,8 +176,7 @@ public class LogServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_GetPublishRecordsForFeed_And_Type_Is_Publish_A_STATUS_OK_Response_Is_Generated()
-            throws Exception {
+    public void Given_Request_Is_GetPublishRecordsForFeed_And_Type_Is_Publish_A_STATUS_OK_Response_Is_Generated() {
         when(request.getParameter("type")).thenReturn("pub");
         when(request.getParameter("expiryReason")).thenReturn(null);
         logServlet.doGet(request, response);
@@ -196,9 +194,9 @@ public class LogServletTest extends DrServletTestBase {
         when(request.getParameter("filename")).thenReturn("file123");
         logServlet.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
-        verify(s, times(1)).print("[");
-        verify(s, times(1)).print(matches("\n\\{\"statusCode\":204,\"publishId\":\"ID\",\"requestURI\":\"URL/file123\",\"sourceIP\":\"172.0.0.8\",\"method\":\"PUT\",\"contentType\":\"application/vnd.dmaap-dr.log-list; version=1.0\",\"endpointId\":\"user\",\"type\":\"pub\",\"date\":\"2050-05-14T1[6-7]:46:04.422Z\",\"contentLength\":100,\"fileName\":\"file123\"}"));
-        verify(s, times(1)).print("[");
+        verify(servletOutputStream, times(1)).print("[");
+        verify(servletOutputStream, times(1)).print(matches("\n\\{\"statusCode\":204,\"publishId\":\"ID\",\"requestURI\":\"URL/file123\",\"sourceIP\":\"172.0.0.8\",\"method\":\"PUT\",\"contentType\":\"application/vnd.dmaap-dr.log-list; version=1.0\",\"endpointId\":\"user\",\"type\":\"pub\",\"date\":\"2050-05-14T1[6-7]:46:04.422Z\",\"contentLength\":100,\"fileName\":\"file123\"}"));
+        verify(servletOutputStream, times(1)).print("[");
     }
 
     @Test
@@ -212,9 +210,9 @@ public class LogServletTest extends DrServletTestBase {
         when(request.getParameter("filename")).thenReturn("file456");
         logServlet.doGet(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
-        verify(s, times(1)).print("[");
-        verify(s, times(0)).print(matches("\n\\{\"statusCode\":204,\"publishId\":\"ID\",\"requestURI\":\"URL/file123\",\"sourceIP\":\"172.0.0.8\",\"method\":\"PUT\",\"contentType\":\"application/vnd.dmaap-dr.log-list; version=1.0\",\"endpointId\":\"user\",\"type\":\"pub\",\"date\":\"2050-05-14T1[6-7]:46:04.422Z\",\"contentLength\":100,\"fileName\":\"file123\"}"));
-        verify(s, times(1)).print("[");
+        verify(servletOutputStream, times(1)).print("[");
+        verify(servletOutputStream, times(0)).print(matches("\n\\{\"statusCode\":204,\"publishId\":\"ID\",\"requestURI\":\"URL/file123\",\"sourceIP\":\"172.0.0.8\",\"method\":\"PUT\",\"contentType\":\"application/vnd.dmaap-dr.log-list; version=1.0\",\"endpointId\":\"user\",\"type\":\"pub\",\"date\":\"2050-05-14T1[6-7]:46:04.422Z\",\"contentLength\":100,\"fileName\":\"file123\"}"));
+        verify(servletOutputStream, times(1)).print("[");
     }
 
     @Test
@@ -268,7 +266,7 @@ public class LogServletTest extends DrServletTestBase {
         when(request.getParameter("expiryReason")).thenReturn("other");
         when(request.getParameter("start")).thenReturn("2536159564422");
         when(request.getParameter("end")).thenReturn("2536159564422");
-        s = mock(ServletOutputStream.class);
-        when(response.getOutputStream()).thenReturn(s);
+        servletOutputStream = mock(ServletOutputStream.class);
+        when(response.getOutputStream()).thenReturn(servletOutputStream);
     }
 }

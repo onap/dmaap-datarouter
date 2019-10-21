@@ -46,7 +46,7 @@ public interface Authorizer {
      * permit/deny decision for the request and (after R1) supplemental information related to the response in the form
      * of advice and obligations.
      */
-    public AuthorizationResponse decide(HttpServletRequest request);
+    AuthorizationResponse decide(HttpServletRequest request);
 
     /**
      * Determine if the API request carried in the <code>request</code> parameter,with additional attributes provided in
@@ -58,5 +58,5 @@ public interface Authorizer {
      * permit/deny decision for the request and (after R1) supplemental information related to the response
      * in the form of advice and obligations.
      */
-    public AuthorizationResponse decide(HttpServletRequest request, Map<String,String> additionalAttrs);
+    AuthorizationResponse decide(HttpServletRequest request, Map<String,String> additionalAttrs);
 }

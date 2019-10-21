@@ -33,8 +33,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeSet;
-
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 
 /**
  * Generate a subscribers report.  The report is a .CSV file.  It contains information per-day and per-subscriber,
@@ -45,15 +44,15 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  */
 public class SubscriberReport extends ReportBase {
     private static final String SELECT_SQL =
-            "select date(from_unixtime(EVENT_TIME div 1000)) as DATE, DELIVERY_SUBID, RESULT, COUNT(RESULT) as COUNT" +
-                    " from LOG_RECORDS" +
-                    " where TYPE = 'del' and EVENT_TIME >= ? and EVENT_TIME <= ?" +
-                    " group by DATE, DELIVERY_SUBID, RESULT";
+        "select date(from_unixtime(EVENT_TIME div 1000)) as DATE, DELIVERY_SUBID, RESULT, COUNT(RESULT) as COUNT" +
+            " from LOG_RECORDS" +
+            " where TYPE = 'del' and EVENT_TIME >= ? and EVENT_TIME <= ?" +
+            " group by DATE, DELIVERY_SUBID, RESULT";
     private static final String SELECT_SQL2 =
-            "select date(from_unixtime(EVENT_TIME div 1000)) as DATE, DELIVERY_SUBID, COUNT(CONTENT_LENGTH_2) as COUNT" +
-                    " from LOG_RECORDS" +
-                    " where TYPE = 'dlx' and CONTENT_LENGTH_2 = -1 and EVENT_TIME >= ? and EVENT_TIME <= ?" +
-                    " group by DATE, DELIVERY_SUBID";
+        "select date(from_unixtime(EVENT_TIME div 1000)) as DATE, DELIVERY_SUBID, COUNT(CONTENT_LENGTH_2) as COUNT" +
+            " from LOG_RECORDS" +
+            " where TYPE = 'dlx' and CONTENT_LENGTH_2 = -1 and EVENT_TIME >= ? and EVENT_TIME <= ?" +
+            " group by DATE, DELIVERY_SUBID";
 
     private class Counters {
         private String date;
@@ -89,20 +88,17 @@ public class SubscriberReport extends ReportBase {
         @Override
         public String toString() {
             return date + "," + sub + "," +
-                    c100 + "," + c200 + "," + c300 + "," + c400 + "," + c500 + "," +
-                    cm1 + "," + cdlx;
+                c100 + "," + c200 + "," + c300 + "," + c400 + "," + c500 + "," +
+                cm1 + "," + cdlx;
         }
     }
 
     @Override
     public void run() {
-        Map<String, Counters> map = new HashMap<String, Counters>();
+        Map<String, Counters> map = new HashMap<>();
         long start = System.currentTimeMillis();
 
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
+        try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
             try(PreparedStatement ps = conn.prepareStatement(SELECT_SQL)) {
                 ps.setLong(1, from);
                 ps.setLong(2, to);
@@ -123,33 +119,31 @@ public class SubscriberReport extends ReportBase {
                 }
             }
 
-           try( PreparedStatement ps2 = conn.prepareStatement(SELECT_SQL2)) {
-               ps2.setLong(1, from);
-               ps2.setLong(2, to);
-               try(ResultSet rs2 = ps2.executeQuery()) {
-                   while (rs2.next()) {
-                       String date = rs2.getString("DATE");
-                       int sub = rs2.getInt("DELIVERY_SUBID");
-                       int count = rs2.getInt("COUNT");
-                       String key = date + "," + sub;
-                       Counters c = map.get(key);
-                       if (c == null) {
-                           c = new Counters(date, sub);
-                           map.put(key, c);
-                       }
-                       c.addDlxCount(count);
-                   }
-                  }
-           }
-
-            db.release(conn);
+            try( PreparedStatement ps2 = conn.prepareStatement(SELECT_SQL2)) {
+                ps2.setLong(1, from);
+                ps2.setLong(2, to);
+                try (ResultSet rs2 = ps2.executeQuery()) {
+                    while (rs2.next()) {
+                        String date = rs2.getString("DATE");
+                        int sub = rs2.getInt("DELIVERY_SUBID");
+                        int count = rs2.getInt("COUNT");
+                        String key = date + "," + sub;
+                        Counters c = map.get(key);
+                        if (c == null) {
+                            c = new Counters(date, sub);
+                            map.put(key, c);
+                        }
+                        c.addDlxCount(count);
+                    }
+                }
+            }
         } catch (SQLException e) {
             logger.error("SQLException: " + e.getMessage());
         }
         logger.debug("Query time: " + (System.currentTimeMillis() - start) + " ms");
-        try (PrintWriter os = new PrintWriter(outfile)){
+        try (PrintWriter os = new PrintWriter(outfile)) {
             os.println("date,subid,count100,count200,count300,count400,count500,countminus1,countdlx");
-            for (String key : new TreeSet<String>(map.keySet())) {
+            for (String key : new TreeSet<>(map.keySet())) {
                 Counters c = map.get(key);
                 os.println(c.toString());
             }

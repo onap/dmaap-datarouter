@@ -53,6 +53,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.onap.dmaap.datarouter.provisioning.ProvRunner;
 
 /**
  * This class provides a Command Line Interface for the routing tables in the DR Release 2.0 DB.
@@ -117,7 +118,7 @@ public class DRRouteCLI {
         this.server = server;
         this.httpclient = new DefaultHttpClient();
 
-        Properties provProperties = (new DB()).getProperties();
+        Properties provProperties = ProvRunner.getProvProperties();
         try {
             AafPropsUtils.init(new File(provProperties.getProperty(
                 "org.onap.dmaap.datarouter.provserver.aafprops.path",

@@ -44,11 +44,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
+import org.onap.dmaap.datarouter.provisioning.utils.Poker;
+import org.onap.dmaap.datarouter.provisioning.utils.SynchronizerTask;
 import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.LogRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.eelf.EelfMsgs;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
 import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
 
@@ -130,7 +131,7 @@ import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
  * <td class="colFirst">/internal/route/*</td>
  * <td class="colOne">*</td>
  * <td class="colLast">URLs under this path are handled via the
- * {@link org.onap.dmaap.datarouter.provisioning.RouteServlet}</td>
+ * {@link RouteServlet}</td>
  * </tr>
  * </table>
  * </div>
@@ -231,14 +232,14 @@ public class InternalServlet extends ProxyServlet {
             eelfLogger.info(EelfMsgs.MESSAGE_WITH_BEHALF_AND_FEEDID,
                     req.getHeader(BEHALF_HEADER), getIdFromPath(req) + "");
             String path = req.getPathInfo();
-            Properties props = (new DB()).getProperties();
+            Properties props = ProvRunner.getProvProperties();
             if ("/halt".equals(path) && !req.isSecure()) {
                 // request to halt the server - can ONLY come from localhost
                 String remote = req.getRemoteAddr();
                 if (remote.equals(props.getProperty("org.onap.dmaap.datarouter.provserver.localhost"))) {
                     intlogger.info("PROV0009 Request to HALT received.");
                     resp.setStatus(HttpServletResponse.SC_OK);
-                    Main.shutdown();
+                    ProvRunner.shutdown();
                 } else {
                     intlogger.info("PROV0010 Disallowed request to HALT received from " + remote);
                     resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -293,7 +294,7 @@ public class InternalServlet extends ProxyServlet {
                 String logdir = props.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
                 String logfile = path.substring(6);
                 if (logdir != null && logfile != null && logfile.indexOf('/') < 0) {
-                    File log = new File(logdir + "/" + logfile);
+                    File log = new File(logdir + File.separator + logfile);
                     if (log.exists() && log.isFile()) {
                         resp.setStatus(HttpServletResponse.SC_OK);
                         resp.setContentType(TEXT_CT);
@@ -461,7 +462,7 @@ public class InternalServlet extends ProxyServlet {
                     return;
                 }
                 String spooldir =
-                        (new DB()).getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
+                        ProvRunner.getProvProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
                 String spoolname = String.format("%d-%d-", System.currentTimeMillis(), Thread.currentThread().getId());
                 synchronized (lock) {
                     // perhaps unnecessary, but it helps make the name unique
@@ -496,7 +497,7 @@ public class InternalServlet extends ProxyServlet {
                 } catch (Exception e) {
                     intlogger.error("PROV0137 InternalServlet.doPost: " + e.getMessage(), e);
                 }
-                if (((avail * 100) / total) < 5) {
+                if (total != 0 && ((avail * 100) / total) < 5) {
                     elr.setResult(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
                     resp.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
                     eventlogger.error(elr.toString());
@@ -570,7 +571,7 @@ public class InternalServlet extends ProxyServlet {
 
     private JSONArray generateLogfileList() {
         JSONArray ja = new JSONArray();
-        Properties prop = (new DB()).getProperties();
+        Properties prop = ProvRunner.getProvProperties();
         String str = prop.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
         if (str != null) {
             String[] dirs = str.split(",");

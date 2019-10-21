@@ -20,6 +20,7 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -30,7 +31,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
@@ -40,7 +41,6 @@ public class EgressRouteTest {
 
     private static EntityManagerFactory emf;
     private static EntityManager em;
-    private DB db;
 
     @BeforeClass
     public static void init() {
@@ -59,7 +59,6 @@ public class EgressRouteTest {
     }
     @Before
     public void setUp() throws Exception {
-        db = new DB();
         egressRoute = new EgressRoute(2, 1);
     }
 
@@ -67,12 +66,14 @@ public class EgressRouteTest {
     public void Verify_EgressRoute_Is_Removed_Successfully() throws SQLException {
         Assert.assertEquals(1, EgressRoute.getAllEgressRoutes().size());
         EgressRoute egressRoute = new EgressRoute(1, 1);
-        egressRoute.doDelete(db.getConnection());
+        try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
+            egressRoute.doDelete(conn);
+        }
         Assert.assertEquals(0, EgressRoute.getAllEgressRoutes().size());
     }
 
     @Test
-    public void Verify_EgressRoute_Is_Updated_Successfully() throws SQLException {
+    public void Verify_EgressRoute_Is_Updated_Successfully() {
         EgressRoute egressRoute = new EgressRoute(1, 1);
         EgressRoute egressRoute1 = new EgressRoute(1, 1);
         Assert.assertEquals(egressRoute.hashCode(), egressRoute1.hashCode());

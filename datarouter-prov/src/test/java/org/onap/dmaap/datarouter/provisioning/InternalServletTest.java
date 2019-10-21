@@ -57,6 +57,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
 import org.onap.dmaap.datarouter.provisioning.beans.LogRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
+import org.onap.dmaap.datarouter.provisioning.utils.Poker;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;

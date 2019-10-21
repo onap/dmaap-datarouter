@@ -22,31 +22,33 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning.beans;
 
-import org.json.JSONObject;
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
-import org.powermock.modules.junit4.PowerMockRunner;
+import static org.mockito.Matchers.anyString;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import java.io.InvalidObjectException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.mockito.Matchers.anyString;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import org.json.JSONObject;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 public class FeedTest {
     private static EntityManagerFactory emf;
     private static EntityManager em;
     private Feed feed;
-    private DB db;
+    private ProvDbUtils provDbUtils;
 
     @BeforeClass
     public static void init() {
@@ -66,7 +68,7 @@ public class FeedTest {
 
     @Before
     public void setUp() throws Exception {
-        db = new DB();
+        provDbUtils = ProvDbUtils.getInstance();
         feed = new Feed("Feed1","v0.1", "First Feed for testing", "First Feed for testing");
         feed.setFeedid(1);
         feed.setGroupid(1);
@@ -76,25 +78,25 @@ public class FeedTest {
 
     @Test
     public void Given_getFilteredFeedUrlList_With_Name_Then_Method_Returns_Self_Links() {
-        List<String>  list= feed.getFilteredFeedUrlList("name","Feed1");
+        List<String>  list= Feed.getFilteredFeedUrlList("name","Feed1");
         Assert.assertEquals("self_link",list.get(0));
     }
 
     @Test
     public void Given_getFilteredFeedUrlList_With_Publ_Then_Method_Returns_Self_Links() {
-        List<String>  list= feed.getFilteredFeedUrlList("publ","pub");
+        List<String>  list= Feed.getFilteredFeedUrlList("publ","pub");
         Assert.assertEquals("self_link",list.get(0));
     }
 
     @Test
     public void Given_getFilteredFeedUrlList_With_Subs_Then_Method_Returns_Self_Links() {
-        List<String>  list= feed.getFilteredFeedUrlList("subs","sub123");
+        List<String>  list= Feed.getFilteredFeedUrlList("subs","sub123");
         Assert.assertEquals("self_link",list.get(0));
     }
 
     @Test
-    public void Given_doDelete_Succeeds_Then_doInsert_To_Put_Feed_Back_And_Bool_Is_True() throws SQLException, InvalidObjectException {
-        Boolean bool = feed.doDelete(db.getConnection());
+    public void Given_doDelete_Succeeds_Then_doInsert_To_Put_Feed_Back_And_Bool_Is_True() throws SQLException {
+        Boolean bool = feed.doDelete(provDbUtils.getConnection());
         Assert.assertEquals(true, bool);
         JSONObject jo = new JSONObject();
         jo.put("self","self_link");
@@ -102,7 +104,7 @@ public class FeedTest {
         jo.put("subscribe","subscribe_link");
         jo.put("log","log_link");
         feed.setLinks(new FeedLinks(jo));
-        bool = feed.doInsert(db.getConnection());
+        bool = feed.doInsert(provDbUtils.getConnection());
         Assert.assertEquals(true, bool);
     }
 
@@ -134,7 +136,7 @@ public class FeedTest {
 
     @Test
     public void Given_doInsert_Throws_SQLException_Then_Returns_False() throws SQLException {
-        Connection connection = db.getConnection();
+        Connection connection = provDbUtils.getConnection();
         FeedAuthorization fa = new FeedAuthorization();
         Set setA = new HashSet();
         setA.add(new FeedEndpointID("1", "Name"));
@@ -176,11 +178,11 @@ public class FeedTest {
 
     @Test
     public void Given_IsFeedValid_Called_And_Feed_Exists_Returns_True(){
-        Assert.assertEquals(feed.isFeedValid(1), true);
+        Assert.assertTrue(Feed.isFeedValid(1));
     }
 
     private Connection CreateSpyForDbConnection() throws SQLException {
-        Connection conn = db.getConnection();
+        Connection conn = provDbUtils.getConnection();
         return Mockito.spy(conn);
     }
 }

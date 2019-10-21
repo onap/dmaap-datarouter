@@ -42,8 +42,8 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.onap.dmaap.datarouter.provisioning.utils.JSONUtilities;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 
 
@@ -58,7 +58,6 @@ public class Feed extends Syncable {
 
     private static EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
     private static int nextFeedID = getMaxFeedID() + 1;
-    private static final String SQLEXCEPTION = "SQLException: ";
     private static final String FEED_ID_SQL = "FEEDID";
     private static final String FEED_ID = "feedid";
     private static final String DEL = "deleted";
@@ -224,20 +223,17 @@ public class Feed extends Syncable {
      * @return true if it is valid
      */
     @SuppressWarnings("resource")
-    public static boolean isFeedValid(int id) {
+    static boolean isFeedValid(int id) {
         int count = 0;
-        try {
-            DB db = new DB();
-            Connection conn = db.getConnection();
-            try (PreparedStatement stmt = conn.prepareStatement("select COUNT(*) from FEEDS where FEEDID = ?")) {
-                stmt.setInt(1, id);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next()) {
-                        count = rs.getInt(1);
-                    }
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                "select COUNT(*) from FEEDS where FEEDID = ?")) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
                 }
             }
-            db.release(conn);
         } catch (SQLException e) {
             intlogger.warn("PROV0024 Feed.isFeedValid: " + e.getMessage(), e);
         }
@@ -276,17 +272,14 @@ public class Feed extends Syncable {
      */
     public static int countActiveFeeds() {
         int count = 0;
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource") Connection conn = db.getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery("select count(*) from FEEDS where DELETED = 0")) {
-                    if (rs.next()) {
-                        count = rs.getInt(1);
-                    }
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                "select count(*) from FEEDS where DELETED = 0")) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
                 }
             }
-            db.release(conn);
         } catch (SQLException e) {
             intlogger.warn("PROV0025 Feed.countActiveFeeds: " + e.getMessage(), e);
         }
@@ -299,18 +292,14 @@ public class Feed extends Syncable {
      */
     public static int getMaxFeedID() {
         int max = 0;
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery("select MAX(feedid) from FEEDS")) {
-                    if (rs.next()) {
-                        max = rs.getInt(1);
-                    }
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                "select MAX(feedid) from FEEDS")) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    max = rs.getInt(1);
                 }
             }
-            db.release(conn);
         } catch (SQLException e) {
             intlogger.warn("PROV0026 Feed.getMaxFeedID: " + e.getMessage(), e);
         }
@@ -323,44 +312,37 @@ public class Feed extends Syncable {
      */
     public static Collection<Feed> getAllFeeds() {
         Map<Integer, Feed> map = new HashMap<>();
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (Statement stmt = conn.createStatement()) {
-                try (ResultSet rs = stmt.executeQuery("select * from FEEDS")) {
-                    while (rs.next()) {
-                        Feed feed = new Feed(rs);
-                        map.put(feed.getFeedid(), feed);
-                    }
+        try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("select * from FEEDS");
+                ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Feed feed = new Feed(rs);
+                    map.put(feed.getFeedid(), feed);
                 }
-
-                String sql = "select * from FEED_ENDPOINT_IDS";
-                try (ResultSet rs = stmt.executeQuery(sql)) {
-                    while (rs.next()) {
-                        int id = rs.getInt(FEED_ID_SQL);
-                        Feed feed = map.get(id);
-                        if (feed != null) {
-                            FeedEndpointID epi = new FeedEndpointID(rs);
-                            Collection<FeedEndpointID> ecoll = feed.getAuthorization().getEndpointIDS();
-                            ecoll.add(epi);
-                        }
-                    }
-                }
-
-                sql = "select * from FEED_ENDPOINT_ADDRS";
-                try (ResultSet rs = stmt.executeQuery(sql)) {
-                    while (rs.next()) {
-                        int id = rs.getInt(FEED_ID_SQL);
-                        Feed feed = map.get(id);
-                        if (feed != null) {
-                            Collection<String> acoll = feed.getAuthorization().getEndpointAddrs();
-                            acoll.add(rs.getString("ADDR"));
-                        }
+            }
+            try (PreparedStatement ps = conn.prepareStatement("select * from FEED_ENDPOINT_IDS");
+                ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt(FEED_ID_SQL);
+                    Feed feed = map.get(id);
+                    if (feed != null) {
+                        FeedEndpointID epi = new FeedEndpointID(rs);
+                        Collection<FeedEndpointID> ecoll = feed.getAuthorization().getEndpointIDS();
+                        ecoll.add(epi);
                     }
                 }
             }
-            db.release(conn);
+            try (PreparedStatement ps = conn.prepareStatement("select * from FEED_ENDPOINT_ADDRS");
+                ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt(FEED_ID_SQL);
+                    Feed feed = map.get(id);
+                    if (feed != null) {
+                        Collection<String> acoll = feed.getAuthorization().getEndpointAddrs();
+                        acoll.add(rs.getString("ADDR"));
+                    }
+                }
+            }
         } catch (SQLException e) {
             intlogger.warn("PROV0027 Feed.getAllFeeds: " + e.getMessage(), e);
         }
@@ -382,26 +364,21 @@ public class Feed extends Syncable {
             sql += " and PUBLISHER = ?";
         } else if (name.equals("subs")) {
             sql = "select distinct FEEDS.SELF_LINK from FEEDS, SUBSCRIPTIONS "
-                          + "where DELETED = 0 "
-                          + "and FEEDS.FEEDID = SUBSCRIPTIONS.FEEDID "
-                          + "and SUBSCRIPTIONS.SUBSCRIBER = ?";
+                + "where DELETED = 0 "
+                + "and FEEDS.FEEDID = SUBSCRIPTIONS.FEEDID "
+                + "and SUBSCRIPTIONS.SUBSCRIBER = ?";
         }
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                if (sql.indexOf('?') >= 0) {
-                    ps.setString(1, val);
-                }
-                try (ResultSet rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        String str = rs.getString(1);
-                        list.add(str.trim());
-                    }
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            if (sql.indexOf('?') >= 0) {
+                ps.setString(1, val);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String str = rs.getString(1);
+                    list.add(str.trim());
                 }
             }
-            db.release(conn);
         } catch (SQLException e) {
             intlogger.warn("PROV0028 Feed.getFilteredFeedUrlList: " + e.getMessage(), e);
         }
@@ -411,9 +388,7 @@ public class Feed extends Syncable {
     @SuppressWarnings("resource")
     private static Feed getFeedBySQL(String sql) {
         Feed feed = null;
-        try {
-            DB db = new DB();
-            Connection conn = db.getConnection();
+        try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
             try (Statement stmt = conn.createStatement()) {
                 try (ResultSet rs = stmt.executeQuery(sql)) {
                     if (rs.next()) {
@@ -438,7 +413,6 @@ public class Feed extends Syncable {
                     }
                 }
             }
-            db.release(conn);
         } catch (SQLException e) {
             intlogger.warn("PROV0029 Feed.getFeedBySQL: " + e.getMessage(), e);
         }
@@ -453,7 +427,7 @@ public class Feed extends Syncable {
 
     /**
      *  Set feedid with FeedLinks.
-      * @param feedid Feedid to set to
+     * @param feedid Feedid to set to
      */
     public void setFeedid(int feedid) {
         this.feedid = feedid;
@@ -468,10 +442,6 @@ public class Feed extends Syncable {
 
     public String getAafInstance() {
         return aafInstance;
-    }
-
-    public void setAafInstance(String aafInstance) {
-        this.aafInstance = aafInstance;
     }
 
     //new getter setters for groups- Rally:US708115 - 1610
@@ -508,11 +478,11 @@ public class Feed extends Syncable {
     }
 
     // New field is added - Groups feature Rally:US708102 - 1610
-    public String getBusinessDescription() {
+    String getBusinessDescription() {
         return businessDescription;
     }
 
-    public void setBusinessDescription(String businessDescription) {
+    void setBusinessDescription(String businessDescription) {
         this.businessDescription = businessDescription;
     }
 
@@ -545,7 +515,7 @@ public class Feed extends Syncable {
         return links;
     }
 
-    public void setLinks(FeedLinks links) {
+    void setLinks(FeedLinks links) {
         this.links = links;
     }
 
@@ -557,11 +527,11 @@ public class Feed extends Syncable {
         this.deleted = deleted;
     }
 
-    public boolean isSuspended() {
+    boolean isSuspended() {
         return suspended;
     }
 
-    public void setSuspended(boolean suspended) {
+    void setSuspended(boolean suspended) {
         this.suspended = suspended;
     }
 
@@ -621,23 +591,12 @@ public class Feed extends Syncable {
     @Override
     public boolean doDelete(Connection conn) {
         boolean rv = true;
-        PreparedStatement ps = null;
-        try {
-            String sql = "delete from FEEDS where FEEDID = ?";
-            ps = conn.prepareStatement(sql);
+        try (PreparedStatement ps = conn.prepareStatement("delete from FEEDS where FEEDID = ?")) {
             ps.setInt(1, feedid);
             ps.execute();
         } catch (SQLException e) {
             rv = false;
             intlogger.error("PROV0007 doDelete: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
         }
         return rv;
     }
@@ -653,51 +612,46 @@ public class Feed extends Syncable {
             if (feedid > nextFeedID) {
                 nextFeedID = feedid + 1;
             }
-
             // Create FEED_ENDPOINT_IDS rows
             FeedAuthorization auth = getAuthorization();
-            String sql = "insert into FEED_ENDPOINT_IDS values (?, ?, ?)";
-            try (PreparedStatement ps2 = conn.prepareStatement(sql)) {
+            try (PreparedStatement ps = conn.prepareStatement("insert into FEED_ENDPOINT_IDS values (?, ?, ?)")) {
                 for (FeedEndpointID fid : auth.getEndpointIDS()) {
-                    ps2.setInt(1, feedid);
-                    ps2.setString(2, fid.getId());
-                    ps2.setString(3, fid.getPassword());
-                    ps2.executeUpdate();
+                    ps.setInt(1, feedid);
+                    ps.setString(2, fid.getId());
+                    ps.setString(3, fid.getPassword());
+                    ps.executeUpdate();
                 }
             }
-
             // Create FEED_ENDPOINT_ADDRS rows
-            sql = "insert into FEED_ENDPOINT_ADDRS values (?, ?)";
-            try (PreparedStatement ps2 = conn.prepareStatement(sql)) {
+            try (PreparedStatement ps = conn.prepareStatement("insert into FEED_ENDPOINT_ADDRS values (?, ?)")) {
                 for (String t : auth.getEndpointAddrs()) {
-                    ps2.setInt(1, feedid);
-                    ps2.setString(2, t);
-                    ps2.executeUpdate();
+                    ps.setInt(1, feedid);
+                    ps.setString(2, t);
+                    ps.executeUpdate();
                 }
             }
-
             // Finally, create the FEEDS row
-            sql = "insert into FEEDS (FEEDID, NAME, VERSION, DESCRIPTION, AUTH_CLASS, PUBLISHER, SELF_LINK, "
-                          + "PUBLISH_LINK, SUBSCRIBE_LINK, LOG_LINK, DELETED, SUSPENDED,"
-                          + "BUSINESS_DESCRIPTION, GROUPID, AAF_INSTANCE) "
-                          + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement ps2 = conn.prepareStatement(sql)) {
-                ps2.setInt(1, feedid);
-                ps2.setString(2, getName());
-                ps2.setString(3, getVersion());
-                ps2.setString(4, getDescription());
-                ps2.setString(5, getAuthorization().getClassification());
-                ps2.setString(6, getPublisher());
-                ps2.setString(7, getLinks().getSelf());
-                ps2.setString(8, getLinks().getPublish());
-                ps2.setString(9, getLinks().getSubscribe());
-                ps2.setString(10, getLinks().getLog());
-                ps2.setBoolean(11, isDeleted());
-                ps2.setBoolean(12, isSuspended());
-                ps2.setString(13, getBusinessDescription());
-                ps2.setInt(14, groupid);
-                ps2.setString(15, getAafInstance());
-                ps2.executeUpdate();
+            try (PreparedStatement ps = conn.prepareStatement(
+                "insert into FEEDS (FEEDID, NAME, VERSION, DESCRIPTION, AUTH_CLASS, PUBLISHER, SELF_LINK, "
+                    + "PUBLISH_LINK, SUBSCRIBE_LINK, LOG_LINK, DELETED, SUSPENDED,"
+                    + "BUSINESS_DESCRIPTION, GROUPID, AAF_INSTANCE) "
+                    + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                ps.setInt(1, feedid);
+                ps.setString(2, getName());
+                ps.setString(3, getVersion());
+                ps.setString(4, getDescription());
+                ps.setString(5, getAuthorization().getClassification());
+                ps.setString(6, getPublisher());
+                ps.setString(7, getLinks().getSelf());
+                ps.setString(8, getLinks().getPublish());
+                ps.setString(9, getLinks().getSubscribe());
+                ps.setString(10, getLinks().getLog());
+                ps.setBoolean(11, isDeleted());
+                ps.setBoolean(12, isSuspended());
+                ps.setString(13, getBusinessDescription());
+                ps.setInt(14, groupid);
+                ps.setString(15, getAafInstance());
+                ps.executeUpdate();
             }
         } catch (SQLException e) {
             rv = false;
@@ -709,88 +663,72 @@ public class Feed extends Syncable {
     @Override
     public boolean doUpdate(Connection conn) {
         boolean rv = true;
-        Feed oldobj = getFeedById(feedid);
-        PreparedStatement ps = null;
         try {
+            Feed oldobj = getFeedById(feedid);
             Set<FeedEndpointID> newset = getAuthorization().getEndpointIDS();
             Set<FeedEndpointID> oldset = oldobj.getAuthorization().getEndpointIDS();
-
-            // Insert new FEED_ENDPOINT_IDS rows
-            String sql = "insert into FEED_ENDPOINT_IDS values (?, ?, ?)";
-            ps = conn.prepareStatement(sql);
-            for (FeedEndpointID fid : newset) {
-                if (!oldset.contains(fid)) {
-                    ps.setInt(1, feedid);
-                    ps.setString(2, fid.getId());
-                    ps.setString(3, fid.getPassword());
-                    ps.executeUpdate();
+            try (PreparedStatement ps = conn.prepareStatement("insert into FEED_ENDPOINT_IDS values (?, ?, ?)")) {
+                // Insert new FEED_ENDPOINT_IDS rows
+                for (FeedEndpointID fid : newset) {
+                    if (!oldset.contains(fid)) {
+                        ps.setInt(1, feedid);
+                        ps.setString(2, fid.getId());
+                        ps.setString(3, fid.getPassword());
+                        ps.executeUpdate();
+                    }
                 }
             }
-            ps.close();
-
             // Delete old FEED_ENDPOINT_IDS rows
-            sql = "delete from FEED_ENDPOINT_IDS where FEEDID = ? AND USERID = ? AND PASSWORD = ?";
-            ps = conn.prepareStatement(sql);
-            for (FeedEndpointID fid : oldset) {
-                if (!newset.contains(fid)) {
-                    ps.setInt(1, feedid);
-                    ps.setString(2, fid.getId());
-                    ps.setString(3, fid.getPassword());
-                    ps.executeUpdate();
+            try (PreparedStatement ps = conn.prepareStatement(
+                "delete from FEED_ENDPOINT_IDS where FEEDID = ? AND USERID = ? AND PASSWORD = ?")) {
+                for (FeedEndpointID fid : oldset) {
+                    if (!newset.contains(fid)) {
+                        ps.setInt(1, feedid);
+                        ps.setString(2, fid.getId());
+                        ps.setString(3, fid.getPassword());
+                        ps.executeUpdate();
+                    }
                 }
             }
-            ps.close();
-
-            // Insert new FEED_ENDPOINT_ADDRS rows
             Set<String> newset2 = getAuthorization().getEndpointAddrs();
             Set<String> oldset2 = oldobj.getAuthorization().getEndpointAddrs();
-            sql = "insert into FEED_ENDPOINT_ADDRS values (?, ?)";
-            ps = conn.prepareStatement(sql);
-            for (String t : newset2) {
-                if (!oldset2.contains(t)) {
-                    ps.setInt(1, feedid);
-                    ps.setString(2, t);
-                    ps.executeUpdate();
+            // Insert new FEED_ENDPOINT_ADDRS rows
+            try (PreparedStatement ps = conn.prepareStatement("insert into FEED_ENDPOINT_ADDRS values (?, ?)")) {
+                for (String t : newset2) {
+                    if (!oldset2.contains(t)) {
+                        ps.setInt(1, feedid);
+                        ps.setString(2, t);
+                        ps.executeUpdate();
+                    }
                 }
             }
-            ps.close();
-
             // Delete old FEED_ENDPOINT_ADDRS rows
-            sql = "delete from FEED_ENDPOINT_ADDRS where FEEDID = ? AND ADDR = ?";
-            ps = conn.prepareStatement(sql);
-            for (String t : oldset2) {
-                if (!newset2.contains(t)) {
-                    ps.setInt(1, feedid);
-                    ps.setString(2, t);
-                    ps.executeUpdate();
+            try (PreparedStatement ps = conn.prepareStatement(
+                "delete from FEED_ENDPOINT_ADDRS where FEEDID = ? AND ADDR = ?")) {
+                for (String t : oldset2) {
+                    if (!newset2.contains(t)) {
+                        ps.setInt(1, feedid);
+                        ps.setString(2, t);
+                        ps.executeUpdate();
+                    }
                 }
             }
-            ps.close();
-
-            // Finally, update the FEEDS row
-            sql = "update FEEDS set DESCRIPTION = ?, AUTH_CLASS = ?, DELETED = ?, SUSPENDED = ?, "
-                          + "BUSINESS_DESCRIPTION=?, GROUPID=? where FEEDID = ?";
-            ps = conn.prepareStatement(sql);
-            ps.setString(1, getDescription());
-            ps.setString(2, getAuthorization().getClassification());
-            ps.setInt(3, deleted ? 1 : 0);
-            ps.setInt(4, suspended ? 1 : 0);
-            ps.setString(5, getBusinessDescription());
-            ps.setInt(6, groupid);
-            ps.setInt(7, feedid);
-            ps.executeUpdate();
-            ps.close();
+            try (PreparedStatement ps = conn.prepareStatement(
+                "update FEEDS set DESCRIPTION = ?, AUTH_CLASS = ?, DELETED = ?, SUSPENDED = ?, "
+                    + "BUSINESS_DESCRIPTION=?, GROUPID=? where FEEDID = ?")) {
+                // Finally, update the FEEDS row
+                ps.setString(1, getDescription());
+                ps.setString(2, getAuthorization().getClassification());
+                ps.setInt(3, deleted ? 1 : 0);
+                ps.setInt(4, suspended ? 1 : 0);
+                ps.setString(5, getBusinessDescription());
+                ps.setInt(6, groupid);
+                ps.setInt(7, feedid);
+                ps.executeUpdate();
+            }
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0006 doUpdate: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
         }
         return rv;
     }
@@ -801,29 +739,15 @@ public class Feed extends Syncable {
      */
     public boolean changeOwnerShip() {
         boolean rv = true;
-        PreparedStatement ps = null;
-        try {
-
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            String sql = "update FEEDS set PUBLISHER = ? where FEEDID = ?";
-            ps = conn.prepareStatement(sql);
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                "update FEEDS set PUBLISHER = ? where FEEDID = ?")) {
             ps.setString(1, this.publisher);
             ps.setInt(2, feedid);
             ps.execute();
-            ps.close();
         } catch (SQLException e) {
             rv = false;
             intlogger.warn("PROV0008 changeOwnerShip: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (ps != null) {
-                    ps.close();
-                }
-            } catch (SQLException e) {
-                intlogger.error(SQLEXCEPTION + e.getMessage(), e);
-            }
         }
         return rv;
     }

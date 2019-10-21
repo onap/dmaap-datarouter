@@ -32,6 +32,7 @@ import java.nio.file.Files;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.TimerTask;
+import org.onap.dmaap.datarouter.provisioning.ProvRunner;
 
 /**
  * This class provides a {@link TimerTask} that purges old logfiles (older than the number of days specified by the
@@ -52,7 +53,7 @@ public class PurgeLogDirTask extends TimerTask {
      * PurgeLogDirTask constructor.
      */
     public PurgeLogDirTask() {
-        Properties prop = (new DB()).getProperties();
+        Properties prop = ProvRunner.getProvProperties();
         logdir = prop.getProperty("org.onap.dmaap.datarouter.provserver.accesslog.dir");
         String str = prop.getProperty("org.onap.dmaap.datarouter.provserver.logretention", "30");
         this.utilsLogger = EELFManager.getInstance().getLogger("UtilsLog");

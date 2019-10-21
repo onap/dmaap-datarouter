@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.zip.GZIPInputStream;
 import org.onap.dmaap.datarouter.provisioning.BaseServlet;
+import org.onap.dmaap.datarouter.provisioning.ProvRunner;
 import org.onap.dmaap.datarouter.provisioning.beans.DeliveryExtraRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.DeliveryRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.ExpiryRecord;
@@ -80,17 +81,11 @@ public class LogfileLoader extends Thread {
     private static LogfileLoader logfileLoader;
 
     /**
-     * The PreparedStatement which is loaded by a <i>Loadable</i>.
-     */
-    private static final String INSERT_SQL = "insert into LOG_RECORDS "
-                                               + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    /**
      * Each server can assign this many IDs.
      */
     private static final long SET_SIZE = (1L << 56);
 
     private final EELFLogger logger;
-    private final DB db;
     private final String spooldir;
     private final long setStart;
     private final long setEnd;
@@ -100,8 +95,7 @@ public class LogfileLoader extends Thread {
 
     private LogfileLoader() {
         this.logger = EELFManager.getInstance().getLogger("InternalLog");
-        this.db = new DB();
-        this.spooldir = db.getProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
+        this.spooldir = ProvRunner.getProvProperties().getProperty("org.onap.dmaap.datarouter.provserver.spooldir");
         this.setStart = getIdRange();
         this.setEnd = setStart + SET_SIZE - 1;
         this.seqSet = new RLEBitSet();
@@ -257,12 +251,10 @@ public class LogfileLoader extends Thread {
             cutoff *= 86400000L;
             logger.debug("  Pruning records older than=" + (cutoff / 86400000L) + " (" + new Date(cutoff) + ")");
 
-            Connection conn = null;
-            try {
+            try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
                 // Limit to a million at a time to avoid typing up the DB for too long.
-                conn = db.getConnection();
                 try (PreparedStatement ps = conn.prepareStatement(
-                        "DELETE from LOG_RECORDS where EVENT_TIME < ? limit 1000000")) {
+                    "DELETE from LOG_RECORDS where EVENT_TIME < ? limit 1000000")) {
                     ps.setLong(1, cutoff);
                     while (count > 0) {
                         if (!ps.execute()) {
@@ -283,8 +275,6 @@ public class LogfileLoader extends Thread {
                 }
             } catch (SQLException e) {
                 logger.error("LogfileLoader.pruneRecords: " + e.getMessage(), e);
-            } finally {
-                db.release(conn);
             }
         }
         return did1;
@@ -292,14 +282,11 @@ public class LogfileLoader extends Thread {
 
     private long countRecords() {
         long count = 0;
-        try (Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement()) {
-            try (ResultSet rs = stmt.executeQuery("SELECT COUNT(*) as COUNT from LOG_RECORDS")) {
-                if (rs.next()) {
-                    count = rs.getLong("COUNT");
-                }
-            } finally {
-                db.release(conn);
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) as COUNT from LOG_RECORDS");
+            ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                count = rs.getLong("COUNT");
             }
         } catch (SQLException e) {
             logger.error("LogfileLoader.countRecords: " + e.getMessage(), e);
@@ -309,19 +296,16 @@ public class LogfileLoader extends Thread {
 
     private Map<Long, Long> getHistogram() {
         Map<Long, Long> map = new HashMap<>();
-        try (Connection conn = db.getConnection();
-            Statement stmt = conn.createStatement()) {
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                "SELECT FLOOR(EVENT_TIME/86400000) AS DAY, COUNT(*) AS COUNT FROM LOG_RECORDS GROUP BY DAY");
+            ResultSet rs = ps.executeQuery()) {
             logger.debug("  LOG_RECORD table histogram...");
-            try (ResultSet rs = stmt.executeQuery(
-                    "SELECT FLOOR(EVENT_TIME/86400000) AS DAY, COUNT(*) AS COUNT FROM LOG_RECORDS GROUP BY DAY")) {
-                while (rs.next()) {
-                    long day = rs.getLong("DAY");
-                    long cnt = rs.getLong("COUNT");
-                    map.put(day, cnt);
-                    logger.debug("  " + day + "  " + cnt);
-                }
-            } finally {
-                db.release(conn);
+            while (rs.next()) {
+                long day = rs.getLong("DAY");
+                long cnt = rs.getLong("COUNT");
+                map.put(day, cnt);
+                logger.debug("  " + day + "  " + cnt);
             }
         } catch (SQLException e) {
             logger.error("LogfileLoader.getHistogram: " + e.getMessage(), e);
@@ -330,9 +314,7 @@ public class LogfileLoader extends Thread {
     }
 
     private void initializeNextid() {
-        Connection conn = null;
-        try {
-            conn = db.getConnection();
+        try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
             RLEBitSet nbs = new RLEBitSet();
             try (Statement stmt = conn.createStatement()) {
                 // Build a bitset of all records in the LOG_RECORDS table
@@ -376,8 +358,6 @@ public class LogfileLoader extends Thread {
             logger.debug(String.format("LogfileLoader.initializeNextid, next ID is %d (%x)", nextId, nextId));
         } catch (SQLException e) {
             logger.error("LogfileLoader.initializeNextid: " + e.getMessage(), e);
-        } finally {
-            db.release(conn);
         }
     }
 
@@ -385,9 +365,9 @@ public class LogfileLoader extends Thread {
     int[] process(File file) {
         int ok = 0;
         int total = 0;
-        try {
-            Connection conn = db.getConnection();
-            PreparedStatement ps = conn.prepareStatement(INSERT_SQL);
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                "insert into LOG_RECORDS values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
             Reader reader = file.getPath().endsWith(".gz")
                 ? new InputStreamReader(new GZIPInputStream(new FileInputStream(file)))
                 : new FileReader(file);
@@ -428,8 +408,6 @@ public class LogfileLoader extends Thread {
                     total++;
                 }
             }
-            ps.close();
-            db.release(conn);
         } catch (SQLException | IOException e) {
             logger.warn("PROV8007 Exception reading " + file + ": " + e);
         }
@@ -462,7 +440,7 @@ public class LogfileLoader extends Thread {
                 ExpiryRecord expiryRecord = new ExpiryRecord(pp);
                 if ("other".equals(expiryRecord.getReason())) {
                     logger.info("Invalid reason '" + pp[9] + "' changed to 'other' for record: "
-                                        + expiryRecord.getPublishId());
+                        + expiryRecord.getPublishId());
                 }
                 return new Loadable[]{expiryRecord};
             }

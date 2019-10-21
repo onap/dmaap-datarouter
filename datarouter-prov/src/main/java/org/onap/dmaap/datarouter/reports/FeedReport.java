@@ -37,10 +37,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 
 /**
  * Generate a feeds report.  The report is a .CSV file.
@@ -49,15 +48,6 @@ import org.onap.dmaap.datarouter.provisioning.utils.DB;
  * @version $Id: FeedReport.java,v 1.2 2013/11/06 16:23:55 eby Exp $
  */
 public class FeedReport extends ReportBase {
-    private static final String SELECT_SQL =
-            // Note to use the time in the publish_id, use date(from_unixtime(substring(publish_id, 1, 10)))
-            // To just use month, substring(from_unixtime(event_time div 1000), 1, 7)
-            "select date(from_unixtime(event_time div 1000)) as date, type, feedid, delivery_subid, count(*) as count" +
-                    " from LOG_RECORDS" +
-                    " where type = 'pub' or type = 'del'" +
-                    " group by date, type, feedid, delivery_subid";
-    private static final String SELECT_SQL_OLD =
-            "select PUBLISH_ID, TYPE, FEEDID, DELIVERY_SUBID from LOG_RECORDS where EVENT_TIME >= ? and EVENT_TIME <= ?";
 
     @Override
     public void run() {
@@ -65,23 +55,22 @@ public class FeedReport extends ReportBase {
         JSONObject jo = new JSONObject();
         long start = System.currentTimeMillis();
         StringBuilder sb = new StringBuilder();
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-           try( PreparedStatement ps = conn.prepareStatement(SELECT_SQL)) {
-               try (ResultSet rs = ps.executeQuery()) {
-                   while (rs.next()) {
-                       String date = rs.getString("date");
-                       String type = rs.getString("type");
-                       int feedid = rs.getInt("feedid");
-                       int subid = type.equals("del") ? rs.getInt("delivery_subid") : 0;
-                       int count = rs.getInt("count");
-                       sb.append(date + "," + type + "," + feedid + "," + subid + "," + count + "\n");
-                   }
-               }
-           }
-        db.release(conn);
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                // Note to use the time in the publish_id, use date(from_unixtime(substring(publish_id, 1, 10)))
+                // To just use month, substring(from_unixtime(event_time div 1000), 1, 7)
+                "select date(from_unixtime(event_time div 1000)) as date, type, feedid, delivery_subid, count(*) "
+                    + "as count from LOG_RECORDS where type = 'pub' or type = 'del' group by date, type, feedid, delivery_subid")) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String date = rs.getString("date");
+                    String type = rs.getString("type");
+                    int feedid = rs.getInt("feedid");
+                    int subid = type.equals("del") ? rs.getInt("delivery_subid") : 0;
+                    int count = rs.getInt("count");
+                    sb.append(date + "," + type + "," + feedid + "," + subid + "," + count + "\n");
+                }
+            }
         } catch (SQLException e) {
             logger.error(e.toString());
         }
@@ -99,53 +88,50 @@ public class FeedReport extends ReportBase {
         JSONObject jo = new JSONObject();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         long start = System.currentTimeMillis();
-        try {
-            DB db = new DB();
-            @SuppressWarnings("resource")
-            Connection conn = db.getConnection();
-            try(PreparedStatement ps = conn.prepareStatement(SELECT_SQL_OLD)) {
-                ps.setLong(1, from);
-                ps.setLong(2, to);
-                ps.setFetchSize(100000);
-                try(ResultSet rs = ps.executeQuery()) {
-                    while (rs.next()) {
-                        String id = rs.getString("PUBLISH_ID");
-                        String date = sdf.format(new Date(getPstart(id)));
-                        JSONObject datemap = jo.optJSONObject(date);
-                        if (datemap == null) {
-                            datemap = new JSONObject();
-                            jo.put(date, datemap);
+        try (Connection conn = ProvDbUtils.getInstance().getConnection();
+            PreparedStatement ps = conn.prepareStatement(
+                "select PUBLISH_ID, TYPE, FEEDID, DELIVERY_SUBID from LOG_RECORDS "
+                    + "where EVENT_TIME >= ? and EVENT_TIME <= ?")) {
+            ps.setLong(1, from);
+            ps.setLong(2, to);
+            ps.setFetchSize(100000);
+            try(ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String id = rs.getString("PUBLISH_ID");
+                    String date = sdf.format(new Date(getPstart(id)));
+                    JSONObject datemap = jo.optJSONObject(date);
+                    if (datemap == null) {
+                        datemap = new JSONObject();
+                        jo.put(date, datemap);
+                    }
+                    int feed = rs.getInt("FEEDID");
+                    JSONObject feedmap = datemap.optJSONObject("" + feed);
+                    if (feedmap == null) {
+                        feedmap = new JSONObject();
+                        feedmap.put("pubcount", 0);
+                        datemap.put("" + feed, feedmap);
+                    }
+                    String type = rs.getString("TYPE");
+                    if (type.equals("pub")) {
+                        try {
+                            int n = feedmap.getInt("pubcount");
+                            feedmap.put("pubcount", n + 1);
+                        } catch (JSONException e) {
+                            feedmap.put("pubcount", 1);
+                            logger.error(e.toString());
                         }
-                        int feed = rs.getInt("FEEDID");
-                        JSONObject feedmap = datemap.optJSONObject("" + feed);
-                        if (feedmap == null) {
-                            feedmap = new JSONObject();
-                            feedmap.put("pubcount", 0);
-                            datemap.put("" + feed, feedmap);
-                        }
-                        String type = rs.getString("TYPE");
-                        if (type.equals("pub")) {
-                            try {
-                                int n = feedmap.getInt("pubcount");
-                                feedmap.put("pubcount", n + 1);
-                            } catch (JSONException e) {
-                                feedmap.put("pubcount", 1);
-                                logger.error(e.toString());
-                            }
-                        } else if (type.equals("del")) {
-                            String subid = "" + rs.getInt("DELIVERY_SUBID");
-                            try {
-                                int n = feedmap.getInt(subid);
-                                feedmap.put(subid, n + 1);
-                            } catch (JSONException e) {
-                                feedmap.put(subid, 1);
-                                logger.error(e.toString());
-                            }
+                    } else if (type.equals("del")) {
+                        String subid = "" + rs.getInt("DELIVERY_SUBID");
+                        try {
+                            int n = feedmap.getInt(subid);
+                            feedmap.put(subid, n + 1);
+                        } catch (JSONException e) {
+                            feedmap.put(subid, 1);
+                            logger.error(e.toString());
                         }
                     }
                 }
             }
-             db.release(conn);
         } catch (SQLException e) {
             logger.error(e.toString());
         }
@@ -225,11 +211,11 @@ public class FeedReport extends ReportBase {
             String[] feeds = JSONObject.getNames(j2);
             Arrays.sort(feeds);
             s.append("<tr><td rowspan=\"" + rc1 + "\">")
-                    .append(date)
-                    .append("</td>");
+                .append(date)
+                .append("</td>");
             s.append("<td rowspan=\"" + rc1 + "\">")
-                    .append(feeds.length)
-                    .append("</td>");
+                .append(feeds.length)
+                .append("</td>");
             String px1 = "";
             for (String feed : feeds) {
                 JSONObject j3 = j2.getJSONObject(feed);
@@ -239,15 +225,15 @@ public class FeedReport extends ReportBase {
                 String[] subs = JSONObject.getNames(j3);
                 Arrays.sort(subs);
                 s.append(px1)
-                        .append("<td rowspan=\"" + rc2 + "\">")
-                        .append(feed)
-                        .append("</td>");
+                    .append("<td rowspan=\"" + rc2 + "\">")
+                    .append(feed)
+                    .append("</td>");
                 s.append("<td rowspan=\"" + rc2 + "\">")
-                        .append(pubcount)
-                        .append("</td>");
+                    .append(pubcount)
+                    .append("</td>");
                 s.append("<td rowspan=\"" + rc2 + "\">")
-                        .append(subcnt)
-                        .append("</td>");
+                    .append(subcnt)
+                    .append("</td>");
                 String px2 = "";
                 for (String sub : subs) {
                     if (!sub.equals("pubcount")) {

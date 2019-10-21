@@ -26,8 +26,6 @@ package org.onap.dmaap.datarouter.provisioning;
 import java.security.NoSuchAlgorithmException;
 import javax.crypto.SecretKeyFactory;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;

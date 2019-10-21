@@ -52,7 +52,7 @@ public class IngressRouteTest {
     Feed feed = mock(Feed.class);
     PowerMockito.when(Feed.getFeedById(1)).thenReturn(feed);
     Map<String, Integer> map = new HashMap<>();
-    FieldUtils.writeDeclaredStaticField(NodeClass.class, "map", map, true);
+    FieldUtils.writeDeclaredStaticField(NodeClass.class, "nodesMap", map, true);
   }
 
   @Test

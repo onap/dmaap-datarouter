@@ -35,20 +35,13 @@ import javax.persistence.Persistence;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.onap.dmaap.datarouter.provisioning.utils.DB;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 
 @RunWith(PowerMockRunner.class)
 public class StatisticsServletTest {
@@ -60,8 +53,6 @@ public class StatisticsServletTest {
 
   @Mock
   private HttpServletResponse response;
-
-  private DB db;
 
   private static EntityManagerFactory emf;
   private static EntityManager em;
@@ -85,7 +76,6 @@ public class StatisticsServletTest {
   @Before
   public void setUp() throws Exception {
     statisticsServlet = new StatisticsServlet();
-    db = new DB();
     buildRequestParameters();
   }
 
