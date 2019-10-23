@@ -70,7 +70,6 @@ public class NodeConfigManagerTest {
         Assert.assertEquals(new String[] {"TLSv1.1", "TLSv1.2"}, nodeConfigManager.getEnabledprotocols());
         Assert.assertEquals("org.onap.dmaap-dr.feed", nodeConfigManager.getAafType());
         Assert.assertEquals("publish", nodeConfigManager.getAafAction());
-        Assert.assertEquals("https://aaf-locate:8095", nodeConfigManager.getAafURL());
         Assert.assertFalse(nodeConfigManager.getCadiEnabled());
         Assert.assertFalse(nodeConfigManager.isShutdown());
         Assert.assertFalse(nodeConfigManager.isConfigured());

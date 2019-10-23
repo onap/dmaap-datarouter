@@ -100,10 +100,11 @@ public class EgressRoute extends NodeClass implements Comparable<EgressRoute> {
         try (Connection conn = ProvDbUtils.getInstance().getConnection();
             PreparedStatement ps = conn.prepareStatement("select NODEID from EGRESS_ROUTES where SUBID = ?")) {
             ps.setInt(1, sub);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                int node = rs.getInt("NODEID");
-                er = new EgressRoute(sub, node);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    int node = rs.getInt("NODEID");
+                    er = new EgressRoute(sub, node);
+                }
             }
         } catch (SQLException e) {
             intlogger.error("PROV0009 EgressRoute.getEgressRoute: " + e.getMessage(), e);
