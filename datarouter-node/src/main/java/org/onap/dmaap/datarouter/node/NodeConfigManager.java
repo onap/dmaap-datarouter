@@ -53,7 +53,6 @@ import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
  */
 public class NodeConfigManager implements DeliveryQueueHelper {
 
-    private static final String CHANGE_ME = "changeme";
     private static final String NODE_CONFIG_MANAGER = "NodeConfigManager";
     private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(NodeConfigManager.class);
     private static NodeConfigManager base = new NodeConfigManager();
@@ -103,7 +102,6 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private String aafType;
     private String aafInstance;
     private String aafAction;
-    private String aafURL;
     private boolean cadiEnabled;
     private NodeAafPropsUtils nodeAafPropsUtils;
 
@@ -141,7 +139,6 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         aafInstance = drNodeProperties.getProperty("AAFInstance", "legacy");
         aafAction = drNodeProperties.getProperty("AAFAction", "publish");
         cadiEnabled = Boolean.parseBoolean(drNodeProperties.getProperty("CadiEnabled", "false"));
-        aafURL = nodeAafPropsUtils.getPropAccess().getProperty("aaf_locate_url", "https://aaf-locate:8095");
         /*
          * END - AAF changes: TDP EPIC US# 307413
          * Pull AAF settings from node.properties
@@ -300,7 +297,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private void fetchconfig() {
         try {
             eelfLogger.debug("NodeConfigMan.fetchConfig: provurl:: " + provurl);
-            Reader reader = new InputStreamReader((new URL(provurl)).openStream());
+            URL url = new URL(provurl);
+            Reader reader = new InputStreamReader(url.openStream());
             config = new NodeConfig(new ProvData(reader), myname, spooldir, port, nak);
             localconfig();
             configtasks.startRun();
@@ -329,7 +327,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * fetch the provisioning data, ignore the request.  If the data has been fetched very recently (default 10
      * seconds), wait a while before fetching again.
      */
-    public synchronized void gofetch(String remoteAddr) {
+    synchronized void gofetch(String remoteAddr) {
         if (provcheck.isReachable(remoteAddr)) {
             eelfLogger.debug("NODE0307 Received configuration fetch request from provisioning server " + remoteAddr);
             pfetcher.request();
@@ -341,15 +339,15 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     /**
      * Am I configured.
      */
-    public boolean isConfigured() {
-        return (config != null);
+    boolean isConfigured() {
+        return config != null;
     }
 
     /**
      * Am I shut down.
      */
-    public boolean isShutdown() {
-        return (quiesce.exists());
+    boolean isShutdown() {
+        return quiesce.exists();
     }
 
     /**
@@ -358,8 +356,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @param routing Target string
      * @return array of targets
      */
-    public Target[] parseRouting(String routing) {
-        return (config.parseRouting(routing));
+    Target[] parseRouting(String routing) {
+        return config.parseRouting(routing);
     }
 
     /**
@@ -369,8 +367,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @param ip IP address the request came from
      * @return If the credentials and IP address are recognized, true, otherwise false.
      */
-    public boolean isAnotherNode(String credentials, String ip) {
-        return (config.isAnotherNode(credentials, ip));
+    boolean isAnotherNode(String credentials, String ip) {
+        return config.isAnotherNode(credentials, ip);
     }
 
     /**
@@ -381,8 +379,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @param ip The requesting IP address
      * @return True if the IP and credentials are valid for the specified feed.
      */
-    public String isPublishPermitted(String feedid, String credentials, String ip) {
-        return (config.isPublishPermitted(feedid, credentials, ip));
+    String isPublishPermitted(String feedid, String credentials, String ip) {
+        return config.isPublishPermitted(feedid, credentials, ip);
     }
 
     /**
@@ -392,8 +390,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @param ip The requesting IP address
      * @return True if the IP and credentials are valid for the specified feed.
      */
-    public String isPublishPermitted(String feedid, String ip) {
-        return (config.isPublishPermitted(feedid, ip));
+    String isPublishPermitted(String feedid, String ip) {
+        return config.isPublishPermitted(feedid, ip);
     }
 
     /**
@@ -402,8 +400,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @param subId The ID of the subscription being requested
      * @return True if the delete file is permitted for the subscriber.
      */
-    public boolean isDeletePermitted(String subId) {
-        return (config.isDeletePermitted(subId));
+    boolean isDeletePermitted(String subId) {
+        return config.isDeletePermitted(subId);
     }
 
     /**
@@ -413,8 +411,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @param credentials The offered credentials
      * @return Null if the credentials are invalid or the user if they are valid.
      */
-    public String getAuthUser(String feedid, String credentials) {
-        return (config.getAuthUser(feedid, credentials));
+    String getAuthUser(String feedid, String credentials) {
+        return config.getAuthUser(feedid, credentials);
     }
 
     /**
@@ -422,11 +420,11 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      *
      * @param feedid The ID of the feed specified
      */
-    public String getAafInstance(String feedid) {
-        return (config.getAafInstance(feedid));
+    String getAafInstance(String feedid) {
+        return config.getAafInstance(feedid);
     }
 
-    public String getAafInstance() {
+    String getAafInstance() {
         return aafInstance;
     }
 
@@ -438,8 +436,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @param ip The IP address of the publish endpoint
      * @return Null if the request should be accepted or the correct hostname if it should be sent to another node.
      */
-    public String getIngressNode(String feedid, String user, String ip) {
-        return (config.getIngressNode(feedid, user, ip));
+    String getIngressNode(String feedid, String user, String ip) {
+        return config.getIngressNode(feedid, user, ip);
     }
 
     /**
@@ -448,8 +446,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @param name The name of the parameter
      * @return The value of the parameter or null if it is not defined.
      */
-    public String getProvParam(String name) {
-        return (config.getProvParam(name));
+    private String getProvParam(String name) {
+        return config.getProvParam(name);
     }
 
     /**
@@ -459,39 +457,39 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @param defaultValue The value to use if the parameter is not defined
      * @return The value of the parameter or deflt if it is not defined.
      */
-    public String getProvParam(String name, String defaultValue) {
+    private String getProvParam(String name, String defaultValue) {
         name = config.getProvParam(name);
         if (name == null) {
             name = defaultValue;
         }
-        return (name);
+        return name;
     }
 
     /**
      * Generate a publish ID.
      */
     public String getPublishId() {
-        return (pid.next());
+        return pid.next();
     }
 
     /**
      * Get all the outbound spooling destinations. This will include both subscriptions and nodes.
      */
-    public DestInfo[] getAllDests() {
-        return (config.getAllDests());
+    DestInfo[] getAllDests() {
+        return config.getAllDests();
     }
 
     /**
      * Register a task to run whenever the configuration changes.
      */
-    public void registerConfigTask(Runnable task) {
+    void registerConfigTask(Runnable task) {
         configtasks.addTask(task);
     }
 
     /**
      * Deregister a task to run whenever the configuration changes.
      */
-    public void deregisterConfigTask(Runnable task) {
+    void deregisterConfigTask(Runnable task) {
         configtasks.removeTask(task);
     }
 
@@ -542,49 +540,49 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * Get the timeout before retrying after an initial delivery failure.
      */
     public long getInitFailureTimer() {
-        return (initfailuretimer);
+        return initfailuretimer;
     }
 
     /**
      * Get the timeout before retrying after delivery and wait for file processing.
      */
     public long getWaitForFileProcessFailureTimer() {
-        return (waitForFileProcessFailureTimer);
+        return waitForFileProcessFailureTimer;
     }
 
     /**
      * Get the maximum timeout between delivery attempts.
      */
     public long getMaxFailureTimer() {
-        return (maxfailuretimer);
+        return maxfailuretimer;
     }
 
     /**
      * Get the ratio between consecutive delivery attempts.
      */
     public double getFailureBackoff() {
-        return (failurebackoff);
+        return failurebackoff;
     }
 
     /**
      * Get the expiration timer for deliveries.
      */
     public long getExpirationTimer() {
-        return (expirationtimer);
+        return expirationtimer;
     }
 
     /**
      * Get the maximum number of file delivery attempts before checking if another queue has work to be performed.
      */
     public int getFairFileLimit() {
-        return (fairfilelimit);
+        return fairfilelimit;
     }
 
     /**
      * Get the maximum amount of time spent delivering files before checking if another queue has work to be performed.
      */
     public long getFairTimeLimit() {
-        return (fairtimelimit);
+        return fairtimelimit;
     }
 
     /**
@@ -593,21 +591,21 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @param feedid The feed ID
      * @return The targets this feed should be delivered to
      */
-    public Target[] getTargets(String feedid) {
-        return (config.getTargets(feedid));
+    Target[] getTargets(String feedid) {
+        return config.getTargets(feedid);
     }
 
     /**
      * Get the spool directory for temporary files.
      */
-    public String getSpoolDir() {
-        return (spooldir + "/f");
+    String getSpoolDir() {
+        return spooldir + "/f";
     }
 
     /**
      * Get the spool directory for a subscription.
      */
-    public String getSpoolDir(String subid, String remoteaddr) {
+    String getSpoolDir(String subid, String remoteaddr) {
         if (provcheck.isFrom(remoteaddr)) {
             String sdir = config.getSpoolDir(subid);
             if (sdir != null) {
@@ -617,137 +615,150 @@ public class NodeConfigManager implements DeliveryQueueHelper {
                 eelfLogger.debug("NODE0311 Received subscription reset request for unknown subscription " + subid
                         + " from provisioning server " + remoteaddr);
             }
-            return (sdir);
+            return sdir;
         } else {
             eelfLogger.debug("NODE0312 Received subscription reset request from unexpected server " + remoteaddr);
-            return (null);
+            return null;
         }
     }
 
     /**
      * Get the base directory for spool directories.
      */
-    public String getSpoolBase() {
-        return (spooldir);
+    String getSpoolBase() {
+        return spooldir;
     }
 
     /**
      * Get the key store type.
      */
-    public String getKSType() {
-        return (kstype);
+    String getKSType() {
+        return kstype;
     }
 
     /**
      * Get the key store file.
      */
-    public String getKSFile() {
-        return (ksfile);
+    String getKSFile() {
+        return ksfile;
     }
 
     /**
      * Get the key store password.
      */
-    public String getKSPass() {
-        return (kspass);
+    String getKSPass() {
+        return kspass;
     }
 
     /**
      * Get the key password.
      */
-    public String getKPass() {
-        return (kpass);
+    String getKPass() {
+        return kpass;
+    }
+
+
+    String getTstype() {
+        return tstype;
+    }
+
+    String getTsfile() {
+        return tsfile;
+    }
+
+    String getTspass() {
+        return tspass;
     }
 
     /**
      * Get the http port.
      */
-    public int getHttpPort() {
-        return (gfport);
+    int getHttpPort() {
+        return gfport;
     }
 
     /**
      * Get the https port.
      */
-    public int getHttpsPort() {
-        return (svcport);
+    int getHttpsPort() {
+        return svcport;
     }
 
     /**
      * Get the externally visible https port.
      */
-    public int getExtHttpsPort() {
-        return (port);
+    int getExtHttpsPort() {
+        return port;
     }
 
     /**
      * Get the external name of this machine.
      */
-    public String getMyName() {
-        return (myname);
+    String getMyName() {
+        return myname;
     }
 
     /**
      * Get the number of threads to use for delivery.
      */
-    public int getDeliveryThreads() {
-        return (deliverythreads);
+    int getDeliveryThreads() {
+        return deliverythreads;
     }
 
     /**
      * Get the URL for uploading the event log data.
      */
-    public String getEventLogUrl() {
-        return (eventlogurl);
+    String getEventLogUrl() {
+        return eventlogurl;
     }
 
     /**
      * Get the prefix for the names of event log files.
      */
-    public String getEventLogPrefix() {
-        return (eventlogprefix);
+    String getEventLogPrefix() {
+        return eventlogprefix;
     }
 
     /**
      * Get the suffix for the names of the event log files.
      */
-    public String getEventLogSuffix() {
-        return (eventlogsuffix);
+    String getEventLogSuffix() {
+        return eventlogsuffix;
     }
 
     /**
      * Get the interval between event log file rollovers.
      */
-    public String getEventLogInterval() {
-        return (eventloginterval);
+    String getEventLogInterval() {
+        return eventloginterval;
     }
 
     /**
      * Should I follow redirects from subscribers.
      */
     public boolean isFollowRedirects() {
-        return (followredirects);
+        return followredirects;
     }
 
     /**
      * Get the directory where the event and node log files live.
      */
-    public String getLogDir() {
-        return (logdir);
+    String getLogDir() {
+        return logdir;
     }
 
     /**
      * How long do I keep log files (in milliseconds).
      */
-    public long getLogRetention() {
-        return (logretention);
+    long getLogRetention() {
+        return logretention;
     }
 
     /**
      * Get the timer.
      */
     public Timer getTimer() {
-        return (timer);
+        return timer;
     }
 
     /**
@@ -757,7 +768,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @return The feed ID
      */
     public String getFeedId(String subid) {
-        return (config.getFeedId(subid));
+        return config.getFeedId(subid);
     }
 
     /**
@@ -765,53 +776,46 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      *
      * @return The Authorization string for this node
      */
-    public String getMyAuth() {
-        return (config.getMyAuth());
+    String getMyAuth() {
+        return config.getMyAuth();
     }
 
     /**
      * Get the fraction of free spool disk space where we start throwing away undelivered files.  This is
      * FREE_DISK_RED_PERCENT / 100.0.  Default is 0.05.  Limited by 0.01 <= FreeDiskStart <= 0.5.
      */
-    public double getFreeDiskStart() {
-        return (fdpstart);
+    double getFreeDiskStart() {
+        return fdpstart;
     }
 
     /**
      * Get the fraction of free spool disk space where we stop throwing away undelivered files.  This is
      * FREE_DISK_YELLOW_PERCENT / 100.0.  Default is 0.2.  Limited by FreeDiskStart <= FreeDiskStop <= 0.5.
      */
-    public double getFreeDiskStop() {
-        return (fdpstop);
+    double getFreeDiskStop() {
+        return fdpstop;
     }
 
     /**
      * Disable and enable protocols.
      */
-    public String[] getEnabledprotocols() {
+    String[] getEnabledprotocols() {
         return enabledprotocols;
     }
 
-    public String getAafType() {
+    String getAafType() {
         return aafType;
     }
 
-    public String getAafAction() {
+    String getAafAction() {
         return aafAction;
     }
 
-    /*
-     * Get aafURL from SWM variable
-     * */
-    public String getAafURL() {
-        return aafURL;
-    }
-
-    public boolean getCadiEnabled() {
+    boolean getCadiEnabled() {
         return cadiEnabled;
     }
 
-    public NodeAafPropsUtils getNodeAafPropsUtils() {
+    NodeAafPropsUtils getNodeAafPropsUtils() {
         return nodeAafPropsUtils;
     }
 
@@ -821,7 +825,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @param aafInstance The aaf instance
      * @return The permissions
      */
-    protected String getPermission(String aafInstance) {
+    String getPermission(String aafInstance) {
         try {
             String type = getAafType();
             String action = getAafAction();

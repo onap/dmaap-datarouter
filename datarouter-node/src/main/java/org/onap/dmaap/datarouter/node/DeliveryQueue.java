@@ -224,16 +224,13 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
                 todoindex = 0;
                 todoList = new ArrayList<>();
                 String[] files = dir.list();
-                Arrays.sort(files);
-                scanForNextTask(files);
+                if (files != null) {
+                    Arrays.sort(files);
+                    scanForNextTask(files);
+                }
                 retry = new HashMap<>();
             }
-            DeliveryTask dt = getDeliveryTask(mindate);
-            if (dt != null) {
-                return dt;
-            }
-            return null;
-
+            return getDeliveryTask(mindate);
         }
     }
 

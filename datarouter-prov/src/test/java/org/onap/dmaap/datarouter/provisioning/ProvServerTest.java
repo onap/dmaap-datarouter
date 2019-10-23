@@ -1,4 +1,4 @@
-/*
+/*-
  * ============LICENSE_START=======================================================
  *  Copyright (C) 2019 Nordix Foundation.
  * ================================================================================
@@ -17,25 +17,41 @@
  * SPDX-License-Identifier: Apache-2.0
  * ============LICENSE_END=========================================================
  */
-package org.onap.dmaap.datarouter.node;
+
+package org.onap.dmaap.datarouter.provisioning;
 
 import java.io.File;
 import java.io.IOException;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.onap.dmaap.datarouter.provisioning.utils.AafPropsUtils;
 
-public class NodeAafPropsUtilsTest {
+public class ProvServerTest {
 
-    private NodeAafPropsUtils nodeAafPropsUtils;
+    private AafPropsUtils aafPropsUtils;
 
     @Before
-    public void setUp() throws IOException {
-        nodeAafPropsUtils = new NodeAafPropsUtils(new File("src/test/resources/aaf/org.onap.dmaap-dr.props"));
+    public void setUp() {
+        try {
+            aafPropsUtils = new AafPropsUtils(new File("src/test/resources/aaf/org.onap.dmaap-dr.props"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @BeforeClass
+    public static void init() {
+        System.setProperty(
+            "org.onap.dmaap.datarouter.provserver.properties",
+            "src/test/resources/h2Database.properties");
     }
 
     @Test
-    public void Veirfy_Aaf_Pass_Decryp_Successful() {
-        Assert.assertEquals("tVac2#@Stx%tIOE^x[c&2fgZ", nodeAafPropsUtils.getDecryptedPass("cadi_keystore_password"));
+    public void Verify_Prov_Server_Is_Configured_Correctly() throws IllegalAccessException {
+        FieldUtils.writeDeclaredStaticField(ProvRunner.class, "aafPropsUtils", aafPropsUtils, true);
+        Assert.assertNotNull(ProvServer.getServerInstance());
     }
 }

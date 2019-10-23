@@ -130,7 +130,7 @@ public class NodeServlet extends HttpServlet {
             } else if (path.startsWith("/internal/resetSubscription/")) {
                 String subid = path.substring(28);
                 if (subid.length() != 0 && subid.indexOf('/') == -1) {
-                    NodeMain.resetQueue(subid, ip);
+                    NodeServer.resetQueue(subid, ip);
                     resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
                     return;
                 }

@@ -87,10 +87,6 @@ public class ProxyServlet extends BaseServlet {
             // Set up truststore
             store = ProvRunner.getAafPropsUtils().getTruststorePathProperty();
             pass = ProvRunner.getAafPropsUtils().getTruststorePassProperty();
-            if (store == null || store.length() == 0) {
-                store = AafPropsUtils.DEFAULT_TRUSTSTORE;
-                pass = "changeit";
-            }
             KeyStore trustStore = readStore(store, pass, AafPropsUtils.TRUESTSTORE_TYPE_PROPERTY);
 
             // We are connecting with the node name, but the certificate will have the CNAME

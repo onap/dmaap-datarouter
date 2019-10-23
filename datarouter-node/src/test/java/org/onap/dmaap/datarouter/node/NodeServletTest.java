@@ -307,7 +307,7 @@ public class NodeServletTest {
         when(config.isDeletePermitted("1")).thenReturn(true);
         when(config.getAllDests()).thenReturn(new DestInfo[0]);
         FieldUtils.writeDeclaredStaticField(NodeServlet.class, "config", config, true);
-        FieldUtils.writeDeclaredStaticField(NodeMain.class, "nodeConfigManager", config, true);
+        FieldUtils.writeDeclaredStaticField(NodeRunner.class, "nodeConfigManager", config, true);
         PowerMockito.when(NodeConfigManager.getInstance()).thenReturn(config);
     }
 
@@ -318,7 +318,7 @@ public class NodeServletTest {
         when(config.isConfigured()).thenReturn(true);
         when(config.isDeletePermitted("1")).thenReturn(false);
         FieldUtils.writeDeclaredStaticField(NodeServlet.class, "config", config, true);
-        FieldUtils.writeDeclaredStaticField(NodeMain.class, "nodeConfigManager", config, true);
+        FieldUtils.writeDeclaredStaticField(NodeRunner.class, "nodeConfigManager", config, true);
         PowerMockito.when(NodeConfigManager.getInstance()).thenReturn(config);
     }
 
@@ -329,14 +329,14 @@ public class NodeServletTest {
         when(config.isConfigured()).thenReturn(true);
         when(config.isDeletePermitted("1")).thenThrow(new NullPointerException());
         FieldUtils.writeDeclaredStaticField(NodeServlet.class, "config", config, true);
-        FieldUtils.writeDeclaredStaticField(NodeMain.class, "nodeConfigManager", config, true);
+        FieldUtils.writeDeclaredStaticField(NodeRunner.class, "nodeConfigManager", config, true);
         PowerMockito.when(NodeConfigManager.getInstance()).thenReturn(config);
     }
 
     private void setUpNodeMainDelivery() throws IllegalAccessException{
         Delivery delivery = mock(Delivery.class);
         doNothing().when(delivery).resetQueue(anyObject());
-        FieldUtils.writeDeclaredStaticField(NodeMain.class, "delivery", delivery, true);
+        FieldUtils.writeDeclaredStaticField(NodeServer.class, "delivery", delivery, true);
     }
 
     private void setNodeConfigManagerIsConfiguredToReturnFalse() throws IllegalAccessException{

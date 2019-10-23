@@ -117,10 +117,11 @@ public class DRRouteCLI {
     public DRRouteCLI(String server) throws Exception {
         this.server = server;
         this.httpclient = new DefaultHttpClient();
+        AafPropsUtils aafPropsUtils = null;
 
         Properties provProperties = ProvRunner.getProvProperties();
         try {
-            AafPropsUtils.init(new File(provProperties.getProperty(
+            aafPropsUtils = new AafPropsUtils(new File(provProperties.getProperty(
                 "org.onap.dmaap.datarouter.provserver.aafprops.path",
                 "/opt/app/osaaf/local/org.onap.dmaap-dr.props")));
         } catch (IOException e) {
@@ -128,8 +129,8 @@ public class DRRouteCLI {
             exit(1);
         }
 
-        String truststoreFile = AafPropsUtils.getInstance().getTruststorePathProperty();
-        String truststorePw = AafPropsUtils.getInstance().getTruststorePassProperty();
+        String truststoreFile = aafPropsUtils.getTruststorePathProperty();
+        String truststorePw = aafPropsUtils.getTruststorePassProperty();
 
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
         if (truststoreFile == null || truststoreFile.equals("")) {

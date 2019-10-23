@@ -309,10 +309,9 @@ public class LogbackFilterTest {
 
     }
 
-
     @Test
     public void Given_call_to_EelfMsgs_return_the_correct_enum(){
-        assertEquals(MESSAGE_WITH_BEHALF.toString(), "MESSAGE_WITH_BEHALF");
+        assertEquals("MESSAGE_WITH_BEHALF", MESSAGE_WITH_BEHALF.toString());
     }
 
 }
