@@ -234,7 +234,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>org.onap.dmaap.datarouter.node.NodeMain</mainClass>
+                            <mainClass>org.onap.dmaap.datarouter.node.NodeRunner</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
