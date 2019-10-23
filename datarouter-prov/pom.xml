@@ -407,7 +407,7 @@
                     <excludes>
                         <exclude>**/src/main/java/org/onap/dmaap/datarouter/reports/**</exclude>
                         <exclude>src/main/java/org/onap/dmaap/datarouter/authz/impl/AuthRespSupplementImpl.java</exclude>
-                        <exclude>src/main/java/org/onap/dmaap/datarouter/provisioning/Main.java</exclude>
+                        <exclude>src/main/java/org/onap/dmaap/datarouter/provisioning/ProvRunner.java</exclude>
                         <exclude>src/main/java/org/onap/dmaap/datarouter/provisioning/utils/DRRouteCLI.java</exclude>
                     </excludes>
                 </configuration>
