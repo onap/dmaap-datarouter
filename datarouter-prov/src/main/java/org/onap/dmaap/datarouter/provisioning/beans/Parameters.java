@@ -108,8 +108,8 @@ public class Parameters extends Syncable {
     public static Collection<Parameters> getParameterCollection() {
         Collection<Parameters> coll = new ArrayList<>();
         try (Connection conn = ProvDbUtils.getInstance().getConnection();
-            PreparedStatement ps = conn.prepareStatement("select * from PARAMETERS")) {
-            ResultSet rs = ps.executeQuery();
+            PreparedStatement ps = conn.prepareStatement("select * from PARAMETERS");
+            ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Parameters param = new Parameters(rs);
                 coll.add(param);
@@ -132,9 +132,10 @@ public class Parameters extends Syncable {
             PreparedStatement stmt = conn.prepareStatement(
                 "select KEYNAME, VALUE from PARAMETERS where KEYNAME = ?")) {
             stmt.setString(1, key);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                val = new Parameters(rs);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    val = new Parameters(rs);
+                }
             }
         } catch (SQLException e) {
             intlogger.error(SQLEXCEPTION + e.getMessage(), e);

@@ -53,7 +53,6 @@ import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
  */
 public class NodeConfigManager implements DeliveryQueueHelper {
 
-    private static final String CHANGE_ME = "changeme";
     private static final String NODE_CONFIG_MANAGER = "NodeConfigManager";
     private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(NodeConfigManager.class);
     private static NodeConfigManager base = new NodeConfigManager();
@@ -103,7 +102,6 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private String aafType;
     private String aafInstance;
     private String aafAction;
-    private String aafURL;
     private boolean cadiEnabled;
     private NodeAafPropsUtils nodeAafPropsUtils;
 
@@ -141,7 +139,6 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         aafInstance = drNodeProperties.getProperty("AAFInstance", "legacy");
         aafAction = drNodeProperties.getProperty("AAFAction", "publish");
         cadiEnabled = Boolean.parseBoolean(drNodeProperties.getProperty("CadiEnabled", "false"));
-        aafURL = nodeAafPropsUtils.getPropAccess().getProperty("aaf_locate_url", "https://aaf-locate:8095");
         /*
          * END - AAF changes: TDP EPIC US# 307413
          * Pull AAF settings from node.properties
@@ -300,7 +297,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private void fetchconfig() {
         try {
             eelfLogger.debug("NodeConfigMan.fetchConfig: provurl:: " + provurl);
-            Reader reader = new InputStreamReader((new URL(provurl)).openStream());
+            URL url = new URL(provurl);
+            Reader reader = new InputStreamReader(url.openStream());
             config = new NodeConfig(new ProvData(reader), myname, spooldir, port, nak);
             localconfig();
             configtasks.startRun();
@@ -659,6 +657,19 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         return (kpass);
     }
 
+
+    public String getTstype() {
+        return tstype;
+    }
+
+    public String getTsfile() {
+        return tsfile;
+    }
+
+    public String getTspass() {
+        return tspass;
+    }
+
     /**
      * Get the http port.
      */
@@ -798,13 +809,6 @@ public class NodeConfigManager implements DeliveryQueueHelper {
 
     public String getAafAction() {
         return aafAction;
-    }
-
-    /*
-     * Get aafURL from SWM variable
-     * */
-    public String getAafURL() {
-        return aafURL;
     }
 
     public boolean getCadiEnabled() {

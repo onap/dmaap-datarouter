@@ -32,8 +32,7 @@ public class AafPropsUtilsTest {
 
     @BeforeClass
     public static void init() throws Exception {
-        AafPropsUtils.init(new File("src/test/resources/aaf/org.onap.dmaap-dr.props"));
-        aafPropsUtils = AafPropsUtils.getInstance();
+        aafPropsUtils = new AafPropsUtils(new File("src/test/resources/aaf/org.onap.dmaap-dr.props"));
     }
 
     @Test

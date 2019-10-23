@@ -23,6 +23,9 @@ package org.onap.dmaap.datarouter.node;
 import java.io.ByteArrayOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,6 +44,8 @@ public class DeliveryTaskTest {
 
     @Mock
     private DeliveryQueue deliveryQueue;
+
+    private ExecutorService executorService;
 
     @Before
     public void setUp() throws Exception {
@@ -86,15 +91,23 @@ public class DeliveryTaskTest {
     }
 
     @Test
-    public void Validate_Delivery_Tasks_Success_For_Standard_File() {
+    public void Validate_Delivery_Tasks_Success_For_Standard_File() throws InterruptedException {
         DeliveryTask task = new DeliveryTask(deliveryQueue, "123456789.test-dr-node");
-        task.run();
+        executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(task);
+
+        executorService.shutdown();
+        executorService.awaitTermination(2, TimeUnit.SECONDS);
     }
 
     @Test
-    public void Validate_Delivery_Tasks_Success_For_Compressed_File() {
+    public void Validate_Delivery_Tasks_Success_For_Compressed_File() throws InterruptedException {
         DeliveryTask task = new DeliveryTask(deliveryQueue, "123456789.test-dr-node.gz");
-        task.run();
+        executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(task);
+
+        executorService.shutdown();
+        executorService.awaitTermination(2, TimeUnit.SECONDS);
     }
 
     private DestInfo getPrivDestInfo() {

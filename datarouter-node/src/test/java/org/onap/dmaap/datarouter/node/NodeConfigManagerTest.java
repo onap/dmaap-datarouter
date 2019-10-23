@@ -39,8 +39,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({InetAddress.class, URL.class})
 public class NodeConfigManagerTest {
 
-    private NodeConfigManager nodeConfigManager = NodeConfigManager.getInstance();
-
     @BeforeClass
     public static void init() {
         System.setProperty("org.onap.dmaap.datarouter.node.properties", "src/test/resources/node_test.properties");
@@ -54,6 +52,7 @@ public class NodeConfigManagerTest {
 
     @Test
     public void Verify_NodeConfigMan_Getters() {
+        NodeConfigManager nodeConfigManager = NodeConfigManager.getInstance();
         Assert.assertEquals("legacy", nodeConfigManager.getAafInstance());
         Assert.assertEquals("src/test/resources/spool/f", nodeConfigManager.getSpoolDir());
         Assert.assertEquals("src/test/resources/spool", nodeConfigManager.getSpoolBase());
@@ -70,10 +69,8 @@ public class NodeConfigManagerTest {
         Assert.assertEquals(new String[] {"TLSv1.1", "TLSv1.2"}, nodeConfigManager.getEnabledprotocols());
         Assert.assertEquals("org.onap.dmaap-dr.feed", nodeConfigManager.getAafType());
         Assert.assertEquals("publish", nodeConfigManager.getAafAction());
-        Assert.assertEquals("https://aaf-locate:8095", nodeConfigManager.getAafURL());
         Assert.assertFalse(nodeConfigManager.getCadiEnabled());
         Assert.assertFalse(nodeConfigManager.isShutdown());
         Assert.assertFalse(nodeConfigManager.isConfigured());
     }
-
 }
