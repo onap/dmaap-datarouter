@@ -45,7 +45,7 @@ class NodeAafPropsUtils {
     String getDecryptedPass(String password) {
         String decryptedPass = "";
         try {
-            decryptedPass = getPropAccess().decrypt(getPropAccess().getProperty(password), false);
+            decryptedPass = propAccess.decrypt(propAccess.getProperty(password), false);
         } catch (IOException e) {
             eelfLogger.error("Failed to decrypt " + password + " : " + e.getMessage(), e);
         }

@@ -29,10 +29,8 @@ import org.onap.aaf.cadi.PropAccess;
 
 public class AafPropsUtils {
 
-    private static AafPropsUtils aafPropsUtilsInstance = null;
     private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(AafPropsUtils.class);
 
-    public static final String DEFAULT_TRUSTSTORE = "/opt/app/osaaf/local/org.onap.dmaap-dr.trust.jks";
     public static final String KEYSTORE_TYPE_PROPERTY = "PKCS12";
     public static final String TRUESTSTORE_TYPE_PROPERTY = "jks";
     private static final String KEYSTORE_PATH_PROPERTY = "cadi_keystore";
@@ -42,7 +40,7 @@ public class AafPropsUtils {
 
     private PropAccess propAccess;
 
-    private AafPropsUtils(File propsFile) throws IOException {
+    public AafPropsUtils(File propsFile) throws IOException {
         propAccess = new PropAccess();
         try {
             propAccess.load(new FileInputStream(propsFile));
@@ -50,20 +48,6 @@ public class AafPropsUtils {
             eelfLogger.error("Failed to load props file: " + propsFile + "\n" + e.getMessage(), e);
             throw e;
         }
-    }
-
-    public static synchronized void init(File propsFile) throws IOException {
-        if (aafPropsUtilsInstance != null) {
-            throw new IllegalStateException("Already initialized");
-        }
-        aafPropsUtilsInstance = new AafPropsUtils(propsFile);
-    }
-
-    public static AafPropsUtils getInstance() {
-        if (aafPropsUtilsInstance == null) {
-            throw new IllegalStateException("Call AafPropsUtils.init(File propsFile) first");
-        }
-        return aafPropsUtilsInstance;
     }
 
     private String decryptedPass(String password) {
@@ -77,9 +61,6 @@ public class AafPropsUtils {
     }
 
     public PropAccess getPropAccess() {
-        if (propAccess == null) {
-            throw new IllegalStateException("Call AafPropsUtils.init(File propsFile) first");
-        }
         return propAccess;
     }
 
