@@ -1,0 +1,9 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: James Cuddy <james.cuddy@est.tech>
+Code-Review+2: sunil unnava <su622b@att.com>
+Code-Review+1: Andy Walshe <andy.walshe@est.tech>
+Submitted-by: Fiachra Corcoran <fiachra.corcoran@est.tech>
+Submitted-at: Thu, 31 Oct 2019 13:56:15 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/dmaap/datarouter/+/97486
+Project: dmaap/datarouter
+Branch: refs/heads/master
