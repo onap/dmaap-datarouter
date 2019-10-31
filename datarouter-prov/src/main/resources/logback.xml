@@ -310,7 +310,7 @@
     </rollingPolicy>
     <triggeringPolicy
       class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-      <maxFileSize>5MB</maxFileSize>
+      <maxFileSize>50MB</maxFileSize>
     </triggeringPolicy>
     <encoder>
       <pattern>${jettyLoggerPattern}</pattern>
@@ -364,7 +364,7 @@
           <appender-ref ref="asyncEELFError" />
       </logger>
 
-     <logger name="log4j.logger.org.eclipse.jetty" additivity="false" level="info">
+     <logger name="log4j.logger.org.eclipse.jetty" additivity="false" level="error">
         <appender-ref ref="asyncEELFjettylog"/>
     </logger>
 
@@ -400,7 +400,7 @@
 
 
 
-  <root level="TRACE">
+  <root level="INFO">
     <appender-ref ref="asyncEELF" />
     <appender-ref ref="asyncEELFError" />
     <appender-ref ref="asyncEELFjettylog" />

@@ -66,7 +66,6 @@ public class Delivery {
         this.config = config;
         Runnable cmon = this::checkconfig;
         config.registerConfigTask(cmon);
-        checkconfig();
     }
 
     /**
