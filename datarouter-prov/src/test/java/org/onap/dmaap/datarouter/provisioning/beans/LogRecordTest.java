@@ -42,14 +42,15 @@ public class LogRecordTest {
 
     private static EntityManagerFactory emf;
     private static EntityManager em;
+    private static ProvDbUtils provDbUtils;
 
     @BeforeClass
     public static void init() {
         emf = Persistence.createEntityManagerFactory("dr-unit-tests");
         em = emf.createEntityManager();
         System.setProperty(
-                "org.onap.dmaap.datarouter.provserver.properties",
-                "src/test/resources/h2Database.properties");
+            "org.onap.dmaap.datarouter.provserver.properties",
+            "src/test/resources/h2Database.properties");
     }
 
     @AfterClass
@@ -61,7 +62,7 @@ public class LogRecordTest {
 
     @Before
     public void setUp() throws ParseException, SQLException {
-
+        provDbUtils = ProvDbUtils.getInstance();
     }
 
     @Test
@@ -95,19 +96,18 @@ public class LogRecordTest {
         System.setOut(new PrintStream(outContent));
         String[] rlebitset = {"0-1,2-2"};
         LogRecord.printLogRecords(System.out, new RLEBitSet(rlebitset[0]));
-        Assert.assertEquals(outContent.toString().substring(25), "LOG|ID|1|URL/file123|PUT|application/vnd.dmaap-dr.log-list; version=1.0|100|pub|1|172.0.0.8|user|204|1|1|204|0|other|1|0\n");
+        Assert.assertEquals("LOG|ID|1|URL/file123|PUT|application/vnd.dmaap-dr.log-list; version=1.0|100|pub|1|172.0.0.8|user|204|1|1|204|0|other|1|0\n", outContent.toString().substring(25));
     }
 
     private void setArgsLoadAndAssertEquals(String type, String s) throws ParseException, SQLException {
         String[] args = {"2018-08-29-10-10-10-543.", "LOG", "ID", "1", "URL/file123", "PUT", "application/vnd.dmaap-.log-list; version=1.0", "100", type, "1", "172.0.0.8", "user", "204", "1", "1", "204", "0", "other", "1", "100", "file123"};
         LogRecord logRecord = new LogRecord(args);
-        try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
-            PreparedStatement ps = conn.prepareStatement(
-                "insert into LOG_RECORDS values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        String compare_string;
+        try (Connection conn = provDbUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(
+            "insert into LOG_RECORDS values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
             logRecord.load(ps);
-            String compare_string = ps.toString().substring(ps.toString().indexOf("{1:"), ps.toString().indexOf("2:")) + ps
-                .toString().substring(ps.toString().indexOf("3:"));
-            Assert.assertEquals(compare_string, s);
+            compare_string = ps.toString().substring(ps.toString().indexOf("{1:"), ps.toString().indexOf(", 2:")) + ps.toString().substring(ps.toString().indexOf(", 3:"));
         }
+        Assert.assertEquals(s, compare_string);
     }
 }
