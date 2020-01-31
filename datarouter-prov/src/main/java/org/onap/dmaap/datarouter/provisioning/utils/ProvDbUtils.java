@@ -25,7 +25,10 @@ import static java.lang.System.exit;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.LineNumberReader;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -66,12 +69,32 @@ public class ProvDbUtils {
         Class.forName((String) props.get("org.onap.dmaap.datarouter.db.driver"));
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setUrl((String) props.get("org.onap.dmaap.datarouter.db.url"));
-        dataSource.setUsername((String) props.get("org.onap.dmaap.datarouter.db.login"));
-        dataSource.setPassword((String) props.get("org.onap.dmaap.datarouter.db.password"));
+        dataSource.setPassword(getValueFromDbProperties("org.onap.dmaap.datarouter.db.login"));
+        dataSource.setPassword(getValueFromDbProperties("org.onap.dmaap.datarouter.db.password"));
         dataSource.setMinIdle(5);
         dataSource.setMaxIdle(15);
         dataSource.setMaxOpenPreparedStatements(100);
         return dataSource;
+    }
+
+    private static String getValueFromDbProperties(final String value) {
+        Properties properties = loadDbProperties();
+        String prop = (String) properties.get(value);
+        if (prop != null && prop.matches("[$][{].*[}]")) {
+            return System.getenv(prop.substring(2, prop.length() - 1));
+        } else {
+            return (String) properties.get(value);
+        }
+    }
+
+    private static Properties loadDbProperties() {
+        Properties prop = new Properties();
+        try (InputStream input = new FileInputStream("src/main/resources/dbsecrets.properties")) {
+            prop.load(input);
+        } catch (IOException ex) {
+            intLogger.error("Unable to find dbsecrets.properties. Error: " + ex.getMessage());
+        }
+        return prop;
     }
 
     public Connection getConnection() throws SQLException {
