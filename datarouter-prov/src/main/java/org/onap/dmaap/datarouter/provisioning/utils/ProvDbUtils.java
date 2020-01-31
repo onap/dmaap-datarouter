@@ -67,7 +67,11 @@ public class ProvDbUtils {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setUrl((String) props.get("org.onap.dmaap.datarouter.db.url"));
         dataSource.setUsername((String) props.get("org.onap.dmaap.datarouter.db.login"));
-        dataSource.setPassword((String) props.get("org.onap.dmaap.datarouter.db.password"));
+        if(((String) props.get("org.onap.dmaap.datarouter.db.password")).matches("[$][{].*[}]")){
+            dataSource.setPassword(System.getenv("datarouter"));
+        }else {
+            dataSource.setPassword((String) props.get("org.onap.dmaap.datarouter.db.password"));
+        }
         dataSource.setMinIdle(5);
         dataSource.setMaxIdle(15);
         dataSource.setMaxOpenPreparedStatements(100);
