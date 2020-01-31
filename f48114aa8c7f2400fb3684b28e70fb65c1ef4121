@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3cb82c13_4221f960",
+        "filename": "datarouter-docker-compose/src/main/resources/prov_data/provserver.properties",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4965
+      },
+      "writtenOn": "2020-01-31T14:37:36Z",
+      "side": 1,
+      "message": "unrelated please remove",
+      "revId": "f48114aa8c7f2400fb3684b28e70fb65c1ef4121",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2da60b9f_d558b58a",
+        "filename": "datarouter-prov/src/main/resources/provserver.properties",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 4965
+      },
+      "writtenOn": "2020-01-31T14:37:36Z",
+      "side": 1,
+      "message": "unrelated",
+      "revId": "f48114aa8c7f2400fb3684b28e70fb65c1ef4121",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
