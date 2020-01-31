@@ -66,12 +66,20 @@ public class ProvDbUtils {
         Class.forName((String) props.get("org.onap.dmaap.datarouter.db.driver"));
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setUrl((String) props.get("org.onap.dmaap.datarouter.db.url"));
-        dataSource.setUsername((String) props.get("org.onap.dmaap.datarouter.db.login"));
-        dataSource.setPassword((String) props.get("org.onap.dmaap.datarouter.db.password"));
+        dataSource.setPassword(getValue(props, "org.onap.dmaap.datarouter.db.login"));
+        dataSource.setPassword(getValue(props, "org.onap.dmaap.datarouter.db.password"));
         dataSource.setMinIdle(5);
         dataSource.setMaxIdle(15);
         dataSource.setMaxOpenPreparedStatements(100);
         return dataSource;
+    }
+
+    private static String getValue(final Properties props, final String value) {
+        String prop = (String) props.get(value);
+        if (prop != null && prop.matches("[$][{].*[}]$")) {
+            return System.getenv(prop.substring(2, prop.length() - 1));
+        }
+        return prop;
     }
 
     public Connection getConnection() throws SQLException {
@@ -130,7 +138,7 @@ public class ProvDbUtils {
      * sql_init_NN.sql
      *
      * @param connection a DB connection
-     * @param scriptId the number of the sql_init_NN.sql script to run
+     * @param scriptId   the number of the sql_init_NN.sql script to run
      */
     private void runInitScript(Connection connection, int scriptId) {
         String scriptDir = ProvRunner.getProvProperties().getProperty("org.onap.dmaap.datarouter.provserver.dbscripts");
