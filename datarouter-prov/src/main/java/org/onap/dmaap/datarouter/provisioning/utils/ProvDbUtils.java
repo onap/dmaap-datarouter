@@ -67,11 +67,22 @@ public class ProvDbUtils {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setUrl((String) props.get("org.onap.dmaap.datarouter.db.url"));
         dataSource.setUsername((String) props.get("org.onap.dmaap.datarouter.db.login"));
-        dataSource.setPassword((String) props.get("org.onap.dmaap.datarouter.db.password"));
+        dataSource.setPassword(getEnv(props, "password"));
         dataSource.setMinIdle(5);
         dataSource.setMaxIdle(15);
         dataSource.setMaxOpenPreparedStatements(100);
         return dataSource;
+    }
+
+    private static String getEnv(Properties props, final String value) {
+        String env;
+        String prop = (String) props.get("org.onap.dmaap.datarouter.db." + value);
+        if(prop != null && prop.matches("[$][{].*[}]")){
+            env = System.getenv(prop.substring(2, prop.length()-1));
+        }else {
+            env = (String) props.get("org.onap.dmaap.datarouter.db." + value);
+        }
+        return env;
     }
 
     public Connection getConnection() throws SQLException {
