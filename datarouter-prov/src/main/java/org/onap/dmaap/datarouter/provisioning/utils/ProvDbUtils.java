@@ -66,7 +66,7 @@ public class ProvDbUtils {
         Class.forName((String) props.get("org.onap.dmaap.datarouter.db.driver"));
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setUrl((String) props.get("org.onap.dmaap.datarouter.db.url"));
-        dataSource.setUsername((String) props.get("org.onap.dmaap.datarouter.db.login"));
+        dataSource.setPassword(getEnv(props, "login"));
         dataSource.setPassword(getEnv(props, "password"));
         dataSource.setMinIdle(5);
         dataSource.setMaxIdle(15);
