@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "00f2ccb3_a1d077bd",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2020-02-03T17:34:38Z",
+      "side": 1,
+      "message": "If \"login\" needs to be included, merge the 2 commits into this one.",
+      "range": {
+        "startLine": 69,
+        "startChar": 30,
+        "endLine": 70,
+        "endChar": 51
+      },
+      "revId": "0cfe04d08020678f0b418bd898ca3aa154b1ade2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c0639bc0_88c24562",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2020-02-03T17:34:38Z",
+      "side": 1,
+      "message": "getDbEnvVar",
+      "range": {
+        "startLine": 77,
+        "startChar": 26,
+        "endLine": 77,
+        "endChar": 31
+      },
+      "revId": "0cfe04d08020678f0b418bd898ca3aa154b1ade2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7eba59ac_042bd049",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2020-02-03T17:34:38Z",
+      "side": 1,
+      "message": "How robust is this. Will the helm charts be set and maintained by the owner?",
+      "range": {
+        "startLine": 80,
+        "startChar": 40,
+        "endLine": 80,
+        "endChar": 52
+      },
+      "revId": "0cfe04d08020678f0b418bd898ca3aa154b1ade2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aede9d3c_5839c32c",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2020-02-03T17:34:38Z",
+      "side": 1,
+      "message": "Try to format the code using the onap checkstyle checks.\nhttps://wiki.onap.org/display/DW/Configure+Onap+Code+Style+for+Idea+IDE",
+      "range": {
+        "startLine": 80,
+        "startChar": 9,
+        "endLine": 80,
+        "endChar": 11
+      },
+      "revId": "0cfe04d08020678f0b418bd898ca3aa154b1ade2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da9c57c0_a08644ef",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2020-02-03T17:34:38Z",
+      "side": 1,
+      "message": "Again, how robust is this?\nIs this the way forward for all k8s secrets in ONAP?",
+      "range": {
+        "startLine": 81,
+        "startChar": 46,
+        "endLine": 81,
+        "endChar": 66
+      },
+      "revId": "0cfe04d08020678f0b418bd898ca3aa154b1ade2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eef95fb6_3d222a80",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2020-02-03T17:34:38Z",
+      "side": 1,
+      "message": "Prefer to have multiple exit points.\n\n    private static String getEnv(Properties props, final String value) {\n        String prop \u003d (String) props.get(\"org.onap.dmaap.datarouter.db.\" + value);\n        if (prop !\u003d null \u0026\u0026 prop.matches(\"[$][{].*[}]\")) {\n            return System.getenv(prop.substring(2, prop.length() - 1));\n        }\n        return (String) props.get(\"org.onap.dmaap.datarouter.db.\" + value);",
+      "range": {
+        "startLine": 82,
+        "startChar": 8,
+        "endLine": 82,
+        "endChar": 15
+      },
+      "revId": "0cfe04d08020678f0b418bd898ca3aa154b1ade2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
