@@ -48,6 +48,47 @@
     },
     {
       "key": {
+        "uuid": "b5f26838_f87e8461",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 4965
+      },
+      "writtenOn": "2020-02-03T22:01:43Z",
+      "side": 1,
+      "message": "why not keep this function generic?",
+      "parentUuid": "c0639bc0_88c24562",
+      "range": {
+        "startLine": 77,
+        "startChar": 26,
+        "endLine": 77,
+        "endChar": 31
+      },
+      "revId": "0cfe04d08020678f0b418bd898ca3aa154b1ade2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "800e0aa5_d9603a1e",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 4965
+      },
+      "writtenOn": "2020-02-03T22:01:43Z",
+      "side": 1,
+      "message": "oh no please don\u0027t do this. Just pass a whole string as an argument",
+      "revId": "0cfe04d08020678f0b418bd898ca3aa154b1ade2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7eba59ac_042bd049",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
         "patchSetId": 3
@@ -94,6 +135,54 @@
     },
     {
       "key": {
+        "uuid": "97e8f305_0273a53b",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4965
+      },
+      "writtenOn": "2020-02-03T22:01:43Z",
+      "side": 1,
+      "message": "It\u0027s a general convention I\u0027d say. For example if you use spring you get this functionality for free.",
+      "parentUuid": "7eba59ac_042bd049",
+      "range": {
+        "startLine": 80,
+        "startChar": 40,
+        "endLine": 80,
+        "endChar": 52
+      },
+      "revId": "0cfe04d08020678f0b418bd898ca3aa154b1ade2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f89a5913_4b5ab64f",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4965
+      },
+      "writtenOn": "2020-02-03T22:01:43Z",
+      "side": 1,
+      "message": "agree",
+      "parentUuid": "aede9d3c_5839c32c",
+      "range": {
+        "startLine": 80,
+        "startChar": 9,
+        "endLine": 80,
+        "endChar": 11
+      },
+      "revId": "0cfe04d08020678f0b418bd898ca3aa154b1ade2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da9c57c0_a08644ef",
         "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
         "patchSetId": 3
@@ -105,6 +194,30 @@
       "writtenOn": "2020-02-03T17:34:38Z",
       "side": 1,
       "message": "Again, how robust is this?\nIs this the way forward for all k8s secrets in ONAP?",
+      "range": {
+        "startLine": 81,
+        "startChar": 46,
+        "endLine": 81,
+        "endChar": 66
+      },
+      "revId": "0cfe04d08020678f0b418bd898ca3aa154b1ade2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4f16a90e_136f855a",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 4965
+      },
+      "writtenOn": "2020-02-03T22:01:43Z",
+      "side": 1,
+      "message": "So in general every project may choose if they want to use environment variable or a separate file in the in-memory volume. Both are considered to be secure enough.\n\nIf you prefer to move DB properties to a separate file that will be provided as a tmpfs volume I\u0027m fine with that just let us know.",
+      "parentUuid": "da9c57c0_a08644ef",
       "range": {
         "startLine": 81,
         "startChar": 46,
