@@ -34,6 +34,24 @@
       "revId": "11c3898011938867d7702b16db86fb027fa06d77",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f199674_36b5a050",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/PasswordProcessor.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4965
+      },
+      "writtenOn": "2020-02-04T15:06:44Z",
+      "side": 1,
+      "message": "Hmm personally I\u0027d say that as long as this is not a part of API (and it\u0027s not) and there is no usage of this class in the open source code, it should be removed. If anyone has some proprietary changes that are using this, they should be aware of the risk that it may be removed.\n\nOtherwise we would end up in a situation that we cannot remove any single class form ONAP because some proprietary changes may be always using that class",
+      "parentUuid": "81ba91c3_ae429da8",
+      "revId": "11c3898011938867d7702b16db86fb027fa06d77",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
