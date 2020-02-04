@@ -315,10 +315,7 @@ public class SubscriptionServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
-            if (intlogger.isDebugEnabled()) {
-                intlogger.debug(jo.toString());
-            }
-            Subscription sub = null;
+            Subscription sub;
             try {
                 sub = new Subscription(jo);
             } catch (InvalidObjectException e) {

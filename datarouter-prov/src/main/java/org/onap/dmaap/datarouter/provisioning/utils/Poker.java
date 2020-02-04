@@ -41,7 +41,7 @@ import java.util.TreeSet;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-
+import org.onap.dmaap.datarouter.provisioning.BaseServlet;
 import org.onap.dmaap.datarouter.provisioning.ProvRunner;
 import org.onap.dmaap.datarouter.provisioning.beans.EgressRoute;
 import org.onap.dmaap.datarouter.provisioning.beans.Feed;
@@ -50,7 +50,6 @@ import org.onap.dmaap.datarouter.provisioning.beans.IngressRoute;
 import org.onap.dmaap.datarouter.provisioning.beans.NetworkRoute;
 import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
-import org.onap.dmaap.datarouter.provisioning.BaseServlet;
 
 /**
  * This class handles the two timers (described in R1 Design Notes), and takes care of issuing the GET to each node of
@@ -252,7 +251,7 @@ public class Poker extends TimerTask {
         if (intv != null) {
             ivals.addAll(Arrays.asList(intv.split("\\|")));
         }
-        for (String key : new TreeSet<String>(props.keySet())) {
+        for (String key : new TreeSet<>(props.keySet())) {
             String val = props.get(key);
             sb.append(pfx);
             sb.append("  \"").append(key).append("\": ");

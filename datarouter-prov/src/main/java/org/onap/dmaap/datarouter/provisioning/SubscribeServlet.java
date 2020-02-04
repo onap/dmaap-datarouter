@@ -241,9 +241,6 @@ public class SubscribeServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
-            if (intlogger.isDebugEnabled()) {
-                intlogger.debug(jo.toString());
-            }
             if (++activeSubs > maxSubs) {
                 activeSubs--;
                 message = "Cannot create subscription; the maximum number of subscriptions has been configured.";

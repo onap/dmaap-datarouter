@@ -322,21 +322,20 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
 
     /**
      * Read the request's input stream and return a JSONObject from it.
-     *
      * @param req the HTTP request
      * @return the JSONObject, or null if the stream cannot be parsed
      */
     JSONObject getJSONfromInput(HttpServletRequest req) {
-        JSONObject jo = null;
+        JSONObject jo = new JSONObject();
         try {
             jo = new JSONObject(new JSONTokener(req.getInputStream()));
             if (intlogger.isDebugEnabled()) {
-                intlogger.debug("JSON: " + jo.toString());
+                intlogger.debug("JSON: " + maskJSON(jo, "password",true));
             }
         } catch (Exception e) {
             intlogger.info("Error reading JSON: " + e);
         }
-        return jo;
+        return maskJSON(jo, "password", false);
     }
 
     /**
@@ -348,7 +347,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
      * @param action  whether to mask the key or unmask it in a JSON passed.
      * @return the JSONObject, or null if the stream cannot be parsed.
      */
-    static JSONObject maskJSON(JSONObject jo, String maskKey, boolean action) {
+    public static JSONObject maskJSON(JSONObject jo, String maskKey, boolean action) {
         if (!jo.isNull("authorization")) {
             JSONArray endpointIds = jo.getJSONObject("authorization").getJSONArray("endpoint_ids");
             for (int index = 0; index < endpointIds.length(); index++) {
@@ -357,6 +356,11 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                     processPassword(maskKey, action, endpointIds, index, password);
                 }
             }
+        }
+        if (!jo.isNull("delivery")) {
+            JSONObject deliveryObj = jo.getJSONObject("delivery");
+            String password = deliveryObj.get(maskKey).toString();
+            processPassword(maskKey, action, deliveryObj, password);
         }
         return jo;
     }
@@ -368,6 +372,18 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
                 endpointIds.getJSONObject(index).put(maskKey, PasswordProcessor.encrypt(password));
             } else {
                 endpointIds.getJSONObject(index).put(maskKey, PasswordProcessor.decrypt(password));
+            }
+        } catch (JSONException | GeneralSecurityException e) {
+            intlogger.info("Error reading JSON while masking: " + e);
+        }
+    }
+
+    private static void processPassword(String maskKey, boolean action, JSONObject deliveryObj, String password) {
+        try {
+            if (action) {
+                deliveryObj.put(maskKey, PasswordProcessor.encrypt(password));
+            } else {
+                deliveryObj.put(maskKey, PasswordProcessor.decrypt(password));
             }
         } catch (JSONException | GeneralSecurityException e) {
             intlogger.info("Error reading JSON while masking: " + e);

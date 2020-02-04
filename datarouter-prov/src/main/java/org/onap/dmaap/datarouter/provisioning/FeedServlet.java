@@ -310,9 +310,6 @@ public class FeedServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
-            if (intlogger.isDebugEnabled()) {
-                intlogger.debug(jo.toString());
-            }
             Feed feed;
             try {
                 feed = new Feed(jo);

@@ -269,9 +269,6 @@ public class DRFeedsServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
-            if (intlogger.isDebugEnabled()) {
-                intlogger.debug(jo.toString());
-            }
             if (++activeFeeds > maxFeeds) {
                 activeFeeds--;
                 message = "Cannot create feed; the maximum number of feeds has been configured.";
