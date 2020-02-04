@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "180e905b_1581f106",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/PasswordProcessor.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4965
+      },
+      "writtenOn": "2020-02-04T14:54:52Z",
+      "side": 1,
+      "message": "Please don\u0027t hardcode the password\n\nInstead of encrypting user passwords in json files you should log them in irreversible form (use hash instead of encryption)",
+      "revId": "11c3898011938867d7702b16db86fb027fa06d77",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
