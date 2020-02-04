@@ -455,8 +455,8 @@ public class NodeServlet extends HttpServlet {
                 }
             }
             try {
-                Files.delete(data.toPath());
-                Files.delete(meta.toPath());
+                Files.deleteIfExists(data.toPath());
+                Files.deleteIfExists(meta.toPath());
             } catch (Exception e) {
                 eelfLogger.error("NODE0533 Exception common: " + e);
             }
