@@ -16,6 +16,24 @@
       "revId": "11c3898011938867d7702b16db86fb027fa06d77",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "81ba91c3_ae429da8",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/PasswordProcessor.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2020-02-04T14:59:00Z",
+      "side": 1,
+      "message": "This is legacy code from initial ATT seeding of DMaaP DR and I am apprehensive of removing it altogether.\n\nI can hash the passwords in the logs but I can\u0027t be sure that ATT aren\u0027t still using the PasswordProcessor class for other use cases.",
+      "parentUuid": "180e905b_1581f106",
+      "revId": "11c3898011938867d7702b16db86fb027fa06d77",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
