@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f1efd42f_e5cbd462",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2020-02-04T11:37:54Z",
+      "side": 1,
+      "message": "Username",
+      "range": {
+        "startLine": 69,
+        "startChar": 22,
+        "endLine": 69,
+        "endChar": 30
+      },
+      "revId": "ac2b22da69e086612c903e588d39bc5591b657ba",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "51665644_b3a6dfd0",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2020-02-04T11:37:54Z",
+      "side": 1,
+      "message": "Ideally the CSIT suite would be run on a custom image to verify this change.",
+      "range": {
+        "startLine": 77,
+        "startChar": 26,
+        "endLine": 77,
+        "endChar": 34
+      },
+      "revId": "ac2b22da69e086612c903e588d39bc5591b657ba",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6641a365_b312539c",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2020-02-04T11:37:54Z",
+      "side": 1,
+      "message": "remove",
+      "range": {
+        "startLine": 79,
+        "startChar": 8,
+        "endLine": 79,
+        "endChar": 33
+      },
+      "revId": "ac2b22da69e086612c903e588d39bc5591b657ba",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7d03823e_b7055ea7",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/ProvDbUtils.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2020-02-04T11:37:54Z",
+      "side": 1,
+      "message": "Cleaner solution:\n\n    private static String getValue(final Properties props, final String value) {\n        String prop \u003d (String) props.get(value);\n        if (prop !\u003d null \u0026\u0026 prop.matches(\"[$][{].*[}]$\")) {\n            return System.getenv(prop.substring(2, prop.length() - 1));\n        }\n        return prop;\n    }",
+      "range": {
+        "startLine": 82,
+        "startChar": 6,
+        "endLine": 84,
+        "endChar": 9
+      },
+      "revId": "ac2b22da69e086612c903e588d39bc5591b657ba",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
