@@ -1,0 +1,9 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Joseph O'Leary <joseph.o.leary@est.tech>
+Code-Review+1: Krzysztof Opasiak <k.opasiak@samsung.com>
+Code-Review+2: Mandar Sawant <ms5838@att.com>
+Submitted-by: Mandar Sawant <ms5838@att.com>
+Submitted-at: Wed, 05 Feb 2020 18:07:36 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/dmaap/datarouter/+/101169
+Project: dmaap/datarouter
+Branch: refs/heads/master
