@@ -109,7 +109,7 @@
           <appender-ref ref="asyncEELFError" />
       </logger>
 
-  <root level="INFO">
+  <root level="DEBUG">
     <appender-ref ref="asyncEELF" />
     <appender-ref ref="asyncEELFError" />
   </root>

@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.Feed;
@@ -309,9 +308,6 @@ public class FeedServlet extends ProxyServlet {
                 eventlogger.error(elr.toString());
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
-            }
-            if (intlogger.isDebugEnabled()) {
-                intlogger.debug(jo.toString());
             }
             Feed feed;
             try {

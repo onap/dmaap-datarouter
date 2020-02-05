@@ -23,8 +23,22 @@
 
 package org.onap.dmaap.datarouter.provisioning;
 
-import java.security.NoSuchAlgorithmException;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import javax.crypto.SecretKeyFactory;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -32,7 +46,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.beans.FeedAuthorization;
 import org.onap.dmaap.datarouter.provisioning.beans.Group;
@@ -43,21 +56,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.MDC;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.provisioning.beans.Feed",
@@ -229,23 +227,7 @@ public class BaseServletTest extends DrServletTestBase {
         Assert.assertEquals("456", MDC.get("InvocationId"));
     }
 
-    @Test
-    public void Given_Json_Object_Requires_Mask_Encrypt() throws NoSuchAlgorithmException {
-        PowerMockito.mockStatic(SecretKeyFactory.class);
-        SecretKeyFactory secretKeyFactory = PowerMockito.mock(SecretKeyFactory.class);
-        PowerMockito.when(SecretKeyFactory.getInstance(Mockito.anyString())).thenReturn(secretKeyFactory);
-        BaseServlet.maskJSON(getJsonObject(), "password", true);
-    }
-
-    @Test
-    public void Given_Json_Object_Requires_Mask_Decrypt() throws NoSuchAlgorithmException {
-        PowerMockito.mockStatic(SecretKeyFactory.class);
-        SecretKeyFactory secretKeyFactory = PowerMockito.mock(SecretKeyFactory.class);
-        PowerMockito.when(SecretKeyFactory.getInstance(Mockito.anyString())).thenReturn(secretKeyFactory);
-        BaseServlet.maskJSON(getJsonObject(), "password", false);
-    }
-
-    public JSONObject getJsonObject() {
+    public JSONObject getFeedJsonObject() {
         return new JSONObject("{\"authorization\": {\n" + "    \"endpoint_addrs\": [\n" + "    ],\n"
                                       + "    \"classification\": \"unclassified\",\n"
                                       + "    \"endpoint_ids\": [\n" + "      {\n"
@@ -253,6 +235,27 @@ public class BaseServletTest extends DrServletTestBase {
                                       + "        \"id\": \"dradmin\"\n" + "      },\n" + "      {\n"
                                       + "        \"password\": \"demo123456!\",\n"
                                       + "        \"id\": \"onap\"\n" + "      }\n" + "    ]\n" + "  }}");
+    }
+
+    public JSONObject getSubJsonObject() {
+        return new JSONObject("{\"delivery\": {\"url\": \"http://172.18.0.3:7070/\", \"user\": "
+            + "\"LOGIN\", \"password\": \"PASSWORD\", \"use100\": true}, \"metadataOnly\": false, "
+            + "\"suspend\": false, \"groupid\": 29, \"subscriber\": \"sg481n\"}");
+    }
+
+    @Test
+    public void Given_Debug_Is_Enabled_Hash_Feed_Passwords_Successful() {
+        JSONObject hashed_feed_pass = BaseServlet.hashPasswords(getFeedJsonObject());
+        assertNotEquals(hashed_feed_pass.getJSONObject("authorization").getJSONArray("endpoint_ids")
+            .getJSONObject(0).get("password").toString(), "demo123456!");
+
+    }
+
+    @Test
+    public void Given_Debug_Is_Enabled_Hash_Sub_Passwords_Successful() {
+        JSONObject hashed_sub_pass = BaseServlet.hashPasswords(getSubJsonObject());
+        assertNotEquals(hashed_sub_pass.getJSONObject("delivery").get("password").toString(), "PASSWORD");
+
     }
 
     @Test
