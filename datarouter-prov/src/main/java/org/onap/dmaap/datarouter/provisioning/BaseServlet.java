@@ -33,7 +33,6 @@ import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -49,6 +48,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
@@ -66,7 +66,6 @@ import org.onap.dmaap.datarouter.provisioning.beans.NodeClass;
 import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
-import org.onap.dmaap.datarouter.provisioning.utils.PasswordProcessor;
 import org.onap.dmaap.datarouter.provisioning.utils.Poker;
 import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 import org.onap.dmaap.datarouter.provisioning.utils.SynchronizerTask;
@@ -156,6 +155,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     static final String START_TIME = "start_time";
     static final String END_TIME = "end_time";
     static final String REASON_SQL = "reasonSQL";
+    static final String JSON_HASH_STRING = "password";
 
     /**
      * A boolean to trigger one time "provisioning changed" event on startup.
@@ -331,7 +331,7 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         try {
             jo = new JSONObject(new JSONTokener(req.getInputStream()));
             if (intlogger.isDebugEnabled()) {
-                intlogger.debug("JSON: " + jo.toString());
+                intlogger.debug("JSON: " + hashPasswords(new JSONObject(jo.toString())).toString());
             }
         } catch (Exception e) {
             intlogger.info("Error reading JSON: " + e);
@@ -339,38 +339,37 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
         return jo;
     }
 
-    /**
-     * This method encrypt/decrypt the key in the JSON passed by user request inside the authorisation
-     * header object in request before logging the JSON.
-     *
-     * @param jo      the JSON passed in http request.
-     * @param maskKey the key to be masked in the JSON passed.
-     * @param action  whether to mask the key or unmask it in a JSON passed.
-     * @return the JSONObject, or null if the stream cannot be parsed.
-     */
-    static JSONObject maskJSON(JSONObject jo, String maskKey, boolean action) {
+    public static JSONObject hashPasswords(JSONObject jo) {
         if (!jo.isNull("authorization")) {
             JSONArray endpointIds = jo.getJSONObject("authorization").getJSONArray("endpoint_ids");
             for (int index = 0; index < endpointIds.length(); index++) {
-                if ((!endpointIds.getJSONObject(index).isNull(maskKey))) {
-                    String password = endpointIds.getJSONObject(index).get(maskKey).toString();
-                    processPassword(maskKey, action, endpointIds, index, password);
+                if ((!endpointIds.getJSONObject(index).isNull(JSON_HASH_STRING))) {
+                    String password = endpointIds.getJSONObject(index).get(JSON_HASH_STRING).toString();
+                    processPassword(endpointIds, index, password);
                 }
             }
+        }
+        if (!jo.isNull("delivery")) {
+            JSONObject deliveryObj = jo.getJSONObject("delivery");
+            String password = deliveryObj.get(JSON_HASH_STRING).toString();
+            processPassword(deliveryObj, password);
         }
         return jo;
     }
 
-    private static void processPassword(String maskKey, boolean action, JSONArray endpointIds, int index,
-        String password) {
+    private static void processPassword(JSONArray endpointIds, int index, String password) {
         try {
-            if (action) {
-                endpointIds.getJSONObject(index).put(maskKey, PasswordProcessor.encrypt(password));
-            } else {
-                endpointIds.getJSONObject(index).put(maskKey, PasswordProcessor.decrypt(password));
-            }
-        } catch (JSONException | GeneralSecurityException e) {
-            intlogger.info("Error reading JSON while masking: " + e);
+            endpointIds.getJSONObject(index).put(JSON_HASH_STRING, DigestUtils.sha256Hex(password));
+        } catch (JSONException e) {
+            intlogger.info("Error reading JSON while hashing: " + e);
+        }
+    }
+
+    private static void processPassword(JSONObject deliveryObj, String password) {
+        try {
+            deliveryObj.put(JSON_HASH_STRING, DigestUtils.sha256Hex(password));
+        } catch (JSONException e) {
+            intlogger.info("Error reading JSON while hashing: " + e);
         }
     }
 

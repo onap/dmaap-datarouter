@@ -40,7 +40,6 @@ import org.onap.dmaap.datarouter.provisioning.beans.Deleteable;
 import org.onap.dmaap.datarouter.provisioning.beans.SubDelivery;
 import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
-import org.onap.dmaap.datarouter.provisioning.utils.PasswordProcessor;
 import org.onap.dmaap.datarouter.provisioning.utils.Poker;
 import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 import org.powermock.api.mockito.PowerMockito;
@@ -64,7 +63,6 @@ import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(PasswordProcessor.class)
 public class SubscriptionServletTest extends DrServletTestBase {
     private static EntityManagerFactory emf;
     private static EntityManager em;
@@ -304,7 +302,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
         when(request.getPathInfo()).thenReturn("/3");
         when(request.isUserInRole("org.onap.dmaap-dr.sub|*|edit")).thenReturn(true);
-        PowerMockito.mockStatic(PasswordProcessor.class);
         JSONObject JSObject = buildRequestJsonObject();
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
             public JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -418,7 +415,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
         when(response.getOutputStream()).thenReturn(outStream);
         when(request.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
-        PowerMockito.mockStatic(PasswordProcessor.class);
         JSONObject JSObject = buildRequestJsonObject();
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
             public JSONObject getJSONfromInput(HttpServletRequest req) {

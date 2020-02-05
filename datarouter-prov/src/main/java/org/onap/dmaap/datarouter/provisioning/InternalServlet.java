@@ -39,19 +39,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Properties;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.json.JSONArray;
-import org.onap.dmaap.datarouter.provisioning.utils.Poker;
-import org.onap.dmaap.datarouter.provisioning.utils.SynchronizerTask;
 import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.LogRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.eelf.EelfMsgs;
 import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
+import org.onap.dmaap.datarouter.provisioning.utils.Poker;
 import org.onap.dmaap.datarouter.provisioning.utils.RLEBitSet;
+import org.onap.dmaap.datarouter.provisioning.utils.SynchronizerTask;
 
 
 
@@ -454,7 +452,7 @@ public class InternalServlet extends ProxyServlet {
 
             if ("/logs".equals(path) || LOGS.equals(path)) {
                 String ctype = req.getHeader("Content-Type");
-                if (ctype == null || !TEXT_CT.equals(ctype)) {
+                if (!TEXT_CT.equals(ctype)) {
                     elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
                     elr.setMessage("Bad media type: " + ctype);
                     resp.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -494,7 +492,7 @@ public class InternalServlet extends ProxyServlet {
                 }
                 try {
                     fs.close();
-                } catch (Exception e) {
+                } catch (UnsupportedOperationException | IOException e) {
                     intlogger.error("PROV0137 InternalServlet.doPost: " + e.getMessage(), e);
                 }
                 if (total != 0 && ((avail * 100) / total) < 5) {
@@ -522,7 +520,7 @@ public class InternalServlet extends ProxyServlet {
             if ("/drlogs".equals(path) || "/drlogs/".equals(path)) {
                 // Receive post request and generate log entries
                 String ctype = req.getHeader("Content-Type");
-                if (ctype == null || !TEXT_CT.equals(ctype)) {
+                if (!TEXT_CT.equals(ctype)) {
                     elr.setResult(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
                     elr.setMessage("Bad media type: " + ctype);
                     resp.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);

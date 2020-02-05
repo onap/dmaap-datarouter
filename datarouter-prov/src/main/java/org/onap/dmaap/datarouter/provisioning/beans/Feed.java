@@ -185,7 +185,7 @@ public class Feed extends Syncable {
                 if (fid.getId().length() > 60) {
                     throw new InvalidObjectException("id field is too long (" + fid.getId() + ")");
                 }
-                if (fid.getPassword().length() > 32) {
+                if (fid.getPassword().length() > 100) {
                     //Fortify scan fixes - Privacy Violation
                     throw new InvalidObjectException("password field is too long (" + fid.getPassword() + ")");
                 }
