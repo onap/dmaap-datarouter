@@ -225,7 +225,9 @@
                                     <name>${datarouter.prov.image.name}</name>
                                     <build>
                                         <cleanup>try</cleanup>
-                                        <dockerFileDir>${basedir}/target/docker-stage</dockerFileDir>
+                                        <noCache>true</noCache>
+                                        <optimise>true</optimise>
+                                        <contextDir>${basedir}/target/docker-stage</contextDir>
                                         <dockerFile>Dockerfile</dockerFile>
                                         <tags>
                                             <tag>${dockertag1}</tag>

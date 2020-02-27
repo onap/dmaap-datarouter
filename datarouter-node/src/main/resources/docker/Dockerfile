@@ -38,3 +38,5 @@ RUN addgroup -S -g 1001 onap \
     && chown -R dradmin:onap /opt/ /var/
 
 USER dradmin
+
+HEALTHCHECK CMD curl --fail http://localhost:8443/ || exit 1

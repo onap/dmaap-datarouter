@@ -35,3 +35,5 @@ RUN addgroup -S -g 1001 onap \
     && chown -R datarouter:onap /opt/
 
 USER datarouter
+
+HEALTHCHECK CMD curl --fail http://localhost:8443/ || exit 1
