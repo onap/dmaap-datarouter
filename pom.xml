@@ -48,10 +48,8 @@
 
         <sonar.language>java</sonar.language>
         <sonar.skip>false</sonar.skip>
-        <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.surefire.reportsPath>${project.build.directory}/surefire-reports</sonar.surefire.reportsPath>
-        <sonar.jacoco.reportPaths>${project.build.directory}/coverage-reports/jacoco.exec</sonar.jacoco.reportPaths>
-        <sonar.jacoco.itReportPath>${project.build.directory}/coverage-reports/jacoco-it.exec</sonar.jacoco.itReportPath>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.reporting.outputDirectory}/jacoco-ut/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <sonar.projectVersion>${project.version}</sonar.projectVersion>
 
         <docker.skip.build>false</docker.skip.build>
@@ -431,6 +429,28 @@
                                 <files>
                                     <file>../version.properties</file>
                                 </files>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>report</id>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                            <configuration>
+                                <dataFile>${project.build.directory}/code-coverage/jacoco.exec</dataFile>
+                                <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
                             </configuration>
                         </execution>
                     </executions>
