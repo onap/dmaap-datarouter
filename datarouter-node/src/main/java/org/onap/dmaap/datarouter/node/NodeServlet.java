@@ -424,7 +424,9 @@ public class NodeServlet extends HttpServlet {
                     mw.write("X-DMAAP-DR-ROUTING\t" + t.getRouting() + "\n");
                 }
                 mw.close();
-                meta.renameTo(new File(dbase + ".M"));
+                if (!meta.renameTo(new File(dbase + ".M"))) {
+                    eelfLogger.error("Rename of file " + dbase + " failed.");
+                }
             }
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
             try {
