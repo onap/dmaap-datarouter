@@ -32,7 +32,7 @@
     <parent>
         <groupId>org.onap.oparent</groupId>
         <artifactId>oparent</artifactId>
-        <version>2.1.0</version>
+        <version>3.0.0</version>
     </parent>
     <properties>
         <!--revision must also be set in the version.properties file at project root-->
