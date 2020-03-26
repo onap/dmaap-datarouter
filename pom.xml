@@ -177,6 +177,11 @@
                 <version>${aaf-cadi-aaf.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.onap.aaf.authz</groupId>
+                <artifactId>aaf-cadi-client</artifactId>
+                <version>${aaf-cadi-aaf.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>

@@ -228,7 +228,7 @@ public class ProvServer {
                     true, ProvRunner.getAafPropsUtils().getPropAccess())), "/*", EnumSet.of(DispatcherType.REQUEST));
                 intlogger.info("PROV0001 AAF CADI filter enabled");
             } catch (ServletException e) {
-                intlogger.error("PROV0001 Failed to add CADI filter to server");
+                intlogger.error("PROV0001 Failed to add CADI filter to server", e);
             }
 
         }

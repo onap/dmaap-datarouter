@@ -98,6 +98,10 @@
             <artifactId>aaf-cadi-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.onap.aaf.authz</groupId>
+            <artifactId>aaf-cadi-client</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.intellij</groupId>
             <artifactId>annotations</artifactId>
         </dependency>

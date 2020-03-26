@@ -99,6 +99,10 @@
             <artifactId>aaf-cadi-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.onap.aaf.authz</groupId>
+            <artifactId>aaf-cadi-client</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
         </dependency>
