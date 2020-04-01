@@ -36,6 +36,6 @@ public class NodeAafPropsUtilsTest {
 
     @Test
     public void Veirfy_Aaf_Pass_Decryp_Successful() {
-        Assert.assertEquals("tVac2#@Stx%tIOE^x[c&2fgZ", nodeAafPropsUtils.getDecryptedPass("cadi_keystore_password"));
+        Assert.assertEquals("V+b}aGuWxHI+BPSNMVXqD*bx", nodeAafPropsUtils.getDecryptedPass("cadi_keystore_password"));
     }
 }

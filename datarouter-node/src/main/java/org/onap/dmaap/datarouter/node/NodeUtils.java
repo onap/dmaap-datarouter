@@ -47,6 +47,9 @@ import java.util.Enumeration;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
+import javax.naming.InvalidNameException;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
@@ -315,15 +318,16 @@ public class NodeUtils {
             X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
             if (cert != null) {
                 String subject = cert.getSubjectX500Principal().getName();
-                String[] parts = subject.split(",");
-                if (parts.length < 1) {
-                    return null;
+                try {
+                    LdapName ln = new LdapName(subject);
+                    for (Rdn rdn : ln.getRdns()) {
+                        if (rdn.getType().equalsIgnoreCase("CN")) {
+                            return rdn.getValue().toString();
+                        }
+                    }
+                } catch (InvalidNameException e) {
+                    eelfLogger.error("No valid CN not found for dr-node cert", e);
                 }
-                subject = parts[5].trim();
-                if (!subject.startsWith("CN=")) {
-                    return null;
-                }
-                return subject.substring(3);
             }
         }
         return null;

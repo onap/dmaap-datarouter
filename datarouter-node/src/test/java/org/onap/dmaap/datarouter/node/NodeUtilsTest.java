@@ -78,8 +78,14 @@ public class NodeUtilsTest {
     }
 
     @Test
-    public void Given_Get_CanonicalName_Called_Valid_CN_Returned() {
+    public void Given_Get_CanonicalName_Called_Valid_CN_Returned_From_JKS() {
         String canonicalName = NodeUtils.getCanonicalName("jks", "src/test/resources/org.onap.dmaap-dr-test-cert.jks", "WGxd2P6MDo*Bi4+UdzWs{?$8");
+        Assert.assertEquals("dmaap-dr-node", canonicalName);
+    }
+
+    @Test
+    public void Given_Get_CanonicalName_Called_Valid_CN_Returned_From_P12() {
+        String canonicalName = NodeUtils.getCanonicalName("PKCS12", "src/test/resources/aaf/org.onap.dmaap-dr.p12", "V+b}aGuWxHI+BPSNMVXqD*bx");
         Assert.assertEquals("dmaap-dr-node", canonicalName);
     }
 }
