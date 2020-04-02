@@ -79,7 +79,7 @@ public class NodeUtilsTest {
 
     @Test
     public void Given_Get_CanonicalName_Called_Valid_CN_Returned() {
-        String canonicalName = NodeUtils.getCanonicalName("jks", "src/test/resources/org.onap.dmaap-dr-test-cert.jks", "WGxd2P6MDo*Bi4+UdzWs{?$8");
+        String canonicalName = NodeUtils.getCanonicalName("jks", "src/test/resources/org.onap.dmaap-dr.jks", "[V7pj(U*?Jzpsl0aZP?3hS;?");
         Assert.assertEquals("dmaap-dr-node", canonicalName);
     }
 }
