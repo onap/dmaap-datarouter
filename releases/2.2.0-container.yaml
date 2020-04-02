@@ -1,0 +1,12 @@
+distribution_type: 'container'
+container_release_tag: '2.2.0'
+project: 'dmaap-datarouter'
+log-dir: 'dmaap-datarouter-maven-docker-stage-elalto/184'
+ref: 2dfca3dc2f06f4e6319094bb006eff090178a8f1
+containers:
+  - name: dmaap/datarouter-prov
+    version: 2.2.0-20200402T190621Z
+  - name: dmaap/datarouter-node
+    version: 2.2.0-20200402T190621Z
+  - name: dmaap/datarouter-subscriber
+    version: 2.2.0-20200402T190621Z
