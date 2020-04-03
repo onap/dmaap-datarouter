@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a76adc5_dd7552fa",
+        "filename": "docs/data-router/architecture.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1111
+      },
+      "writtenOn": "2020-04-03T13:18:29Z",
+      "side": 1,
+      "message": "1MB  is the current config of replica.fetch.max.bytes in MR.  Although this is configurable, we tend not to change it, so this doc should be consistent with",
+      "range": {
+        "startLine": 10,
+        "startChar": 127,
+        "endLine": 10,
+        "endChar": 130
+      },
+      "revId": "00c7c2ec0e83282e1a7f19c110d8d56cd40d3d67",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
