@@ -34,7 +34,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.MDC;
 
 @RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"java.net.ssl", "javax.security.auth.x500.X500Principal"})
+@PowerMockIgnore({"java.net.ssl", "javax.security.auth.x500.X500Principal", "com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
 public class NodeUtilsTest {
 
     @Mock

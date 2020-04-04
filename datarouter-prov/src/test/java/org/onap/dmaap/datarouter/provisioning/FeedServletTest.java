@@ -22,8 +22,7 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.argThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.contains;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -59,10 +58,12 @@ import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.Feed;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
 import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 
 @RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*", "com.sun.org.apache.xalan.*"})
 public class FeedServletTest extends DrServletTestBase {
 
     private static FeedServlet feedServlet;
@@ -108,7 +109,7 @@ public class FeedServletTest extends DrServletTestBase {
         throws Exception {
         when(request.isSecure()).thenReturn(false);
         feedServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -117,28 +118,28 @@ public class FeedServletTest extends DrServletTestBase {
         throws Exception {
         setBehalfHeader(null);
         feedServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Path_Header_Is_Not_Set_In_Request_With_Valid_Path_Then_Bad_Request_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn(null);
         feedServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Feed_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn("/123");
         feedServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated() throws Exception {
         setAuthoriserToReturnRequestNotAuthorized();
         feedServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
     }
 
     @Test
@@ -167,7 +168,7 @@ public class FeedServletTest extends DrServletTestBase {
         };
         feedServlet.doDelete(request, response);
         verify(response)
-            .sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+            .sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), anyString());
     }
 
     @Test
@@ -183,7 +184,7 @@ public class FeedServletTest extends DrServletTestBase {
         throws Exception {
         when(request.isSecure()).thenReturn(false);
         feedServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -192,7 +193,7 @@ public class FeedServletTest extends DrServletTestBase {
         throws Exception {
         setBehalfHeader(null);
         feedServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
@@ -200,7 +201,7 @@ public class FeedServletTest extends DrServletTestBase {
         throws Exception {
         when(request.getPathInfo()).thenReturn(null);
         feedServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
@@ -208,7 +209,7 @@ public class FeedServletTest extends DrServletTestBase {
         throws Exception {
         when(request.getPathInfo()).thenReturn("/123");
         feedServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
     @Test
@@ -217,7 +218,7 @@ public class FeedServletTest extends DrServletTestBase {
         setAuthoriserToReturnRequestNotAuthorized();
         when(request.getPathInfo()).thenReturn("/2");
         feedServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
     }
 
     @Test
@@ -235,7 +236,7 @@ public class FeedServletTest extends DrServletTestBase {
         throws Exception {
         when(request.isSecure()).thenReturn(false);
         feedServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -244,7 +245,7 @@ public class FeedServletTest extends DrServletTestBase {
         throws Exception {
         setBehalfHeader(null);
         feedServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
@@ -252,7 +253,7 @@ public class FeedServletTest extends DrServletTestBase {
         throws Exception {
         when(request.getPathInfo()).thenReturn(null);
         feedServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
@@ -260,7 +261,7 @@ public class FeedServletTest extends DrServletTestBase {
         throws Exception {
         when(request.getPathInfo()).thenReturn("/123");
         feedServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
     @Test
@@ -270,7 +271,7 @@ public class FeedServletTest extends DrServletTestBase {
         when(request.getContentType()).thenReturn("stub_contentType");
         when(request.getPathInfo()).thenReturn("/2");
         feedServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), anyString());
     }
 
     @Test
@@ -297,7 +298,7 @@ public class FeedServletTest extends DrServletTestBase {
             }
         };
         feedServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
@@ -436,7 +437,7 @@ public class FeedServletTest extends DrServletTestBase {
             }
         };
         feedServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), anyString());
     }
 
     @Test
@@ -467,7 +468,7 @@ public class FeedServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_POST_SC_METHOD_NOT_ALLOWED_Response_Is_Generated() throws Exception {
         feedServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 

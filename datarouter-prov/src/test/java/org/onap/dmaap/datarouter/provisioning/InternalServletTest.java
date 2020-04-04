@@ -22,15 +22,15 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import java.io.File;
 import java.net.InetAddress;
 import javax.persistence.EntityManager;
@@ -40,18 +40,14 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.BeforeClass;
-import org.junit.AfterClass;
 import org.mockito.Mock;
-
 import org.onap.dmaap.datarouter.provisioning.beans.Deleteable;
 import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
 import org.onap.dmaap.datarouter.provisioning.beans.LogRecord;
@@ -59,11 +55,13 @@ import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
 import org.onap.dmaap.datarouter.provisioning.utils.Poker;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(LogRecord.class)
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*"})
 public class InternalServletTest extends DrServletTestBase {
   private static EntityManagerFactory emf;
   private static EntityManager em;
@@ -106,7 +104,7 @@ public class InternalServletTest extends DrServletTestBase {
     when(request.getRemoteAddr()).thenReturn("127.100.0.3");
     internalServlet.doGet(request, response);
     verify(response)
-        .sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        .sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
     verifyEnteringExitCalled(listAppender);
   }
 
@@ -165,7 +163,7 @@ public class InternalServletTest extends DrServletTestBase {
     when(request.getPathInfo()).thenReturn("/logs/TestFile");
     internalServlet.doGet(request, response);
     verify(response)
-        .sendError(eq(HttpServletResponse.SC_NO_CONTENT), argThat(notNullValue(String.class)));
+        .sendError(eq(HttpServletResponse.SC_NO_CONTENT), anyString());
   }
 
   @Test
@@ -208,7 +206,7 @@ public class InternalServletTest extends DrServletTestBase {
     when(request.getPathInfo()).thenReturn("/incorrect/");
     internalServlet.doGet(request, response);
     verify(response)
-        .sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        .sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
   }
 
   @Test
@@ -218,7 +216,7 @@ public class InternalServletTest extends DrServletTestBase {
     FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
     internalServlet.doPut(request, response);
     verify(response)
-        .sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        .sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
     verifyEnteringExitCalled(listAppender);
   }
 
@@ -243,7 +241,7 @@ public class InternalServletTest extends DrServletTestBase {
     internalServlet = internalServerFailure();
     internalServlet.doPut(request, response);
     verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
-        argThat(notNullValue(String.class)));
+        anyString());
   }
 
   @Test
@@ -252,7 +250,7 @@ public class InternalServletTest extends DrServletTestBase {
     when(request.getPathInfo()).thenReturn("/incorrect");
     internalServlet.doPut(request, response);
     verify(response)
-        .sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        .sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
   }
 
   @Test
@@ -262,7 +260,7 @@ public class InternalServletTest extends DrServletTestBase {
     FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
     internalServlet.doDelete(request, response);
     verify(response)
-        .sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        .sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
     verifyEnteringExitCalled(listAppender);
   }
 
@@ -298,7 +296,7 @@ public class InternalServletTest extends DrServletTestBase {
     internalServlet = internalServerFailure();
     internalServlet.doDelete(request, response);
     verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
-        argThat(notNullValue(String.class)));
+        anyString());
   }
 
   @Test
@@ -307,7 +305,7 @@ public class InternalServletTest extends DrServletTestBase {
     when(request.getPathInfo()).thenReturn("/incorrect");
     internalServlet.doDelete(request, response);
     verify(response)
-        .sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        .sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
   }
 
   @Test
@@ -316,7 +314,7 @@ public class InternalServletTest extends DrServletTestBase {
     when(request.getRemoteAddr()).thenReturn("127.100.0.3");
     internalServlet.doPost(request, response);
     verify(response)
-        .sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        .sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
     verifyEnteringExitCalled(listAppender);
   }
 
@@ -341,7 +339,7 @@ public class InternalServletTest extends DrServletTestBase {
     internalServlet = internalServerFailure();
     internalServlet.doPost(request, response);
     verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
-        argThat(notNullValue(String.class)));
+        anyString());
   }
 
   @Test
@@ -406,7 +404,7 @@ public class InternalServletTest extends DrServletTestBase {
     when(request.getPathInfo()).thenReturn("/incorrect/");
     internalServlet.doPost(request, response);
     verify(response)
-        .sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        .sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
   }
 
   private void setUpValidAuthorisedRequest() throws Exception {

@@ -42,8 +42,7 @@ import org.onap.dmaap.datarouter.provisioning.beans.Subscription;
 import org.onap.dmaap.datarouter.provisioning.beans.Updateable;
 import org.onap.dmaap.datarouter.provisioning.utils.Poker;
 import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import javax.persistence.EntityManager;
@@ -57,12 +56,17 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 
 @RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*"})
 public class SubscriptionServletTest extends DrServletTestBase {
     private static EntityManagerFactory emf;
     private static EntityManager em;
@@ -109,7 +113,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_DELETE_SC_Forbidden_Response_Is_Generated() throws Exception {
         when(request.isSecure()).thenReturn(false);
         subscriptionServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -117,28 +121,28 @@ public class SubscriptionServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_DELETE_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated() throws Exception {
         setBehalfHeader(null);
         subscriptionServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Path_Header_Is_Not_Set_In_Request_With_Valid_Path_Then_Bad_Request_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn(null);
         subscriptionServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Subscription_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn("/123");
         subscriptionServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated() throws Exception {
         setAuthoriserToReturnRequestNotAuthorized();
         subscriptionServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
     }
 
     @Test
@@ -149,7 +153,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
             }
         };
         subscriptionServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), anyString());
     }
 
     @Test
@@ -175,7 +179,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_GET_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated() throws Exception {
         when(request.isSecure()).thenReturn(false);
         subscriptionServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -183,28 +187,28 @@ public class SubscriptionServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_GET_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated() throws Exception {
         setBehalfHeader(null);
         subscriptionServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_Path_Header_Is_Not_Set_In_Request_With_Valid_Path_Then_Bad_Request_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn(null);
         subscriptionServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_Subscription_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn("/123");
         subscriptionServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated() throws Exception {
         setAuthoriserToReturnRequestNotAuthorized();
         subscriptionServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
     }
 
     @Test
@@ -220,7 +224,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_PUT_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated() throws Exception {
         when(request.isSecure()).thenReturn(false);
         subscriptionServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -228,21 +232,21 @@ public class SubscriptionServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_PUT_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated() throws Exception {
         setBehalfHeader(null);
         subscriptionServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Path_Header_Is_Not_Set_In_Request_With_Valid_Path_Then_Bad_Request_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn(null);
         subscriptionServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Subscription_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn("/123");
         subscriptionServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
     @Test
@@ -267,7 +271,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
             }
         };
         subscriptionServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
     }
 
     @Test
@@ -328,7 +332,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_PUT_And_Content_Header_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated() throws Exception {
         when(request.getContentType()).thenReturn("stub_ContentType");
         subscriptionServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), anyString());
     }
 
     @Test
@@ -337,7 +341,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         ServletInputStream inStream = mock(ServletInputStream.class);
         when(request.getInputStream()).thenReturn(inStream);
         subscriptionServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
@@ -350,7 +354,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
             }
         };
         subscriptionServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
@@ -376,7 +380,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
             }
         };
         subscriptionServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
@@ -406,7 +410,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
             }
         };
         subscriptionServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), anyString());
     }
 
     @Test
@@ -443,7 +447,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_POST_And_Is_Not_Secure_When_HTTPS_Is_Required_Then_Forbidden_Response_Is_Generated() throws Exception {
         when(request.isSecure()).thenReturn(false);
         subscriptionServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -451,28 +455,28 @@ public class SubscriptionServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_POST_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated() throws Exception {
         setBehalfHeader(null);
         subscriptionServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Path_Header_Is_Not_Set_In_Request_With_Valid_Path_Then_Bad_Request_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn(null);
         subscriptionServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Subscription_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn("/123");
         subscriptionServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Content_Header_Is_Not_Supported_Type_Then_Unsupported_Media_Type_Response_Is_Generated() throws Exception {
         when(request.getContentType()).thenReturn("stub_ContentType");
         subscriptionServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), anyString());
     }
 
     @Test
@@ -480,7 +484,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         when(request.getHeader(anyString())).thenReturn("application/vnd.dmaap-dr.subscription-control");
         setAuthoriserToReturnRequestNotAuthorized();
         subscriptionServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
     }
 
     @Test
@@ -489,7 +493,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         ServletInputStream inStream = mock(ServletInputStream.class);
         when(request.getInputStream()).thenReturn(inStream);
         subscriptionServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
@@ -509,7 +513,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
             }
         };
         subscriptionServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test

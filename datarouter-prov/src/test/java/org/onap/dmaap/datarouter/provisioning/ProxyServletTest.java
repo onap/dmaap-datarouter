@@ -61,8 +61,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PowerMockIgnore("javax.net.ssl.*")
 @PrepareForTest({URLUtilities.class, BaseServlet.class, Scheme.class})
+@PowerMockIgnore({"javax.net.ssl.*", "com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*"})
 public class ProxyServletTest {
     private static ProxyServlet proxyServlet;
     private static EntityManagerFactory emf;

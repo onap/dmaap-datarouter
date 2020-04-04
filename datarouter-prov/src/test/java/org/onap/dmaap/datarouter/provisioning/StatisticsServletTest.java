@@ -22,9 +22,8 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,9 +40,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*"})
 public class StatisticsServletTest {
 
   private StatisticsServlet statisticsServlet;
@@ -84,7 +85,7 @@ public class StatisticsServletTest {
       throws Exception {
     statisticsServlet.doDelete(request, response);
     verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED),
-        argThat(notNullValue(String.class)));
+        anyString());
   }
 
   @Test
@@ -92,7 +93,7 @@ public class StatisticsServletTest {
       throws Exception {
     statisticsServlet.doPut(request, response);
     verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED),
-        argThat(notNullValue(String.class)));
+        anyString());
   }
 
   @Test
@@ -100,7 +101,7 @@ public class StatisticsServletTest {
       throws Exception {
     statisticsServlet.doPost(request, response);
     verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED),
-        argThat(notNullValue(String.class)));
+        anyString());
   }
 
   @Test
@@ -109,7 +110,7 @@ public class StatisticsServletTest {
     when(request.getParameter("type")).thenReturn("get");
     statisticsServlet.doGet(request, response);
     verify(response)
-        .sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        .sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
   }
 
   @Test

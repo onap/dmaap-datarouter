@@ -22,12 +22,10 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning.beans;
 
-import org.jetbrains.annotations.NotNull;
+import java.text.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;
-
-import java.text.ParseException;
 
 public class BaseLogRecordTest {
 

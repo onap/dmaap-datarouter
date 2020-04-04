@@ -22,8 +22,7 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.argThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.contains;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -55,10 +54,12 @@ import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
 import org.onap.dmaap.datarouter.provisioning.utils.Poker;
 import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 
 @RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*"})
 public class SubscribeServletTest extends DrServletTestBase {
     private static SubscribeServlet subscribeServlet;
     private static EntityManagerFactory emf;
@@ -102,7 +103,7 @@ public class SubscribeServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_DELETE_SC_METHOD_NOT_ALLOWED_Response_Is_Generated() throws Exception {
         subscribeServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -111,7 +112,7 @@ public class SubscribeServletTest extends DrServletTestBase {
         when(request.isSecure()).thenReturn(false);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         subscribeServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -119,7 +120,7 @@ public class SubscribeServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_GET_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated() throws Exception {
         setBehalfHeader(null);
         subscribeServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
 
@@ -127,14 +128,14 @@ public class SubscribeServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_GET_And_Path_Header_Is_Not_Set_In_Request_With_Valid_Path_Then_Bad_Request_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn(null);
         subscribeServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_GET_And_Feed_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn("/123");
         subscribeServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
     @Test
@@ -151,7 +152,7 @@ public class SubscribeServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_PUT_SC_METHOD_NOT_ALLOWED_Response_Is_Generated() throws Exception {
         subscribeServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), anyString());
         verifyEnteringExitCalled(listAppender);
     }
     @Test
@@ -159,7 +160,7 @@ public class SubscribeServletTest extends DrServletTestBase {
         when(request.isSecure()).thenReturn(false);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -167,7 +168,7 @@ public class SubscribeServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_POST_And_BEHALF_HEADER_Is_Not_Set_In_Request_Then_Bad_Request_Response_Is_Generated() throws Exception {
         setBehalfHeader(null);
         subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
 
@@ -175,7 +176,7 @@ public class SubscribeServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_POST_And_Path_Header_Is_Not_Set_In_Request_With_Valid_Path_Then_Bad_Request_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn(null);
         subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
 
@@ -183,7 +184,7 @@ public class SubscribeServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_POST_And_Feed_Id_Is_Invalid_Then_Not_Found_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn("/123");
         subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
     @Test
@@ -208,7 +209,7 @@ public class SubscribeServletTest extends DrServletTestBase {
             }
         };
         subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
     }
 
     @Test
@@ -319,14 +320,14 @@ public class SubscribeServletTest extends DrServletTestBase {
         when(request.getContentType()).thenReturn("stub_contentType");
         when(request.getPathInfo()).thenReturn("/1");
         subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_Request_Contains_Badly_Formed_JSON_Then_Bad_Request_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn("/1");
         subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
@@ -339,7 +340,7 @@ public class SubscribeServletTest extends DrServletTestBase {
             }
         };
         subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_CONFLICT), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_CONFLICT), anyString());
     }
 
     @Test
@@ -366,7 +367,7 @@ public class SubscribeServletTest extends DrServletTestBase {
             }
         };
         subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), anyString());
     }
 
     @NotNull

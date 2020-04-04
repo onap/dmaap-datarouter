@@ -22,32 +22,43 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.node;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import ch.qos.logback.classic.Logger;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.onap.dmaap.datarouter.node.NodeConfigManager")
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*"})
 public class NodeServletTest {
 
     private NodeServlet nodeServlet;
@@ -128,7 +139,7 @@ public class NodeServletTest {
     public void Given_Request_Is_HTTP_PUT_And_Endpoint_Is_Incorrect_Then_Not_Found_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn("/incorrect/");
         nodeServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -136,7 +147,7 @@ public class NodeServletTest {
     public void Given_Request_Is_HTTP_PUT_And_Request_Is_Not_Secure_Then_Forbidden_Response_Is_Generated() throws Exception {
         when(request.isSecure()).thenReturn(false);
         nodeServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -144,7 +155,7 @@ public class NodeServletTest {
     public void Given_Request_Is_HTTP_PUT_And_File_Id_Is_Null_Then_Not_Found_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn(null);
         nodeServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -152,7 +163,7 @@ public class NodeServletTest {
     public void Given_Request_Is_HTTP_PUT_And_Authorization_Is_Null_Then_Forbidden_Response_Is_Generated() throws Exception {
         when(request.getHeader("Authorization")).thenReturn(null);
         nodeServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -160,16 +171,17 @@ public class NodeServletTest {
     public void Given_Request_Is_HTTP_PUT_And_Publish_Does_Not_Include_File_Id_Then_Not_Found_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn("/publish/");
         nodeServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Publish_Not_Permitted_Then_Forbidden_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn("/publish/1/fileName");
+        when(request.getRemoteAddr()).thenReturn("1.2.3.4");
         setNodeConfigManagerIsPublishPermittedToReturnAReason();
         nodeServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -184,16 +196,19 @@ public class NodeServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Internal_Publish_But_Invalid_File_Id_Then_Not_Found_Response_Is_Generated() throws Exception {
-        when(request.getPathInfo()).thenReturn("/internal/publish/1/");
+        when(request.getPathInfo()).thenReturn("/internal/publish/1/blah");
+        when(request.getRemoteAddr()).thenReturn("1.2.3.4");
+        when(config.isAnotherNode(anyString(), anyString())).thenReturn(true);
         nodeServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
     @Test
     public void Given_Request_Is_HTTP_PUT_On_Publish_And_Ingress_Node_Is_Provided_Then_Request_Is_Redirected() throws Exception {
-        when(request.getPathInfo()).thenReturn("/publish/1/fileName");
         setNodeConfigManagerToAllowRedirectOnIngressNode();
+        when(request.getPathInfo()).thenReturn("/publish/1/fileName");
+        when(request.getRemoteAddr()).thenReturn("1.2.3.4");
         nodeServlet.doPut(request, response);
         verify(response).sendRedirect(anyString());
         verifyEnteringExitCalled(listAppender);
@@ -204,7 +219,7 @@ public class NodeServletTest {
         when(request.getPathInfo()).thenReturn("/publish/1/fileName");
         setHeadersForValidRequest(true);
         nodeServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
@@ -212,7 +227,7 @@ public class NodeServletTest {
         when(request.getPathInfo()).thenReturn("/publish/1/fileName");
         setHeadersForValidRequest(false);
         nodeServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
@@ -222,7 +237,7 @@ public class NodeServletTest {
         when(request.getPathInfo()).thenReturn("/publish/1/fileName");
         setHeadersForValidRequest(true);
         nodeServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -231,14 +246,14 @@ public class NodeServletTest {
         when(request.getPathInfo()).thenReturn("/publish/1/fileName");
         setHeadersForValidRequest(false);
         nodeServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_File_With_Invalid_Endpoint_Then_Not_Found_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn("/delete/1");
         nodeServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -273,7 +288,7 @@ public class NodeServletTest {
     public void Given_Request_Is_HTTP_DELETE_File_And_File_Does_Not_Exist_Then_Not_Found_Response_Is_Generated() throws IOException {
         when(request.getPathInfo()).thenReturn("/delete/1/nonExistingFile");
         nodeServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -302,7 +317,7 @@ public class NodeServletTest {
         when(config.getSpoolBase()).thenReturn("spool");
         when(config.getLogDir()).thenReturn("log/dir");
         when(config.getPublishId()).thenReturn("User1");
-        when(config.isAnotherNode(anyString(), anyString())).thenReturn(true);
+        when(config.isAnotherNode(anyString(), anyString())).thenReturn(false);
         when(config.getEventLogInterval()).thenReturn("40");
         when(config.isDeletePermitted("1")).thenReturn(true);
         when(config.getAllDests()).thenReturn(new DestInfo[0]);
@@ -348,10 +363,11 @@ public class NodeServletTest {
     private void setNodeConfigManagerIsPublishPermittedToReturnAReason() throws IllegalAccessException{
         NodeConfigManager config = mock(NodeConfigManager.class);
         when(config.isShutdown()).thenReturn(false);
+        when(config.getMyName()).thenReturn("dmaap-dr-node");
         when(config.isConfigured()).thenReturn(true);
         when(config.getSpoolDir()).thenReturn("spool/dir");
         when(config.getLogDir()).thenReturn("log/dir");
-        when(config.isPublishPermitted(anyString(), anyString(), anyString())).thenReturn("Not Permitted");
+        when(config.isPublishPermitted(anyString(), anyString(), anyString())).thenReturn("Publisher not permitted for this feed");
         when(config.isAnotherNode(anyString(), anyString())).thenReturn(false);
         FieldUtils.writeDeclaredStaticField(NodeServlet.class, "config", config, true);
     }

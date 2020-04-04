@@ -34,11 +34,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.onap.dmaap.datarouter.node.NodeConfigManager")
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*"})
 public class NodeServerTest {
 
     private NodeConfigManager config = mock(NodeConfigManager.class);
@@ -47,7 +49,6 @@ public class NodeServerTest {
         setUpConfig();
         setUpNodeMainDelivery();
         createFilesAndDirectories();
-        mock(Delivery.class);
     }
 
     @AfterClass

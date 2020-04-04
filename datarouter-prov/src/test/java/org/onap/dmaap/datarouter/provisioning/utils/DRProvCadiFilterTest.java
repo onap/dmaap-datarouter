@@ -20,6 +20,19 @@
 
 package org.onap.dmaap.datarouter.provisioning.utils;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.servlet.FilterChain;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,24 +43,13 @@ import org.onap.aaf.cadi.filter.CadiFilter;
 import org.onap.dmaap.datarouter.provisioning.BaseServlet;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.api.support.membermodification.MemberMatcher;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.servlet.FilterChain;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
-
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({CadiFilter.class})
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*"})
 public class DRProvCadiFilterTest {
 
     @Mock
@@ -88,7 +90,7 @@ public class DRProvCadiFilterTest {
         setRequestMocking("PUT", "subs");
 
         cadiFilter.doFilter(request, response, chain);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
     @Test
@@ -114,7 +116,7 @@ public class DRProvCadiFilterTest {
         setRequestMocking("PUT", "feeds");
 
         cadiFilter.doFilter(request, response, chain);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
     @Test
@@ -150,7 +152,7 @@ public class DRProvCadiFilterTest {
         setRequestMocking("POST", "subscribe");
 
         cadiFilter.doFilter(request, response, chain);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
 
     }
 
@@ -159,7 +161,7 @@ public class DRProvCadiFilterTest {
         setRequestMocking("POST", "subscribe");
 
         cadiFilter.doFilter(request, response, chain);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
 
     }
 
@@ -169,7 +171,7 @@ public class DRProvCadiFilterTest {
         when(request.getPathInfo()).thenReturn("/2");
 
         cadiFilter.doFilter(request, response, chain);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
 
     }
 
@@ -213,7 +215,7 @@ public class DRProvCadiFilterTest {
         when(request.getPathInfo()).thenReturn("/5");
 
         cadiFilter.doFilter(request, response, chain);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
 
     }
 
@@ -245,7 +247,7 @@ public class DRProvCadiFilterTest {
             setRequestMocking("PUT", "subs");
             when(request.getPathInfo()).thenReturn("5/");
             cadiFilter.doFilter(request, response, chain);
-            verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+            verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
 
     }
 
@@ -254,7 +256,7 @@ public class DRProvCadiFilterTest {
         setRequestMocking("PUT", "feeds");
         when(request.getPathInfo()).thenReturn("//5");
         cadiFilter.doFilter(request, response, chain);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
     private void setRequestMocking(String method, String servletPath)

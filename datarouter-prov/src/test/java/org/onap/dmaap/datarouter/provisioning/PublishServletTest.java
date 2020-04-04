@@ -30,6 +30,7 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -43,9 +44,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
 import java.net.InetAddress;
 
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -56,6 +57,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({InetAddress.class })
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*"})
 public class PublishServletTest extends DrServletTestBase {
     private PublishServlet publishServlet;
 
@@ -99,7 +101,7 @@ public class PublishServletTest extends DrServletTestBase {
             throws Exception {
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "nodes", new String[0], true);
         publishServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_SERVICE_UNAVAILABLE), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_SERVICE_UNAVAILABLE), anyString());
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "nodes", new String[1], true);
         verifyEnteringExitCalled(listAppender);
     }
@@ -108,7 +110,7 @@ public class PublishServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_DELETE_And_Path_Is_Null_Then_Not_Found_Error_Is_Returned()
             throws Exception {
         publishServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
     @Test
@@ -117,7 +119,7 @@ public class PublishServletTest extends DrServletTestBase {
 
         when(request.getPathInfo()).thenReturn("/1/");
         publishServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
     @Test
@@ -125,7 +127,7 @@ public class PublishServletTest extends DrServletTestBase {
             throws Exception {
         when(request.getPathInfo()).thenReturn("/122/fileName.txt");
         publishServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
     @Test
@@ -133,7 +135,7 @@ public class PublishServletTest extends DrServletTestBase {
             throws Exception {
         when(request.getPathInfo()).thenReturn("/abc/fileName.txt");
         publishServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
 

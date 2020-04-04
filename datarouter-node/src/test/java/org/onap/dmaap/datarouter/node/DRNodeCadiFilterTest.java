@@ -39,6 +39,7 @@ import org.onap.aaf.cadi.PropAccess;
 import org.onap.aaf.cadi.filter.CadiFilter;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.api.support.membermodification.MemberMatcher;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -46,6 +47,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @SuppressStaticInitializationFor("org.onap.dmaap.datarouter.node.NodeConfigManager")
 @PrepareForTest({CadiFilter.class})
 @RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
 public class DRNodeCadiFilterTest {
 
     @Mock

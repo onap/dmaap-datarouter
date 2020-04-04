@@ -22,8 +22,7 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
-import static org.hamcrest.Matchers.notNullValue;
-import static org.mockito.Mockito.argThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.contains;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -55,10 +54,12 @@ import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.provisioning.beans.Insertable;
 import org.onap.dmaap.datarouter.provisioning.utils.Poker;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 
 @RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*"})
 public class DRFeedsServletTest extends DrServletTestBase {
 
     private static DRFeedsServlet drfeedsServlet;
@@ -102,7 +103,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_DELETE_SC_METHOD_NOT_ALLOWED_Response_Is_Generated() throws Exception {
         drfeedsServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -112,7 +113,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         when(request.isSecure()).thenReturn(false);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         drfeedsServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -121,7 +122,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         throws Exception {
         setBehalfHeader(null);
         drfeedsServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
 
@@ -130,7 +131,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         throws Exception {
         when(request.getRequestURI()).thenReturn("/123");
         drfeedsServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
 
@@ -139,7 +140,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         throws Exception {
         setAuthoriserToReturnRequestNotAuthorized();
         drfeedsServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
     }
 
     @Test
@@ -147,7 +148,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         when(request.getParameter("name")).thenReturn("stub_name");
         when(request.getParameter("version")).thenReturn("stub_version");
         drfeedsServlet.doGet(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
@@ -175,7 +176,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_PUT_SC_METHOD_NOT_ALLOWED_Response_Is_Generated() throws Exception {
         drfeedsServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_METHOD_NOT_ALLOWED), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -186,7 +187,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         when(request.isSecure()).thenReturn(false);
         FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isAddressAuthEnabled", "true", true);
         drfeedsServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -195,7 +196,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         throws Exception {
         setBehalfHeader(null);
         drfeedsServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
 
@@ -204,7 +205,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         throws Exception {
         when(request.getRequestURI()).thenReturn("/123");
         drfeedsServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_NOT_FOUND), anyString());
     }
 
 
@@ -215,7 +216,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         when(request.getContentType()).thenReturn("stub_contentType");
         drfeedsServlet.doPost(request, response);
         verify(response)
-            .sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), argThat(notNullValue(String.class)));
+            .sendError(eq(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE), anyString());
     }
 
     @Test
@@ -236,7 +237,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
             }
         };
         drfeedsServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
     }
 
     @Test
@@ -257,7 +258,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
             }
         };
         drfeedsServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
     }
 
     @Test
@@ -330,7 +331,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_POST_And_Request_Contains_Badly_Formed_JSON_Then_Bad_Request_Response_Is_Generated()
         throws Exception {
         drfeedsServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
@@ -343,7 +344,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
             }
         };
         drfeedsServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_CONFLICT), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_CONFLICT), anyString());
     }
 
     @Test
@@ -356,7 +357,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         };
 
         drfeedsServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), argThat(notNullValue(String.class)));
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
@@ -402,7 +403,7 @@ public class DRFeedsServletTest extends DrServletTestBase {
         };
         drfeedsServlet.doPost(request, response);
         verify(response)
-            .sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), argThat(notNullValue(String.class)));
+            .sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), anyString());
     }
 
     @NotNull

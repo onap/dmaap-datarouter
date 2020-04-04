@@ -61,7 +61,7 @@ import org.slf4j.MDC;
 @SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.provisioning.beans.Feed",
         "org.onap.dmaap.datarouter.provisioning.beans.Subscription",
         "org.onap.dmaap.datarouter.provisioning.beans.Group"})
-@PowerMockIgnore({"javax.crypto.*"})
+@PowerMockIgnore({"javax.crypto.*", "com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*"})
 @PrepareForTest({UUID.class, SecretKeyFactory.class})
 public class BaseServletTest extends DrServletTestBase {
 
