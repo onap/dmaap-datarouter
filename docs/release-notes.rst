@@ -1,6 +1,51 @@
 .. This work is licensed under a Creative Commons Attribution 4.0 International License.
 .. http://creativecommons.org/licenses/by/4.0
 
+
+Release-notes
+==============
+
+Version: 6.0.0 (Frankfurt)
+---------------------------
+
+:Release Date: 2020-05-14
+
+Docker Image Version: 2.1.6
+
+New Features:
+
++----------------+---------------------------------------------------------------------------------------------------------------------------------+
+| JIRA ID        | Description                                                                                                                     |
++================+=================================================================================================================================+
+| DMAAP-1152     | [DMAAP] Implement boolean flag in OOM to disable HTTP ports                                                                     |
++----------------+---------------------------------------------------------------------------------------------------------------------------------+
+| DMAAP-1320     | [DR] Dynamic cert distribution from OOM AAF                                                                                     |
++----------------+---------------------------------------------------------------------------------------------------------------------------------+
+
+Bug Fixes:
+
++----------------+--------------------------------------------------------------------------------------------------+
+| JIRA ID        | Description                                                                                      |
++================+==================================================================================================+
+| DMAAP-1420     | [DR] dr-node fails to get CN from new AAF p12 cert                                               |
++----------------+--------------------------------------------------------------------------------------------------+
+
+Known Issues:
+N/A
+
+Security Issues:
+N/A
+
+Upgrade Notes:
+N/A
+
+Deprecation Notes:
+N/A
+
+Other:
+N/A
+
+
 Release-notes
 ==============
 
@@ -8,8 +53,6 @@ Version: 2.1.2 (El Alto)
 ---------------------------
 
 :Release Date: 2019-09-05
-
-The DataRouter(DR) provisioning API is a HTTPS-based, REST-like API for creating and managing DR feeds and subscriptions.
 
 New Features:
 
@@ -24,7 +67,12 @@ New Features:
 +----------------+---------------------------------------------------------------------------------------------------------------------------------+
 
 Bug Fixes:
-N/A
+
++----------------+--------------------------------------------------------------------------------------------------+
+| JIRA ID        | Description                                                                                      |
++================+==================================================================================================+
+| DMAAP-1421     |  [DR] ElAlto AAF certs expired                                                                   |
++----------------+--------------------------------------------------------------------------------------------------+
 
 Known Issues:
 N/A
@@ -46,8 +94,6 @@ Version: 2.1.0 (Dublin)
 ---------------------------
 
 :Release Date: 2019-06-06
-
-The DataRouter(DR) provisioning API is a HTTPS-based, REST-like API for creating and managing DR feeds and subscriptions.
 
 New Features:
 
@@ -113,8 +159,6 @@ Version: 1.0.8 (Casablanca)
 
 :Release Date: 2019-02-28
 
-The DataRouter(DR) provisioning API is a HTTPS-based, REST-like API for creating and managing DR feeds and subscriptions.
-
 New Features:
 
 +--------------+------------------------------------------------------------------+
@@ -156,8 +200,6 @@ Version: 1.0.3 (Casablanca)
 ---------------------------
 
 :Release Date: 2018-11-30
-
-The DataRouter(DR) provisioning API is a HTTPS-based, REST-like API for creating and managing DR feeds and subscriptions.
 
 New Features:
 
