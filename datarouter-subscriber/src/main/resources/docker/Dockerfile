@@ -36,7 +36,7 @@ RUN chmod 0700 startup.sh
 ENTRYPOINT ["sh", "startup.sh"]
 
 RUN groupadd -g 1001 onap \
-    && useradd -u 1000 datarouter -g onap \
-    && chown -R datarouter:onap /opt/
+    && useradd -u 1000 dradmin -g onap \
+    && chown -R dradmin:onap /opt/ /var/
 
-USER datarouter
+USER dradmin

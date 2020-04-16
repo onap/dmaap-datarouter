@@ -300,7 +300,7 @@
                         <exclude>IntegrationSuite.java</exclude>
                     </excludes>
                     <argLine>
-                        --illegal-access=permit
+                        ${surefireArgLine} --illegal-access=permit
                     </argLine>
                 </configuration>
             </plugin>
@@ -374,7 +374,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.2.0</version>
                     <configuration>
                         <failOnError>false</failOnError>
                     </configuration>
@@ -469,28 +469,6 @@
                                 <files>
                                     <file>../version.properties</file>
                                 </files>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>prepare-agent</id>
-                            <goals>
-                                <goal>prepare-agent</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>report</id>
-                            <goals>
-                                <goal>report</goal>
-                            </goals>
-                            <configuration>
-                                <dataFile>${project.build.directory}/code-coverage/jacoco.exec</dataFile>
-                                <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
                             </configuration>
                         </execution>
                     </executions>

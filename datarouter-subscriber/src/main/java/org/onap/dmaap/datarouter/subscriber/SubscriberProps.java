@@ -23,15 +23,16 @@
 
 package org.onap.dmaap.datarouter.subscriber;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
 
 public class SubscriberProps {
 
     private static SubscriberProps instance = null;
-    private static Logger subLogger = Logger.getLogger("org.onap.dmaap.datarouter.subscriber.internal");
+    private static EELFLogger logger = EELFManager.getInstance().getLogger(SubscriberProps.class);
     private Properties properties;
 
     private SubscriberProps(String propsPath) throws IOException {
@@ -50,7 +51,7 @@ public class SubscriberProps {
             try {
                 instance = new SubscriberProps(propsPath);
             } catch (IOException ioe) {
-                subLogger.error("IO Exception: " + ioe.getMessage(), ioe);
+                logger.error("IO Exception: " + ioe.getMessage(), ioe);
             }
         }
         return instance;

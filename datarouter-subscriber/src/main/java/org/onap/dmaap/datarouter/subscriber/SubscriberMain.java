@@ -23,8 +23,9 @@
 
 package org.onap.dmaap.datarouter.subscriber;
 
+import com.att.eelf.configuration.EELFLogger;
+import com.att.eelf.configuration.EELFManager;
 import java.util.Arrays;
-import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -40,7 +41,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 public class SubscriberMain {
 
-    private static Logger logger = Logger.getLogger("org.onap.dmaap.datarouter.subscriber.SubscriberMain");
+    private static EELFLogger logger = EELFManager.getInstance().getLogger(SubscriberMain.class);
 
     /**
      * Main class for Subscriber.
