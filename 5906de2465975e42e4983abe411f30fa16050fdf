@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2c53db35_42d81af9",
+        "filename": "pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2020-04-16T14:05:22Z",
+      "side": 1,
+      "message": "This was the main fix for sonar reporting.\nOther fixes are mainly for sonar bugs etc",
+      "range": {
+        "startLine": 303,
+        "startChar": 24,
+        "endLine": 303,
+        "endChar": 43
+      },
+      "revId": "5906de2465975e42e4983abe411f30fa16050fdf",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
