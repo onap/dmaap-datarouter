@@ -32,6 +32,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -511,10 +513,9 @@ public class StatisticsServlet extends BaseServlet {
                 ResultSet rs = ps.executeQuery()) {
                 if ("csv".equals(outputType)) {
                     resp.setContentType("application/octet-stream");
-                    Date date = new Date();
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY HH:mm:ss");
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
                     resp.setHeader("Content-Disposition",
-                        "attachment; filename=\"result:" + dateFormat.format(date) + ".csv\"");
+                        "attachment; filename=\"result:" + LocalDateTime.now().format(formatter) + ".csv\"");
                     eventlogger.info("Generating CSV file from Statistics resultset");
                     rsToCSV(rs, out);
                 } else {
