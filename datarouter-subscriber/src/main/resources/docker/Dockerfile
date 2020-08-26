@@ -18,25 +18,23 @@
 #  limitations under the License.
 #  ============LICENSE_END====================================================
 #
-FROM openjdk:11.0.6-jre-slim
-
-MAINTAINER DMAAP Team
+FROM adoptopenjdk/openjdk11:jre-11.0.8_10-alpine
 
 COPY /opt /opt
 
-RUN apt-get update && \
-     apt-get install -y \
-     curl \
-     vim
+ARG user=onap
+ARG group=onap
+
+RUN apk update && apk add curl && apk add vim
 
 EXPOSE 8080 8443
 
 WORKDIR /opt
 RUN chmod 0700 startup.sh
+
 ENTRYPOINT ["sh", "startup.sh"]
 
-RUN groupadd -g 1001 onap \
-    && useradd -u 1000 dradmin -g onap \
-    && chown -R dradmin:onap /opt/ /var/
+RUN addgroup -S $group && adduser -G $group -D $user \
+    && chown -R $user:$group /opt/ /var/log
 
-USER dradmin
+USER $user
