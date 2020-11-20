@@ -2,6 +2,55 @@
 .. http://creativecommons.org/licenses/by/4.0
 .. _release_notes:
 
+
+..      ===========================
+..      * * *    GUILIN       * * *
+..      ===========================
+
+DMaaP Data Router Release Notes
+===============================
+
+Abstract
+========
+
+This document provides the release notes for the DMaaP DR Guilin release.
+
+Summary
+=======
+
+Release Data
+============
+
++--------------------------------------+--------------------------------------+
+| **DMaaP Data Router Project**        |                                      |
++--------------------------------------+--------------------------------------+
+| **Docker images**                    | - datarouter-prov 2.1.7              |
+|                                      | - datarouter-node 2.1.7              |
++--------------------------------------+--------------------------------------+
+| **Release designation**              | 7.0.0 guilin                         |
++--------------------------------------+--------------------------------------+
+| **Release date**                     | 2020-10-19 (TBD)                     |
++--------------------------------------+--------------------------------------+
+
+New features
+------------
+
+Known Limitations, Issues and Workarounds
+=========================================
+
+System Limitations
+------------------
+
+Known Vulnerabilities
+---------------------
+
+Workarounds
+-----------
+
+Security Notes
+--------------
+
+
 ..      ===========================
 ..      * * *    FRANKFURT    * * *
 ..      ===========================
