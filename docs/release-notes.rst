@@ -11,15 +11,15 @@ DMaaP Data Router Release Notes
 ===============================
 
 Abstract
-========
+--------
 
 This document provides the release notes for the DMaaP DR Guilin release.
 
 Summary
-=======
+-------
 
 Release Data
-============
+------------
 
 +--------------------------------------+--------------------------------------+
 | **DMaaP Data Router Project**        |                                      |
@@ -36,7 +36,7 @@ New features
 ------------
 
 Known Limitations, Issues and Workarounds
-=========================================
+-----------------------------------------
 
 System Limitations
 ------------------
@@ -56,18 +56,18 @@ Security Notes
 ..      ===========================
 
 DMaaP Data Router Release Notes
-===============================
+-------------------------------
 
 Abstract
-========
+--------
 
 This document provides the release notes for the DMaaP DR Frankfurt release.
 
 Summary
-=======
+-------
 
 Release Data
-============
+------------
 
 +--------------------------------------+--------------------------------------+
 | **DMaaP Data Router Project**        |                                      |
@@ -87,7 +87,7 @@ New features
 * Dynamic cert distribution from OOM AAF
 
 Known Limitations, Issues and Workarounds
-=========================================
+-----------------------------------------
 
 System Limitations
 ------------------
@@ -103,7 +103,7 @@ Security Notes
 --------------
 
 References
-==========
+----------
 
 For more information on the ONAP Frankfurt release, please see:
 
