@@ -64,7 +64,7 @@
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <qos.logback.version>1.2.3</qos.logback.version>
         <aaf-cadi-aaf.version>2.1.15</aaf-cadi-aaf.version>
-        <commons-codec.version>1.13</commons-codec.version>
+        <commons-codec.version>1.15</commons-codec.version>
         <gmaven-plugin.version>1.5</gmaven-plugin.version>
         <io.fabric8.version>0.33.0</io.fabric8.version>
         <docker.apiVersion>2.2.54</docker.apiVersion>
