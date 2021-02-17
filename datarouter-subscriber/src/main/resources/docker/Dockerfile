@@ -18,14 +18,15 @@
 #  limitations under the License.
 #  ============LICENSE_END====================================================
 #
-FROM adoptopenjdk/openjdk11:jre-11.0.8_10-alpine
+FROM nexus3.onap.org:10001/onap/integration-java11:8.0.0
 
 COPY /opt /opt
 
 ARG user=onap
 ARG group=onap
 
-RUN apk update && apk add curl && apk add vim
+USER root
+RUN apk add --no-cache curl
 
 EXPOSE 8080 8443
 
@@ -34,7 +35,7 @@ RUN chmod 0700 startup.sh
 
 ENTRYPOINT ["sh", "startup.sh"]
 
-RUN addgroup -S $group && adduser -G $group -D $user \
-    && chown -R $user:$group /opt/ /var/log
+# onap user and group already avaliable in base img
+RUN chown -R $user:$group /opt/ /var/log
 
 USER $user
