@@ -18,7 +18,7 @@
 #  limitations under the License.
 #  ============LICENSE_END====================================================
 #
-FROM adoptopenjdk/openjdk11:jre-11.0.8_10-alpine
+FROM nexus3.onap.org:10001/onap/integration-java11:8.0.0
 
 COPY /opt /opt
 
