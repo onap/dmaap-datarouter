@@ -112,10 +112,10 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private NodeConfigManager() {
 
         Properties drNodeProperties = new Properties();
-        try {
+        try (FileInputStream fileInputStream = new FileInputStream(System
+                .getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties"))) {
             eelfLogger.debug("NODE0301 Loading local config file node.properties");
-            drNodeProperties.load(new FileInputStream(System
-                    .getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties")));
+            drNodeProperties.load(fileInputStream);
         } catch (Exception e) {
             NodeUtils.setIpAndFqdnForEelf(NODE_CONFIG_MANAGER);
             eelfLogger.error(EelfMsgs.MESSAGE_PROPERTIES_LOAD_ERROR, e,
