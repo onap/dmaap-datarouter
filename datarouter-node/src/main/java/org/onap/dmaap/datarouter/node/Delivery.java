@@ -160,7 +160,7 @@ public class Delivery {
             if (sxdir.startsWith(".")) {
                 continue;
             }
-            File sxf = new File(sxbase + "/" + sxdir);
+            File sxf = new File(sxbase + File.separator + sxdir);
             for (String sdir : sxf.list()) {
                 if (!sdir.startsWith(".")) {
                     cleardir(sxbase + "/" + sxdir + "/" + sdir);
