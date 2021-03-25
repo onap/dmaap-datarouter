@@ -2,6 +2,75 @@
 .. http://creativecommons.org/licenses/by/4.0
 .. _release_notes:
 
+..      ===========================
+..      * * *    Honolulu    * * *
+..      ===========================
+
+DMaaP Data Router Release Notes
+-------------------------------
+
+Abstract
+--------
+
+This document provides the release notes for the DMaaP DR Honolulu release.
+
+Summary
+-------
+No big changes for Honolulu Release.
+
+Release Data
+------------
+
++--------------------------------------+--------------------------------------+
+| **DMaaP Data Router Project**        |                                      |
++--------------------------------------+--------------------------------------+
+| **Docker images**                    | - datarouter-prov 2.1.8              |
+|                                      | - datarouter-node 2.1.8              |
++--------------------------------------+--------------------------------------+
+| **Release designation**              | 8.0.0 Honolulu                       |
++--------------------------------------+--------------------------------------+
+| **Release date**                     | 2021-04-01 (TBD)                     |
++--------------------------------------+--------------------------------------+
+
+New features
+------------
+
+* Update commons-codec (listed in "Known Vulnerabilities" below) - DMAAP-1515
+* Change openjdk baseOS imgs to ONAP/integration- - INT-1864
+* Update Project Lead Information - DMAAP-1538
+
+
+Known Limitations, Issues and Workarounds
+-----------------------------------------
+
+System Limitations
+------------------
+
+Known Vulnerabilities
+---------------------
+* SONATYPE-2012-0050
+
+Workarounds
+-----------
+
+Security Notes
+--------------
+
+References
+----------
+
+For more information on the ONAP Frankfurt release, please see:
+
+#. `ONAP Home Page`_
+#. `ONAP Documentation`_
+#. `ONAP Release Downloads`_
+#. `ONAP Wiki Page`_
+
+.. _`ONAP Home Page`: https://www.onap.org
+.. _`ONAP Wiki Page`: https://wiki.onap.org
+.. _`ONAP Documentation`: https://docs.onap.org
+.. _`ONAP Release Downloads`: https://git.onap.org
+
 
 ..      ===========================
 ..      * * *    GUILIN       * * *
