@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dc807272_4241291f",
+        "filename": "docs/release-notes.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2021-04-01T13:14:11Z",
+      "side": 1,
+      "message": "2.1.8",
+      "range": {
+        "startLine": 27,
+        "startChar": 62,
+        "endLine": 27,
+        "endChar": 65
+      },
+      "revId": "9c8abd6b821f6ab78f14f357593cdf74834ec8e7",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
