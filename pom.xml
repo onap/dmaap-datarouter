@@ -59,7 +59,7 @@
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss'Z'</maven.build.timestamp.format>
 
         <!--dependency version across all modules-->
-        <jetty.version>9.4.20.v20190813</jetty.version>
+        <jetty.version>9.4.40.v20210413</jetty.version>
         <javax.mail-api.version>1.5.5</javax.mail-api.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <qos.logback.version>1.2.3</qos.logback.version>
@@ -71,7 +71,7 @@
         <commons-lang.version>2.4</commons-lang.version>
         <commons-io.version>2.7</commons-io.version>
         <httpcore.version>4.4</httpcore.version>
-        <httpclient.version>4.5.3</httpclient.version>
+        <httpclient.version>4.5.13</httpclient.version>
         <junit-runner.version>0.11</junit-runner.version>
         <junit.version>4.12</junit.version>
         <mockito-core.version>3.3.3</mockito-core.version>
