@@ -59,7 +59,7 @@
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss'Z'</maven.build.timestamp.format>
 
         <!--dependency version across all modules-->
-        <jetty.version>9.4.40.v20210413</jetty.version>
+        <jetty.version>9.4.20.v20190813</jetty.version>
         <javax.mail-api.version>1.5.5</javax.mail-api.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <qos.logback.version>1.2.3</qos.logback.version>
