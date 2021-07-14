@@ -36,11 +36,11 @@ committers:
       company: 'ericsson'
       id: 'efiacor'
       timezone: 'Europe/Dublin'
-    - name: 'Dominic Lunanuova'
-      email: 'dgl@research.att.com'
-      company: 'ATT'
-      id: 'dglFromAtt'
-      timezone: 'America/Dallas'
+    - name: 'David McWeeney'
+      email: 'david.mcweeney@est.tech'
+      company: 'Ericsson Software Technology'
+      id: 'david.mcweeney'
+      timezone: 'Europe/Dublin'
 tsc:
     approval: 'https://lists.onap.org/pipermail/onap-tsc'
     changes:
@@ -62,3 +62,5 @@ tsc:
           name: 'Bhanu Ramesh'
         - type: 'Removal'
           name: 'Mandar Sawant'
+        - type: 'Removal'
+          name: 'Dominic Lunanuova'
