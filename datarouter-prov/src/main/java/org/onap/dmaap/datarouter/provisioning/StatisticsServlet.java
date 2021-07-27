@@ -79,6 +79,8 @@ public class StatisticsServlet extends BaseServlet {
     private static final String SQL_JOIN_RECORDS = " e JOIN LOG_RECORDS m ON m.PUBLISH_ID = e.PUBLISH_ID AND e.FEEDID IN (";
     private static final String SQL_STATUS_204 = " AND m.STATUS=204 AND e.RESULT=204 ";
     private static final String SQL_GROUP_SUB_ID = " group by SUBID";
+    private static final String JSON_OUTPUT_TYPE = "json";
+    private static final String CSV_OUTPUT_TYPE = "csv";
 
 
     /**
@@ -109,7 +111,7 @@ public class StatisticsServlet extends BaseServlet {
         // check Accept: header??
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType(LOGLIST_CONTENT_TYPE);
-        String outputType = "json";
+        String outputType = JSON_OUTPUT_TYPE;
         if (req.getParameter(FEEDID) == null && req.getParameter(GROUPID) == null) {
             try {
                 resp.getOutputStream().print("Invalid request, Feedid or Group ID is required.");
@@ -153,8 +155,12 @@ public class StatisticsServlet extends BaseServlet {
         if (req.getParameter("type") != null) {
             map.put(EVENT_TYPE, req.getParameter("type").replace("|", ","));
         }
-        if (req.getParameter(OUTPUT_TYPE) != null) {
-            map.put(OUTPUT_TYPE, req.getParameter(OUTPUT_TYPE));
+        if (req.getParameter(OUTPUT_TYPE) != null && req.getParameter(OUTPUT_TYPE).equals(CSV_OUTPUT_TYPE)) {
+            map.put(OUTPUT_TYPE, req.getParameter(CSV_OUTPUT_TYPE));
+            outputType = CSV_OUTPUT_TYPE;
+        }
+        if (req.getParameter(OUTPUT_TYPE) != null && req.getParameter(OUTPUT_TYPE).equals(JSON_OUTPUT_TYPE)) {
+            map.put(OUTPUT_TYPE, req.getParameter(JSON_OUTPUT_TYPE));
         }
         if (req.getParameter(START_TIME) != null) {
             map.put(START_TIME, req.getParameter(START_TIME));
@@ -165,9 +171,6 @@ public class StatisticsServlet extends BaseServlet {
         if (req.getParameter("time") != null) {
             map.put(START_TIME, req.getParameter("time"));
             map.put(END_TIME, null);
-        }
-        if (req.getParameter(OUTPUT_TYPE) != null) {
-            outputType = req.getParameter(OUTPUT_TYPE);
         }
         try {
             this.getRecordsForSQL(map, outputType, resp.getOutputStream(), resp);
@@ -511,7 +514,7 @@ public class StatisticsServlet extends BaseServlet {
             try (Connection conn = ProvDbUtils.getInstance().getConnection();
                 PreparedStatement ps = conn.prepareStatement(filterQuery);
                 ResultSet rs = ps.executeQuery()) {
-                if ("csv".equals(outputType)) {
+                if (CSV_OUTPUT_TYPE.equals(outputType)) {
                     resp.setContentType("application/octet-stream");
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
                     resp.setHeader("Content-Disposition",
