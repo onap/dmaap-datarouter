@@ -253,14 +253,8 @@ public class NodeServlet extends HttpServlet {
                 return;
             }
             fileid = fileid.substring(18);
-            if (req.getHeader("X-DMAAP-DR-PUBLISH-ID") != null && !req.getHeader("X-DMAAP-DR-PUBLISH-ID").matches("^[a-zA-Z0-9_]+$")) {
-                String reason = "Error validating header";
-                eelfLogger.error(reason);
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, reason);
-                eelfLogger.info(EelfMsgs.EXIT);
-                return;
-            }
             pubid = req.getHeader("X-DMAAP-DR-PUBLISH-ID");
+
             user = "datartr";   // SP6 : Added usr as datartr to avoid null entries for internal routing
             targets = config.parseRouting(req.getHeader("X-DMAAP-DR-ROUTING"));
         } else {
