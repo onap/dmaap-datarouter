@@ -205,17 +205,6 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Internal_Publish_But_Invalid_Header_Then_Bad_Request_Response_Is_Generated() throws Exception {
-        when(request.getPathInfo()).thenReturn("/internal/publish/1/blah");
-        when(request.getRemoteAddr()).thenReturn("1.2.3.4");
-        when(config.isAnotherNode(anyString(), anyString())).thenReturn(true);
-        when(request.getHeader("X-DMAAP-DR-PUBLISH-ID")).thenReturn("User1+");
-        nodeServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
-        verifyEnteringExitCalled(listAppender);
-    }
-
-    @Test
     public void Given_Request_Is_HTTP_PUT_On_Publish_And_Ingress_Node_Is_Provided_Then_Request_Is_Redirected() throws Exception {
         setNodeConfigManagerToAllowRedirectOnIngressNode();
         when(request.getPathInfo()).thenReturn("/publish/1/fileName");
