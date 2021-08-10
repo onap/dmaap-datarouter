@@ -156,7 +156,7 @@ public class StatisticsServlet extends BaseServlet {
             map.put(EVENT_TYPE, req.getParameter("type").replace("|", ","));
         }
         if (req.getParameter(OUTPUT_TYPE) != null && req.getParameter(OUTPUT_TYPE).equals(CSV_OUTPUT_TYPE)) {
-            map.put(OUTPUT_TYPE, req.getParameter(CSV_OUTPUT_TYPE));
+            map.put(OUTPUT_TYPE, CSV_OUTPUT_TYPE);
             outputType = CSV_OUTPUT_TYPE;
         }
         if (req.getParameter(OUTPUT_TYPE) != null && req.getParameter(OUTPUT_TYPE).equals(JSON_OUTPUT_TYPE)) {
