@@ -160,7 +160,7 @@ public class StatisticsServlet extends BaseServlet {
             outputType = CSV_OUTPUT_TYPE;
         }
         if (req.getParameter(OUTPUT_TYPE) != null && req.getParameter(OUTPUT_TYPE).equals(JSON_OUTPUT_TYPE)) {
-            map.put(OUTPUT_TYPE, req.getParameter(JSON_OUTPUT_TYPE));
+            map.put(OUTPUT_TYPE, JSON_OUTPUT_TYPE);
         }
         if (req.getParameter(START_TIME) != null) {
             map.put(START_TIME, req.getParameter(START_TIME));
