@@ -66,7 +66,7 @@ public class SubscriberMain {
             httpServerConnector.setIdleTimeout(30000);
 
             // SSL Context Factory
-            SslContextFactory sslContextFactory = new SslContextFactory();
+            SslContextFactory sslContextFactory = new SslContextFactory.Server();
 
             // SSL HTTP Configuration
             HttpConfiguration httpsConfig = new HttpConfiguration(httpConfig);

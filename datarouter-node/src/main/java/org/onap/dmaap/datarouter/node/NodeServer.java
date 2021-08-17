@@ -121,7 +121,7 @@ public class NodeServer {
 
     @NotNull
     private static SslContextFactory getSslContextFactory(NodeConfigManager nodeConfigManager) {
-        SslContextFactory sslContextFactory = new SslContextFactory();
+        SslContextFactory sslContextFactory = new SslContextFactory.Server();
         sslContextFactory.setKeyStoreType(nodeConfigManager.getKSType());
         sslContextFactory.setKeyStorePath(nodeConfigManager.getKSFile());
         sslContextFactory.setKeyStorePassword(nodeConfigManager.getKSPass());

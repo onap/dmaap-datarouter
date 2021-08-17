@@ -139,7 +139,7 @@ public class ProvServer {
 
     @NotNull
     private static SslContextFactory getSslContextFactory(Properties provProps) {
-        SslContextFactory sslContextFactory = new SslContextFactory();
+        SslContextFactory sslContextFactory = new SslContextFactory.Server();
         sslContextFactory.setKeyStoreType(AafPropsUtils.KEYSTORE_TYPE_PROPERTY);
         sslContextFactory.setKeyStorePath(ProvRunner.getAafPropsUtils().getKeystorePathProperty());
         sslContextFactory.setKeyStorePassword(ProvRunner.getAafPropsUtils().getKeystorePassProperty());

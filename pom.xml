@@ -59,7 +59,7 @@
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss'Z'</maven.build.timestamp.format>
 
         <!--dependency version across all modules-->
-        <jetty.version>9.4.20.v20190813</jetty.version>
+        <jetty.version>9.4.41.v20210516</jetty.version>
         <javax.mail-api.version>1.5.5</javax.mail-api.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <qos.logback.version>1.2.3</qos.logback.version>
@@ -79,7 +79,7 @@
         <powermock.version>2.0.7</powermock.version>
         <commons-lang3.version>3.0</commons-lang3.version>
         <eelf-core.version>1.0.0</eelf-core.version>
-        <json.version>20160810</json.version>
+        <json.version>20210307</json.version>
         <sl4j-api.version>1.7.25</sl4j-api.version>
         <hamcrest-lib.version>1.3</hamcrest-lib.version>
         <annotations.version>12.0</annotations.version>
@@ -168,7 +168,7 @@
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-http</artifactId>
-                <version>${jetty.version}</version>
+                <version>9.4.43.v20210629</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
