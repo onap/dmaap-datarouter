@@ -155,22 +155,43 @@ public class StatisticsServlet extends BaseServlet {
         if (req.getParameter("type") != null) {
             map.put(EVENT_TYPE, req.getParameter("type").replace("|", ","));
         }
-        if (req.getParameter(OUTPUT_TYPE) != null && req.getParameter(OUTPUT_TYPE).equals(CSV_OUTPUT_TYPE)) {
-            map.put(OUTPUT_TYPE, CSV_OUTPUT_TYPE);
-            outputType = CSV_OUTPUT_TYPE;
+        if (req.getParameter(OUTPUT_TYPE) != null) {
+            map.put(OUTPUT_TYPE, req.getParameter(OUTPUT_TYPE));
+            outputType = req.getParameter(OUTPUT_TYPE);
         }
         if (req.getParameter(OUTPUT_TYPE) != null && req.getParameter(OUTPUT_TYPE).equals(JSON_OUTPUT_TYPE)) {
             map.put(OUTPUT_TYPE, JSON_OUTPUT_TYPE);
         }
         if (req.getParameter(START_TIME) != null) {
-            map.put(START_TIME, req.getParameter(START_TIME));
+            String start_time = req.getParameter(START_TIME);
+            try{
+                Long.parseLong(start_time);
+                map.put(START_TIME, start_time);
+            }
+            catch (NumberFormatException e){
+                eventlogger.error("Invalid start time StatisticsServlet.doGet: " +  e.getMessage(), e);
+            }
         }
         if (req.getParameter(END_TIME) != null) {
-            map.put(END_TIME, req.getParameter(END_TIME));
+            String end_time = req.getParameter(END_TIME);
+            try{
+                Long.parseLong(end_time);
+                map.put(END_TIME, end_time);
+            }
+            catch (NumberFormatException e){
+                eventlogger.error("Invalid end time StatisticsServlet.doGet: " +  e.getMessage(), e);
+            }
         }
         if (req.getParameter("time") != null) {
-            map.put(START_TIME, req.getParameter("time"));
-            map.put(END_TIME, null);
+            String time = req.getParameter("time");
+            try{
+                Long.parseLong(time);
+                map.put(START_TIME, time);
+                map.put(END_TIME, null);
+            }
+            catch (NumberFormatException e){
+                eventlogger.error("Invalid end time StatisticsServlet.doGet: " +  e.getMessage(), e);
+            }
         }
         try {
             this.getRecordsForSQL(map, outputType, resp.getOutputStream(), resp);
@@ -180,6 +201,10 @@ public class StatisticsServlet extends BaseServlet {
 
     }
 
+    private boolean validateDateInput(String date){
+
+        return true;
+    }
 
     /**
      * rsToJson - Converting RS to JSON object.
