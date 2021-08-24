@@ -1,0 +1,12 @@
+distribution_type: 'container'
+container_release_tag: '2.1.9'
+project: 'dmaap-datarouter'
+log-dir: 'dmaap-datarouter-maven-docker-stage-master/794'
+ref: 6cae65debc366ca3fb2f2467226420b82f2b0070
+containers:
+  - name: dmaap/datarouter-prov
+    version: 2.1.9-STAGING-20210823T131036Z
+  - name: dmaap/datarouter-node
+    version: 2.1.9-STAGING-20210823T131036Z
+  - name: dmaap/datarouter-subscriber
+    version: 2.1.9-STAGING-20210823T131036Z
