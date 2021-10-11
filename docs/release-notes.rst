@@ -2,12 +2,82 @@
 .. http://creativecommons.org/licenses/by/4.0
 .. _release_notes:
 
+
+..      ===========================
+..      * * *    ISTANBUL    * * *
+..      ===========================
+
+Release Notes
+=============
+
+Abstract
+--------
+
+This document provides the release notes for the DMaaP DR Istanbul release.
+
+Summary
+-------
+No big changes for Istanbul Release.
+
+Release Data
+------------
+
++--------------------------------------+--------------------------------------+
+| **DMaaP Data Router Project**        |                                      |
++--------------------------------------+--------------------------------------+
+| **Docker images**                    | - datarouter-prov 2.1.9              |
+|                                      | - datarouter-node 2.1.9              |
++--------------------------------------+--------------------------------------+
+| **Release designation**              | 9.0.0 Istanbul                       |
++--------------------------------------+--------------------------------------+
+| **Release date**                     | 2021-10-14                           |
++--------------------------------------+--------------------------------------+
+
+New features
+------------
+
+* Package upgrades - DMAAP-1608
+* Move csits to dr repo - DMAAP-1636
+* Sonar fixes - DMAAP-1623
+
+
+Known Limitations, Issues and Workarounds
+-----------------------------------------
+
+System Limitations
+------------------
+
+Known Vulnerabilities
+---------------------
+
+Workarounds
+-----------
+
+Security Notes
+--------------
+
+References
+----------
+
+For more information on the ONAP Frankfurt release, please see:
+
+#. `ONAP Home Page`_
+#. `ONAP Documentation`_
+#. `ONAP Release Downloads`_
+#. `ONAP Wiki Page`_
+
+.. _`ONAP Home Page`: https://www.onap.org
+.. _`ONAP Wiki Page`: https://wiki.onap.org
+.. _`ONAP Documentation`: https://docs.onap.org
+.. _`ONAP Release Downloads`: https://git.onap.org
+
+
 ..      ===========================
 ..      * * *    Honolulu    * * *
 ..      ===========================
 
-DMaaP Data Router Release Notes
--------------------------------
+Release Notes
+=============
 
 Abstract
 --------
@@ -29,7 +99,7 @@ Release Data
 +--------------------------------------+--------------------------------------+
 | **Release designation**              | 8.0.0 Honolulu                       |
 +--------------------------------------+--------------------------------------+
-| **Release date**                     | 2021-04-01 (TBD)                     |
+| **Release date**                     | 2021-04-01                           |
 +--------------------------------------+--------------------------------------+
 
 New features
@@ -76,8 +146,8 @@ For more information on the ONAP Frankfurt release, please see:
 ..      * * *    GUILIN       * * *
 ..      ===========================
 
-DMaaP Data Router Release Notes
-===============================
+Release Notes
+=============
 
 Abstract
 --------
@@ -124,8 +194,8 @@ Security Notes
 ..      * * *    FRANKFURT    * * *
 ..      ===========================
 
-DMaaP Data Router Release Notes
--------------------------------
+Release Notes
+=============
 
 Abstract
 --------
@@ -188,8 +258,10 @@ For more information on the ONAP Frankfurt release, please see:
 
 
 Version: 2.1.2 (El Alto)
----------------------------
+------------------------
 
+Release Notes
+=============
 :Release Date: 2019-09-05
 
 New Features:
@@ -229,7 +301,10 @@ N/A
 
 
 Version: 2.1.0 (Dublin)
----------------------------
+-----------------------
+
+Release Notes
+=============
 
 :Release Date: 2019-06-06
 
@@ -295,6 +370,9 @@ N/A
 Version: 1.0.8 (Casablanca)
 ---------------------------
 
+Release Notes
+=============
+
 :Release Date: 2019-02-28
 
 New Features:
@@ -336,6 +414,9 @@ N/A
 
 Version: 1.0.3 (Casablanca)
 ---------------------------
+
+Release Notes
+=============
 
 :Release Date: 2018-11-30
 
