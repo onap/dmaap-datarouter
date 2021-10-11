@@ -100,16 +100,6 @@ public class LogfileLoaderTest {
         assertFalse(lfl.pruneRecords());
     }
 
-    @Test
-    public void Verify_Records_Prune_When_Record_Count_Is_Greater_Then_Threshold() {
-        lfl.process(testLog);
-        PowerMockito.mockStatic(Parameters.class);
-        PowerMockito.when(Parameters.getParameter(Parameters.PROV_LOG_RETENTION)).thenReturn(new Parameters(Parameters.PROV_LOG_RETENTION, "0"));
-        PowerMockito.when(Parameters.getParameter(Parameters.DEFAULT_LOG_RETENTION)).thenReturn(new Parameters(Parameters.DEFAULT_LOG_RETENTION, "1"));
-        assertTrue(lfl.pruneRecords());
-    }
-
-
     private void prepFile(File logFile) {
         String testLogs =           "2018-08-29-10-10-10-543.|LOG|1|1|https://dmaap-dr-prov:/url/file123|POST|application/vnd.att-dr.feed|100|mockType|file123|https://dmaap-dr-prov|user123|200|1|1|200|2|2\n"
                                   + "2018-08-29-10-10-10-543.|EXP|1|1|1|'url/file123'|PUT|null|3|new reason|4\n"
