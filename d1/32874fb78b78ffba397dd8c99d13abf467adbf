@@ -1,0 +1,8 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+1: Bengt Thuree <bthuree@linuxfoundation.org>
+Code-Review+2: Fiachra Corcoran <fiachra.corcoran@est.tech>
+Submitted-by: Fiachra Corcoran <fiachra.corcoran@est.tech>
+Submitted-at: Tue, 26 Oct 2021 13:11:00 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/dmaap/datarouter/+/125238
+Project: dmaap/datarouter
+Branch: refs/heads/istanbul
