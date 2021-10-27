@@ -7,8 +7,12 @@
 ..      * * *    ISTANBUL    * * *
 ..      ===========================
 
+=============
 Release Notes
 =============
+
+Istanbul
+========
 
 Abstract
 --------
@@ -59,7 +63,7 @@ Security Notes
 References
 ----------
 
-For more information on the ONAP Frankfurt release, please see:
+For more information on the ONAP Istanbul release, please see:
 
 #. `ONAP Home Page`_
 #. `ONAP Documentation`_
@@ -76,8 +80,9 @@ For more information on the ONAP Frankfurt release, please see:
 ..      * * *    Honolulu    * * *
 ..      ===========================
 
-Release Notes
-=============
+
+Honolulu
+========
 
 Abstract
 --------
@@ -129,7 +134,7 @@ Security Notes
 References
 ----------
 
-For more information on the ONAP Frankfurt release, please see:
+For more information on the ONAP Honolulu release, please see:
 
 #. `ONAP Home Page`_
 #. `ONAP Documentation`_
@@ -146,8 +151,8 @@ For more information on the ONAP Frankfurt release, please see:
 ..      * * *    GUILIN       * * *
 ..      ===========================
 
-Release Notes
-=============
+Guilin
+======
 
 Abstract
 --------
@@ -194,8 +199,8 @@ Security Notes
 ..      * * *    FRANKFURT    * * *
 ..      ===========================
 
-Release Notes
-=============
+Frankfurt
+=========
 
 Abstract
 --------
@@ -257,11 +262,12 @@ For more information on the ONAP Frankfurt release, please see:
 .. _`ONAP Release Downloads`: https://git.onap.org
 
 
-Version: 2.1.2 (El Alto)
-------------------------
+El Alto
+=======
 
-Release Notes
-=============
+Version: 2.1.2
+--------------
+
 :Release Date: 2019-09-05
 
 New Features:
@@ -300,11 +306,11 @@ Other:
 N/A
 
 
-Version: 2.1.0 (Dublin)
------------------------
+Dublin
+======
 
-Release Notes
-=============
+Version: 2.1.0
+--------------
 
 :Release Date: 2019-06-06
 
@@ -367,11 +373,11 @@ Other:
 N/A
 
 
-Version: 1.0.8 (Casablanca)
----------------------------
+Casablanca Maintenance
+======================
 
-Release Notes
-=============
+Version: 1.0.8
+--------------
 
 :Release Date: 2019-02-28
 
@@ -412,11 +418,11 @@ Other:
 N/A
 
 
-Version: 1.0.3 (Casablanca)
----------------------------
+Casablanca
+==========
 
-Release Notes
-=============
+Version: 1.0.3
+--------------
 
 :Release Date: 2018-11-30
 
