@@ -62,7 +62,8 @@
         <jetty.version>9.4.41.v20210516</jetty.version>
         <javax.mail-api.version>1.5.5</javax.mail-api.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
-        <qos.logback.version>1.2.3</qos.logback.version>
+        <qos.logback.version>1.2.7</qos.logback.version>
+        <qos.logback.classic.version>1.2.3</qos.logback.classic.version>
         <aaf-cadi-aaf.version>2.1.15</aaf-cadi-aaf.version>
         <commons-codec.version>1.15</commons-codec.version>
         <gmaven-plugin.version>1.5</gmaven-plugin.version>
@@ -120,7 +121,7 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>${qos.logback.version}</version>
+                <version>${qos.logback.classic.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>
@@ -374,7 +375,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.1</version>
                     <configuration>
                         <failOnError>false</failOnError>
                     </configuration>
