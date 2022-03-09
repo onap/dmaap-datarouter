@@ -163,33 +163,33 @@ public class StatisticsServlet extends BaseServlet {
             map.put(OUTPUT_TYPE, JSON_OUTPUT_TYPE);
         }
         if (req.getParameter(START_TIME) != null) {
-            String start_time = req.getParameter(START_TIME);
-            try{
-                Long.parseLong(start_time);
-                map.put(START_TIME, start_time);
+            String startTime = req.getParameter(START_TIME);
+            try {
+                Long.parseLong(startTime);
+                map.put(START_TIME, startTime);
             }
-            catch (NumberFormatException e){
+            catch (NumberFormatException e) {
                 eventlogger.error("Invalid start time StatisticsServlet.doGet: " +  e.getMessage(), e);
             }
         }
         if (req.getParameter(END_TIME) != null) {
-            String end_time = req.getParameter(END_TIME);
-            try{
-                Long.parseLong(end_time);
-                map.put(END_TIME, end_time);
+            String endTime = req.getParameter(END_TIME);
+            try {
+                Long.parseLong(endTime);
+                map.put(END_TIME, endTime);
             }
-            catch (NumberFormatException e){
+            catch (NumberFormatException e) {
                 eventlogger.error("Invalid end time StatisticsServlet.doGet: " +  e.getMessage(), e);
             }
         }
         if (req.getParameter("time") != null) {
             String time = req.getParameter("time");
-            try{
+            try {
                 Long.parseLong(time);
                 map.put(START_TIME, time);
                 map.put(END_TIME, null);
             }
-            catch (NumberFormatException e){
+            catch (NumberFormatException e) {
                 eventlogger.error("Invalid end time StatisticsServlet.doGet: " +  e.getMessage(), e);
             }
         }
@@ -199,11 +199,6 @@ public class StatisticsServlet extends BaseServlet {
             eventlogger.error("PROV0174 StatisticsServlet.doGet: " +  ioe.getMessage(), ioe);
         }
 
-    }
-
-    private boolean validateDateInput(String date){
-
-        return true;
     }
 
     /**
@@ -310,13 +305,18 @@ public class StatisticsServlet extends BaseServlet {
      *
      * @param map as key value pare of all user input fields
      */
-    private String queryGeneretor(Map<String, String> map) throws ParseException {
+    private PreparedStatement queryGeneretor(Map<String, String> map) throws ParseException, SQLException {
 
         String sql;
         String feedids = null;
         String startTime = null;
         String endTime = null;
+        long compareTime = 0;
+        long startInMillis = 0;
+        long endInMillis = 0;
         String subid = " ";
+        String compareType = null;
+        PreparedStatement ps = null;
 
         if (map.get(FEEDIDS) != null) {
             feedids = map.get(FEEDIDS);
@@ -331,49 +331,56 @@ public class StatisticsServlet extends BaseServlet {
             subid = map.get(SUBID);
         }
 
-        eventlogger.info("Generating sql query to get Statistics resultset. ");
-
         if (endTime == null && startTime == null) {
-
-            sql =  SQL_SELECT_NAME + feedids + SQL_FEED_ID + SQL_SELECT_COUNT + feedids + SQL_TYPE_PUB
-                + SQL_SELECT_SUM
-                + feedids + SQL_PUBLISH_LENGTH
-                + SQL_SUBSCRIBER_URL + SQL_SUB_ID + SQL_DELIVERY_TIME + SQL_AVERAGE_DELAY + SQL_JOIN_RECORDS
-                + feedids + ") " + subid
-                + SQL_STATUS_204 + SQL_GROUP_SUB_ID;
-
-            return sql;
+            sql =  SQL_SELECT_NAME + "?" + SQL_FEED_ID + SQL_SELECT_COUNT + "?" + SQL_TYPE_PUB + SQL_SELECT_SUM
+                + "?" + SQL_PUBLISH_LENGTH + SQL_SUBSCRIBER_URL + SQL_SUB_ID + SQL_DELIVERY_TIME + SQL_AVERAGE_DELAY
+                + SQL_JOIN_RECORDS + "?" + ") " + "?" + SQL_STATUS_204
+                + SQL_GROUP_SUB_ID;
+            compareType = "default";
         } else if (startTime != null && endTime == null) {
-
             long inputTimeInMilli = 60000 * Long.parseLong(startTime);
             Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
             long currentTimeInMilli = cal.getTimeInMillis();
-            long compareTime = currentTimeInMilli - inputTimeInMilli;
-
-            sql = SQL_SELECT_NAME + feedids + SQL_FEED_ID + SQL_SELECT_COUNT + feedids + SQL_TYPE_PUB
-                + SQL_SELECT_SUM
-                + feedids + SQL_PUBLISH_LENGTH
-                + SQL_SUBSCRIBER_URL + SQL_SUB_ID + SQL_DELIVERY_TIME + SQL_AVERAGE_DELAY + SQL_JOIN_RECORDS
-                + feedids + ") " + subid
-                + SQL_STATUS_204 + " and e.event_time>=" + compareTime + SQL_GROUP_SUB_ID;
-            return sql;
-
+            compareTime = currentTimeInMilli - inputTimeInMilli;
+            sql = SQL_SELECT_NAME + "?" + SQL_FEED_ID + SQL_SELECT_COUNT + "?" + SQL_TYPE_PUB + SQL_SELECT_SUM
+                + "?" + SQL_PUBLISH_LENGTH + SQL_SUBSCRIBER_URL + SQL_SUB_ID + SQL_DELIVERY_TIME + SQL_AVERAGE_DELAY
+                + SQL_JOIN_RECORDS + "?" + ") " + "?" + SQL_STATUS_204
+                + " and e.event_time>=" + "?" + SQL_GROUP_SUB_ID;
+            compareType = "start";
         } else {
             SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             Date startDate = inFormat.parse(startTime);
             Date endDate = inFormat.parse(endTime);
-
-            long startInMillis = startDate.getTime();
-            long endInMillis = endDate.getTime();
-
-            sql = SQL_SELECT_NAME + feedids + SQL_FEED_ID + SQL_SELECT_COUNT + feedids + SQL_TYPE_PUB
-                + SQL_SELECT_SUM
-                + feedids + SQL_PUBLISH_LENGTH + SQL_SUBSCRIBER_URL
-                + SQL_SUB_ID + SQL_DELIVERY_TIME + SQL_AVERAGE_DELAY + SQL_JOIN_RECORDS + feedids + ")" + subid + SQL_STATUS_204
-                +" and e.event_time between " + startInMillis + " and " + endInMillis + SQL_GROUP_SUB_ID;
-
-            return sql;
+            startInMillis = startDate.getTime();
+            endInMillis = endDate.getTime();
+            sql = SQL_SELECT_NAME + "?" + SQL_FEED_ID + SQL_SELECT_COUNT + "?" + SQL_TYPE_PUB + SQL_SELECT_SUM
+                + "?" + SQL_PUBLISH_LENGTH + SQL_SUBSCRIBER_URL + SQL_SUB_ID + SQL_DELIVERY_TIME + SQL_AVERAGE_DELAY
+                + SQL_JOIN_RECORDS + "?" + ") " + "?" + SQL_STATUS_204
+                + " and e.event_time between " + "?" + " and " + "?" + SQL_GROUP_SUB_ID;
+            compareType = "startAndEnd";
         }
+        try (Connection conn = ProvDbUtils.getInstance().getConnection()) {
+            eventlogger.debug("SQL Query for Statistics resultset. " + sql);
+            intlogger.debug(sql);
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, feedids);
+            ps.setString(2, feedids);
+            ps.setString(3, feedids);
+            ps.setString(4, feedids);
+            ps.setString(5, subid);
+            if (compareType.equals("start")) {
+                ps.setLong(6, compareTime);
+            }
+            if (compareType.equals("startAndEnd")) {
+                ps.setLong(6, startInMillis);
+                ps.setLong(7, endInMillis);
+            }
+        } finally {
+            if (ps != null) {
+                ps.close();
+            }
+        }
+        return ps;
     }
 
 
@@ -459,7 +466,7 @@ public class StatisticsServlet extends BaseServlet {
                 return map;
             }
             map.put("statusSQL", sql);
-            map.put("resultSQL", sql.replaceAll("STATUS", "RESULT"));
+            map.put("resultSQL", sql.replace("STATUS", "RESULT"));
         }
 
         str = req.getParameter("expiryReason");
@@ -531,35 +538,39 @@ public class StatisticsServlet extends BaseServlet {
 
     private void getRecordsForSQL(Map<String, String> map, String outputType, ServletOutputStream out,
         HttpServletResponse resp) {
+        eventlogger.info("Generating sql query to get Statistics resultset. ");
         try {
-            String filterQuery = this.queryGeneretor(map);
-            eventlogger.debug("SQL Query for Statistics resultset. " + filterQuery);
-            intlogger.debug(filterQuery);
+            PreparedStatement ps = this.queryGeneretor(map);
             long start = System.currentTimeMillis();
-            try (Connection conn = ProvDbUtils.getInstance().getConnection();
-                PreparedStatement ps = conn.prepareStatement(filterQuery);
-                ResultSet rs = ps.executeQuery()) {
-                if (CSV_OUTPUT_TYPE.equals(outputType)) {
-                    resp.setContentType("application/octet-stream");
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-                    resp.setHeader("Content-Disposition",
-                        "attachment; filename=\"result:" + LocalDateTime.now().format(formatter) + ".csv\"");
-                    eventlogger.info("Generating CSV file from Statistics resultset");
-                    rsToCSV(rs, out);
-                } else {
-                    eventlogger.info("Generating JSON for Statistics resultset");
-                    this.rsToJson(rs, out);
-                }
-            } catch (SQLException e) {
-                eventlogger.error("SQLException:" + e);
-            }
+            executeQuery(outputType, out, resp, ps);
             intlogger.debug("Time: " + (System.currentTimeMillis() - start) + " ms");
+        } catch (SQLException e) {
+            eventlogger.error("SQLException:" + e);
         } catch (IOException e) {
             eventlogger.error("IOException - Generating JSON/CSV:" + e);
         } catch (JSONException e) {
             eventlogger.error("JSONException - executing SQL query:" + e);
         } catch (ParseException e) {
             eventlogger.error("ParseException - executing SQL query:" + e);
+        }
+    }
+
+    private void executeQuery(String outputType, ServletOutputStream out, HttpServletResponse resp,
+        PreparedStatement ps) throws IOException {
+        try (ResultSet rs = ps.executeQuery()) {
+            if (CSV_OUTPUT_TYPE.equals(outputType)) {
+                resp.setContentType("application/octet-stream");
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+                resp.setHeader("Content-Disposition",
+                    "attachment; filename=\"result:" + LocalDateTime.now().format(formatter) + ".csv\"");
+                eventlogger.info("Generating CSV file from Statistics resultset");
+                rsToCSV(rs, out);
+            } else {
+                eventlogger.info("Generating JSON for Statistics resultset");
+                this.rsToJson(rs, out);
+            }
+        } catch (SQLException e) {
+            eventlogger.error("SQLException:" + e);
         }
     }
 }

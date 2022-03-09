@@ -119,7 +119,7 @@ public class StatisticsServletTest {
     ServletOutputStream outStream = mock(ServletOutputStream.class);
     when(response.getOutputStream()).thenReturn(outStream);
     statisticsServlet.doGet(request, response);
-    verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+    verify(response).setStatus(HttpServletResponse.SC_OK);
   }
 
   @Test
@@ -130,7 +130,7 @@ public class StatisticsServletTest {
     ServletOutputStream outStream = mock(ServletOutputStream.class);
     when(response.getOutputStream()).thenReturn(outStream);
     statisticsServlet.doGet(request, response);
-    verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+    verify(response).setStatus(HttpServletResponse.SC_OK);
   }
 
   private void buildRequestParameters() {
