@@ -30,6 +30,7 @@ services:
     - "8080:8080"
     volumes:
     - ./provserver.properties:/opt/app/datartr/etc/provserver.properties
+    - ./logback.xml:/opt/app/datartr/etc/logback.xml
     - ../dr_certs/dr_prov/truststore.jks:/opt/app/osaaf/local/truststore.jks
     - ../dr_certs/dr_prov/org.onap.dmaap-dr-prov.p12:/opt/app/osaaf/local/org.onap.dmaap-dr-prov.p12
     - ../dr_certs/dr_prov/org.onap.dmaap-dr.cred.props:/opt/app/osaaf/local/org.onap.dmaap-dr.cred.props
