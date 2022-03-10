@@ -253,7 +253,7 @@ public class NodeServlet extends HttpServlet {
                 return;
             }
             fileid = fileid.substring(18);
-            pubid = req.getHeader("X-DMAAP-DR-PUBLISH-ID");
+            pubid = generateAndValidatePublishId(req);
 
             user = "datartr";   // SP6 : Added usr as datartr to avoid null entries for internal routing
             targets = config.parseRouting(req.getHeader("X-DMAAP-DR-ROUTING"));
@@ -464,6 +464,17 @@ public class NodeServlet extends HttpServlet {
                 eelfLogger.error("NODE0533 Exception common: " + e);
             }
         }
+    }
+
+    private String generateAndValidatePublishId(HttpServletRequest req) throws IOException {
+        String newPubId = req.getHeader("X-DMAAP-DR-PUBLISH-ID");
+
+        String regex = ".*";
+
+        if(newPubId.matches(regex)){
+            return newPubId;
+        }
+        throw new IOException("Invalid Header X-DMAAP-DR-PUBLISH-ID");
     }
 
     private String writeInputStreamToFile(HttpServletRequest req, File data) {
