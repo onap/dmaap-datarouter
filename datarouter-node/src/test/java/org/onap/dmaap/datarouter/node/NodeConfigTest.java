@@ -239,7 +239,7 @@ public class NodeConfigTest {
     @Test
     public void Given_Different_Ip_Then_Is_Another_Node_Returns_True() {
         Boolean isAnotherNode =
-                nodeConfig.isAnotherNode("Basic MTcyLjAuMC40OmtCTmhkWVFvbzhXNUphZ2g4T1N4Zmp6Mzl1ND0=", "172.0.0.4");
+                nodeConfig.isAnotherNode("Basic MTcyLjAuMC40OjlKOEFMUEhWQ2FpZ3FnZFpMMlRMYVRKSE1QQS8wNjdjR2JhV2RaUU1XSG1MNk5KbEtBVmpPbWtoZTR6ZmVlYjJzbElNMVR0REc2b0tYb0dLSDRMa1BBPT0=", "172.0.0.4");
         Assert.assertTrue(isAnotherNode);
     }
 
@@ -258,6 +258,6 @@ public class NodeConfigTest {
     @Test
     public void Validate_Get_MyAuth_Returns_Correct_Auth() {
         String auth = nodeConfig.getMyAuth();
-        Assert.assertEquals("Basic TmFtZTp6Z04wMFkyS3gybFppbXltNy94ZDhuMkdEYjA9", auth);
+        Assert.assertEquals("Basic TmFtZTo3YTRsQkxqMENQQ3lEbVVPaUI5Tks3b0pSeGROVUxqZzNNUHpkcEFYNHcvN09DNVR5S1hhWFA0MGR5aHhzbm90bXM4d1BGeXdHVlQ3MTJhcldXSFR1dz09", auth);
     }
 }

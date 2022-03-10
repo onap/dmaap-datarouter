@@ -99,14 +99,14 @@ public class NodeUtils {
      */
     public static String getNodeAuthHdr(String node, String key) {
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA");
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
             md.update(key.getBytes());
             md.update(node.getBytes());
             md.update(key.getBytes());
             return (getAuthHdr(node, base64Encode(md.digest())));
         } catch (Exception exception) {
             eelfLogger
-                    .error("Exception in generating Credentials for given node name:= " + exception.toString(),
+                    .error("Exception in generating Credentials for given node name:= " + exception.getMessage(),
                             exception);
             return (null);
         }

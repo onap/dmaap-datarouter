@@ -133,7 +133,7 @@ public class NodeConfigManagerTest {
         Assert.assertFalse(nodeConfigManager.isFollowRedirects());
         Assert.assertNotNull(nodeConfigManager.getTimer());
         Assert.assertEquals("1", nodeConfigManager.getFeedId("1"));
-        Assert.assertEquals("Basic ZG1hYXAtZHItbm9kZTpsaEFUNHY2N3F3blY3QVFxV3ByMm84WXNuVjg9", nodeConfigManager.getMyAuth());
+        Assert.assertEquals("Basic ZG1hYXAtZHItbm9kZTp2OStFanZpWVBXSURrazVxRlF5ZkoxSC9LdHBuYWo4K0NVTXlNL0lRRUp2UGdjOUxpU2s5ZnpKTjdFazl3SzZkaG11S1E4S3RtcC9kelpBU3BRUGZCdz09", nodeConfigManager.getMyAuth());
         Assert.assertEquals(0.05, nodeConfigManager.getFreeDiskStart(), 0.0);
         Assert.assertEquals(0.2, nodeConfigManager.getFreeDiskStop(), 0.0);
         Assert.assertEquals("org.onap.dmaap-dr.feed|legacy|publish", nodeConfigManager.getPermission("legacy"));
