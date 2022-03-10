@@ -117,7 +117,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
                 String header = line.substring(0, index);
                 String headerValue = line.substring(index + 1);
                 if ("x-dmaap-dr-routing".equalsIgnoreCase(header)) {
-                    subid = headerValue.replaceAll("[^ ]*/", "");
+                    subid = headerValue.replaceAll("[^ ]*/+", "");
                     feedid = deliveryTaskHelper.getFeedId(subid.replaceAll(" .*", ""));
                 }
                 if (length == 0 && header.toLowerCase().startsWith("content-")) {

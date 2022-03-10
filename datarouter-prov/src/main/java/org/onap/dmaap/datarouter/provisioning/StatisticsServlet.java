@@ -542,7 +542,6 @@ public class StatisticsServlet extends BaseServlet {
             intlogger.debug("Time: " + (System.currentTimeMillis() - start) + " ms");
         } catch (SQLException e) {
             eventlogger.error("SQLException:" + e.getMessage());
-            e.printStackTrace();
         } catch (IOException e) {
             eventlogger.error("IOException - Generating JSON/CSV:" + e);
         } catch (JSONException e) {
