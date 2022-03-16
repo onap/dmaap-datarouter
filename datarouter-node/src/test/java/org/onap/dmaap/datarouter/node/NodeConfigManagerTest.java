@@ -112,6 +112,7 @@ public class NodeConfigManagerTest {
         Assert.assertEquals("publish", nodeConfigManager.getAafAction());
         Assert.assertFalse(nodeConfigManager.getCadiEnabled());
         Assert.assertFalse(nodeConfigManager.isShutdown());
+        Assert.assertTrue(nodeConfigManager.isTlsEnabled());
         Assert.assertTrue(nodeConfigManager.isConfigured());
         Assert.assertEquals("legacy", nodeConfigManager.getAafInstance("1"));
         Assert.assertNotNull(nodeConfigManager.getPublishId());
