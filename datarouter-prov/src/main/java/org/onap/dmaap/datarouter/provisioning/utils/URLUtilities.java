@@ -28,8 +28,8 @@ import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
 import org.onap.dmaap.datarouter.provisioning.BaseServlet;
+import org.onap.dmaap.datarouter.provisioning.ProvRunner;
 
 /**
  * Utility functions used to generate the different URLs used by the Data Router.
@@ -39,9 +39,7 @@ import org.onap.dmaap.datarouter.provisioning.BaseServlet;
  */
 public class URLUtilities {
 
-
     private static final EELFLogger utilsLogger = EELFManager.getInstance().getLogger("UtilsLog");
-    private static final String HTTPS = "https://";
     private static String otherPod;
 
     private URLUtilities() {
@@ -54,7 +52,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generateFeedURL(int feedid) {
-        return HTTPS + BaseServlet.getProvName() + "/feed/" + feedid;
+        return getUrlSecurityOption() + BaseServlet.getProvName() + "/feed/" + feedid;
     }
 
     /**
@@ -64,7 +62,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generatePublishURL(int feedid) {
-        return HTTPS + BaseServlet.getProvName() + "/publish/" + feedid;
+        return getUrlSecurityOption() + BaseServlet.getProvName() + "/publish/" + feedid;
     }
 
     /**
@@ -74,7 +72,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generateSubscribeURL(int feedid) {
-        return HTTPS + BaseServlet.getProvName() + "/subscribe/" + feedid;
+        return getUrlSecurityOption() + BaseServlet.getProvName() + "/subscribe/" + feedid;
     }
 
     /**
@@ -84,7 +82,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generateFeedLogURL(int feedid) {
-        return HTTPS + BaseServlet.getProvName() + "/feedlog/" + feedid;
+        return getUrlSecurityOption() + BaseServlet.getProvName() + "/feedlog/" + feedid;
     }
 
     /**
@@ -94,7 +92,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generateSubscriptionURL(int subid) {
-        return HTTPS + BaseServlet.getProvName() + "/subs/" + subid;
+        return getUrlSecurityOption() + BaseServlet.getProvName() + "/subs/" + subid;
     }
 
     /**
@@ -104,7 +102,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generateSubLogURL(int subid) {
-        return HTTPS + BaseServlet.getProvName() + "/sublog/" + subid;
+        return getUrlSecurityOption() + BaseServlet.getProvName() + "/sublog/" + subid;
     }
 
     /**
@@ -113,7 +111,7 @@ public class URLUtilities {
      * @return the URL
      */
     public static String generatePeerProvURL() {
-        return HTTPS + getPeerPodName() + "/internal/prov";
+        return getUrlSecurityOption() + getPeerPodName() + "/internal/prov";
     }
 
     /**
@@ -128,7 +126,7 @@ public class URLUtilities {
             return "";
         }
 
-        return HTTPS + peerPodUrl + "/internal/drlogs/";
+        return getUrlSecurityOption() + peerPodUrl + "/internal/drlogs/";
     }
 
     /**
@@ -152,6 +150,14 @@ public class URLUtilities {
             }
         }
         return otherPod;
+    }
+
+    public static String getUrlSecurityOption() {
+        if (Boolean.parseBoolean(ProvRunner.getProvProperties()
+            .getProperty("org.onap.dmaap.datarouter.provserver.tlsenabled", "true"))) {
+            return "https://";
+        }
+        return "http://";
     }
 
 }
