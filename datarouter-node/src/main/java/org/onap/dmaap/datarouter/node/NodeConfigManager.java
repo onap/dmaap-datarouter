@@ -102,6 +102,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private String aafType;
     private String aafInstance;
     private String aafAction;
+    private boolean tlsEnabled;
     private boolean cadiEnabled;
     private NodeAafPropsUtils nodeAafPropsUtils;
 
@@ -159,6 +160,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         svcport = Integer.parseInt(drNodeProperties.getProperty("IntHttpsPort", "8443"));
         port = Integer.parseInt(drNodeProperties.getProperty("ExtHttpsPort", "443"));
         spooldir = drNodeProperties.getProperty("SpoolDir", "spool");
+        tlsEnabled = Boolean.parseBoolean(drNodeProperties.getProperty("TlsEnabled", "true"));
+
         File fdir = new File(spooldir + "/f");
         fdir.mkdirs();
         for (File junk : Objects.requireNonNull(fdir.listFiles())) {
@@ -809,6 +812,10 @@ public class NodeConfigManager implements DeliveryQueueHelper {
 
     String getAafAction() {
         return aafAction;
+    }
+
+    protected boolean isTlsEnabled() {
+        return tlsEnabled;
     }
 
     boolean getCadiEnabled() {

@@ -549,7 +549,7 @@ public class NodeServlet extends HttpServlet {
             eelfLogger.info(EelfMsgs.EXIT);
             return null;
         }
-        if (!req.isSecure()) {
+        if (!req.isSecure() && config.isTlsEnabled()) {
             eelfLogger.error(
                     "NODE0104 Rejecting insecure PUT or DELETE of " + req.getPathInfo() + FROM + req
                             .getRemoteAddr());

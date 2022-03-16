@@ -23,7 +23,6 @@
 package org.onap.dmaap.datarouter.node;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.anyString;
@@ -144,8 +143,9 @@ public class NodeServletTest {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_PUT_And_Request_Is_Not_Secure_Then_Forbidden_Response_Is_Generated() throws Exception {
+    public void Given_Request_Is_HTTP_PUT_And_Request_Is_Not_Secure_And_TLS_Enabled_Then_Forbidden_Response_Is_Generated() throws Exception {
         when(request.isSecure()).thenReturn(false);
+        when(config.isTlsEnabled()).thenReturn(true);
         nodeServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
         verifyEnteringExitCalled(listAppender);
@@ -277,6 +277,17 @@ public class NodeServletTest {
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_File_Then_Request_Succeeds() throws Exception {
+        when(request.getPathInfo()).thenReturn("/delete/1/dmaap-dr-node.1234567");
+        createFilesAndDirectories();
+        nodeServlet.doDelete(request, response);
+        verify(response).setStatus(eq(HttpServletResponse.SC_OK));
+        verifyEnteringExitCalled(listAppender);
+    }
+
+    @Test
+    public void Given_Request_Is_HTTP_DELETE_File_And_Request_Is_Not_Secure_But_TLS_Disabled_Then_Request_Succeeds() throws Exception {
+        when(request.isSecure()).thenReturn(false);
+        when(config.isTlsEnabled()).thenReturn(false);
         when(request.getPathInfo()).thenReturn("/delete/1/dmaap-dr-node.1234567");
         createFilesAndDirectories();
         nodeServlet.doDelete(request, response);
