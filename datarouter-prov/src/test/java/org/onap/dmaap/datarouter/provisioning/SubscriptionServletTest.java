@@ -22,9 +22,27 @@
  ******************************************************************************/
 package org.onap.dmaap.datarouter.provisioning;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
+
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
@@ -44,25 +62,6 @@ import org.onap.dmaap.datarouter.provisioning.utils.Poker;
 import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.onap.dmaap.datarouter.provisioning.BaseServlet.BEHALF_HEADER;
 
 
 @RunWith(PowerMockRunner.class)
@@ -89,7 +88,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         em = emf.createEntityManager();
         System.setProperty(
             "org.onap.dmaap.datarouter.provserver.properties",
-            "src/test/resources/h2Database.properties");
+            "src/test/resources/h2DatabaseTlsDisabled.properties");
     }
 
     @AfterClass
@@ -154,14 +153,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
         };
         subscriptionServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), anyString());
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_DELETE_And_AAF_CADI_Is_Enabled_Without_Permissions_Then_Forbidden_Response_Is_Generated() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
-        when(request.getPathInfo()).thenReturn("/2");
-        subscriptionServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), contains("AAF disallows access"));
     }
 
     @Test
