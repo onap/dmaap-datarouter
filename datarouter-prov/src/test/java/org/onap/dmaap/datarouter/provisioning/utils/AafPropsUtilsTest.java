@@ -37,12 +37,12 @@ public class AafPropsUtilsTest {
 
     @Test
     public void Assert_AaafPropsUtils_Decrypt_KeyStorePass() {
-        Assert.assertEquals("SYCnsM&BPf@JFhi[&Z2?w?p1", aafPropsUtils.getKeystorePassProperty());
+        Assert.assertEquals("b.Qo{*!a(a;jmeOfKbA&vHx#", aafPropsUtils.getKeystorePassProperty());
     }
 
     @Test
     public void Assert_AaafPropsUtils_Decrypt_TruststorePass() {
-        Assert.assertEquals(";#HI&OVN,V5O!qBRoNiQEut:", aafPropsUtils.getTruststorePassProperty());
+        Assert.assertEquals("YeXhcTw6%G[od1a43+P!yhoN", aafPropsUtils.getTruststorePassProperty());
     }
 
     @Test
