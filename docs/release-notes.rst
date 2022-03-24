@@ -2,6 +2,80 @@
 .. http://creativecommons.org/licenses/by/4.0
 .. _release_notes:
 
+..      ===========================
+..      * * *    JAKARTA    * * *
+..      ===========================
+
+=============
+Release Notes
+=============
+
+Jakarta
+========
+
+Abstract
+--------
+
+This document provides the release notes for the DMaaP DR Jakarta release.
+
+Summary
+-------
+No big changes for Jakarta Release.
+Some bug fixes and sonar fixes.
+
+Release Data
+------------
+
++--------------------------------------+--------------------------------------+
+| **DMaaP Data Router Project**        |                                      |
++--------------------------------------+--------------------------------------+
+| **Docker images**                    | - datarouter-prov 2.1.10             |
+|                                      | - datarouter-node 2.1.10             |
++--------------------------------------+--------------------------------------+
+| **Release designation**              | 10.0.0 Jakarta                       |
++--------------------------------------+--------------------------------------+
+| **Release date**                     | TBD                                  |
++--------------------------------------+--------------------------------------+
+
+New features
+------------
+
+* Patch DR certs - DMAAP-1726
+* Cross Scripting sonar fix - DMAAP-1624
+* SQL Injection Fix - DMAAP-1623
+* Sonar Security hotspot fixes - DMAAP-1624
+
+
+Known Limitations, Issues and Workarounds
+-----------------------------------------
+
+System Limitations
+------------------
+
+Known Vulnerabilities
+---------------------
+
+Workarounds
+-----------
+
+Security Notes
+--------------
+
+References
+----------
+
+For more information on the ONAP Istanbul release, please see:
+
+#. `ONAP Home Page`_
+#. `ONAP Documentation`_
+#. `ONAP Release Downloads`_
+#. `ONAP Wiki Page`_
+
+.. _`ONAP Home Page`: https://www.onap.org
+.. _`ONAP Wiki Page`: https://wiki.onap.org
+.. _`ONAP Documentation`: https://docs.onap.org
+.. _`ONAP Release Downloads`: https://git.onap.org
+
 
 ..      ===========================
 ..      * * *    ISTANBUL    * * *
