@@ -44,12 +44,6 @@ Specifies HTTP Headers, such as Content-Type, that define the parameters of the 
 
 The HTTP Body contains the feed content when creating a feed.
 
-**HTTP Authorization**
-
-The user-id:password pair:
-
-* If AAF enabled:  A valid AAF AppId to be authenticated and authorized by the AAF CADI framework.
-* If Non AAF    :  When publishing or retracting a file, a valid `EID Object`_ with publish permissions.
 
 Create a Feed
 -------------
@@ -62,43 +56,35 @@ Create a Feed
 
 **Request Parameters:**
 
-+----------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
-| Field                | Description                    | Param Type | Data Type        | MaxLen | Set By | Updatable? | Required |  Valid/Example Values         |
-+======================+================================+============+==================+========+========+============+==========+===============================+
-| name                 | Feed name                      | Body       | String           | <=20   | Client | N          | Y        |                               |
-+----------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
-| version              | Feed version                   | Body       | String           | <=20   | Client | N          | Y        | v1.0.0                        |
-+----------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
-| description          | Feed description               | Body       | String           | <=256  | Client | Y          | N        |                               |
-+----------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
-| business description | Business description           | Body       | String           | <=256  | Client | Y          | N        |                               |
-+----------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
-| authorization        | Information for authorizing    | Body       |`Auth Object`_    |        | Client | Y          | Y        |                               |
-|                      | publishing requests            |            |                  |        |        |            |          |                               |
-+----------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
-| suspend              | Set to true if the feed is in  | Body       | Boolean          |        | Client | Y          | N        | * true                        |
-|                      | the suspended state            |            |                  |        |        |            |          | * false (default)             |
-+----------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
-| group-id             | Auth group for feed management | Body       | Integer          |        | Client | Y          | N        | 0 (default)                   |
-+----------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
-| aaf_instance         | The instance passed to aaf     | Body       | String           | <=256  | Client | N          | N        | legacy (default)              |
-|                      | during permission checks       |            |                  |        |        |            |          |                               |
-+----------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
-| Content-Type         | To specify type of message     | Header     | String           |        | Client | N          | Y        | application/vnd.dmaap-dr.feed |
-+----------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
-| publisher            | Publisher identity as passed   | Header     | String           | <=8    | DR     | N          | Y        | username                      |
-|                      | in X-DMAAP-DR-ON-BEHALF-OF at  |            |                  |        |        |            |          |                               |
-|                      | creation time                  |            |                  |        |        |            |          |                               |
-+----------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
-| Authorization        | The user / AppId to be         | Header     | String           |        | Client | N          | Y if AAF | dcae@dcae.onap.org:{password} |
-|                      | authorized by the AAF CADI     |            |                  |        |        |            | enabled  |                               |
-|                      | framework                      |            |                  |        |        |            |          |                               |
-+----------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
-| X-EXCLUDE-AAF        | To determine if the feed to    | Header     | Boolean          |        | Client | N          | Y if AAF | * true (for legacy feed)      |
-|                      | create is legacy or AAF        |            |                  |        |        |            | enabled  | * false (for AAF feed)        |
-+----------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
-| Links                | URLs related to this feed      | Body       |`Feed Links Obj`_ |        | DR     | N          | N        |                               |
-+----------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
++-------------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
+| Field                   | Description                    | Param Type | Data Type        | MaxLen | Set By | Updatable? | Required |  Valid/Example Values         |
++=========================+================================+============+==================+========+========+============+==========+===============================+
+| name                    | Feed name                      | Body       | String           | <=20   | Client | N          | Y        |                               |
++-------------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
+| version                 | Feed version                   | Body       | String           | <=20   | Client | N          | Y        | v1.0.0                        |
++-------------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
+| description             | Feed description               | Body       | String           | <=256  | Client | Y          | N        |                               |
++-------------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
+| business description    | Business description           | Body       | String           | <=256  | Client | Y          | N        |                               |
++-------------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
+| authorization           | Information for authorizing    | Body       |`Auth Object`_    |        | Client | Y          | Y        |                               |
+|                         | publishing requests            |            |                  |        |        |            |          |                               |
++-------------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
+| suspend                 | Set to true if the feed is in  | Body       | Boolean          |        | Client | Y          | N        | * true                        |
+|                         | the suspended state            |            |                  |        |        |            |          | * false (default)             |
++-------------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
+| group-id                | Auth group for feed management | Body       | Integer          |        | Client | Y          | N        | 0 (default)                   |
++-------------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
+| Content-Type            | To specify type of message     | Header     | String           |        | Client | N          | Y        | application/vnd.dmaap-dr.feed |
++-------------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
+| Authorization           | The user / AppId to be         | Header     | String           |        | Client | N          | Y        | Basic <credentials>           |
+|                         | authorized                     |            |                  |        |        |            |          |                               |
++-------------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
+| X-DMAAP-DR-ON-BEHALF-OF | Publisher identity as passed   | Header     | String           | <=8    | DR     | N          | Y        | username                      |
+|                         | in X-DMAAP-DR-ON-BEHALF-OF at  |            |                  |        |        |            |          |                               |
+|                         | creation time                  |            |                  |        |        |            |          |                               |
++-------------------------+--------------------------------+------------+------------------+--------+--------+------------+----------+-------------------------------+
+
 
 **Response Codes**
 
@@ -158,17 +144,12 @@ Create a Feed
           {
             "password": "dradmin",
             "id": "dradmin"
-          },
-          {
-            "password": "demo123456!",
-            "id": "onap"
           }
         ]
       },
       "name": "ONAP Data Feed",
       "business_description": "",
-      "aaf_instance": "legacy",
-      "publisher": "dradmin",
+      "publisher": "{user}",
       "links": {
         "subscribe": "https://dmaap-dr-prov/subscribe/1",
         "log": "https://dmaap-dr-prov/feedlog/1",
@@ -191,35 +172,34 @@ Update a Feed
 
 **Request Parameters:**
 
-+------------------------+---------------------------------+-------------+---------------+------------+-------------+
-| Field                  | Description                     |  Param Type |  Data Type    |  MaxLen    |  Required   |
-+========================+=================================+=============+===============+============+=============+
-| name                   | Feed name                       |     Body    |   String      |   <=20     |     Y       |
-+------------------------+---------------------------------+-------------+---------------+------------+-------------+
-| description            | Feed description                |     Body    |   String      |   <=256    |     N       |
-+------------------------+---------------------------------+-------------+---------------+------------+-------------+
-| business description   | Business description            |     Body    |   String      |   <=256    |     N       |
-+------------------------+---------------------------------+-------------+---------------+------------+-------------+
-| authorization          | Information for authorizing     |     Body    |`Auth Object`_ |            |     Y       |
-|                        | publishing requests             |             |               |            |             |
-+------------------------+---------------------------------+-------------+---------------+------------+-------------+
-| suspend                | Set to true if the feed is in   |     Body    |   Boolean     |            |     N       |
-|                        | the suspended state             |             |               |            |             |
-+------------------------+---------------------------------+-------------+---------------+------------+-------------+
-| group-id               | Auth group for feed management  |     Body    |   Integer     |            |     N       |
-|                        |                                 |             |               |            |             |
-+------------------------+---------------------------------+-------------+---------------+------------+-------------+
-| Content-type           | To specify type of message      |    Header   |   String      |            |     Y       |
-|                        | (feed,subscriber,publisher)     |             |               |            |             |
-+------------------------+---------------------------------+-------------+---------------+------------+-------------+
-| publisher              | Publisher identity as passed    |    Header   |   String      |   <=8      |     Y       |
-|                        | in X-DMAAP-DR-ON-BEHALF-OF at   |             |               |            |             |
-|                        | creation time                   |             |               |            |             |
-+------------------------+---------------------------------+-------------+---------------+------------+-------------+
-| Authorization          | The user / AppId to be          |    Header   |   String      |            | Y if AAF    |
-|                        | authorized by the AAF CADI      |             |               |            | enabled     |
-|                        | framework                       |             |               |            |             |
-+------------------------+---------------------------------+-------------+---------------+------------+-------------+
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| Field                   | Description                     |  Param Type |  Data Type    |  MaxLen    |  Required   |
++=========================+=================================+=============+===============+============+=============+
+| name                    | Feed name                       |     Body    |   String      |   <=20     |     Y       |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| description             | Feed description                |     Body    |   String      |   <=256    |     N       |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| business description    | Business description            |     Body    |   String      |   <=256    |     N       |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| authorization           | Information for authorizing     |     Body    |`Auth Object`_ |            |     Y       |
+|                         | publishing requests             |             |               |            |             |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| suspend                 | Set to true if the feed is in   |     Body    |   Boolean     |            |     N       |
+|                         | the suspended state             |             |               |            |             |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| group-id                | Auth group for feed management  |     Body    |   Integer     |            |     N       |
+|                         |                                 |             |               |            |             |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| Content-type            | To specify type of message      |    Header   |   String      |            |     Y       |
+|                         | (feed,subscriber,publisher)     |             |               |            |             |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| Authorization           | The user / AppId to be          |    Header   |   String      |            |     Y       |
+|                         | authorized                      |             |               |            |             |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| X-DMAAP-DR-ON-BEHALF-OF | Publisher identity as passed    |    Header   |   String      | <=8        |     Y       |
+|                         | in X-DMAAP-DR-ON-BEHALF-OF at   |             |               |            |             |
+|                         | creation time                   |             |               |            |             |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
 
 **Response Codes**
 
@@ -295,8 +275,7 @@ Update a Feed
       },
       "name": "ONAP Data Feed1",
       "business_description": "Updated ONAP Feed",
-      "aaf_instance": "legacy",
-      "publisher": "dradmin",
+      "publisher": "{user}",
       "links": {
         "subscribe": "https://dmaap-dr-prov/subscribe/1",
         "log": "https://dmaap-dr-prov/feedlog/1",
@@ -319,17 +298,16 @@ Get a Feed
 
 **Request Parameters:**
 
-+------------------------+---------------------------------+-------------+---------------+------------+-------------+
-| Field                  | Description                     |  Param Type |  Data Type    |  MaxLen    |  Required   |
-+========================+=================================+=============+===============+============+=============+
-| publisher              | Publisher identity as passed    |    Header   |   String      |   <=8      |     Y       |
-|                        | in X-DMAAP-DR-ON-BEHALF-OF at   |             |               |            |             |
-|                        | creation time                   |             |               |            |             |
-+------------------------+---------------------------------+-------------+---------------+------------+-------------+
-| Authorization          | The user / AppId to be          |    Header   |   String      |            | Y if AAF    |
-|                        | authorized by the AAF CADI      |             |               |            | enabled     |
-|                        | framework                       |             |               |            |             |
-+------------------------+---------------------------------+-------------+---------------+------------+-------------+
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| Field                   | Description                     |  Param Type |  Data Type    |  MaxLen    |  Required   |
++=========================+=================================+=============+===============+============+=============+
+| Authorization           | The user / AppId to be          |    Header   |   String      |            |     Y       |
+|                         | authorized                      |             |               |            |             |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| X-DMAAP-DR-ON-BEHALF-OF | Publisher identity as passed    |    Header   |   String      | <=8        |     Y       |
+|                         | in X-DMAAP-DR-ON-BEHALF-OF at   |             |               |            |             |
+|                         | creation time                   |             |               |            |             |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
 
 **Response Codes**
 
@@ -367,17 +345,12 @@ Get a Feed
           {
             "password": "dradmin",
             "id": "dradmin"
-          },
-          {
-            "password": "demo123456!",
-            "id": "onap"
           }
         ]
       },
       "name": "ONAP Data Feed",
       "business_description": "Updated ONAP Feed",
-      "aaf_instance": "legacy",
-      "publisher": "dradmin",
+      "publisher": "{user}",
       "links": {
         "subscribe": "https://dmaap-dr-prov/subscribe/1",
         "log": "https://dmaap-dr-prov/feedlog/1",
@@ -399,17 +372,16 @@ Delete a Feed
 
 **Request Parameters:**
 
-+------------------------+---------------------------------+-------------+---------------+------------+-------------+
-| Field                  | Description                     |  Param Type |  Data Type    |  MaxLen    |  Required   |
-+========================+=================================+=============+===============+============+=============+
-| publisher              | Publisher identity as passed    |    Header   |   String      |   <=8      |     Y       |
-|                        | in X-DMAAP-DR-ON-BEHALF-OF at   |             |               |            |             |
-|                        | creation time                   |             |               |            |             |
-+------------------------+---------------------------------+-------------+---------------+------------+-------------+
-| Authorization          | The user / AppId to be          |    Header   |   String      |            | Y if AAF    |
-|                        | authorized by the AAF CADI      |             |               |            | enabled     |
-|                        | framework                       |             |               |            |             |
-+------------------------+---------------------------------+-------------+---------------+------------+-------------+
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| Field                   | Description                     |  Param Type |  Data Type    |  MaxLen    |  Required   |
++=========================+=================================+=============+===============+============+=============+
+| Authorization           | The user / AppId to be          |    Header   |   String      |            |     Y       |
+|                         | authorized                      |             |               |            |             |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| X-DMAAP-DR-ON-BEHALF-OF | Publisher identity as passed    |    Header   |   String      | <=8        |     Y       |
+|                         | in X-DMAAP-DR-ON-BEHALF-OF at   |             |               |            |             |
+|                         | creation time                   |             |               |            |             |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
 
 **Response Codes**
 
@@ -438,51 +410,40 @@ Subscribe to Feed
 
 **Request Parameters:**
 
-+-----------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
-| Field           | Description                     |  Param Type   |  Data Type      | MaxLen | Set By | Updatable? | Required |  Valid/Example Values                |
-+=================+=================================+===============+=================+========+========+============+==========+======================================+
-| feedId          | ID for the feed you are         |     Path      |   String        |        | Client |     N      |     Y    | 1                                    |
-|                 | subscribing to                  |               |                 |        |        |            |          |                                      |
-+-----------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
-| delivery        | Address and credentials for     |     Body      | `Del Object`_   |        | Client |     Y      |     Y    |                                      |
-|                 | delivery                        |               |                 |        |        |            |          |                                      |
-+-----------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
-| follow_redirect | Set to true if feed redirection |     Body      |   Boolean       |        | Client |     Y      |     N    | * true                               |
-|                 | is expected                     |               |                 |        |        |            |          | * false (default)                    |
-+-----------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
-| metadata_only   | Set to true if subscription is  |     Body      |   Boolean       |        | Client |     Y      |     Y    | * true                               |
-|                 | to receive per-file metadata    |               |                 |        |        |            |          | * false                              |
-+-----------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
-| suspend         | Set to true if the subscription |     Body      |   Boolean       |        | Client |     Y      |     N    | * true                               |
-|                 | is in the suspended state       |               |                 |        |        |            |          | * false (default)                    |
-+-----------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
-| decompress      | Set to true if the data is to   |     Body      |   Boolean       |        | Client |     Y      |     N    | * true                               |
-|                 | be decompressed for subscriber  |               |                 |        |        |            |          | * false (default)                    |
-+-----------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
-| group-id        | Auth group for sub management   |     Body      |   Integer       |        | Client |     Y      |     Y    | 22                                   |
-|                 |                                 |               |                 |        |        |            |          |                                      |
-+-----------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
-| aaf_instance    | The instance passed to aaf      |     Body      |   String        | <=256  | Client |     N      |     N    | * legacy (default)                   |
-|                 | during permission checks        |               |                 |        |        |            |          |                                      |
-|                 |                                 |               |                 |        |        |            |          |                                      |
-+-----------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
-| Content-type    | To specify type of message      |     Header    |   String        |        | Client |     N      |     Y    | application/vnd.dmaap-dr.subscription|
-|                 | (feed,subscriber,publisher)     |               |                 |        |        |            |          |                                      |
-+-----------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
-| subscriber      | Subscriber identity as passed   |     Header    |   String        |   <=8  |  DR    |     N      |     Y    | username                             |
-|                 | in X-DMAAP-DR-ON-BEHALF-OF at   |               |                 |        |        |            |          |                                      |
-|                 | creation time                   |               |                 |        |        |            |          |                                      |
-+-----------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
-| Authorization   | The user / AppId to be          |    Header     |   String        |        | Client |     N      | Y if AAF | dcae@dcae.onap.org:{password}        |
-|                 | authorized by the AAF CADI      |               |                 |        |        |            | enabled  |                                      |
-|                 | framework                       |               |                 |        |        |            |          |                                      |
-+-----------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
-| X-EXCLUDE-AAF   | To determine if the feed to     |    Header     |   Boolean       |        | Client |     N      | Y if AAF | * true (for legacy feed)             |
-|                 | create is legacy or AAF         |               |                 |        |        |            | enabled  | * false (for AAF feed)               |
-+-----------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
-| Links           | URLs related to this            |     Body      |`Sub Links Obj`_ |        |  DR    |     N      |     N    |                                      |
-|                 | subscription                    |               |                 |        |        |            |          |                                      |
-+-----------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
++-------------------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
+| Field                   | Description                     |  Param Type   |  Data Type      | MaxLen | Set By | Updatable? | Required |  Valid/Example Values                |
++=========================+=================================+===============+=================+========+========+============+==========+======================================+
+| feedId                  | ID for the feed you are         |     Path      |   String        |        | Client |     N      |     Y    | 1                                    |
+|                         | subscribing to                  |               |                 |        |        |            |          |                                      |
++-------------------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
+| delivery                | Address and credentials for     |     Body      | `Del Object`_   |        | Client |     Y      |     Y    |                                      |
+|                         | delivery                        |               |                 |        |        |            |          |                                      |
++-------------------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
+| follow_redirect         | Set to true if feed redirection |     Body      |   Boolean       |        | Client |     Y      |     N    | * true                               |
+|                         | is expected                     |               |                 |        |        |            |          | * false (default)                    |
++-------------------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
+| metadata_only           | Set to true if subscription is  |     Body      |   Boolean       |        | Client |     Y      |     Y    | * true                               |
+|                         | to receive per-file metadata    |               |                 |        |        |            |          | * false                              |
++-------------------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
+| suspend                 | Set to true if the subscription |     Body      |   Boolean       |        | Client |     Y      |     N    | * true                               |
+|                         | is in the suspended state       |               |                 |        |        |            |          | * false (default)                    |
++-------------------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
+| decompress              | Set to true if the data is to   |     Body      |   Boolean       |        | Client |     Y      |     N    | * true                               |
+|                         | be decompressed for subscriber  |               |                 |        |        |            |          | * false (default)                    |
++-------------------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
+| group-id                | Auth group for sub management   |     Body      |   Integer       |        | Client |     Y      |     Y    | 22                                   |
+|                         |                                 |               |                 |        |        |            |          |                                      |
++-------------------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
+| Content-type            | To specify type of message      |     Header    |    String       |        | Client |     N      |     Y    | application/vnd.dmaap-dr.subscription|
+|                         | (feed,subscriber,publisher)     |               |                 |        |        |            |          |                                      |
++-------------------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
+| Authorization           | The user / AppId to be          |    Header     |    String       |        | Client | N          | Y        | Basic <credentials>                  |
+|                         | authorized                      |               |                 |        |        |            |          |                                      |
++-------------------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
+| X-DMAAP-DR-ON-BEHALF-OF | Publisher identity as passed    |    Header     |    String       | <=8    | DR     | N          | Y        | username                             |
+|                         | in X-DMAAP-DR-ON-BEHALF-OF at   |               |                 |        |        |            |          |                                      |
+|                         | creation time                   |               |                 |        |        |            |          |                                      |
++-------------------------+---------------------------------+---------------+-----------------+--------+--------+------------+----------+--------------------------------------+
 
 **Response Codes**
 
@@ -535,12 +496,11 @@ Subscribe to Feed
         "user": "LOGIN",
         "url": "http://dmaap-dr-subscriber:7070/"
       },
-      "subscriber": "onap",
+      "subscriber": "{user}",
       "groupid": 1,
       "metadataOnly": false,
       "follow_redirect": true,
       "decompress": true,
-      "aaf_instance": "legacy",
       "links": {
         "feed": "https://dmaap-dr-prov/feed/1",
         "log": "https://dmaap-dr-prov/sublog/1",
@@ -563,44 +523,40 @@ Update subscription
 
 **Request Parameters:**
 
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
-| Field           | Description                     |  Param Type  |  Data Type    | MaxLen |  Required   |
-+=================+=================================+==============+===============+========+=============+
-| subId           | ID for the subscription you are |     Path     |   String      |        |     Y       |
-|                 | updating                        |              |               |        |             |
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
-| delivery        | Address and credentials for     |     Body     | `Del Object`_ |        |     Y       |
-|                 | delivery                        |              |               |        |             |
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
-| follow_redirect | Set to true if feed redirection |     Body     |   Boolean     |        |     N       |
-|                 | is expected                     |              |               |        |             |
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
-| metadata_only   | Set to true if subscription is  |     Body     |   Boolean     |        |     Y       |
-|                 | to receive per-file metadata    |              |               |        |             |
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
-| suspend         | Set to true if the subscription |     Body     |   Boolean     |        |     N       |
-|                 | is in the suspended state       |              |               |        |             |
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
-| decompress      | Set to true if the data is to   |     Body     |   Boolean     |        |     N       |
-|                 | be decompressed for subscriber  |              |               |        |             |
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
-| group-id        | Auth group for sub management   |     Body     |   Integer     |        |     Y       |
-|                 |                                 |              |               |        |             |
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
-| Content-type    | To specify type of message      |     Header   |   String      |        |     Y       |
-|                 | (feed,subscriber,publisher)     |              |               |        |             |
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
-| subscriber      | Subscriber identity as passed   |     Header   |   String      |  <=8   |     Y       |
-|                 | in X-DMAAP-DR-ON-BEHALF-OF at   |              |               |        |             |
-|                 | creation time                   |              |               |        |             |
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
-| Authorization   | The user / AppId to be          |    Header    |   String      |        |  Y if AAF   |
-|                 | authorized by the AAF CADI      |              |               |        |  enabled    |
-|                 | framework                       |              |               |        |             |
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
-| X-EXCLUDE-AAF   | To determine if the feed to     |    Header    |   Boolean     |        |  Y if AAF   |
-|                 | create is legacy or AAF         |              |               |        |  enabled    |
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
++-------------------------+---------------------------------+--------------+---------------+--------+-------------+
+| Field                   | Description                     |  Param Type  |  Data Type    | MaxLen |  Required   |
++=========================+=================================+==============+===============+========+=============+
+| subId                   | ID for the subscription you are |     Path     |   String      |        |     Y       |
+|                         | updating                        |              |               |        |             |
++-------------------------+---------------------------------+--------------+---------------+--------+-------------+
+| delivery                | Address and credentials for     |     Body     | `Del Object`_ |        |     Y       |
+|                         | delivery                        |              |               |        |             |
++-------------------------+---------------------------------+--------------+---------------+--------+-------------+
+| follow_redirect         | Set to true if feed redirection |     Body     |   Boolean     |        |     N       |
+|                         | is expected                     |              |               |        |             |
++-------------------------+---------------------------------+--------------+---------------+--------+-------------+
+| metadata_only           | Set to true if subscription is  |     Body     |   Boolean     |        |     Y       |
+|                         | to receive per-file metadata    |              |               |        |             |
++-------------------------+---------------------------------+--------------+---------------+--------+-------------+
+| suspend                 | Set to true if the subscription |     Body     |   Boolean     |        |     N       |
+|                         | is in the suspended state       |              |               |        |             |
++-------------------------+---------------------------------+--------------+---------------+--------+-------------+
+| decompress              | Set to true if the data is to   |     Body     |   Boolean     |        |     N       |
+|                         | be decompressed for subscriber  |              |               |        |             |
++-------------------------+---------------------------------+--------------+---------------+--------+-------------+
+| group-id                | Auth group for sub management   |     Body     |   Integer     |        |     Y       |
+|                         |                                 |              |               |        |             |
++-------------------------+---------------------------------+--------------+---------------+--------+-------------+
+| Content-type            | To specify type of message      |     Header   |   String      |        |     Y       |
+|                         | (feed,subscriber,publisher)     |              |               |        |             |
++-------------------------+---------------------------------+--------------+---------------+--------+-------------+
+| Authorization           | The user / AppId to be          |    Header    |   String      |        |     Y       |
+|                         | authorized                      |              |               |        |             |
++-------------------------+---------------------------------+--------------+---------------+--------+-------------+
+| X-DMAAP-DR-ON-BEHALF-OF | Publisher identity as passed    |    Header    |   String      | <=8    |     Y       |
+|                         | in X-DMAAP-DR-ON-BEHALF-OF at   |              |               |        |             |
+|                         | creation time                   |              |               |        |             |
++-------------------------+---------------------------------+--------------+---------------+--------+-------------+
 
 **Response Codes**
 
@@ -652,12 +608,11 @@ Update subscription
         "user": "NEW_LOGIN",
         "url": "http://dmaap-dr-subscriber:7070/"
       },
-      "subscriber": "onap",
+      "subscriber": "{user}",
       "groupid": 67,
       "metadataOnly": true,
       "follow_redirect": false,
       "decompress": false,
-      "aaf_instance": "legacy",
       "links": {
         "feed": "https://dmaap-dr-prov/feed/1",
         "log": "https://dmaap-dr-prov/sublog/1",
@@ -680,17 +635,17 @@ Get a Subscription
 
 **Request Parameters:**
 
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
-| Field           | Description                     |  Param Type  |  Data Type    | MaxLen |  Required   |
-+=================+=================================+==============+===============+========+=============+
-| subscriber      | Subscriber identity as passed   |    Header    |   String      |  <=8   |     Y       |
-|                 | in X-DMAAP-DR-ON-BEHALF-OF at   |              |               |        |             |
-|                 | creation time                   |              |               |        |             |
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
-| Authorization   | The user / AppId to be          |    Header    |   String      |        |  Y if AAF   |
-|                 | authorized by the AAF CADI      |              |               |        |  enabled    |
-|                 | framework                       |              |               |        |             |
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| Field                   | Description                     |  Param Type |  Data Type    |  MaxLen    |  Required   |
++=========================+=================================+=============+===============+============+=============+
+| Authorization           | The user / AppId to be          |    Header   |   String      |            |     Y       |
+|                         | authorized                      |             |               |            |             |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| X-DMAAP-DR-ON-BEHALF-OF | Subscriber identity as passed   |    Header   |   String      | <=8        |     Y       |
+|                         | in X-DMAAP-DR-ON-BEHALF-OF at   |             |               |            |             |
+|                         | creation time                   |             |               |            |             |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+
 
 **Response Codes**
 
@@ -721,13 +676,12 @@ Get a Subscription
         "user": "NEW_LOGIN",
         "url": "http://dmaap-dr-subscriber:7070/"
       },
-      "subscriber": "onap",
+      "subscriber": "{user}",
       "groupid": 67,
       "metadataOnly": true,
       "privilegedSubscriber": false,
       "follow_redirect": false,
       "decompress": false,
-      "aaf_instance": "legacy",
       "links": {
         "feed": "https://dmaap-dr-prov/feed/2",
         "log": "https://dmaap-dr-prov/sublog/6",
@@ -749,17 +703,16 @@ Delete a subscription
 
 **Request Parameters:**
 
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
-| Field           | Description                     |  Param Type  |  Data Type    | MaxLen |  Required   |
-+=================+=================================+==============+===============+========+=============+
-| subscriber      | Subscriber identity as passed   |     Header   |   String      |  <=8   |     Y       |
-|                 | in X-DMAAP-DR-ON-BEHALF-OF at   |              |               |        |             |
-|                 | creation time                   |              |               |        |             |
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
-| Authorization   | The user / AppId to be          |    Header    |   String      |        |  Y if AAF   |
-|                 | authorized by the AAF CADI      |              |               |        |  enabled    |
-|                 | framework                       |              |               |        |             |
-+-----------------+---------------------------------+--------------+---------------+--------+-------------+
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| Field                   | Description                     |  Param Type |  Data Type    |  MaxLen    |  Required   |
++=========================+=================================+=============+===============+============+=============+
+| Authorization           | The user / AppId to be          |    Header   |   String      |            |     Y       |
+|                         | authorized                      |             |               |            |             |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
+| X-DMAAP-DR-ON-BEHALF-OF | Subscriber identity as passed   |    Header   |   String      | <=8        |     Y       |
+|                         | in X-DMAAP-DR-ON-BEHALF-OF at   |             |               |            |             |
+|                         | creation time                   |             |               |            |             |
++-------------------------+---------------------------------+-------------+---------------+------------+-------------+
 
 **Response Codes**
 
@@ -809,10 +762,8 @@ Publish to Feed
 |                        | * Lowercase boolean             |                  |            |              |             |                                           |
 |                        | * null                          |                  |            |              |             |                                           |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+-------------------------------------------+
-| Authorization          | An `EID Object`_ with publish   |     Header       |  String    |              |     Y       | * (legacy Feed) dradmin:dradmin           |
-|                        | permissions.                    |                  |            |              |             | * (AAF Feed) dcae@dcae.onap.org:{password}|
-|                        | If AAF CADI is enabled, use a   |                  |            |              |             |                                           |
-|                        | valid AAF user/AppId instead.   |                  |            |              |             |                                           |
+| Authorization          | An `EID Object`_ with publish   |     Header       |  String    |              |     Y       | * dradmin:dradmin                         |
+|                        | permissions.                    |                  |            |              |             |                                           |
 +------------------------+---------------------------------+------------------+------------+--------------+-------------+-------------------------------------------+
 
 **Response Codes**
@@ -846,10 +797,8 @@ Delete/Retract a Published file
 +-----------------+---------------------------------+--------------+---------------+------------+-------------------------------------------+
 | Field           | Description                     |  Param Type  |  Data Type    | Required   |  Valid/Example Values                     |
 +=================+=================================+==============+===============+============+===========================================+
-| Authorization   | An `EID Object`_ with publish   |   Header     |    String     |    Y       | * (legacy Feed) dradmin:dradmin           |
-|                 | permissions.                    |              |               |            | * (AAF Feed) dcae@dcae.onap.org:{password}|
-|                 | If AAF CADI is enabled, use a   |              |               |            |                                           |
-|                 | valid AAF user/AppId instead.   |              |               |            |                                           |
+| Authorization   | An `EID Object`_ with publish   |   Header     |    String     |    Y       | * dradmin:dradmin                         |
+|                 | permissions.                    |              |               |            |                                           |
 +-----------------+---------------------------------+--------------+---------------+------------+-------------------------------------------+
 | feedId          | ID of the feed that was         |     Path     |    String     |    Y       |                                           |
 |                 | publishing to                   |              |               |            |                                           |
