@@ -10,13 +10,6 @@ Capabilities
 The DMaaP Data Router (DR) provisioning API is an HTTPS-based, REST-like API for creating and managing
 DR feeds and subscriptions, which provides a pub/sub architectural model for the transfer of data.
 
-The DR API also supports `AAF CADI authorization <https://docs.onap.org/en/latest/submodules/aaf/authz.git/docs/sections/architecture/cadi.html#authorization>`_.
-
-To use this feature, the API client must provide a valid AAF AppID / MechID with each request.
-To enable this feature, see the :ref:`configuration` section.
-
-.. note:: In future releases, AAF CADI auth will be enabled by default.
-
 Usage Scenarios
 ---------------
 Typically, DR pub clients request the provisioning of a new DR feed.

@@ -6,38 +6,21 @@
 Configuration
 =============
 
-Configuration properties for both Data Router Provisioning server and Data Router Node server should remain as default values.
+Most configuration properties for both Data Router Provisioning server and Data Router Node server
+should remain as default values.
 
-The only exception to this, is when enabling the AAF CADI framework to authorize the DR provisioning requests.
+An exception to this is when a user wants to run over HTTP (non TLS).
 
-.. note:: The AAF CADI filtering feature is disabled by default. When AAF CADI auth is enabled, all DR API calls must provide an AAF AppID to access the relevant API endpoint.
+For DR Provisioning server config, edit the following props in the provserver.properties file.
 
-To enable DR AAF CADI authorization, the following steps are required:
-
-DR CADI Prerequisites:
-    * AAF deployment
-
-Update the following properties at deployment time.
+org.onap.dmaap.datarouter.provserver.tlsenabled   = false
+and ensure aaf is disabled also
+org.onap.dmaap.datarouter.provserver.cadi.enabled = false
 
 
-**DMaaP DR Prov AAF properties**
+For DR Node server config, edit the following props in the node.properties file.
 
-::
-
-    # AAF config
-    org.onap.dmaap.datarouter.provserver.cadi.enabled = true
-
-    # AAF URL to connect to AAF server
-    org.onap.dmaap.datarouter.provserver.cadi.aaf.url = https://<RELEVANT_AAF_URL>:8095
-
-
-**DMaaP DR Node AAF properties**
-
-::
-
-    # AAF URL to connect to AAF server
-    AafUrl = https://<RELEVANT_AAF_URL>:8095
-
-    # AAF CADI enabled flag
-    CadiEnabled = true
+TlsEnabled = false
+and ensure cadi aaf is disabled also
+CadiEnabled = false
 
