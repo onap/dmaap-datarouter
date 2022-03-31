@@ -6,38 +6,37 @@
 Configuration
 =============
 
-Configuration properties for both Data Router Provisioning server and Data Router Node server should remain as default values.
+Most configuration properties for both Data Router Provisioning server and Data Router Node server
+should remain as default values.
 
-The only exception to this, is when enabling the AAF CADI framework to authorize the DR provisioning requests.
+An exception to this is when a user wants to run over HTTP (non TLS).
 
-.. note:: The AAF CADI filtering feature is disabled by default. When AAF CADI auth is enabled, all DR API calls must provide an AAF AppID to access the relevant API endpoint.
+For DR Provisioning server config, edit the following props in the provserver.properties file.
 
-To enable DR AAF CADI authorization, the following steps are required:
+.. code-block:: bash
 
-DR CADI Prerequisites:
-    * AAF deployment
+    org.onap.dmaap.datarouter.provserver.tlsenabled  = false
 
-Update the following properties at deployment time.
+and ensure aaf cadi is disabled also
 
+.. code-block:: bash
 
-**DMaaP DR Prov AAF properties**
-
-::
-
-    # AAF config
-    org.onap.dmaap.datarouter.provserver.cadi.enabled = true
-
-    # AAF URL to connect to AAF server
-    org.onap.dmaap.datarouter.provserver.cadi.aaf.url = https://<RELEVANT_AAF_URL>:8095
+    org.onap.dmaap.datarouter.provserver.cadi.enabled = false
 
 
-**DMaaP DR Node AAF properties**
+For DR Node server config, edit the following props in the node.properties file to target http.
 
-::
+.. code-block:: bash
 
-    # AAF URL to connect to AAF server
-    AafUrl = https://<RELEVANT_AAF_URL>:8095
-
-    # AAF CADI enabled flag
-    CadiEnabled = true
-
+    #    URL to retrieve dynamic configuration
+    ProvisioningURL = http://dmaap-dr-prov:8808/internal/prov
+    #
+    #    URL to upload PUB/DEL/EXP logs
+    LogUploadURL = http://dmaap-dr-prov:8080/internal/logs
+    ...
+    #
+    #    AAF CADI enabled flag
+    CadiEnabled = false
+    #
+    #    Enable to run over http or https (default true|https)
+    TlsEnabled = false
