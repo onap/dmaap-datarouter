@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fc76bf43_3b2fb4a5",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/URLUtilities.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-04-01T18:04:02Z",
+      "side": 1,
+      "message": "I think this should be provserver",
+      "range": {
+        "startLine": 169,
+        "startChar": 52,
+        "endLine": 169,
+        "endChar": 62
+      },
+      "revId": "697a2640259549bf1b142a3c8ac6bdfdc13474eb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
