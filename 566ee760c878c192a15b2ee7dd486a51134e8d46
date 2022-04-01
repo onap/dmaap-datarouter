@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f8955f42_791f701b",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-04-01T13:06:33Z",
+      "side": 1,
+      "message": "I think we should add this to all the relevant props files",
+      "range": {
+        "startLine": 163,
+        "startChar": 72,
+        "endLine": 163,
+        "endChar": 81
+      },
+      "revId": "566ee760c878c192a15b2ee7dd486a51134e8d46",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e9f893e4_b99efd34",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-04-01T13:06:33Z",
+      "side": 1,
+      "message": "I think we need to add this to all the relevant props files",
+      "range": {
+        "startLine": 163,
+        "startChar": 75,
+        "endLine": 163,
+        "endChar": 85
+      },
+      "revId": "566ee760c878c192a15b2ee7dd486a51134e8d46",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4c5bb43f_9e4971dd",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/PublishServlet.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-04-01T13:06:33Z",
+      "side": 1,
+      "message": "Need to add these to the relevant props files\norg.onap.dmaap.datarouter.nodeserver.https.port\norg.onap.dmaap.datarouter.nodeserver.http.port",
+      "range": {
+        "startLine": 165,
+        "startChar": 57,
+        "endLine": 165,
+        "endChar": 76
+      },
+      "revId": "566ee760c878c192a15b2ee7dd486a51134e8d46",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b4474e38_9309b734",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/URLUtilities.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-04-01T13:06:33Z",
+      "side": 1,
+      "message": "I think we will need to get the port here as it may default to port 80, we need 8080\nCould add a getPort method below like the one for the protocol",
+      "range": {
+        "startLine": 105,
+        "startChar": 66,
+        "endLine": 105,
+        "endChar": 67
+      },
+      "revId": "566ee760c878c192a15b2ee7dd486a51134e8d46",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
