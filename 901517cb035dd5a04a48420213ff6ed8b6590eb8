@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bb0208ee_6aa3687c",
+        "filename": "csit/scripts/dmaap-datarouter/docker-compose/node.properties",
+        "patchSetId": 6
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-04-04T15:20:31Z",
+      "side": 1,
+      "message": "Maybe just add an explainer comment above",
+      "range": {
+        "startLine": 84,
+        "startChar": 2,
+        "endLine": 84,
+        "endChar": 6
+      },
+      "revId": "901517cb035dd5a04a48420213ff6ed8b6590eb8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "19bf38d5_d170a41f",
+        "filename": "datarouter-node/src/main/resources/node.properties",
+        "patchSetId": 6
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-04-04T15:20:31Z",
+      "side": 1,
+      "message": "Small explainer comment above",
+      "range": {
+        "startLine": 89,
+        "startChar": 3,
+        "endLine": 89,
+        "endChar": 9
+      },
+      "revId": "901517cb035dd5a04a48420213ff6ed8b6590eb8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "45a1a787_2909adc0",
+        "filename": "datarouter-node/src/test/resources/node_test.properties",
+        "patchSetId": 6
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-04-04T15:20:31Z",
+      "side": 1,
+      "message": "Small explainer comment above",
+      "range": {
+        "startLine": 89,
+        "startChar": 4,
+        "endLine": 89,
+        "endChar": 10
+      },
+      "revId": "901517cb035dd5a04a48420213ff6ed8b6590eb8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
