@@ -22,6 +22,30 @@
       "revId": "697a2640259549bf1b142a3c8ac6bdfdc13474eb",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d743fb5b_b069025b",
+        "filename": "datarouter-prov/src/main/java/org/onap/dmaap/datarouter/provisioning/utils/URLUtilities.java",
+        "patchSetId": 5
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 7617
+      },
+      "writtenOn": "2022-04-04T08:39:51Z",
+      "side": 1,
+      "message": "Ok. I will change it in the props as well.",
+      "parentUuid": "fc76bf43_3b2fb4a5",
+      "range": {
+        "startLine": 169,
+        "startChar": 52,
+        "endLine": 169,
+        "endChar": 62
+      },
+      "revId": "697a2640259549bf1b142a3c8ac6bdfdc13474eb",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
