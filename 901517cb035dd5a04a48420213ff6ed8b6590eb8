@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "7831bef6_d927a001",
+        "filename": "csit/scripts/dmaap-datarouter/docker-compose/node.properties",
+        "patchSetId": 6
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 7617
+      },
+      "writtenOn": "2022-04-04T15:28:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb0208ee_6aa3687c",
+      "range": {
+        "startLine": 84,
+        "startChar": 2,
+        "endLine": 84,
+        "endChar": 6
+      },
+      "revId": "901517cb035dd5a04a48420213ff6ed8b6590eb8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "19bf38d5_d170a41f",
         "filename": "datarouter-node/src/main/resources/node.properties",
         "patchSetId": 6
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "25e45873_17003393",
+        "filename": "datarouter-node/src/main/resources/node.properties",
+        "patchSetId": 6
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 7617
+      },
+      "writtenOn": "2022-04-04T15:28:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19bf38d5_d170a41f",
+      "range": {
+        "startLine": 89,
+        "startChar": 3,
+        "endLine": 89,
+        "endChar": 9
+      },
+      "revId": "901517cb035dd5a04a48420213ff6ed8b6590eb8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "45a1a787_2909adc0",
         "filename": "datarouter-node/src/test/resources/node_test.properties",
         "patchSetId": 6
@@ -68,6 +116,30 @@
       "revId": "901517cb035dd5a04a48420213ff6ed8b6590eb8",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "30548ccf_a6fedaf3",
+        "filename": "datarouter-node/src/test/resources/node_test.properties",
+        "patchSetId": 6
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 7617
+      },
+      "writtenOn": "2022-04-04T15:28:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45a1a787_2909adc0",
+      "range": {
+        "startLine": 89,
+        "startChar": 4,
+        "endLine": 89,
+        "endChar": 10
+      },
+      "revId": "901517cb035dd5a04a48420213ff6ed8b6590eb8",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
