@@ -1,0 +1,7 @@
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+2: David McWeeney <david.mcweeney@est.tech>
+Submitted-by: David McWeeney <david.mcweeney@est.tech>
+Submitted-at: Thu, 12 May 2022 11:44:48 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/dmaap/datarouter/+/129220
+Project: dmaap/datarouter
+Branch: refs/heads/jakarta
