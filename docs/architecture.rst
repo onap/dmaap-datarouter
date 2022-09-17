@@ -29,9 +29,9 @@ the DR provisioning API to manage feeds and subscriptions.
 
 See DMaaP Bus Controller API docs for more information:
 
-`Bus Controller Feeds API <https://onap.readthedocs.io/en/latest/submodules/dmaap/dbcapi.git/docs/api.html#feeds>`_
+`Bus Controller Feeds API <https://docs.onap.org/projects/onap-dmaap-buscontroller/en/latest/apis/api.html#feeds>`_
 
-`Bus Controller Subs API <https://onap.readthedocs.io/en/latest/submodules/dmaap/dbcapi.git/docs/api.html#dr-subs>`_
+`Bus Controller Subs API <https://docs.onap.org/projects/onap-dmaap-buscontroller/en/latest/apis/api.html#dr-subs>`_
 
 
 High level Architecture
