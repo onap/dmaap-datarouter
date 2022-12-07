@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;

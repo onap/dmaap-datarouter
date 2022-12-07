@@ -26,10 +26,10 @@ package org.onap.dmaap.datarouter.provisioning;
 
 import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.sendResponseError;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InvalidObjectException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 
 import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;

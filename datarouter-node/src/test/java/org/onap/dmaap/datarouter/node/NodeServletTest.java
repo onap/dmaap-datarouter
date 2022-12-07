@@ -23,6 +23,8 @@
 package org.onap.dmaap.datarouter.node;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.anyString;
@@ -41,22 +43,27 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.BDDMockito;
 import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.internal.matchers.Any;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.LoggerFactory;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.onap.dmaap.datarouter.node.NodeConfigManager")
+@PrepareForTest(NodeServer.class)
 @PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*"})
 public class NodeServletTest {
 
@@ -84,7 +91,8 @@ public class NodeServletTest {
         setUpNodeMainDelivery();
         delivery = mock(Delivery.class);
         when(delivery.markTaskSuccess("spool/s/0/1", "dmaap-dr-node.1234567")).thenReturn(true);
-        nodeServlet = new NodeServlet(delivery);
+        PowerMockito.mockStatic(NodeServer.class);
+        nodeServlet = new NodeServlet(delivery, config);
         when(request.getHeader("Authorization")).thenReturn("User1");
         when(request.getHeader("X-DMAAP-DR-PUBLISH-ID")).thenReturn("User1");
     }
@@ -332,31 +340,23 @@ public class NodeServletTest {
         when(config.getEventLogInterval()).thenReturn("40");
         when(config.isDeletePermitted("1")).thenReturn(true);
         when(config.getAllDests()).thenReturn(new DestInfo[0]);
-        FieldUtils.writeDeclaredStaticField(NodeServlet.class, "config", config, true);
-        FieldUtils.writeDeclaredStaticField(NodeRunner.class, "nodeConfigManager", config, true);
-        PowerMockito.when(NodeConfigManager.getInstance()).thenReturn(config);
+        FieldUtils.writeDeclaredStaticField(NodeConfigManager.class, "base", config, true);
     }
 
     private void setUpConfigToReturnUnprivilegedSubscriber() throws IllegalAccessException {
-        NodeConfigManager config = mock(NodeConfigManager.class);
         PowerMockito.mockStatic(NodeConfigManager.class);
         when(config.isShutdown()).thenReturn(false);
         when(config.isConfigured()).thenReturn(true);
         when(config.isDeletePermitted("1")).thenReturn(false);
-        FieldUtils.writeDeclaredStaticField(NodeServlet.class, "config", config, true);
-        FieldUtils.writeDeclaredStaticField(NodeRunner.class, "nodeConfigManager", config, true);
-        PowerMockito.when(NodeConfigManager.getInstance()).thenReturn(config);
+        FieldUtils.writeDeclaredStaticField(NodeConfigManager.class, "base", config, true);
     }
 
     private void setUpConfigToReturnNullOnIsDeletePermitted() throws IllegalAccessException {
-        NodeConfigManager config = mock(NodeConfigManager.class);
         PowerMockito.mockStatic(NodeConfigManager.class);
         when(config.isShutdown()).thenReturn(false);
         when(config.isConfigured()).thenReturn(true);
         when(config.isDeletePermitted("1")).thenThrow(new NullPointerException());
-        FieldUtils.writeDeclaredStaticField(NodeServlet.class, "config", config, true);
-        FieldUtils.writeDeclaredStaticField(NodeRunner.class, "nodeConfigManager", config, true);
-        PowerMockito.when(NodeConfigManager.getInstance()).thenReturn(config);
+        FieldUtils.writeDeclaredStaticField(NodeConfigManager.class, "base", config, true);
     }
 
     private void setUpNodeMainDelivery() throws IllegalAccessException{
@@ -365,14 +365,12 @@ public class NodeServletTest {
         FieldUtils.writeDeclaredStaticField(NodeServer.class, "delivery", delivery, true);
     }
 
-    private void setNodeConfigManagerIsConfiguredToReturnFalse() throws IllegalAccessException{
-        NodeConfigManager config = mock(NodeConfigManager.class);
+    private void setNodeConfigManagerIsConfiguredToReturnFalse() throws IllegalAccessException {
         when(config.isConfigured()).thenReturn(false);
-        FieldUtils.writeDeclaredStaticField(NodeServlet.class, "config", config, true);
+        FieldUtils.writeDeclaredStaticField(NodeConfigManager.class, "base", config, true);
     }
 
     private void setNodeConfigManagerIsPublishPermittedToReturnAReason() throws IllegalAccessException{
-        NodeConfigManager config = mock(NodeConfigManager.class);
         when(config.isShutdown()).thenReturn(false);
         when(config.getMyName()).thenReturn("dmaap-dr-node");
         when(config.isConfigured()).thenReturn(true);
@@ -380,11 +378,10 @@ public class NodeServletTest {
         when(config.getLogDir()).thenReturn("log/dir");
         when(config.isPublishPermitted(anyString(), anyString(), anyString())).thenReturn("Publisher not permitted for this feed");
         when(config.isAnotherNode(anyString(), anyString())).thenReturn(false);
-        FieldUtils.writeDeclaredStaticField(NodeServlet.class, "config", config, true);
+        FieldUtils.writeDeclaredStaticField(NodeConfigManager.class, "base", config, true);
     }
 
-    private void setNodeConfigManagerToAllowRedirectOnIngressNode() throws IllegalAccessException{
-        NodeConfigManager config = mock(NodeConfigManager.class);
+    private void setNodeConfigManagerToAllowRedirectOnIngressNode() {
         when(config.isShutdown()).thenReturn(false);
         when(config.isConfigured()).thenReturn(true);
         when(config.getSpoolDir()).thenReturn("spool/dir");
@@ -394,7 +391,6 @@ public class NodeServletTest {
         when(config.getAuthUser(anyString(), anyString())).thenReturn("User1");
         when(config.getIngressNode(anyString(), anyString(), anyString())).thenReturn("NewNode");
         when(config.getExtHttpsPort()).thenReturn(8080);
-        FieldUtils.writeDeclaredStaticField(NodeServlet.class, "config", config, true);
     }
 
     private String createLargeMetaDataString() {

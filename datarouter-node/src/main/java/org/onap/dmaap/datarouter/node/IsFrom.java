@@ -37,7 +37,7 @@ import java.util.Arrays;
  */
 public class IsFrom {
 
-    private static EELFLogger logger = EELFManager.getInstance().getLogger(IsFrom.class);
+    private static final EELFLogger logger = EELFManager.getInstance().getLogger(IsFrom.class);
     private long nextcheck;
     private String[] ips;
     private String fqdn;
@@ -91,9 +91,9 @@ public class IsFrom {
                 return true;
             }
         } catch (UnknownHostException e) {
-            logger.error("IsFrom: UnknownHostEx: " + e.toString(), e);
+            logger.error("IsFrom: UnknownHostEx: " + e, e);
         } catch (IOException e) {
-            logger.error("IsFrom: Failed to parse IP : " + ip + " : " + e.toString(), e);
+            logger.error("IsFrom: Failed to parse IP : " + ip + " : " + e, e);
         }
         return false;
     }

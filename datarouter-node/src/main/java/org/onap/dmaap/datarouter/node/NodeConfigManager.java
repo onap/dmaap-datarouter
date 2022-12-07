@@ -25,6 +25,7 @@
 package org.onap.dmaap.datarouter.node;
 
 import static java.lang.System.exit;
+import static java.lang.System.getProperty;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
@@ -54,10 +55,9 @@ import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 public class NodeConfigManager implements DeliveryQueueHelper {
 
     private static final String NODE_CONFIG_MANAGER = "NodeConfigManager";
-    private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(NodeConfigManager.class);
-    private static NodeConfigManager base = new NodeConfigManager();
+    private static final EELFLogger eelfLogger = EELFManager.getInstance().getLogger(NodeConfigManager.class);
+    private static NodeConfigManager base;
 
-    private Timer timer = new Timer("Node Configuration Timer", true);
     private long maxfailuretimer;
     private long initfailuretimer;
     private long waitForFileProcessFailureTimer;
@@ -68,16 +68,17 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private double fdpstart;
     private double fdpstop;
     private int deliverythreads;
-    private String provurl;
+    private final String provurl;
     private String provhost;
-    private IsFrom provcheck;
-    private int gfport;
-    private int svcport;
-    private int port;
-    private String spooldir;
-    private String logdir;
-    private long logretention;
-    private String redirfile;
+    private final int intHttpPort;
+    private final int intHttpsPort;
+    private final int extHttpsPort;
+    private String[] enabledprotocols;
+    private final boolean cadiEnabled;
+    private String aafType;
+    private String aafInstance;
+    private String aafAction;
+    private final boolean tlsEnabled;
     private String kstype;
     private String ksfile;
     private String kspass;
@@ -86,66 +87,45 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private String tsfile;
     private String tspass;
     private String myname;
-    private RedirManager rdmgr;
-    private RateLimitedOperation pfetcher;
-    private NodeConfig config;
-    private File quiesce;
-    private PublishId pid;
-    private String nak;
-    private TaskList configtasks = new TaskList();
-    private String eventlogurl;
-    private String eventlogprefix;
-    private String eventlogsuffix;
+    private final String nak;
+    private final File quiesce;
+    private final String spooldir;
+    private final String logdir;
+    private final long logretention;
+    private final String eventlogurl;
+    private final String eventlogprefix;
+    private final String eventlogsuffix;
     private String eventloginterval;
     private boolean followredirects;
-    private String[] enabledprotocols;
-    private String aafType;
-    private String aafInstance;
-    private String aafAction;
-    private boolean tlsEnabled;
-    private boolean cadiEnabled;
+    private final TaskList configtasks = new TaskList();
+    private final PublishId publishId;
+    private final IsFrom provcheck;
+    private final RedirManager rdmgr;
+    private final Timer timer = new Timer("Node Configuration Timer", true);
+    private final RateLimitedOperation pfetcher;
+    private NodeConfig config;
     private NodeAafPropsUtils nodeAafPropsUtils;
+    private static Properties drNodeProperties;
 
-
+    public static Properties getDrNodeProperties() {
+        if (drNodeProperties == null) {
+            try (FileInputStream props = new FileInputStream(getProperty(
+                "org.onap.dmaap.datarouter.node.properties",
+                "/opt/app/datartr/etc/node.properties"))) {
+                drNodeProperties = new Properties();
+                drNodeProperties.load(props);
+            } catch (IOException e) {
+                eelfLogger.error("Failed to load NODE properties: " + e.getMessage(), e);
+                exit(1);
+            }
+        }
+        return drNodeProperties;
+    }
     /**
      * Initialize the configuration of a Data Router node.
      */
     private NodeConfigManager() {
-
-        Properties drNodeProperties = new Properties();
-        try (FileInputStream fileInputStream = new FileInputStream(System
-                .getProperty("org.onap.dmaap.datarouter.node.properties", "/opt/app/datartr/etc/node.properties"))) {
-            eelfLogger.debug("NODE0301 Loading local config file node.properties");
-            drNodeProperties.load(fileInputStream);
-        } catch (Exception e) {
-            NodeUtils.setIpAndFqdnForEelf(NODE_CONFIG_MANAGER);
-            eelfLogger.error(EelfMsgs.MESSAGE_PROPERTIES_LOAD_ERROR, e,
-                    System.getProperty("org.onap.dmaap.datarouter.node.properties",
-                            "/opt/app/datartr/etc/node.properties"));
-        }
-        provurl = drNodeProperties.getProperty("ProvisioningURL", "https://dmaap-dr-prov:8443/internal/prov");
-        String aafPropsFilePath = drNodeProperties
-            .getProperty("AAFPropsFilePath", "/opt/app/osaaf/local/org.onap.dmaap-dr.props");
-        try {
-            nodeAafPropsUtils = new NodeAafPropsUtils(new File(aafPropsFilePath));
-        } catch (IOException e) {
-            eelfLogger.error("NODE0314 Failed to load AAF props. Exiting", e);
-            exit(1);
-        }
-        /*
-         * START - AAF changes: TDP EPIC US# 307413
-         * Pull AAF settings from node.properties
-         */
-        aafType = drNodeProperties.getProperty("AAFType", "org.onap.dmaap-dr.feed");
-        aafInstance = drNodeProperties.getProperty("AAFInstance", "legacy");
-        aafAction = drNodeProperties.getProperty("AAFAction", "publish");
-        cadiEnabled = Boolean.parseBoolean(drNodeProperties.getProperty("CadiEnabled", "false"));
-        /*
-         * END - AAF changes: TDP EPIC US# 307413
-         * Pull AAF settings from node.properties
-         */
-        //Disable and enable protocols*/
-        enabledprotocols = ((drNodeProperties.getProperty("NodeHttpsProtocols")).trim()).split("\\|");
+        provurl = getDrNodeProperties().getProperty("ProvisioningURL", "http://dmaap-dr-prov:8080/internal/prov");
         try {
             provhost = (new URL(provurl)).getHost();
         } catch (Exception e) {
@@ -153,14 +133,49 @@ public class NodeConfigManager implements DeliveryQueueHelper {
             eelfLogger.error(EelfMsgs.MESSAGE_BAD_PROV_URL, e, provurl);
             exit(1);
         }
-        eelfLogger.debug("NODE0303 Provisioning server is " + provhost);
-        eventlogurl = drNodeProperties.getProperty("LogUploadURL", "https://feeds-drtr.web.att.com/internal/logs");
+        eelfLogger.debug("NODE0303 Provisioning server is at: " + provhost);
         provcheck = new IsFrom(provhost);
-        gfport = Integer.parseInt(drNodeProperties.getProperty("IntHttpPort", "8080"));
-        svcport = Integer.parseInt(drNodeProperties.getProperty("IntHttpsPort", "8443"));
-        port = Integer.parseInt(drNodeProperties.getProperty("ExtHttpsPort", "443"));
-        spooldir = drNodeProperties.getProperty("SpoolDir", "spool");
-        tlsEnabled = Boolean.parseBoolean(drNodeProperties.getProperty("TlsEnabled", "true"));
+
+        cadiEnabled = Boolean.parseBoolean(getDrNodeProperties().getProperty("CadiEnabled", "false"));
+        if (cadiEnabled) {
+            aafType = getDrNodeProperties().getProperty("AAFType", "org.onap.dmaap-dr.feed");
+            aafInstance = getDrNodeProperties().getProperty("AAFInstance", "legacy");
+            aafAction = getDrNodeProperties().getProperty("AAFAction", "publish");
+        }
+        tlsEnabled = Boolean.parseBoolean(getDrNodeProperties().getProperty("TlsEnabled", "true"));
+        if (isTlsEnabled()) {
+            try {
+                kstype = getDrNodeProperties().getProperty("KeyStoreType", "PKCS12");
+                tstype = getDrNodeProperties().getProperty("TrustStoreType", "jks");
+                enabledprotocols = ((getDrNodeProperties().getProperty("NodeHttpsProtocols")).trim()).split("\\|");
+                nodeAafPropsUtils = new NodeAafPropsUtils(new File(getDrNodeProperties()
+                    .getProperty("AAFPropsFilePath", "/opt/app/osaaf/local/org.onap.dmaap-dr.props")));
+                getSslContextData();
+                if (tsfile != null && tsfile.length() > 0) {
+                    System.setProperty("javax.net.ssl.trustStoreType", tstype);
+                    System.setProperty("javax.net.ssl.trustStore", tsfile);
+                    System.setProperty("javax.net.ssl.trustStorePassword", tspass);
+                }
+                myname = NodeUtils.getCanonicalName(kstype, ksfile, kspass);
+                if (myname == null) {
+                    NodeUtils.setIpAndFqdnForEelf(NODE_CONFIG_MANAGER);
+                    eelfLogger.error(EelfMsgs.MESSAGE_KEYSTORE_FETCH_ERROR, ksfile);
+                    eelfLogger.error("NODE0309 Unable to fetch canonical name from keystore file " + ksfile);
+                    exit(1);
+                }
+                eelfLogger.debug("NODE0304 My certificate says my name is " + myname);
+            } catch (Exception e) {
+                eelfLogger.error("NODE0314 Failed to load AAF props. Exiting", e);
+                exit(1);
+            }
+        }
+        myname = "dmaap-dr-node";
+
+        eventlogurl = getDrNodeProperties().getProperty("LogUploadURL", "https://feeds-drtr.web.att.com/internal/logs");
+        intHttpPort = Integer.parseInt(getDrNodeProperties().getProperty("IntHttpPort", "80"));
+        intHttpsPort = Integer.parseInt(getDrNodeProperties().getProperty("IntHttpsPort", "443"));
+        extHttpsPort = Integer.parseInt(getDrNodeProperties().getProperty("ExtHttpsPort", "443"));
+        spooldir = getDrNodeProperties().getProperty("SpoolDir", "spool");
 
         File fdir = new File(spooldir + "/f");
         fdir.mkdirs();
@@ -171,39 +186,19 @@ public class NodeConfigManager implements DeliveryQueueHelper {
                 eelfLogger.error("NODE0313 Failed to clear junk files from " + fdir.getPath(), e);
             }
         }
-        logdir = drNodeProperties.getProperty("LogDir", "logs");
+        logdir = getDrNodeProperties().getProperty("LogDir", "logs");
         (new File(logdir)).mkdirs();
-        logretention = Long.parseLong(drNodeProperties.getProperty("LogRetention", "30")) * 86400000L;
+        logretention = Long.parseLong(getDrNodeProperties().getProperty("LogRetention", "30")) * 86400000L;
         eventlogprefix = logdir + "/events";
         eventlogsuffix = ".log";
-        redirfile = drNodeProperties.getProperty("RedirectionFile", "etc/redirections.dat");
-        kstype = drNodeProperties.getProperty("KeyStoreType", "PKCS12");
-        ksfile = nodeAafPropsUtils.getPropAccess().getProperty("cadi_keystore");
-        kspass = nodeAafPropsUtils.getDecryptedPass("cadi_keystore_password");
-        kpass = nodeAafPropsUtils.getDecryptedPass("cadi_keystore_password");
-        tstype = drNodeProperties.getProperty("TrustStoreType", "jks");
-        tsfile = nodeAafPropsUtils.getPropAccess().getProperty("cadi_truststore");
-        tspass = nodeAafPropsUtils.getDecryptedPass("cadi_truststore_password");
-        if (tsfile != null && tsfile.length() > 0) {
-            System.setProperty("javax.net.ssl.trustStoreType", tstype);
-            System.setProperty("javax.net.ssl.trustStore", tsfile);
-            System.setProperty("javax.net.ssl.trustStorePassword", tspass);
-        }
-        nak = drNodeProperties.getProperty("NodeAuthKey", "Node123!");
-        quiesce = new File(drNodeProperties.getProperty("QuiesceFile", "etc/SHUTDOWN"));
-        myname = NodeUtils.getCanonicalName(kstype, ksfile, kspass);
-        if (myname == null) {
-            NodeUtils.setIpAndFqdnForEelf(NODE_CONFIG_MANAGER);
-            eelfLogger.error(EelfMsgs.MESSAGE_KEYSTORE_FETCH_ERROR, ksfile);
-            eelfLogger.error("NODE0309 Unable to fetch canonical name from keystore file " + ksfile);
-            exit(1);
-        }
-        eelfLogger.debug("NODE0304 My certificate says my name is " + myname);
-        pid = new PublishId(myname);
-        long minrsinterval = Long.parseLong(drNodeProperties.getProperty("MinRedirSaveInterval", "10000"));
-        long minpfinterval = Long.parseLong(drNodeProperties.getProperty("MinProvFetchInterval", "10000"));
-        rdmgr = new RedirManager(redirfile, minrsinterval, timer);
-        pfetcher = new RateLimitedOperation(minpfinterval, timer) {
+        String redirfile = getDrNodeProperties().getProperty("RedirectionFile", "etc/redirections.dat");
+        publishId = new PublishId(myname);
+        nak = getDrNodeProperties().getProperty("NodeAuthKey", "Node123!");
+        quiesce = new File(getDrNodeProperties().getProperty("QuiesceFile", "etc/SHUTDOWN"));
+        rdmgr = new RedirManager(redirfile,
+            Long.parseLong(getDrNodeProperties().getProperty("MinRedirSaveInterval", "10000")), timer);
+        pfetcher = new RateLimitedOperation(
+            Long.parseLong(getDrNodeProperties().getProperty("MinProvFetchInterval", "10000")), timer) {
             public void run() {
                 fetchconfig();
             }
@@ -212,10 +207,21 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         pfetcher.request();
     }
 
+    private void getSslContextData() {
+        ksfile = nodeAafPropsUtils.getPropAccess().getProperty("cadi_keystore");
+        kspass = nodeAafPropsUtils.getDecryptedPass("cadi_keystore_password");
+        kpass = nodeAafPropsUtils.getDecryptedPass("cadi_keystore_password");
+        tsfile = nodeAafPropsUtils.getPropAccess().getProperty("cadi_truststore");
+        tspass = nodeAafPropsUtils.getDecryptedPass("cadi_truststore_password");
+    }
+
     /**
      * Get the default node configuration manager.
      */
     public static NodeConfigManager getInstance() {
+        if (base == null) {
+            base = new NodeConfigManager();
+        }
         return base;
     }
 
@@ -302,14 +308,14 @@ public class NodeConfigManager implements DeliveryQueueHelper {
             eelfLogger.debug("NodeConfigMan.fetchConfig: provurl:: " + provurl);
             URL url = new URL(provurl);
             Reader reader = new InputStreamReader(url.openStream());
-            config = new NodeConfig(new ProvData(reader), myname, spooldir, port, nak);
+            config = new NodeConfig(new ProvData(reader), myname, spooldir, extHttpsPort, nak);
             localconfig();
             configtasks.startRun();
             runTasks();
         } catch (Exception e) {
             NodeUtils.setIpAndFqdnForEelf("fetchconfigs");
             eelfLogger.error(EelfMsgs.MESSAGE_CONF_FAILED, e.toString());
-            eelfLogger.error("NODE0306 Configuration failed " + e.toString() + " - try again later", e);
+            eelfLogger.error("NODE0306 Configuration failed " + e + " - try again later", e);
             pfetcher.request();
         }
     }
@@ -472,7 +478,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * Generate a publish ID.
      */
     public String getPublishId() {
-        return pid.next();
+        return publishId.next();
     }
 
     /**
@@ -677,21 +683,21 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * Get the http port.
      */
     int getHttpPort() {
-        return gfport;
+        return intHttpPort;
     }
 
     /**
      * Get the https port.
      */
     int getHttpsPort() {
-        return svcport;
+        return intHttpsPort;
     }
 
     /**
      * Get the externally visible https port.
      */
     int getExtHttpsPort() {
-        return port;
+        return extHttpsPort;
     }
 
     /**

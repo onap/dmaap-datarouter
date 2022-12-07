@@ -38,7 +38,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import javax.crypto.SecretKeyFactory;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.json.JSONObject;
 import org.junit.Assert;

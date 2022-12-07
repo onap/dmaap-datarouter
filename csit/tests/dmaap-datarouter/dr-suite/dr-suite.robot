@@ -7,15 +7,15 @@ Library           Process
 Library           String
 
 *** Variables ***
-${TARGET_URL}                       https://dmaap-dr-prov:8443/
-${TARGET_URL_FEED}                  https://dmaap-dr-prov:8443/feed/1
-${TARGET_URL_EXISTS_LOGGING}        https://dmaap-dr-prov:8443/feedlog/1?type=pub&filename=csit_test
-${TARGET_URL_NOT_EXISTS_LOGGING}    https://dmaap-dr-prov:8443/feedlog/1?type=pub&filename=file_that_doesnt_exist
-${TARGET_URL_SUBSCRIBE}             https://dmaap-dr-prov:8443/subscribe/1
-${TARGET_URL_SUBSCRIPTION}          https://dmaap-dr-prov:8443/subs/1
-${TARGET_URL_PUBLISH_PROV}          https://dmaap-dr-prov:8443/publish/1/csit_test
-${TARGET_URL_PUBLISH_NODE}          https://dmaap-dr-node:8443/publish/1/csit_test
-${TARGET_URL_DELETE_FILE}           https://dmaap-dr-node:8443/delete/2
+${TARGET_URL}                       http://dmaap-dr-prov:8080/
+${TARGET_URL_FEED}                  http://dmaap-dr-prov:8080/feed/1
+${TARGET_URL_EXISTS_LOGGING}        http://dmaap-dr-prov:8080/feedlog/1?type=pub&filename=csit_test
+${TARGET_URL_NOT_EXISTS_LOGGING}    http://dmaap-dr-prov:8080/feedlog/1?type=pub&filename=file_that_doesnt_exist
+${TARGET_URL_SUBSCRIBE}             http://dmaap-dr-prov:8080/subscribe/1
+${TARGET_URL_SUBSCRIPTION}          http://dmaap-dr-prov:8080/subs/1
+${TARGET_URL_PUBLISH_PROV}          http://dmaap-dr-prov:8080/publish/1/csit_test
+${TARGET_URL_PUBLISH_NODE}          http://dmaap-dr-node:8080/publish/1/csit_test
+${TARGET_URL_DELETE_FILE}           http://dmaap-dr-node:8080/delete/2
 
 ${FEED_CONTENT_TYPE}                application/vnd.dmaap-dr.feed
 ${SUBSCRIBE_CONTENT_TYPE}           application/vnd.dmaap-dr.subscription
@@ -23,9 +23,9 @@ ${PUBLISH_FEED_CONTENT_TYPE}        application/octet-stream
 
 ${CREATE_FEED_DATA}                 {"name": "CSIT_Test", "version": "m1.0", "description": "CSIT_Test", "business_description": "CSIT_Test", "suspend": false, "deleted": false, "changeowner": true, "authorization": {"classification": "unclassified", "endpoint_addrs": [],  "endpoint_ids": [{"password": "dradmin", "id": "dradmin"}]}}
 ${UPDATE_FEED_DATA}                 {"name": "CSIT_Test", "version": "m1.0", "description": "UPDATED-CSIT_Test", "business_description": "CSIT_Test", "suspend": true, "deleted": false, "changeowner": true, "authorization": {"classification": "unclassified", "endpoint_addrs": [],  "endpoint_ids": [{"password": "dradmin", "id": "dradmin"}]}}
-${SUBSCRIBE_DATA}                   {"delivery":{ "url":"http://${DR_SUB_IP}:7070/",  "user":"LOGIN", "password":"PASSWORD", "use100":true}, "metadataOnly":false, "suspend":false, "groupid":29, "subscriber":"dradmin", "privilegedSubscriber":false}
-${UPDATE_SUBSCRIPTION_DATA}         {"delivery":{ "url":"http://${DR_SUB_IP}:7070/",  "user":"dradmin", "password":"dradmin", "use100":true}, "metadataOnly":false, "suspend":true, "groupid":29, "subscriber":"dradmin", "privilegedSubscriber":false}
-${SUBSCRIBE2_DATA}                  {"delivery":{ "url":"http://${DR_SUB2_IP}:7070/",  "user":"LOGIN", "password":"PASSWORD", "use100":true}, "metadataOnly":false, "suspend":false, "groupid":29, "subscriber":"privileged", "privilegedSubscriber":true}
+${SUBSCRIBE_DATA}                   {"delivery":{ "url":"http://${DR_SUB_IP}:7070",  "user":"LOGIN", "password":"PASSWORD", "use100":true}, "metadataOnly":false, "suspend":false, "groupid":29, "subscriber":"dradmin", "privilegedSubscriber":false}
+${UPDATE_SUBSCRIPTION_DATA}         {"delivery":{ "url":"http://${DR_SUB_IP}:7070",  "user":"dradmin", "password":"dradmin", "use100":true}, "metadataOnly":false, "suspend":true, "groupid":29, "subscriber":"dradmin", "privilegedSubscriber":false}
+${SUBSCRIBE2_DATA}                  {"delivery":{ "url":"http://${DR_SUB2_IP}:7070",  "user":"LOGIN", "password":"PASSWORD", "use100":true}, "metadataOnly":false, "suspend":false, "groupid":29, "subscriber":"privileged", "privilegedSubscriber":true}
 
 ${CLI_VERIFY_SUB_RECEIVED_FILE}     docker exec subscriber-node /bin/sh -c "ls /opt/app/subscriber/delivery | grep csit_test"
 ${CLI_VERIFY_FILE_REMAINS_ON_NODE}  docker exec datarouter-node /bin/sh -c "ls /opt/app/datartr/spool/s/0/2 | grep dmaap-dr-node | grep -v .M"
@@ -64,7 +64,7 @@ Run Publish to Feed
     Sleep                           10s                              Behaviour was noticed where feed was not created in time for publish to be sent
     ${resp}=                        PutCall                          ${TARGET_URL_PUBLISH_PROV}    ${CREATE_FEED_DATA}      ${PUBLISH_FEED_CONTENT_TYPE}    dradmin
     log                             ${TARGET_URL_PUBLISH_PROV}
-    Should Contain                  ${resp.headers['Location']}      https://dmaap-dr-node:8443/publish/1/csit_test
+    Should Contain                  ${resp.headers['Location']}      http://dmaap-dr-node:8080/publish/1/csit_test
     ${resp}=                        PutCall                          ${TARGET_URL_PUBLISH_NODE}    ${CREATE_FEED_DATA}      ${PUBLISH_FEED_CONTENT_TYPE}    dradmin
     Should Be Equal As Strings      ${resp.status_code}              204
     log                             'JSON Response Code:'${resp}

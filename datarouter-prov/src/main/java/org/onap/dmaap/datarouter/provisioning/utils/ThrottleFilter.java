@@ -26,6 +26,14 @@ package org.onap.dmaap.datarouter.provisioning.utils;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -34,14 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationSupport;
 import org.eclipse.jetty.server.HttpConnection;
@@ -213,7 +213,7 @@ public class ThrottleFilter extends TimerTask implements Filter {
             String str = String.format("Throttling connection: %s %d bad connections in %d minutes",
                 getConnectionId(request), rate, samplingPeriod);
             logger.info(str);
-            Continuation continuation = ContinuationSupport.getContinuation(request);
+            Continuation continuation = ContinuationSupport.getContinuation((javax.servlet.ServletRequest) request);
             continuation.suspend();
             register(id, continuation);
             continuation.undispatch();

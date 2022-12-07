@@ -28,6 +28,7 @@ import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.send
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
+import jakarta.servlet.ServletOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,9 +39,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.onap.dmaap.datarouter.provisioning.beans.DeliveryRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;
 import org.onap.dmaap.datarouter.provisioning.beans.ExpiryRecord;

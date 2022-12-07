@@ -17,13 +17,6 @@ For DR Provisioning server config, edit the following props in the provserver.pr
 
     org.onap.dmaap.datarouter.provserver.tlsenabled  = false
 
-and ensure aaf cadi is disabled also
-
-.. code-block:: bash
-
-    org.onap.dmaap.datarouter.provserver.cadi.enabled = false
-
-
 For DR Node server config, edit the following props in the node.properties file to target http.
 
 .. code-block:: bash
@@ -34,9 +27,6 @@ For DR Node server config, edit the following props in the node.properties file 
     #    URL to upload PUB/DEL/EXP logs
     LogUploadURL = http://dmaap-dr-prov:8080/internal/logs
     ...
-    #
-    #    AAF CADI enabled flag
-    CadiEnabled = false
     #
     #    Enable to run over http or https (default true|https)
     TlsEnabled = false

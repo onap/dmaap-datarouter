@@ -47,7 +47,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 
+@SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.node.NodeConfigManager"})
 @PowerMockIgnore({"javax.net.ssl.*", "javax.security.auth.x500.X500Principal", "javax.crypto.*"})
 @PrepareForTest({InetAddress.class})
 public class NodeConfigManagerTest {
@@ -75,7 +77,6 @@ public class NodeConfigManagerTest {
         String href = "https://dmaap-dr-prov:8443/internal/prov";
         URLConnection urlConnection = mock(URLConnection.class);
         httpUrlStreamHandler.addConnection(new URL(href), urlConnection);
-        //File prov = new File("src/test/resources/prov_data.json");
         InputStream anyInputStream = new ByteArrayInputStream(Files.readAllBytes(Paths.get("src/test/resources/prov_data.json")));
         when(urlConnection.getInputStream()).thenReturn(anyInputStream);
     }
@@ -92,7 +93,7 @@ public class NodeConfigManagerTest {
     }
 
     @Test
-    public void Verify_NodeConfigMan_Getters() {
+    public void Verify_NodeConfigMan_Getters_Secure() {
         NodeConfigManager nodeConfigManager = NodeConfigManager.getInstance();
         Assert.assertEquals("legacy", nodeConfigManager.getAafInstance());
         Assert.assertEquals("src/test/resources/spool/f", nodeConfigManager.getSpoolDir());
@@ -110,11 +111,10 @@ public class NodeConfigManagerTest {
         Assert.assertEquals(new String[] {"TLSv1.1", "TLSv1.2"}, nodeConfigManager.getEnabledprotocols());
         Assert.assertEquals("org.onap.dmaap-dr.feed", nodeConfigManager.getAafType());
         Assert.assertEquals("publish", nodeConfigManager.getAafAction());
-        Assert.assertFalse(nodeConfigManager.getCadiEnabled());
+        Assert.assertTrue(nodeConfigManager.getCadiEnabled());
         Assert.assertFalse(nodeConfigManager.isShutdown());
         Assert.assertTrue(nodeConfigManager.isTlsEnabled());
         Assert.assertTrue(nodeConfigManager.isConfigured());
-        Assert.assertEquals("legacy", nodeConfigManager.getAafInstance("1"));
         Assert.assertNotNull(nodeConfigManager.getPublishId());
         Assert.assertNotNull(nodeConfigManager.getAllDests());
         Assert.assertEquals(10000, nodeConfigManager.getInitFailureTimer());

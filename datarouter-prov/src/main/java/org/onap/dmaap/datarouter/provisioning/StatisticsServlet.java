@@ -25,6 +25,7 @@ package org.onap.dmaap.datarouter.provisioning;
 
 import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.sendResponseError;
 
+import jakarta.servlet.ServletOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -39,9 +40,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;
 import org.onap.dmaap.datarouter.provisioning.utils.LOGJSONObject;

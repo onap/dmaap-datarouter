@@ -24,8 +24,8 @@
 package org.onap.dmaap.datarouter.provisioning.utils;
 
 import com.att.eelf.configuration.EELFLogger;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import javax.servlet.http.HttpServletResponse;
 
 public class HttpServletUtils {
 
