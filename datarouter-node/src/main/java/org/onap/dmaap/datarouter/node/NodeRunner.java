@@ -34,8 +34,7 @@ import org.eclipse.jetty.server.Server;
  */
 public class NodeRunner {
 
-    private static EELFLogger nodeMainLogger = EELFManager.getInstance().getLogger(NodeRunner.class);
-    private static NodeConfigManager nodeConfigManager;
+    private static final EELFLogger nodeMainLogger = EELFManager.getInstance().getLogger(NodeRunner.class);
 
     private NodeRunner() {
     }
@@ -49,26 +48,26 @@ public class NodeRunner {
     public static void main(String[] args) {
         nodeMainLogger.debug("NODE0001 Data Router Node Starting");
         IsFrom.setDNSCache();
-        nodeConfigManager = NodeConfigManager.getInstance();
+        NodeConfigManager nodeConfigManager = NodeConfigManager.getInstance();
         nodeMainLogger.debug("NODE0002 I am " + nodeConfigManager.getMyName());
         (new WaitForConfig(nodeConfigManager)).waitForConfig();
         new LogManager(nodeConfigManager);
         try {
-            Server server = NodeServer.getServerInstance();
+            Server server = NodeServer.getServerInstance(nodeConfigManager);
             server.start();
             server.join();
-            nodeMainLogger.debug("NODE00006 Node Server started-" + server.getState());
+            nodeMainLogger.debug("NODE0006 Node Server started-" + server.getState());
         } catch (Exception e) {
-            nodeMainLogger.error("NODE00006 Jetty failed to start. Reporting will we be unavailable: "
+            nodeMainLogger.error("NODE0006 Jetty failed to start. Reporting will we be unavailable: "
                                          + e.getMessage(), e);
             exit(1);
         }
-        nodeMainLogger.debug("NODE00007 Node Server joined");
+        nodeMainLogger.debug("NODE0007 Node Server joined");
     }
 
     private static class WaitForConfig implements Runnable {
 
-        private NodeConfigManager localNodeConfigManager;
+        private final NodeConfigManager localNodeConfigManager;
 
         WaitForConfig(NodeConfigManager ncm) {
             this.localNodeConfigManager = ncm;
@@ -86,7 +85,7 @@ public class NodeRunner {
                     wait();
                 } catch (Exception exception) {
                     nodeMainLogger.error("NodeMain: waitForConfig exception. Exception Message:- "
-                        + exception.toString(), exception);
+                        + exception, exception);
                 }
             }
             localNodeConfigManager.deregisterConfigTask(this);

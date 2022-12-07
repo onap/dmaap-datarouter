@@ -28,7 +28,7 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

@@ -34,8 +34,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
@@ -53,17 +53,12 @@ import org.onap.dmaap.datarouter.provisioning.utils.SynchronizerTask;
  * @author Robert Eby
  * @version $Id$
  */
-@SuppressWarnings("serial")
 public class SubscriptionServlet extends ProxyServlet {
 
     private static final String SUBCNTRL_CONTENT_TYPE = "application/vnd.dmaap-dr.subscription-control";
     //Adding EELF Logger Rally:US664892
-    private static EELFLogger eelfLogger = EELFManager.getInstance()
+    private static final EELFLogger eelfLogger = EELFManager.getInstance()
         .getLogger(SubscriptionServlet.class);
-
-
-
-
 
     /**
      * DELETE on the &lt;subscriptionUrl&gt; -- delete a subscription. See the <i>Deleting a Subscription</i> section in

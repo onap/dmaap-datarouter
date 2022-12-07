@@ -68,7 +68,7 @@ public class DeliveryQueueTest {
         when(destInfo.isPrivilegedSubscriber()).thenReturn(true);
         deliveryQueue = new DeliveryQueue(deliveryQueueHelper, destInfo);
         NodeConfigManager configManager = mockNodeConfigManager();
-        FieldUtils.writeDeclaredStaticField(StatusLog.class, "config", configManager, true);
+        FieldUtils.writeDeclaredStaticField(NodeConfigManager.class, "base", configManager, true);
     }
 
     @Test

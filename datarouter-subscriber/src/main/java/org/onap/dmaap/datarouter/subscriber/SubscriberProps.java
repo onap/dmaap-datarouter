@@ -23,17 +23,18 @@
 
 package org.onap.dmaap.datarouter.subscriber;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
 import java.io.IOException;
 import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class SubscriberProps {
 
+    private static final Logger logger = LoggerFactory.getLogger(SubscriberProps.class);
+
     private static SubscriberProps instance = null;
-    private static EELFLogger logger = EELFManager.getInstance().getLogger(SubscriberProps.class);
-    private Properties properties;
+    private final Properties properties;
 
     private SubscriberProps(String propsPath) throws IOException {
         properties = new Properties();

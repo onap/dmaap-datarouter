@@ -23,8 +23,6 @@
 
 package org.onap.dmaap.datarouter.subscriber;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
 import java.util.Arrays;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Connector;
@@ -37,11 +35,13 @@ import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class SubscriberMain {
 
-    private static EELFLogger logger = EELFManager.getInstance().getLogger(SubscriberMain.class);
+    private static final Logger logger = LoggerFactory.getLogger(SubscriberMain.class);
 
     /**
      * Main class for Subscriber.
@@ -66,7 +66,7 @@ public class SubscriberMain {
             httpServerConnector.setIdleTimeout(30000);
 
             // SSL Context Factory
-            SslContextFactory sslContextFactory = new SslContextFactory.Server();
+            SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
 
             // SSL HTTP Configuration
             HttpConfiguration httpsConfig = new HttpConfiguration(httpConfig);
@@ -81,7 +81,7 @@ public class SubscriberMain {
 
             /*Skip SSLv3 Fixes*/
             sslContextFactory.addExcludeProtocols("SSLv3");
-            logger.info("Excluded protocols for SubscriberMain:"
+            logger.debug("Excluded protocols for SubscriberMain:"
                                 + Arrays.toString(sslContextFactory.getExcludeProtocols()));
             /*End of SSLv3 Fixes*/
 
@@ -102,10 +102,10 @@ public class SubscriberMain {
         try {
             server.start();
         } catch ( Exception e ) {
-            logger.info("Jetty failed to start. Reporting will be unavailable-" + e);
+            logger.error("Jetty failed to start. Reporting will be unavailable-" + e);
         }
         server.join();
-        logger.info("org.onap.dmaap.datarouter.subscriber.SubscriberMain started-" + server.getState());
+        logger.debug("org.onap.dmaap.datarouter.subscriber.SubscriberMain started-" + server.getState());
 
     }
 }

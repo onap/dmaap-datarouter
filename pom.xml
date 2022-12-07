@@ -32,7 +32,7 @@
     <parent>
         <groupId>org.onap.oparent</groupId>
         <artifactId>oparent</artifactId>
-        <version>3.0.0</version>
+        <version>3.3.2</version>
     </parent>
     <properties>
         <!--revision must also be set in the version.properties file at project root-->
@@ -59,7 +59,7 @@
         <maven.build.timestamp.format>yyyyMMdd'T'HHmmss'Z'</maven.build.timestamp.format>
 
         <!--dependency version across all modules-->
-        <jetty.version>9.4.41.v20210516</jetty.version>
+        <jetty.version>11.0.12</jetty.version>
         <javax.mail-api.version>1.5.5</javax.mail-api.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <qos.logback.version>1.2.7</qos.logback.version>

@@ -41,7 +41,7 @@ import org.onap.dmaap.datarouter.provisioning.ProvRunner;
 
 public class ProvDbUtils {
 
-    private static EELFLogger intLogger = EELFManager.getInstance().getLogger("InternalLog");
+    private static final EELFLogger intLogger = EELFManager.getInstance().getLogger("InternalLog");
     private static DataSource dataSource;
     private static ProvDbUtils provDbUtils;
 

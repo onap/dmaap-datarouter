@@ -29,7 +29,6 @@ import static org.onap.dmaap.datarouter.provisioning.BaseServlet.TEXT_CT;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -50,11 +49,12 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
@@ -137,43 +137,46 @@ public class SynchronizerTask extends TimerTask {
         nextsynctime = 0;
 
         logger.info("PROV5000: Sync task starting, server podState is UNKNOWN_POD");
-        try {
-            // Set up keystore
-            String type = AafPropsUtils.KEYSTORE_TYPE_PROPERTY;
-            String store = ProvRunner.getAafPropsUtils().getKeystorePathProperty();
-            String pass = ProvRunner.getAafPropsUtils().getKeystorePassProperty();
-            KeyStore keyStore = KeyStore.getInstance(type);
-            try (FileInputStream instream = new FileInputStream(new File(store))) {
-                keyStore.load(instream, pass.toCharArray());
-
-            }
-            // Set up truststore
-            store = ProvRunner.getAafPropsUtils().getTruststorePathProperty();
-            pass = ProvRunner.getAafPropsUtils().getTruststorePassProperty();
-            KeyStore trustStore = null;
-            if (store != null && store.length() > 0) {
-                trustStore = KeyStore.getInstance(AafPropsUtils.TRUESTSTORE_TYPE_PROPERTY);
-                try (FileInputStream instream = new FileInputStream(new File(store))) {
-                    trustStore.load(instream, pass.toCharArray());
+        try (AbstractHttpClient hc = new DefaultHttpClient()) {
+            Scheme sch;
+            if (Boolean.TRUE.equals(ProvRunner.getTlsEnabled())) {
+                // Set up keystore
+                String type = AafPropsUtils.KEYSTORE_TYPE_PROPERTY;
+                String store = ProvRunner.getAafPropsUtils().getKeystorePathProperty();
+                String pass = ProvRunner.getAafPropsUtils().getKeystorePassProperty();
+                KeyStore keyStore = KeyStore.getInstance(type);
+                try (FileInputStream instream = new FileInputStream(store)) {
+                    keyStore.load(instream, pass.toCharArray());
 
                 }
-            }
+                // Set up truststore
+                store = ProvRunner.getAafPropsUtils().getTruststorePathProperty();
+                pass = ProvRunner.getAafPropsUtils().getTruststorePassProperty();
+                KeyStore trustStore = null;
+                if (store != null && store.length() > 0) {
+                    trustStore = KeyStore.getInstance(AafPropsUtils.TRUESTSTORE_TYPE_PROPERTY);
+                    try (FileInputStream instream = new FileInputStream(store)) {
+                        trustStore.load(instream, pass.toCharArray());
 
-            // We are connecting with the node name, but the certificate will have the CNAME
-            // So we need to accept a non-matching certificate name
-            String keystorepass = ProvRunner.getAafPropsUtils().getKeystorePassProperty();
-            try (AbstractHttpClient hc = new DefaultHttpClient()) {
+                    }
+                }
+                // We are connecting with the node name, but the certificate will have the CNAME
+                // So we need to accept a non-matching certificate name
+                String keystorepass = ProvRunner.getAafPropsUtils().getKeystorePassProperty();
                 SSLSocketFactory socketFactory =
                         (trustStore == null)
                                 ? new SSLSocketFactory(keyStore, keystorepass)
                                 : new SSLSocketFactory(keyStore, keystorepass, trustStore);
                 socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-                Scheme sch = new Scheme("https", 443, socketFactory);
-                hc.getConnectionManager().getSchemeRegistry().register(sch);
-                httpclient = hc;
+                sch = new Scheme("https", 443, socketFactory);
+            } else {
+                PlainSocketFactory socketFactory = new PlainSocketFactory();
+                sch = new Scheme("http", 80, socketFactory);
             }
+            hc.getConnectionManager().getSchemeRegistry().register(sch);
+            httpclient = hc;
             setSynchTimer(ProvRunner.getProvProperties().getProperty(
-                "org.onap.dmaap.datarouter.provserver.sync_interval", "5000"));
+                    "org.onap.dmaap.datarouter.provserver.sync_interval", "5000"));
         } catch (Exception e) {
             logger.warn("PROV5005: Problem starting the synchronizer: " + e);
         }
