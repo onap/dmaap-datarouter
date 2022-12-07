@@ -1,0 +1,9 @@
+docker-py
+ipaddr
+netaddr
+netifaces
+pyhocon
+requests
+robotframework-httplibrary
+robotframework-requests
+robotframework-sshlibrary

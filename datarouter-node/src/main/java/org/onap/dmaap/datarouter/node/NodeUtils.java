@@ -50,8 +50,8 @@ import java.util.zip.GZIPInputStream;
 import javax.naming.InvalidNameException;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
@@ -62,8 +62,7 @@ import org.slf4j.MDC;
  */
 public class NodeUtils {
 
-    private static EELFLogger eelfLogger = EELFManager.getInstance()
-            .getLogger(NodeUtils.class);
+    private static final EELFLogger eelfLogger = EELFManager.getInstance().getLogger(NodeUtils.class);
 
     private NodeUtils() {
     }

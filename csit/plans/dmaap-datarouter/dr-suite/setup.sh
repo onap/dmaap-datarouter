@@ -17,5 +17,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # ============LICENSE_END=====================================================
 
-source ${WORKSPACE}/scripts/dmaap-datarouter/datarouter-teardown.sh
-teardown_dmaap_dr
+source ${WORKSPACE}/scripts/dmaap-datarouter/datarouter-launch.sh
+# Launch DR. If true is passed, 2 subscriber containers are also deployed, else false.
+dmaap_dr_launch true

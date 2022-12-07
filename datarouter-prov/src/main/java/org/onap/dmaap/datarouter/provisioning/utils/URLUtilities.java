@@ -153,20 +153,17 @@ public class URLUtilities {
     }
 
     public static String getUrlSecurityOption() {
-        if (Boolean.parseBoolean(ProvRunner.getProvProperties()
-            .getProperty("org.onap.dmaap.datarouter.provserver.tlsenabled", "true"))) {
+        if (Boolean.TRUE.equals(ProvRunner.getTlsEnabled())) {
             return "https://";
         }
         return "http://";
     }
 
     private static String getAppropriateUrlPort() {
-        if (Boolean.parseBoolean(ProvRunner.getProvProperties()
-            .getProperty("org.onap.dmaap.datarouter.provserver.tlsenabled", "true")))
-                return "";
-
+        if (Boolean.TRUE.equals(ProvRunner.getTlsEnabled())) {
+            return "";
+        }
         return ":" + ProvRunner.getProvProperties()
             .getProperty("org.onap.dmaap.datarouter.provserver.http.port", "8080");
-
     }
 }

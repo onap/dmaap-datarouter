@@ -16,13 +16,15 @@
 # limitations under the License.
 #
 
+# shellcheck disable=SC2155
 export WORKSPACE=$(git rev-parse --show-toplevel)/csit
 
-rm -rf ${WORKSPACE}/archives
-mkdir -p ${WORKSPACE}/archives
-cd ${WORKSPACE}
+rm -rf "${WORKSPACE}"/archives
+mkdir -p "${WORKSPACE}"/archives
+# shellcheck disable=SC2164
+cd "${WORKSPACE}"
 
-./run-csit.sh plans/dmaap-datarouter/ssl-dr-suite
+./run-csit.sh plans/dmaap-datarouter/dr-suite
 
 
 

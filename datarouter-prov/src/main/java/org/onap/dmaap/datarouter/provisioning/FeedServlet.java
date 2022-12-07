@@ -28,10 +28,11 @@ import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.send
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InvalidObjectException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
@@ -53,8 +54,7 @@ import org.onap.dmaap.datarouter.provisioning.eelf.EelfMsgs;
 
 public class FeedServlet extends ProxyServlet {
 
-    //Adding EELF Logger Rally:US664892
-    private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(FeedServlet.class);
+    private static final EELFLogger eelfLogger = EELFManager.getInstance().getLogger(FeedServlet.class);
 
     /**
      * Delete the Feed at the address /feed/&lt;feednumber&gt;.

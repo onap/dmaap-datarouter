@@ -73,12 +73,12 @@ import org.onap.dmaap.datarouter.provisioning.utils.SynchronizerTask;
  */
 public class ProvRunner {
 
-    public static final EELFLogger intlogger = EELFManager.getInstance()
-                                                       .getLogger("org.onap.dmaap.datarouter.provisioning.internal");
+    public static final EELFLogger intlogger = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.provisioning.internal");
 
     private static Server provServer;
     private static AafPropsUtils aafPropsUtils;
     private static Properties provProperties;
+    private static Boolean tlsEnabled;
 
     /**
      * Starts the Data Router Provisioning server.
@@ -91,14 +91,16 @@ public class ProvRunner {
             intlogger.error("Data Router Provisioning database init failure. Exiting.");
             exit(1);
         }
-        // Set up AAF properties
-        try {
-            aafPropsUtils = new AafPropsUtils(new File(getProvProperties().getProperty(
-                "org.onap.dmaap.datarouter.provserver.aafprops.path",
-                "/opt/app/osaaf/local/org.onap.dmaap-dr.props")));
-        } catch (IOException e) {
-            intlogger.error("NODE0314 Failed to load AAF props. Exiting", e);
-            exit(1);
+        if (Boolean.TRUE.equals(getTlsEnabled())) {
+            // Set up AAF properties
+            try {
+                aafPropsUtils = new AafPropsUtils(new File(getProvProperties().getProperty(
+                    "org.onap.dmaap.datarouter.provserver.aafprops.path",
+                    "/opt/app/osaaf/local/org.onap.dmaap-dr.props")));
+            } catch (IOException e) {
+                intlogger.error("NODE0314 Failed to load AAF props. Exiting", e);
+                exit(1);
+            }
         }
         // Daemon to clean up the log directory on a daily basis
         Timer rolex = new Timer();
@@ -138,11 +140,11 @@ public class ProvRunner {
 
     public static Properties getProvProperties() {
         if (provProperties == null) {
-            try {
+            try (FileInputStream props = new FileInputStream(getProperty(
+                "org.onap.dmaap.datarouter.provserver.properties",
+                "/opt/app/datartr/etc/provserver.properties"))) {
                 provProperties = new Properties();
-                provProperties.load(new FileInputStream(getProperty(
-                    "org.onap.dmaap.datarouter.provserver.properties",
-                    "/opt/app/datartr/etc/provserver.properties")));
+                provProperties.load(props);
             } catch (IOException e) {
                 intlogger.error("Failed to load PROV properties: " + e.getMessage(), e);
                 exit(1);
@@ -153,5 +155,13 @@ public class ProvRunner {
 
     public static AafPropsUtils getAafPropsUtils() {
         return aafPropsUtils;
+    }
+
+    public static Boolean getTlsEnabled() {
+        if (tlsEnabled == null) {
+            tlsEnabled = Boolean.parseBoolean(getProvProperties()
+                .getProperty("org.onap.dmaap.datarouter.provserver.tlsenabled", "true"));
+        }
+        return tlsEnabled;
     }
 }

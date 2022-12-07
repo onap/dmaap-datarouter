@@ -29,8 +29,8 @@ import org.onap.aaf.cadi.PropAccess;
 
 class NodeAafPropsUtils {
 
-    private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(NodeAafPropsUtils.class);
-    private PropAccess propAccess;
+    private static final EELFLogger eelfLogger = EELFManager.getInstance().getLogger(NodeAafPropsUtils.class);
+    private final PropAccess propAccess;
 
     NodeAafPropsUtils(File propsFile) throws IOException {
         propAccess = new PropAccess();

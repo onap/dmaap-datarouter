@@ -24,10 +24,8 @@
 
 package org.onap.dmaap.datarouter.provisioning.beans;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.security.cert.X509Certificate;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.onap.dmaap.datarouter.provisioning.BaseServlet;
 
 /**

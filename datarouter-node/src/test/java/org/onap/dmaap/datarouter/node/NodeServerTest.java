@@ -43,7 +43,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*"})
 public class NodeServerTest {
 
-    private NodeConfigManager config = mock(NodeConfigManager.class);
+    private final NodeConfigManager config = mock(NodeConfigManager.class);
     @Before
     public void setUp() throws Exception {
         setUpConfig();
@@ -58,7 +58,7 @@ public class NodeServerTest {
 
     @Test
     public void Verify_Node_Server_Is_Configured_Correctly() {
-        Assert.assertNotNull(NodeServer.getServerInstance());
+        Assert.assertNotNull(NodeServer.getServerInstance(config));
     }
 
     private void setUpConfig() throws IllegalAccessException {
@@ -73,14 +73,13 @@ public class NodeServerTest {
         when(config.getEventLogInterval()).thenReturn("40");
         when(config.isDeletePermitted("1")).thenReturn(true);
         when(config.getAllDests()).thenReturn(new DestInfo[0]);
+        when(config.isTlsEnabled()).thenReturn(true);
         when(config.getKSType()).thenReturn("PKCS12");
         when(config.getKSFile()).thenReturn("src/test/resources/aaf/org.onap.dmaap-dr.p12");
         when(config.getKSPass()).thenReturn("tVac2#@Stx%tIOE^x[c&2fgZ");
         when(config.getTstype()).thenReturn("jks");
         when(config.getTsfile()).thenReturn("src/test/resources/aaf/org.onap.dmaap-dr.trust.jks");
         when(config.getTspass()).thenReturn("XHX$2Vl?Lk*2CB.i1+ZFAhZd");
-        FieldUtils.writeDeclaredStaticField(NodeServlet.class, "config", config, true);
-        FieldUtils.writeDeclaredStaticField(NodeRunner.class, "nodeConfigManager", config, true);
         PowerMockito.when(NodeConfigManager.getInstance()).thenReturn(config);
     }
 

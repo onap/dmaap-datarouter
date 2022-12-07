@@ -24,8 +24,8 @@
 
 package org.onap.dmaap.datarouter.authz;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * A Data Router API that requires authorization of incoming requests creates an instance of a class that implements

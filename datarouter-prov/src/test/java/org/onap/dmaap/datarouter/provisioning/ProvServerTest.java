@@ -46,7 +46,7 @@ public class ProvServerTest {
     public static void init() {
         System.setProperty(
             "org.onap.dmaap.datarouter.provserver.properties",
-            "src/test/resources/h2Database.properties");
+            "src/test/resources/h2DatabaseTlsDisabled.properties");
     }
 
     @Test

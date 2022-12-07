@@ -25,10 +25,10 @@
       "aaf_instance": "legacy",
       "publisher": "dradmin",
       "links": {
-        "subscribe": "https://dmaap-dr-prov/subscribe/1",
-        "log": "https://dmaap-dr-prov/feedlog/1",
-        "publish": "https://dmaap-dr-prov/publish/1",
-        "self": "https://dmaap-dr-prov/feed/1"
+        "subscribe": "http://dmaap-dr-prov/subscribe/1",
+        "log": "http://dmaap-dr-prov/feedlog/1",
+        "publish": "http://dmaap-dr-prov/publish/1",
+        "self": "http://dmaap-dr-prov/feed/1"
       },
       "created_date": 1560871903000
     }
@@ -49,7 +49,7 @@
         "use100": true,
         "password": "PASSWORD",
         "user": "LOGIN",
-        "url": "https://dcae-pm-mapper:8443/delivery"
+        "url": "http://dcae-pm-mapper:8080/delivery"
       },
       "subscriber": "dradmin",
       "groupid": 0,
@@ -62,9 +62,9 @@
       "decompress": true,
       "aaf_instance": "legacy",
       "links": {
-        "feed": "https://dmaap-dr-prov/feed/1",
-        "log": "https://dmaap-dr-prov/sublog/1",
-        "self": "https://dmaap-dr-prov/subs/1"
+        "feed": "http://dmaap-dr-prov/feed/1",
+        "log": "http://dmaap-dr-prov/sublog/1",
+        "self": "http://dmaap-dr-prov/subs/1"
       },
       "created_date": 1560872889000
     }

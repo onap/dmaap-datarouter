@@ -22,6 +22,15 @@
 # functions
 #
 
+# wrapper for sourcing a file
+function source_safely() {
+    [ -z "$1" ] && return 1
+    relax_set
+    # shellcheck disable=SC1090
+    . "$1"
+    load_set
+}
+
 function on_exit(){
     rc=$?
     if [[ ${WORKSPACE} ]]; then
@@ -105,14 +114,6 @@ function relax_set() {
     set +o pipefail
 }
 
-# wrapper for sourcing a file
-function source_safely() {
-    [ -z "$1" ] && return 1
-    relax_set
-    . "$1"
-    load_set
-}
-
 #
 # main
 #
@@ -153,13 +154,14 @@ TESTPLANDIR="${WORKSPACE}/${TESTPLAN}"
 source_safely "${WORKSPACE}/prepare-csit.sh"
 
 # Activate the virtualenv containing all the required libraries installed by prepare-csit.sh
-source_safely "${ROBOT_VENV}/bin/activate"
+source_safely "${ROBOT3_VENV}/bin/activate"
 
 WORKDIR=$(mktemp -d --suffix=-robot-workdir)
+
 cd "${WORKDIR}"
 
 # Add csit scripts to PATH
-export PATH="${PATH}:${WORKSPACE}/docker/scripts:${WORKSPACE}/scripts:${ROBOT_VENV}/bin"
+export PATH="${PATH}:${WORKSPACE}/docker/scripts:${WORKSPACE}/scripts:${ROBOT3_VENV}/bin"
 export SCRIPTS="${WORKSPACE}/scripts"
 export ROBOT_VARIABLES=
 

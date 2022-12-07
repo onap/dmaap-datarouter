@@ -18,31 +18,25 @@
 #
 
 if [ -z "$WORKSPACE" ]; then
+    # shellcheck disable=SC2155
     export WORKSPACE=`git rev-parse --show-toplevel`
 fi
 
+# shellcheck disable=SC2034
 TESTPLANDIR=${WORKSPACE}/${TESTPLAN}
 
-# Assume that if ROBOT_VENV is set and virtualenv with system site packages can be activated, 
-# ci-management/jjb/integration/include-raw-integration-install-robotframework.sh has already
-# been executed
+# Assume that if ROBOT3_VENV is set and virtualenv with system site packages can be activated,
+# and install-robotframework.sh has already been executed
 
 if [ -f ${WORKSPACE}/env.properties ]; then
     source ${WORKSPACE}/env.properties
 fi
-if [ -f ${ROBOT_VENV}/bin/activate ]; then
-    source ${ROBOT_VENV}/bin/activate
+if [ -f ${ROBOT3_VENV}/bin/activate ]; then
+    source ${ROBOT3_VENV}/bin/activate
 else
-    rm -rf /tmp/ci-management
     rm -f ${WORKSPACE}/env.properties
-    cd /tmp
-    git clone "https://gerrit.onap.org/r/ci-management"
-    source /tmp/ci-management/jjb/integration/include-raw-integration-install-robotframework.sh
+    source ${WORKSPACE}/install-robotframework.sh
 fi
 
-# install eteutils
-mkdir -p ${ROBOT_VENV}/src/onap
-rm -rf ${ROBOT_VENV}/src/onap/testsuite
-pip install --upgrade --extra-index-url="https://nexus3.onap.org/repository/PyPi.staging/simple" 'robotframework-onap==0.5.1.*' --pre
-
+pip install --upgrade --extra-index-url="https://nexus3.onap.org/repository/PyPi.staging/simple" 'robotframework-onap==7.0.2.*' --pre
 pip freeze

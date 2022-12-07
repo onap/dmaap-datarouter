@@ -23,6 +23,25 @@
 
 package org.onap.dmaap.datarouter.provisioning.utils;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.eclipse.jetty.continuation.Continuation;
 import org.eclipse.jetty.continuation.ContinuationSupport;
@@ -31,33 +50,20 @@ import org.eclipse.jetty.server.HttpChannel;
 import org.eclipse.jetty.server.HttpConnection;
 import org.eclipse.jetty.server.Request;
 import org.junit.Test;
-
 import org.junit.runner.RunWith;
-import static org.junit.Assert.*;
-import static org.hamcrest.core.Is.is;
 import org.mockito.Mock;
-
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
 import org.onap.dmaap.datarouter.provisioning.beans.Parameters;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.*;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.provisioning.beans.Parameters",
                                   "org.eclipse.jetty.server.Request",
                                   "org.eclipse.jetty.continuation.ContinuationSupport",
                                   "org.eclipse.jetty.server.HttpConnection"})
+@PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
 public class ThrottleFilterTest {
 
     @Mock
@@ -132,7 +138,7 @@ public class ThrottleFilterTest {
     public void Given_Do_Filter_Run_and_enabled_and_action_is_true_and_rate_is_greater_than_0_and_getFeedId_returns_id_then_continuation_will_call_suspend_and_dispatch_once() throws Exception {
         mockParametersWithValues("0,5,thing");
         PowerMockito.mockStatic(ContinuationSupport.class);
-        PowerMockito.when(continuationsupport.getContinuation(any())).thenReturn(continuation);
+        PowerMockito.when(ContinuationSupport.getContinuation(any())).thenReturn(continuation);
         ThrottleFilter.configure();
         mockServletInputStream();
         FieldUtils.writeDeclaredStaticField(ThrottleFilter.class, "action", 1, true);
@@ -175,7 +181,7 @@ public class ThrottleFilterTest {
         FilterConfig filterconfig = mock(FilterConfig.class);
         mockParametersWithValues("0,5,thing");
         PowerMockito.mockStatic(ContinuationSupport.class);
-        PowerMockito.when(continuationsupport.getContinuation(any())).thenReturn(continuation);
+        PowerMockito.when(ContinuationSupport.getContinuation(any())).thenReturn(continuation);
 
         throttleFilter.init(filterconfig);
         throttleFilter.destroy();
@@ -199,17 +205,17 @@ public class ThrottleFilterTest {
 
     private void mockContinuationSupport() {
         PowerMockito.mockStatic(ContinuationSupport.class);
-        PowerMockito.when(continuationsupport.getContinuation(any())).thenReturn(continuation);
+        PowerMockito.when(ContinuationSupport.getContinuation(any())).thenReturn(continuation);
     }
 
     private void mockHttpConnectionHttpChannelAndRequest(ServletInputStream serverinputstream) throws IOException {
         PowerMockito.mockStatic(ContinuationSupport.class);
-        PowerMockito.when(continuationsupport.getContinuation(any())).thenReturn(continuation);
+        PowerMockito.when(ContinuationSupport.getContinuation(any())).thenReturn(continuation);
         when(serverinputstream.read(any())).thenReturn(2).thenReturn(1).thenReturn(0);
         when(request.getInputStream()).thenReturn(serverinputstream);
         PowerMockito.mockStatic(HttpConnection.class);
         EndPoint endpoint = mock(EndPoint.class);
-        PowerMockito.when(httpconnection.getCurrentConnection()).thenReturn(httpconnection);
+        PowerMockito.when(HttpConnection.getCurrentConnection()).thenReturn(httpconnection);
         PowerMockito.when(httpconnection.getHttpChannel()).thenReturn(httpchannel);
         when(httpchannel.getRequest()).thenReturn(req);
         when(req.getHttpChannel()).thenReturn(httpchannel);

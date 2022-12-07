@@ -55,7 +55,6 @@ public class LogManagerTest {
     @Before
     public void setUp() throws IllegalAccessException {
         mockNodeConfigManager();
-        FieldUtils.writeDeclaredStaticField(StatusLog.class, "config", config, true);
         logManager = new LogManager(config);
     }
 
@@ -94,7 +93,7 @@ public class LogManagerTest {
         assertNull(worker.getFeedId(""));
     }
 
-    private void mockNodeConfigManager() {
+    private void mockNodeConfigManager() throws IllegalAccessException {
         PowerMockito.when(config.getLogDir()).thenReturn(System.getProperty("user.dir") + "/src/test/resources");
         PowerMockito.when(config.getTimer()).thenReturn(new Timer("Node Configuration Timer", true));
         PowerMockito.when(config.getEventLogPrefix())
@@ -104,6 +103,7 @@ public class LogManagerTest {
         PowerMockito.when(config.getEventLogInterval()).thenReturn("30s");
         PowerMockito.when(config.getPublishId()).thenReturn("123456789.dmaap-dr-node");
         PowerMockito.when(config.getEventLogUrl()).thenReturn("https://dmaap-dr-prov:8443/internal/logs");
+        FieldUtils.writeDeclaredStaticField(NodeConfigManager.class, "base", config, true);
     }
 
 }
