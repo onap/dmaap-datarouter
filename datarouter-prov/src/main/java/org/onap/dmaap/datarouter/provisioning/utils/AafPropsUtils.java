@@ -29,7 +29,7 @@ import org.onap.aaf.cadi.PropAccess;
 
 public class AafPropsUtils {
 
-    private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(AafPropsUtils.class);
+    private static final EELFLogger eelfLogger = EELFManager.getInstance().getLogger(AafPropsUtils.class);
 
     public static final String KEYSTORE_TYPE_PROPERTY = "PKCS12";
     public static final String TRUESTSTORE_TYPE_PROPERTY = "jks";
@@ -38,7 +38,7 @@ public class AafPropsUtils {
     private static final String TRUSTSTORE_PATH_PROPERTY = "cadi_truststore";
     private static final String TRUSTSTORE_PASS_PROPERTY = "cadi_truststore_password";
 
-    private PropAccess propAccess;
+    private final PropAccess propAccess;
 
     public AafPropsUtils(File propsFile) throws IOException {
         propAccess = new PropAccess();

@@ -26,7 +26,7 @@ package org.onap.dmaap.datarouter.authz.impl;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.authz.Authorizer;
 import org.onap.dmaap.datarouter.authz.impl.AuthzResource.ResourceType;

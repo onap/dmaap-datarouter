@@ -30,7 +30,7 @@ package org.onap.dmaap.datarouter.node;
 public class PublishId {
 
     private long nextuid;
-    private String myname;
+    private final String myname;
 
     /**
      * Generate publish IDs for the specified name.

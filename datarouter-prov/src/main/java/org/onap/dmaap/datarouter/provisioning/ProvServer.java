@@ -23,16 +23,13 @@ package org.onap.dmaap.datarouter.provisioning;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import java.security.Security;
-import java.util.EnumSet;
 import java.util.Properties;
-import javax.servlet.DispatcherType;
-import javax.servlet.ServletException;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.CustomRequestLog;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.NCSARequestLog;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
@@ -40,21 +37,17 @@ import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
-import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.jetbrains.annotations.NotNull;
 import org.onap.dmaap.datarouter.provisioning.utils.AafPropsUtils;
-import org.onap.dmaap.datarouter.provisioning.utils.DRProvCadiFilter;
-import org.onap.dmaap.datarouter.provisioning.utils.ThrottleFilter;
 
 
 public class ProvServer {
 
-    public static final EELFLogger intlogger = EELFManager.getInstance()
-        .getLogger("InternalLog");
+    public static final EELFLogger intlogger = EELFManager.getInstance().getLogger("InternalLog");
 
     private static Server server;
 
@@ -69,9 +62,6 @@ public class ProvServer {
     }
 
     private static Server createProvServer(Properties provProps) {
-        final int httpsPort = Integer.parseInt(
-            provProps.getProperty("org.onap.dmaap.datarouter.provserver.https.port", "8443"));
-
         Security.setProperty("networkaddress.cache.ttl", "4");
         QueuedThreadPool queuedThreadPool = getQueuedThreadPool();
 
@@ -81,48 +71,52 @@ public class ProvServer {
         server.setDumpAfterStart(false);
         server.setDumpBeforeStop(false);
 
-        NCSARequestLog ncsaRequestLog = getRequestLog(provProps);
-        RequestLogHandler requestLogHandler = new RequestLogHandler();
-        requestLogHandler.setRequestLog(ncsaRequestLog);
-
-        server.setRequestLog(ncsaRequestLog);
-
-        HttpConfiguration httpConfiguration = getHttpConfiguration(httpsPort);
+        HttpConfiguration httpConfiguration = getHttpConfiguration();
 
         //HTTP Connector
         try (ServerConnector httpServerConnector = new ServerConnector(server,
             new HttpConnectionFactory(httpConfiguration))) {
             httpServerConnector.setPort(Integer.parseInt(provProps.getProperty(
-                "org.onap.dmaap.datarouter.provserver.http.port", "8080")));
+                "org.onap.dmaap.datarouter.provserver.http.port", "80")));
             httpServerConnector.setAcceptQueueSize(2);
             httpServerConnector.setIdleTimeout(30000);
 
-            SslContextFactory sslContextFactory = getSslContextFactory(provProps);
+            ServletContextHandler servletContextHandler = getServletContextHandler(provProps);
+            ContextHandlerCollection contextHandlerCollection = new ContextHandlerCollection();
+            contextHandlerCollection.addHandler(servletContextHandler);
 
-            // HTTPS configuration
-            HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
-            httpsConfiguration.setRequestHeaderSize(8192);
+            CustomRequestLog customRequestLog = getCustomRequestLog(provProps);
+            RequestLogHandler requestLogHandler = new RequestLogHandler();
+            requestLogHandler.setRequestLog(customRequestLog);
 
-            // HTTPS connector
-            try (ServerConnector httpsServerConnector = new ServerConnector(server,
-                new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
-                new HttpConnectionFactory(httpsConfiguration))) {
-                httpsServerConnector.setPort(httpsPort);
-                httpsServerConnector.setIdleTimeout(30000);
-                httpsServerConnector.setAcceptQueueSize(2);
+            server.setRequestLog(customRequestLog);
 
-                ServletContextHandler servletContextHandler = getServletContextHandler(provProps);
-                ContextHandlerCollection contextHandlerCollection = new ContextHandlerCollection();
-                contextHandlerCollection.addHandler(servletContextHandler);
+            // Server's Handler collection
+            HandlerCollection handlerCollection = new HandlerCollection();
+            handlerCollection.setHandlers(new Handler[]{contextHandlerCollection, new DefaultHandler()});
+            handlerCollection.addHandler(requestLogHandler);
 
-                // Server's Handler collection
-                HandlerCollection handlerCollection = new HandlerCollection();
-                handlerCollection.setHandlers(new Handler[]{contextHandlerCollection, new DefaultHandler()});
-                handlerCollection.addHandler(requestLogHandler);
-
-                server.setConnectors(new Connector[]{httpServerConnector, httpsServerConnector});
-                server.setHandler(handlerCollection);
+            if (Boolean.TRUE.equals(ProvRunner.getTlsEnabled())) {
+                // HTTPS configuration
+                int httpsPort = Integer.parseInt(
+                    provProps.getProperty("org.onap.dmaap.datarouter.provserver.https.port", "443"));
+                httpConfiguration.setSecureScheme("https");
+                httpConfiguration.setSecurePort(httpsPort);
+                HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
+                httpsConfiguration.setRequestHeaderSize(8192);
+                // HTTPS connector
+                try (ServerConnector httpsServerConnector = new ServerConnector(server,
+                    new SslConnectionFactory(getSslContextFactory(provProps), HttpVersion.HTTP_1_1.asString()),
+                    new HttpConnectionFactory(httpsConfiguration))) {
+                    httpsServerConnector.setPort(httpsPort);
+                    httpsServerConnector.setIdleTimeout(30000);
+                    httpsServerConnector.setAcceptQueueSize(2);
+                    server.setConnectors(new Connector[]{httpServerConnector, httpsServerConnector});
+                }
+            } else {
+                server.setConnectors(new Connector[]{httpServerConnector});
             }
+            server.setHandler(handlerCollection);
         }
         return server;
     }
@@ -138,7 +132,7 @@ public class ProvServer {
     }
 
     @NotNull
-    private static SslContextFactory getSslContextFactory(Properties provProps) {
+    private static SslContextFactory.Server getSslContextFactory(Properties provProps) {
         SslContextFactory sslContextFactory = new SslContextFactory.Server();
         sslContextFactory.setKeyStoreType(AafPropsUtils.KEYSTORE_TYPE_PROPERTY);
         sslContextFactory.setKeyStorePath(ProvRunner.getAafPropsUtils().getKeystorePathProperty());
@@ -149,7 +143,6 @@ public class ProvServer {
         sslContextFactory.setTrustStorePath(ProvRunner.getAafPropsUtils().getTruststorePathProperty());
         sslContextFactory.setTrustStorePassword(ProvRunner.getAafPropsUtils().getTruststorePassProperty());
 
-        sslContextFactory.setWantClientAuth(true);
         sslContextFactory.setExcludeCipherSuites(
             "SSL_RSA_WITH_DES_CBC_SHA",
             "SSL_DHE_RSA_WITH_DES_CBC_SHA",
@@ -169,28 +162,20 @@ public class ProvServer {
         intlogger.info("Unsupported ciphers: " + String.join(",", sslContextFactory.getExcludeCipherSuites()));
         intlogger.info("Supported ciphers: " + String.join(",", sslContextFactory.getIncludeCipherSuites()));
 
-        return sslContextFactory;
+        return (SslContextFactory.Server) sslContextFactory;
     }
 
     @NotNull
-    private static NCSARequestLog getRequestLog(Properties provProps) {
-        NCSARequestLog ncsaRequestLog = new NCSARequestLog();
-        ncsaRequestLog.setFilename(provProps.getProperty(
-            "org.onap.dmaap.datarouter.provserver.accesslog.dir") + "/request.log.yyyy_mm_dd");
-        ncsaRequestLog.setFilenameDateFormat("yyyyMMdd");
-        ncsaRequestLog.setRetainDays(90);
-        ncsaRequestLog.setAppend(true);
-        ncsaRequestLog.setExtended(false);
-        ncsaRequestLog.setLogCookies(false);
-        ncsaRequestLog.setLogTimeZone("GMT");
-        return ncsaRequestLog;
+    private static CustomRequestLog getCustomRequestLog(Properties provProps) {
+        String filename = provProps.getProperty(
+            "org.onap.dmaap.datarouter.provserver.accesslog.dir") + "/request.log.yyyy_mm_dd";
+        String format = "yyyyMMdd";
+        return new CustomRequestLog(filename, format);
     }
 
     @NotNull
-    private static HttpConfiguration getHttpConfiguration(int httpsPort) {
+    private static HttpConfiguration getHttpConfiguration() {
         HttpConfiguration httpConfiguration = new HttpConfiguration();
-        httpConfiguration.setSecureScheme("https");
-        httpConfiguration.setSecurePort(httpsPort);
         httpConfiguration.setOutputBufferSize(32768);
         httpConfiguration.setRequestHeaderSize(8192);
         httpConfiguration.setResponseHeaderSize(8192);
@@ -214,23 +199,6 @@ public class ProvServer {
         servletContextHandler.addServlet(new ServletHolder(new InternalServlet()), "/internal/*");
         servletContextHandler.addServlet(new ServletHolder(new RouteServlet()), "/internal/route/*");
         servletContextHandler.addServlet(new ServletHolder(new DRFeedsServlet()), "/");
-        servletContextHandler.addFilter(new FilterHolder(new ThrottleFilter()),
-            "/publish/*", EnumSet.of(DispatcherType.REQUEST));
-        setCadiFilter(servletContextHandler, provProps);
         return servletContextHandler;
-    }
-
-    private static void setCadiFilter(ServletContextHandler servletContextHandler, Properties provProps) {
-        if (Boolean.parseBoolean(provProps.getProperty(
-            "org.onap.dmaap.datarouter.provserver.cadi.enabled", "false"))) {
-            try {
-                servletContextHandler.addFilter(new FilterHolder(new DRProvCadiFilter(
-                    true, ProvRunner.getAafPropsUtils().getPropAccess())), "/*", EnumSet.of(DispatcherType.REQUEST));
-                intlogger.info("PROV0001 AAF CADI filter enabled");
-            } catch (ServletException e) {
-                intlogger.error("PROV0001 Failed to add CADI filter to server");
-            }
-
-        }
     }
 }

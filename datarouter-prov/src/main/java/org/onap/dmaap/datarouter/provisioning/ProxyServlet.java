@@ -26,6 +26,10 @@ package org.onap.dmaap.datarouter.provisioning;
 
 import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.sendResponseError;
 
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,10 +40,6 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.util.Collections;
 import java.util.List;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -47,6 +47,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.BasicHttpEntity;
@@ -79,22 +80,27 @@ public class ProxyServlet extends BaseServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         try {
-            // Set up keystore
-            String type = AafPropsUtils.KEYSTORE_TYPE_PROPERTY;
-            String store = ProvRunner.getAafPropsUtils().getKeystorePathProperty();
-            String pass = ProvRunner.getAafPropsUtils().getKeystorePassProperty();
-            KeyStore keyStore = readStore(store, pass, type);
-            // Set up truststore
-            store = ProvRunner.getAafPropsUtils().getTruststorePathProperty();
-            pass = ProvRunner.getAafPropsUtils().getTruststorePassProperty();
-            KeyStore trustStore = readStore(store, pass, AafPropsUtils.TRUESTSTORE_TYPE_PROPERTY);
+            if (Boolean.TRUE.equals(ProvRunner.getTlsEnabled())) {
+                // Set up keystore
+                String type = AafPropsUtils.KEYSTORE_TYPE_PROPERTY;
+                String store = ProvRunner.getAafPropsUtils().getKeystorePathProperty();
+                String pass = ProvRunner.getAafPropsUtils().getKeystorePassProperty();
+                KeyStore keyStore = readStore(store, pass, type);
+                // Set up truststore
+                store = ProvRunner.getAafPropsUtils().getTruststorePathProperty();
+                pass = ProvRunner.getAafPropsUtils().getTruststorePassProperty();
+                KeyStore trustStore = readStore(store, pass, AafPropsUtils.TRUESTSTORE_TYPE_PROPERTY);
 
-            // We are connecting with the node name, but the certificate will have the CNAME
-            // So we need to accept a non-matching certificate name
-            SSLSocketFactory socketFactory = new SSLSocketFactory(keyStore,
+                // We are connecting with the node name, but the certificate will have the CNAME
+                // So we need to accept a non-matching certificate name
+                SSLSocketFactory socketFactory = new SSLSocketFactory(keyStore,
                     ProvRunner.getAafPropsUtils().getKeystorePassProperty(), trustStore);
-            socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-            sch = new Scheme("https", 443, socketFactory);
+                socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+                sch = new Scheme("https", 443, socketFactory);
+            } else {
+                PlainSocketFactory socketFactory = new PlainSocketFactory();
+                sch = new Scheme("http", 80, socketFactory);
+            }
             inited = true;
         } catch (Exception e) {
             intlogger.error("ProxyServlet.init: " + e.getMessage(), e);

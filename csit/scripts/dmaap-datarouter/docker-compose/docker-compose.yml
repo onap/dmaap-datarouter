@@ -25,15 +25,10 @@ services:
     container_name: datarouter-prov
     hostname: dmaap-dr-prov
     ports:
-    - "443:8443"
-    - "8443:8443"
     - "8080:8080"
     volumes:
     - ./provserver.properties:/opt/app/datartr/etc/provserver.properties
     - ./logback.xml:/opt/app/datartr/etc/logback.xml
-    - ../dr_certs/dr_prov/truststore.jks:/opt/app/osaaf/local/truststore.jks
-    - ../dr_certs/dr_prov/org.onap.dmaap-dr-prov.p12:/opt/app/osaaf/local/org.onap.dmaap-dr-prov.p12
-    - ../dr_certs/dr_prov/org.onap.dmaap-dr.cred.props:/opt/app/osaaf/local/org.onap.dmaap-dr.cred.props
     depends_on:
       mariadb:
         condition: service_healthy
@@ -52,13 +47,10 @@ services:
     container_name: datarouter-node
     hostname: dmaap-dr-node
     ports:
-    - "9443:8443"
     - "9090:8080"
     volumes:
     - ./node.properties:/opt/app/datartr/etc/node.properties
-    - ../dr_certs/dr_node/truststore.jks:/opt/app/osaaf/local/truststore.jks
-    - ../dr_certs/dr_node/org.onap.dmaap-dr-node.p12:/opt/app/osaaf/local/org.onap.dmaap-dr-node.p12
-    - ../dr_certs/dr_node/org.onap.dmaap-dr.cred.props:/opt/app/osaaf/local/org.onap.dmaap-dr.cred.props
+    - ./logback.xml:/opt/app/datartr/etc/logback.xml
     depends_on:
       datarouter-prov:
         condition: service_healthy
@@ -75,6 +67,7 @@ services:
     - "7070:7070"
     volumes:
     - ./subscriber.properties:/opt/app/subscriber/etc/subscriber.properties
+    - ./sub-logback.xml:/opt/app/subscriber/etc/logback.xml
     networks:
       net:
         aliases:
@@ -88,6 +81,7 @@ services:
     - "7071:7070"
     volumes:
     - ./subscriber.properties:/opt/app/subscriber/etc/subscriber.properties
+    - ./sub-logback.xml:/opt/app/subscriber/etc/logback.xml
     networks:
       net:
         aliases:

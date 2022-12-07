@@ -19,7 +19,7 @@
 #  limitations under the License.
 #  ============LICENSE_END====================================================
 #
-FROM nexus3.onap.org:10001/onap/integration-java11:8.0.0
+FROM nexus3.onap.org:10001/onap/integration-java11:10.0.0
 
 COPY /opt /opt
 
@@ -28,8 +28,6 @@ ARG group=onap
 
 USER root
 RUN apk add --no-cache curl
-
-EXPOSE 8080 8443
 
 WORKDIR /opt
 RUN chmod 0700 startup.sh

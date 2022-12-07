@@ -23,8 +23,9 @@
 
 package org.onap.dmaap.datarouter.subscriber;
 
-import com.att.eelf.configuration.EELFLogger;
-import com.att.eelf.configuration.EELFManager;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -32,18 +33,18 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SampleSubscriberServlet extends HttpServlet {
 
-    private static EELFLogger logger = EELFManager.getInstance().getLogger(SampleSubscriberServlet.class);
+    private final Logger logger = LoggerFactory.getLogger(SampleSubscriberServlet.class);
+
     private static String outputDirectory;
     private static String basicAuth;
 
@@ -67,7 +68,7 @@ public class SampleSubscriberServlet extends HttpServlet {
         try {
             Files.createDirectory(Paths.get(outputDirectory));
         } catch (IOException e) {
-            logger.info("SubServlet: Failed to create delivery dir: " + e.getMessage(), e);
+            logger.error("SubServlet: Failed to create delivery dir: " + e.getMessage(), e);
         }
         basicAuth = "Basic " + Base64.encodeBase64String((login + ":" + password).getBytes());
     }
@@ -77,7 +78,7 @@ public class SampleSubscriberServlet extends HttpServlet {
         try {
             common(req, resp, false);
         } catch (IOException e) {
-            logger.info("SampleSubServlet: Failed to doPut: " + req.getRemoteAddr() + " : " + req.getPathInfo(), e);
+            logger.error("SampleSubServlet: Failed to doPut: " + req.getRemoteAddr() + " : " + req.getPathInfo(), e);
         }
     }
 
@@ -86,7 +87,7 @@ public class SampleSubscriberServlet extends HttpServlet {
         try {
             common(req, resp, true);
         } catch (IOException e) {
-            logger.info("SampleSubServlet: Failed to doDelete: " + req.getRemoteAddr() + " : " + req.getPathInfo(), e);
+            logger.error("SampleSubServlet: Failed to doDelete: " + req.getRemoteAddr() + " : " + req.getPathInfo(), e);
         }
     }
 
@@ -115,7 +116,7 @@ public class SampleSubscriberServlet extends HttpServlet {
             return;
         }
         if (!basicAuth.equals(authHeader)) {
-            logger.info("SampleSubServlet: Rejecting request with incorrect Authorization header from "
+            logger.error("SampleSubServlet: Rejecting request with incorrect Authorization header from "
                                 + req.getRemoteAddr() + ": " + req.getPathInfo());
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -127,7 +128,7 @@ public class SampleSubscriberServlet extends HttpServlet {
             fileid = fileid + "?" + queryString;
         }
         String publishid = req.getHeader("X-DMAAP-DR-PUBLISH-ID");
-        String filename = URLEncoder.encode(fileid, "UTF-8").replaceAll("^\\.", "%2E").replaceAll("\\*", "%2A");
+        String filename = URLEncoder.encode(fileid, StandardCharsets.UTF_8).replaceAll("^\\.", "%2E").replaceAll("\\*", "%2A");
         String fullPath = outputDirectory + "/" + filename;
         String tmpPath = outputDirectory + "/." + filename;
         String fullMetaDataPath = outputDirectory + "/" + filename + ".M";
@@ -164,7 +165,7 @@ public class SampleSubscriberServlet extends HttpServlet {
         } catch (IOException ioe) {
             Files.deleteIfExists(Paths.get(tmpPath));
             Files.deleteIfExists(Paths.get(tmpMetaDataPath));
-            logger.info("SampleSubServlet: Failed to process file " + fullPath + " from " + req.getRemoteAddr() + ": "
+            logger.error("SampleSubServlet: Failed to process file " + fullPath + " from " + req.getRemoteAddr() + ": "
                                 + req.getPathInfo());
             throw ioe;
         }

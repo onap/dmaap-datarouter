@@ -102,9 +102,9 @@ public class ThrottleFilter extends TimerTask implements Filter {
     private static int samplingPeriod = 0;            // sampling period
     private static int action = ACTION_DROP;    // action to take (throttle or drop)
 
-    private static EELFLogger logger = EELFManager.getInstance().getLogger("InternalLog");
+    private static final EELFLogger logger = EELFManager.getInstance().getLogger("InternalLog");
     private static Map<String, Counter> map = new HashMap<>();
-    private Map<String, List<Continuation>> suspendedRequests = new HashMap<>();
+    private final Map<String, List<Continuation>> suspendedRequests = new HashMap<>();
     private static final Timer rolex = new Timer();
 
     @Override
@@ -213,7 +213,7 @@ public class ThrottleFilter extends TimerTask implements Filter {
             String str = String.format("Throttling connection: %s %d bad connections in %d minutes",
                 getConnectionId(request), rate, samplingPeriod);
             logger.info(str);
-            Continuation continuation = ContinuationSupport.getContinuation(request);
+            Continuation continuation = ContinuationSupport.getContinuation((javax.servlet.ServletRequest) request);
             continuation.suspend();
             register(id, continuation);
             continuation.undispatch();
@@ -232,11 +232,7 @@ public class ThrottleFilter extends TimerTask implements Filter {
 
     private void register(String id, Continuation continuation) {
         synchronized (suspendedRequests) {
-            List<Continuation> list = suspendedRequests.get(id);
-            if (list == null) {
-                list = new ArrayList<>();
-                suspendedRequests.put(id, list);
-            }
+            List<Continuation> list = suspendedRequests.computeIfAbsent(id, k -> new ArrayList<>());
             list.add(continuation);
         }
     }
@@ -277,8 +273,8 @@ public class ThrottleFilter extends TimerTask implements Filter {
         }
     }
 
-    public class Counter {
-        private List<Long> times = new ArrayList<>();    // a record of request times
+    public static class Counter {
+        private final List<Long> times = new ArrayList<>();    // a record of request times
 
         /**
          * Method to prune request rate.

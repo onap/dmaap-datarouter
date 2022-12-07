@@ -22,7 +22,7 @@ rm -rf ${WORKSPACE}/archives
 mkdir -p ${WORKSPACE}/archives
 cd ${WORKSPACE}
 
-./run-csit.sh plans/dmaap-datarouter/ssl-dr-suite
+./run-csit.sh plans/dmaap-datarouter/dr-suite
 
 
 

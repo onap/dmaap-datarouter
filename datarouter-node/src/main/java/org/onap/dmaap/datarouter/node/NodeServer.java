@@ -42,7 +42,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class NodeServer {
 
-    private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(NodeServer.class);
+    private static final EELFLogger eelfLogger = EELFManager.getInstance().getLogger(NodeServer.class);
 
     private static Server server;
     private static Delivery delivery;
@@ -50,14 +50,15 @@ public class NodeServer {
     private NodeServer(){
     }
 
-    static Server getServerInstance() {
+    static Server getServerInstance(NodeConfigManager nodeConfigManager) {
         if (server == null) {
-            server = createNodeServer(NodeConfigManager.getInstance());
+            server = createNodeServer(nodeConfigManager);
         }
         return server;
     }
 
     private static Server createNodeServer(NodeConfigManager nodeConfigManager) {
+        eelfLogger.info("NODE0005 Creating new NodeServer");
         server = new Server();
         delivery = new Delivery(nodeConfigManager);
 
@@ -70,45 +71,43 @@ public class NodeServer {
             httpServerConnector.setPort(nodeConfigManager.getHttpPort());
             httpServerConnector.setIdleTimeout(2000);
 
-            SslContextFactory sslContextFactory = getSslContextFactory(nodeConfigManager);
+            //Context Handler
+            ServletContextHandler servletContextHandler = new ServletContextHandler(0);
+            servletContextHandler.setContextPath("/");
+            servletContextHandler.addServlet(new ServletHolder(new NodeServlet(delivery, nodeConfigManager)), "/*");
 
-            HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
-            httpsConfiguration.setRequestHeaderSize(8192);
-
-            SecureRequestCustomizer secureRequestCustomizer = new SecureRequestCustomizer();
-            secureRequestCustomizer.setStsMaxAge(2000);
-            secureRequestCustomizer.setStsIncludeSubDomains(true);
-            httpsConfiguration.addCustomizer(secureRequestCustomizer);
-
-            // HTTPS connector
-            try (ServerConnector httpsServerConnector = new ServerConnector(server,
-                new SslConnectionFactory(sslContextFactory, HttpVersion.HTTP_1_1.asString()),
-                new HttpConnectionFactory(httpsConfiguration))) {
-
-                httpsServerConnector.setPort(nodeConfigManager.getHttpsPort());
-                httpsServerConnector.setIdleTimeout(3600000);
-                httpsServerConnector.setAcceptQueueSize(2);
-
-                //Context Handler
-                ServletContextHandler servletContextHandler = new ServletContextHandler(0);
-                servletContextHandler.setContextPath("/");
-                servletContextHandler.addServlet(new ServletHolder(new NodeServlet(delivery)), "/*");
-
-                //CADI Filter activation check
-                if (nodeConfigManager.getCadiEnabled()) {
-                    try {
-                        servletContextHandler.addFilter(new FilterHolder(new DRNodeCadiFilter(true,
-                                nodeConfigManager.getNodeAafPropsUtils().getPropAccess())), "/*",
-                            EnumSet.of(DispatcherType.REQUEST));
-                    } catch (ServletException e) {
-                        eelfLogger.error("Failed to add CADI Filter: " + e.getMessage(), e);
-                    }
-                }
-                server.setHandler(servletContextHandler);
-                server.setConnectors(new Connector[]{httpServerConnector, httpsServerConnector});
+            if (nodeConfigManager.isTlsEnabled()) {
+                initialiseHttpsConnector(nodeConfigManager, httpConfiguration, httpServerConnector, servletContextHandler);
+            } else {
+                eelfLogger.info("NODE0005 Adding HTTP Connector");
+                server.setConnectors(new Connector[]{httpServerConnector});
             }
+            server.setHandler(servletContextHandler);
         }
         return server;
+    }
+
+    private static void initialiseHttpsConnector(NodeConfigManager nodeConfigManager, HttpConfiguration httpConfiguration,
+        ServerConnector httpServerConnector, ServletContextHandler servletContextHandler) {
+        HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
+        httpsConfiguration.setRequestHeaderSize(8192);
+
+        SecureRequestCustomizer secureRequestCustomizer = new SecureRequestCustomizer();
+        secureRequestCustomizer.setStsMaxAge(2000);
+        secureRequestCustomizer.setStsIncludeSubDomains(true);
+        httpsConfiguration.addCustomizer(secureRequestCustomizer);
+
+        // HTTPS connector
+        try (ServerConnector httpsServerConnector = new ServerConnector(server,
+            new SslConnectionFactory(getSslContextFactory(nodeConfigManager), HttpVersion.HTTP_1_1.asString()),
+            new HttpConnectionFactory(httpsConfiguration))) {
+
+            httpsServerConnector.setPort(nodeConfigManager.getHttpsPort());
+            httpsServerConnector.setIdleTimeout(3600000);
+            httpsServerConnector.setAcceptQueueSize(2);
+            eelfLogger.info("NODE0005 TLS Enabled: Adding HTTP/S Connectors");
+            server.setConnectors(new Connector[]{httpServerConnector, httpsServerConnector});
+        }
     }
 
     /**
@@ -120,7 +119,7 @@ public class NodeServer {
 
 
     @NotNull
-    private static SslContextFactory getSslContextFactory(NodeConfigManager nodeConfigManager) {
+    private static SslContextFactory.Server getSslContextFactory(NodeConfigManager nodeConfigManager) {
         SslContextFactory sslContextFactory = new SslContextFactory.Server();
         sslContextFactory.setKeyStoreType(nodeConfigManager.getKSType());
         sslContextFactory.setKeyStorePath(nodeConfigManager.getKSFile());
@@ -142,6 +141,6 @@ public class NodeServer {
         eelfLogger.info("Supported protocols: " + String.join(",", sslContextFactory.getIncludeProtocols()));
         eelfLogger.info("Unsupported ciphers: " + String.join(",", sslContextFactory.getExcludeCipherSuites()));
         eelfLogger.info("Supported ciphers: " + String.join(",", sslContextFactory.getIncludeCipherSuites()));
-        return sslContextFactory;
+        return (SslContextFactory.Server) sslContextFactory;
     }
 }

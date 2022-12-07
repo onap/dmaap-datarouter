@@ -148,16 +148,6 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.att.eelf</groupId>
-            <artifactId>eelf-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>powermock-api-mockito</artifactId>
-                    <groupId>org.powermock</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
     </dependencies>
     <profiles>
         <profile>
