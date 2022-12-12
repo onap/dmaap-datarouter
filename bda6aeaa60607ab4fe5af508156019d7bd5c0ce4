@@ -16,6 +16,24 @@
       "revId": "bda6aeaa60607ab4fe5af508156019d7bd5c0ce4",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f33153b9_94d3c59b",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-12-12T11:35:53Z",
+      "side": 1,
+      "message": "Using it as a bool check on setting up the server connectors etc",
+      "parentUuid": "5498e7f3_0b8d5ae6",
+      "revId": "bda6aeaa60607ab4fe5af508156019d7bd5c0ce4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
     }
   ]
 }
