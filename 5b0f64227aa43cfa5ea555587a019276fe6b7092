@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "aefcf4ed_d7887b0b",
+        "filename": "csit/scripts/dmaap-datarouter/docker-compose/node.properties",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-12-12T11:34:02Z",
+      "side": 1,
+      "message": "Should prob keep some mech for tls but ultimatley be ignored mostly",
+      "parentUuid": "a2377a5d_38e477de",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 85,
+        "endChar": 10
+      },
+      "revId": "5b0f64227aa43cfa5ea555587a019276fe6b7092",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "88820e42_6e49562a",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
         "patchSetId": 2
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "56917b17_aa81cd22",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-12-12T11:34:02Z",
+      "side": 1,
+      "message": "Agreed. Work being done in this space for logging compliance. EELF is junk in this respect so will look to remove it and just use logback",
+      "parentUuid": "88820e42_6e49562a",
+      "range": {
+        "startLine": 58,
+        "startChar": 36,
+        "endLine": 58,
+        "endChar": 46
+      },
+      "revId": "5b0f64227aa43cfa5ea555587a019276fe6b7092",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "fcf96ca0_ce89fcf4",
         "filename": "pom.xml",
         "patchSetId": 2
@@ -59,6 +107,30 @@
       "writtenOn": "2022-12-12T11:02:13Z",
       "side": 1,
       "message": "Why set this one differently to from the global property you set above?",
+      "range": {
+        "startLine": 157,
+        "startChar": 32,
+        "endLine": 157,
+        "endChar": 41
+      },
+      "revId": "5b0f64227aa43cfa5ea555587a019276fe6b7092",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "44cef74f_30fc93b9",
+        "filename": "pom.xml",
+        "patchSetId": 2
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-12-12T11:34:02Z",
+      "side": 1,
+      "message": "No version available in mvn central. This is part of that ThrottleFilter I was on about.",
+      "parentUuid": "fcf96ca0_ce89fcf4",
       "range": {
         "startLine": 157,
         "startChar": 32,
