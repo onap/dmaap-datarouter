@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5498e7f3_0b8d5ae6",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServer.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 7617
+      },
+      "writtenOn": "2022-12-12T11:02:13Z",
+      "side": 1,
+      "message": "Oh. I commented earlier on removing TLSEnabled config. But it\u0027s still being used some places. :/",
+      "revId": "bda6aeaa60607ab4fe5af508156019d7bd5c0ce4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

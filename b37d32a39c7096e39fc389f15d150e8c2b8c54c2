@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e7a600a0_1b815b29",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/DRNodeCadiFilter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7617
+      },
+      "writtenOn": "2022-12-12T11:02:13Z",
+      "side": 0,
+      "message": "Remove this file? You sure?",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 2
+      },
+      "revId": "b37d32a39c7096e39fc389f15d150e8c2b8c54c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "60b3440b_ffb09dad",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeRunner.java",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 7617
+      },
+      "writtenOn": "2022-12-12T11:02:13Z",
+      "side": 0,
+      "message": "A bit silly, i know. But should we be updating all these as \"modified\", with Nordix appended to it?",
+      "revId": "b37d32a39c7096e39fc389f15d150e8c2b8c54c2",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
