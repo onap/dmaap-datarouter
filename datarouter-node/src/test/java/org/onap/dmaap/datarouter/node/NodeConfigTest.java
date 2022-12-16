@@ -31,12 +31,14 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.onap.dmaap.datarouter.node.config.NodeConfig;
+import org.onap.dmaap.datarouter.node.config.ProvData;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.node.ProvData"})
+@SuppressStaticInitializationFor({"org.onap.dmaap.datarouter.node.config.ProvData"})
 @PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*"})
 public class NodeConfigTest {
 
@@ -79,7 +81,6 @@ public class NodeConfigTest {
         endpointAddrs.put("172.0.0.1");
         auth.put("endpoint_addrs", endpointAddrs);
         feed.put("authorization", auth);
-        feed.put("aaf_instance", "legacy");
         feeds.put(feed);
         provData.put("feeds", feeds);
     }

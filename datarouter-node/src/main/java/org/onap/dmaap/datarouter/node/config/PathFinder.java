@@ -22,23 +22,24 @@
  ******************************************************************************/
 
 
-package org.onap.dmaap.datarouter.node;
+package org.onap.dmaap.datarouter.node.config;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import org.jetbrains.annotations.Nullable;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvHop;
+import org.onap.dmaap.datarouter.node.config.NodeConfig;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvHop;
 
 /**
  * Given a set of node names and next hops, identify and ignore any cycles and figure out the sequence of next hops to
  * get from this node to any other node.
  */
 
-class PathFinder {
+public class PathFinder {
 
-    private ArrayList<String> errors = new ArrayList<>();
-    private HashMap<String, String> routes = new HashMap<>();
+    private final ArrayList<String> errors = new ArrayList<>();
+    private final HashMap<String, String> routes = new HashMap<>();
 
     /**
      * Find routes from a specified origin to all of the nodes given a set of specified next hops.
@@ -47,7 +48,7 @@ class PathFinder {
      * @param nodes where we can go
      * @param hops detours along the way
      */
-    PathFinder(String origin, String[] nodes, NodeConfig.ProvHop[] hops) {
+    public PathFinder(String origin, String[] nodes, NodeConfig.ProvHop[] hops) {
         HashSet<String> known = new HashSet<>();
         HashMap<String, HashMap<String, Hop>> ht = new HashMap<>();
         for (String n : nodes) {
@@ -77,7 +78,7 @@ class PathFinder {
      *
      * @return array of error descriptions
      */
-    String[] getErrors() {
+    public String[] getErrors() {
         return (errors.toArray(new String[0]));
     }
 
@@ -87,7 +88,7 @@ class PathFinder {
      * @param destination node
      * @return list of node names separated by and ending with "/"
      */
-    String getPath(String destination) {
+    public String getPath(String destination) {
         String ret = routes.get(destination);
         if (ret == null) {
             return ("");

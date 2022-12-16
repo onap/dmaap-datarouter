@@ -21,7 +21,7 @@
  * *
  ******************************************************************************/
 
-package org.onap.dmaap.datarouter.node;
+package org.onap.dmaap.datarouter.node.log;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
@@ -35,6 +35,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.onap.dmaap.datarouter.node.NodeConfigManager;
+import org.onap.dmaap.datarouter.node.utils.NodeUtils;
 
 /**
  * Logging for data router delivery events (PUB/DEL/EXP).

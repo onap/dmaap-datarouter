@@ -24,7 +24,7 @@
 
 package org.onap.dmaap.datarouter.node;
 
-import static org.onap.dmaap.datarouter.node.NodeUtils.sendResponseError;
+import static org.onap.dmaap.datarouter.node.utils.NodeUtils.sendResponseError;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
@@ -44,7 +44,10 @@ import java.util.regex.Pattern;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.Nullable;
+import org.onap.dmaap.datarouter.node.delivery.Delivery;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
+import org.onap.dmaap.datarouter.node.log.StatusLog;
+import org.onap.dmaap.datarouter.node.utils.NodeUtils;
 import org.slf4j.MDC;
 
 /**
@@ -195,7 +198,6 @@ public class NodeServlet extends HttpServlet {
         String pubid = null;
         String rcvd = NodeUtils.logts(System.currentTimeMillis()) + ";from=" + ip + ";by=" + lip;
         Target[] targets;
-        boolean isAAFFeed = false;
         if (fileid.startsWith("/delete/")) {
             deleteFile(req, resp, fileid, pubid);
             return;
@@ -220,28 +222,6 @@ public class NodeServlet extends HttpServlet {
                 return;
             }
             feedid = fileid.substring(0, index);
-
-            if (config.getCadiEnabled()) {
-                String path = req.getPathInfo();
-                if (!path.startsWith("/internal") && feedid != null) {
-                    String aafInstance = config.getAafInstance(feedid);
-                    if (!("legacy".equalsIgnoreCase(aafInstance))) {
-                        isAAFFeed = true;
-                        String permission = config.getPermission(aafInstance);
-                        eelfLogger.debug("NodeServlet.common() permission string - " + permission);
-                        //Check in CADI Framework API if user has AAF permission or not
-                        if (!req.isUserInRole(permission)) {
-                            String message = "AAF disallows access to permission string - " + permission;
-                            eelfLogger.error("NODE0307 Rejecting unauthenticated PUT or DELETE of " + req.getPathInfo()
-                                + FROM + req.getRemoteAddr());
-                            resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
-                            eelfLogger.info(EelfMsgs.EXIT);
-                            return;
-                        }
-                    }
-                }
-            }
-
             fileid = fileid.substring(index + 1);
             pubid = config.getPublishId();
             targets = config.getTargets(feedid);
@@ -254,8 +234,6 @@ public class NodeServlet extends HttpServlet {
             }
             fileid = fileid.substring(18);
             pubid = generateAndValidatePublishId(req);
-
-            user = "datartr";   // SP6 : Added usr as datartr to avoid null entries for internal routing
             targets = config.parseRouting(req.getHeader("X-DMAAP-DR-ROUTING"));
         } else {
             eelfLogger.error("NODE0204 Rejecting bad URI for PUT or DELETE of " + req.getPathInfo() + FROM + req
@@ -285,39 +263,15 @@ public class NodeServlet extends HttpServlet {
         String logurl = HTTPS + hp + INTERNAL_PUBLISH + fileid;
         if (feedid != null) {
             logurl = HTTPS + hp + PUBLISH + feedid + "/" + fileid;
-            //Cadi code starts
-            if (!isAAFFeed) {
-                String reason = config.isPublishPermitted(feedid, credentials, ip);
-                if (reason != null) {
-                    eelfLogger.error("NODE0111 Rejecting unauthorized publish attempt to feed " + PathUtil
-                        .cleanString(feedid) + " fileid " + PathUtil.cleanString(fileid) + FROM + PathUtil
-                        .cleanString(ip) + " reason " + PathUtil.cleanString(reason));
-                    resp.sendError(HttpServletResponse.SC_FORBIDDEN, reason);
-                    eelfLogger.info(EelfMsgs.EXIT);
-                    return;
-                }
-                user = config.getAuthUser(feedid, credentials);
-            } else {
-                String reason = config.isPublishPermitted(feedid, ip);
-                if (reason != null) {
-                    eelfLogger.error("NODE0111 Rejecting unauthorized publish attempt to feed " + PathUtil
-                        .cleanString(feedid) + " fileid " + PathUtil.cleanString(fileid) + FROM + PathUtil
-                        .cleanString(ip) + " reason   Invalid AAF user- " + PathUtil.cleanString(reason));
-                    String message = "Invalid AAF user- " + PathUtil.cleanString(reason);
-                    eelfLogger.debug("NODE0308 Rejecting unauthenticated PUT or DELETE of " + PathUtil
-                        .cleanString(req.getPathInfo()) + FROM + PathUtil.cleanString(req.getRemoteAddr()));
-                    resp.sendError(HttpServletResponse.SC_FORBIDDEN, message);
-                    return;
-                }
-                if ((req.getUserPrincipal() != null) && (req.getUserPrincipal().getName() != null)) {
-                    String userName = req.getUserPrincipal().getName();
-                    String[] attid = userName.split("@");
-                    user = attid[0];
-                } else {
-                    user = "AAFUser";
-                }
+            String reason = config.isPublishPermitted(feedid, credentials, ip);
+            if (reason != null) {
+                eelfLogger.info("NODE0111 Rejecting unauthorized publish attempt to feed " + feedid + " fileid "
+                    + fileid + " from " + ip + " reason " + reason);
+                resp.sendError(javax.servlet.http.HttpServletResponse.SC_FORBIDDEN, reason);
+                eelfLogger.info(EelfMsgs.EXIT);
+                return;
             }
-            //Cadi code Ends
+            user = config.getAuthUser(feedid, credentials);
             String newnode = config.getIngressNode(feedid, user, ip);
             if (newnode != null) {
                 String port = "";
@@ -599,6 +553,91 @@ public class NodeServlet extends HttpServlet {
             return Integer.parseInt(path.substring(1));
         } catch (NumberFormatException e) {
             return -1;
+        }
+    }
+
+    /**
+     * FORTIFY SCAN FIXES.
+     * <p>This Utility is used for Fortify fixes. It Validates the path url formed from
+     * the string passed in the request parameters.</p>
+     */
+    static class PathUtil {
+
+        private PathUtil() {
+            throw new IllegalStateException("Utility Class");
+        }
+
+        /**
+         * This method takes String as the parameter and return the filtered path string.
+         *
+         * @param string String to clean
+         * @return A cleaned String
+         */
+        static String cleanString(String string) {
+            if (string == null) {
+                return null;
+            }
+            StringBuilder cleanString = new StringBuilder();
+            for (int i = 0; i < string.length(); ++i) {
+                cleanString.append(cleanChar(string.charAt(i)));
+            }
+            return cleanString.toString();
+        }
+
+        /**
+         * This method filters the valid special characters in path string.
+         *
+         * @param character The char to be cleaned
+         * @return The cleaned char
+         */
+        private static char cleanChar(char character) {
+            // 0 - 9
+            for (int i = 48; i < 58; ++i) {
+                if (character == i) {
+                    return (char) i;
+                }
+            }
+            // 'A' - 'Z'
+            for (int i = 65; i < 91; ++i) {
+                if (character == i) {
+                    return (char) i;
+                }
+            }
+            // 'a' - 'z'
+            for (int i = 97; i < 123; ++i) {
+                if (character == i) {
+                    return (char) i;
+                }
+            }
+            return getValidCharacter(character);
+        }
+
+        private static char getValidCharacter(char character) {
+            // other valid characters
+            switch (character) {
+                case '/':
+                    return '/';
+                case '.':
+                    return '.';
+                case '-':
+                    return '-';
+                case ':':
+                    return ':';
+                case '?':
+                    return '?';
+                case '&':
+                    return '&';
+                case '=':
+                    return '=';
+                case '#':
+                    return '#';
+                case '_':
+                    return '_';
+                case ' ':
+                    return ' ';
+                default:
+                    return '%';
+            }
         }
     }
 }

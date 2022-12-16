@@ -21,7 +21,7 @@
  * *
  ******************************************************************************/
 
-package org.onap.dmaap.datarouter.node;
+package org.onap.dmaap.datarouter.node.delivery;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
+import org.onap.dmaap.datarouter.node.DestInfo;
+import org.onap.dmaap.datarouter.node.NodeConfigManager;
 
 /**
  * Main control point for delivering files to destinations.
@@ -277,7 +279,7 @@ public class Delivery {
         return false;
     }
 
-    static class DelItem implements Comparable<DelItem> {
+    public static class DelItem implements Comparable<DelItem> {
 
         private String pubid;
         private String spool;

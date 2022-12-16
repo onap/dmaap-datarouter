@@ -29,6 +29,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.onap.dmaap.datarouter.node.config.ProvData;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 

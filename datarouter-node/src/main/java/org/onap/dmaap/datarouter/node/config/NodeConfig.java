@@ -22,7 +22,7 @@
  ******************************************************************************/
 
 
-package org.onap.dmaap.datarouter.node;
+package org.onap.dmaap.datarouter.node.config;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
@@ -32,6 +32,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import org.jetbrains.annotations.NotNull;
+import org.onap.dmaap.datarouter.node.DestInfo;
+import org.onap.dmaap.datarouter.node.DestInfoBuilder;
+import org.onap.dmaap.datarouter.node.IsFrom;
+import org.onap.dmaap.datarouter.node.Target;
+import org.onap.dmaap.datarouter.node.utils.NodeUtils;
 
 /**
  * Processed configuration for this node.
@@ -43,16 +48,16 @@ import org.jetbrains.annotations.NotNull;
 public class NodeConfig {
 
     private static final String PUBLISHER_NOT_PERMITTED = "Publisher not permitted for this feed";
-    private static EELFLogger logger = EELFManager.getInstance().getLogger(NodeConfig.class);
-    private HashMap<String, String> params = new HashMap<>();
-    private HashMap<String, Feed> feeds = new HashMap<>();
-    private HashMap<String, DestInfo> nodeinfo = new HashMap<>();
-    private HashMap<String, DestInfo> subinfo = new HashMap<>();
-    private HashMap<String, IsFrom> nodes = new HashMap<>();
-    private HashMap<String, ProvSubscription> provSubscriptions = new HashMap<>();
-    private String myname;
+    private static final EELFLogger logger = EELFManager.getInstance().getLogger(NodeConfig.class);
+    private final HashMap<String, String> params = new HashMap<>();
+    private final HashMap<String, Feed> feeds = new HashMap<>();
+    private final HashMap<String, DestInfo> nodeinfo = new HashMap<>();
+    private final HashMap<String, DestInfo> subinfo = new HashMap<>();
+    private final HashMap<String, IsFrom> nodes = new HashMap<>();
+    private final HashMap<String, ProvSubscription> provSubscriptions = new HashMap<>();
+    private final String myname;
     private String myauth;
-    private DestInfo[] alldests;
+    private final DestInfo[] alldests;
     private int rrcntr;
 
     /**
@@ -228,11 +233,6 @@ public class NodeConfig {
             feed.createdDate = pfx.getCreatedDate();
             feed.loginfo = pfx.getLogData();
             feed.status = pfx.getStatus();
-            /*
-             * AAF changes: TDP EPIC US# 307413
-             * Passing aafInstance from ProvFeed to identify legacy/AAF feeds
-             */
-            feed.aafInstance = pfx.getAafInstance();
             ArrayList<SubnetMatcher> v1 = pfstab.get(fid);
             if (v1 == null) {
                 feed.subnets = new SubnetMatcher[0];
@@ -330,33 +330,6 @@ public class NodeConfig {
     }
 
     /**
-     * Check whether publication is allowed for AAF Feed.
-     *
-     * @param feedid The ID of the feed being requested.
-     * @param ip The requesting IP address
-     */
-    public String isPublishPermitted(String feedid, String ip) {
-        Feed feed = feeds.get(feedid);
-        String nf = "Feed does not exist";
-        if (feed != null) {
-            nf = feed.status;
-        }
-        if (nf != null) {
-            return nf;
-        }
-        if (feed.subnets.length == 0) {
-            return null;
-        }
-        byte[] addr = NodeUtils.getInetAddress(ip);
-        for (SubnetMatcher snm : feed.subnets) {
-            if (snm.matches(addr)) {
-                return null;
-            }
-        }
-        return PUBLISHER_NOT_PERMITTED;
-    }
-
-    /**
      * Check whether delete file is allowed.
      *
      * @param subId The ID of the subscription being requested.
@@ -371,16 +344,6 @@ public class NodeConfig {
      */
     public String getAuthUser(String feedid, String credentials) {
         return (feeds.get(feedid).authusers.get(credentials));
-    }
-
-    /**
-     * AAF changes: TDP EPIC US# 307413 Check AAF_instance for feed ID.
-     *
-     * @param feedid The ID of the feed specified
-     */
-    public String getAafInstance(String feedid) {
-        Feed feed = feeds.get(feedid);
-        return feed.aafInstance;
     }
 
     /**
@@ -586,15 +549,10 @@ public class NodeConfig {
      */
     public static class ProvFeed {
 
-        private String id;
-        private String logdata;
-        private String status;
-        private String createdDate;
-        /*
-         * AAF changes: TDP EPIC US# 307413
-         * Passing aafInstance from to identify legacy/AAF feeds
-         */
-        private String aafInstance;
+        private final String id;
+        private final String logdata;
+        private final String status;
+        private final String createdDate;
 
         /**
          * Construct a feed configuration entry.
@@ -604,12 +562,11 @@ public class NodeConfig {
          * @param status The reason why this feed cannot be used (Feed has been deleted, Feed has been suspended) or
          *      null if it is valid.
          */
-        public ProvFeed(String id, String logdata, String status, String createdDate, String aafInstance) {
+        public ProvFeed(String id, String logdata, String status, String createdDate) {
             this.id = id;
             this.logdata = logdata;
             this.status = status;
             this.createdDate = createdDate;
-            this.aafInstance = aafInstance;
         }
 
         /**
@@ -617,13 +574,6 @@ public class NodeConfig {
          */
         public String getCreatedDate() {
             return (createdDate);
-        }
-
-        /**
-         * Get the aafInstance of the data feed.
-         */
-        public String getAafInstance() {
-            return aafInstance;
         }
 
         /**
@@ -653,9 +603,9 @@ public class NodeConfig {
      */
     public static class ProvFeedUser {
 
-        private String feedid;
-        private String user;
-        private String credentials;
+        private final String feedid;
+        private final String user;
+        private final String credentials;
 
         /**
          * Construct a feed user configuration entry.
@@ -697,8 +647,8 @@ public class NodeConfig {
      */
     public static class ProvFeedSubnet {
 
-        private String feedid;
-        private String cidr;
+        private final String feedid;
+        private final String cidr;
 
         /**
          * Construct a feed subnet configuration entry.
@@ -731,16 +681,16 @@ public class NodeConfig {
      */
     public static class ProvSubscription {
 
-        private String subid;
-        private String feedid;
-        private String url;
-        private String authuser;
-        private String credentials;
-        private boolean metaonly;
-        private boolean use100;
-        private boolean privilegedSubscriber;
-        private boolean followRedirect;
-        private boolean decompress;
+        private final String subid;
+        private final String feedid;
+        private final String url;
+        private final String authuser;
+        private final String credentials;
+        private final boolean metaonly;
+        private final boolean use100;
+        private final boolean privilegedSubscriber;
+        private final boolean followRedirect;
+        private final boolean decompress;
 
         /**
          * Construct a subscription configuration entry.
@@ -839,7 +789,7 @@ public class NodeConfig {
          * New field is added - FOLLOW_REDIRECTS feature iTrack:DATARTR-17 - 1706 Get the followRedirect of this
          * destination.
          */
-        boolean getFollowRedirect() {
+        public boolean getFollowRedirect() {
             return (followRedirect);
         }
     }
@@ -849,10 +799,10 @@ public class NodeConfig {
      */
     public static class ProvForceIngress {
 
-        private String feedid;
-        private String subnet;
-        private String user;
-        private String[] nodes;
+        private final String feedid;
+        private final String subnet;
+        private final String user;
+        private final String[] nodes;
 
         /**
          * Construct a forced ingress configuration entry.
@@ -909,8 +859,8 @@ public class NodeConfig {
      */
     public static class ProvForceEgress {
 
-        private String subid;
-        private String node;
+        private final String subid;
+        private final String node;
 
         /**
          * Construct a forced egress configuration entry.
@@ -943,9 +893,9 @@ public class NodeConfig {
      */
     public static class ProvHop {
 
-        private String from;
-        private String to;
-        private String via;
+        private final String from;
+        private final String to;
+        private final String via;
 
         /**
          * Construct a hop entry.
@@ -1005,6 +955,5 @@ public class NodeConfig {
         Redirection[] redirections;
         Target[] targets;
         String createdDate;
-        String aafInstance;
     }
 }
