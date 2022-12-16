@@ -27,12 +27,15 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.onap.dmaap.datarouter.node.delivery.Delivery;
+import org.onap.dmaap.datarouter.node.utils.NodeTlsManager;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
@@ -44,9 +47,11 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class NodeServerTest {
 
     private final NodeConfigManager config = mock(NodeConfigManager.class);
+    private NodeTlsManager nodeTlsManager;
     @Before
     public void setUp() throws Exception {
         setUpConfig();
+        setUpNodeTlsMan();
         setUpNodeMainDelivery();
         createFilesAndDirectories();
     }
@@ -61,7 +66,7 @@ public class NodeServerTest {
         Assert.assertNotNull(NodeServer.getServerInstance(config));
     }
 
-    private void setUpConfig() throws IllegalAccessException {
+    private void setUpConfig() {
         PowerMockito.mockStatic(NodeConfigManager.class);
         when(config.isShutdown()).thenReturn(false);
         when(config.isConfigured()).thenReturn(true);
@@ -74,13 +79,14 @@ public class NodeServerTest {
         when(config.isDeletePermitted("1")).thenReturn(true);
         when(config.getAllDests()).thenReturn(new DestInfo[0]);
         when(config.isTlsEnabled()).thenReturn(true);
-        when(config.getKSType()).thenReturn("PKCS12");
-        when(config.getKSFile()).thenReturn("src/test/resources/aaf/org.onap.dmaap-dr.p12");
-        when(config.getKSPass()).thenReturn("tVac2#@Stx%tIOE^x[c&2fgZ");
-        when(config.getTstype()).thenReturn("jks");
-        when(config.getTsfile()).thenReturn("src/test/resources/aaf/org.onap.dmaap-dr.trust.jks");
-        when(config.getTspass()).thenReturn("XHX$2Vl?Lk*2CB.i1+ZFAhZd");
         PowerMockito.when(NodeConfigManager.getInstance()).thenReturn(config);
+    }
+
+    private void setUpNodeTlsMan() throws IOException {
+        Properties nodeProps = new Properties();
+        nodeProps.load(NodeTlsManagerTest.class.getClassLoader().getResourceAsStream("node_test.properties"));
+        nodeTlsManager = new NodeTlsManager(nodeProps);
+        PowerMockito.when(NodeConfigManager.getNodeTlsManager()).thenReturn(nodeTlsManager);
     }
 
     private void setUpNodeMainDelivery() throws IllegalAccessException{

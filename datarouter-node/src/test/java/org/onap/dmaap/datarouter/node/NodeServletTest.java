@@ -24,7 +24,6 @@ package org.onap.dmaap.datarouter.node;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.anyString;
@@ -50,10 +49,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.BDDMockito;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.internal.matchers.Any;
+import org.onap.dmaap.datarouter.node.delivery.Delivery;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -238,16 +235,6 @@ public class NodeServletTest {
         verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
-    @Test
-    public void Given_Request_Is_HTTP_PUT_On_Publish_On_AAF_Feed_And_Cadi_Enabled_And_No_Permissions_Then_Forbidden_Response_Is_Generated() throws Exception {
-        when(config.getCadiEnabled()).thenReturn(true);
-        when(config.getAafInstance("1")).thenReturn("*");
-        when(request.getPathInfo()).thenReturn("/publish/1/fileName");
-        setHeadersForValidRequest(true);
-        nodeServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
-        verifyEnteringExitCalled(listAppender);
-    }
 
     @Test
     public void Given_Request_Is_HTTP_DELETE_On_Publish_With_Meta_Data_Malformed_Then_Bad_Request_Response_Is_Generated() throws Exception {

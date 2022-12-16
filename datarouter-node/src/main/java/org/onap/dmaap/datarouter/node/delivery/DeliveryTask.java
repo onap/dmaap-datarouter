@@ -22,10 +22,10 @@
  ******************************************************************************/
 
 
-package org.onap.dmaap.datarouter.node;
+package org.onap.dmaap.datarouter.node.delivery;
 
 import static com.att.eelf.configuration.Configuration.MDC_KEY_REQUEST_ID;
-import static org.onap.dmaap.datarouter.node.NodeUtils.isFiletypeGzip;
+import static org.onap.dmaap.datarouter.node.utils.NodeUtils.isFiletypeGzip;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
@@ -45,6 +45,8 @@ import java.util.Arrays;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import org.jetbrains.annotations.Nullable;
+import org.onap.dmaap.datarouter.node.DestInfo;
+import org.onap.dmaap.datarouter.node.utils.NodeUtils;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 import org.slf4j.MDC;
 
@@ -86,7 +88,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
      * @param pubid The publish ID for this file.  This is used as the base for the file name in the spool directory and
      *      is of the form (milliseconds since 1970).(fqdn of initial data router node)
      */
-    DeliveryTask(DeliveryTaskHelper deliveryTaskHelper, String pubid) {
+    public DeliveryTask(DeliveryTaskHelper deliveryTaskHelper, String pubid) {
         this.deliveryTaskHelper = deliveryTaskHelper;
         this.pubid = pubid;
         destInfo = deliveryTaskHelper.getDestinationInfo();
@@ -177,7 +179,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     /**
      * Get the publish ID.
      */
-    String getPublishId() {
+    public String getPublishId() {
         return (pubid);
     }
 
@@ -356,7 +358,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     /**
      * Remove meta and data files.
      */
-    void clean() {
+    public void clean() {
         deleteWithRetry(datafile);
         deleteWithRetry(metafile);
         eelfLogger.info(EelfMsgs.INVOKE, newInvocationId);
@@ -389,14 +391,14 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     /**
      * Set the resume time for a delivery task.
      */
-    void setResumeTime(long resumeTime) {
+    public void setResumeTime(long resumeTime) {
         this.resumeTime = resumeTime;
     }
 
     /**
      * Has this delivery task been cleaned.
      */
-    boolean isCleaned() {
+    public boolean isCleaned() {
         return (hdrs == null);
     }
 
@@ -410,7 +412,7 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     /**
      * Get creation date as encoded in the publish ID.
      */
-    long getDate() {
+    public long getDate() {
         return (date);
     }
 
@@ -424,49 +426,49 @@ public class DeliveryTask implements Runnable, Comparable<DeliveryTask> {
     /**
      * Get the content type.
      */
-    String getCType() {
+    public String getCType() {
         return (ctype);
     }
 
     /**
      * Get the method.
      */
-    String getMethod() {
+    public String getMethod() {
         return (method);
     }
 
     /**
      * Get the file ID.
      */
-    String getFileId() {
+    public String getFileId() {
         return (fileid);
     }
 
     /**
      * Get the number of delivery attempts.
      */
-    int getAttempts() {
+    public int getAttempts() {
         return (attempts);
     }
 
     /**
      * Get the (space delimited list of) subscription ID for this delivery task.
      */
-    String getSubId() {
+    public String getSubId() {
         return (subid);
     }
 
     /**
      * Get the feed ID for this delivery task.
      */
-    String getFeedId() {
+    public String getFeedId() {
         return (feedid);
     }
 
     /**
      * Get the followRedirects for this delivery task.
      */
-    boolean getFollowRedirects() {
+    public boolean getFollowRedirects() {
         return (followRedirects);
     }
 }

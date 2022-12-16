@@ -41,7 +41,7 @@ import java.util.Iterator;
 class TaskList {
 
     private Iterator<Runnable> runlist;
-    private HashSet<Runnable> tasks = new HashSet<>();
+    private final HashSet<Runnable> tasks = new HashSet<>();
     private HashSet<Runnable> togo;
     private HashSet<Runnable> sofar;
     private HashSet<Runnable> added;

@@ -36,10 +36,17 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Timer;
+import org.onap.dmaap.datarouter.node.config.NodeConfig;
+import org.onap.dmaap.datarouter.node.config.ProvData;
+import org.onap.dmaap.datarouter.node.delivery.DeliveryQueueHelper;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
+import org.onap.dmaap.datarouter.node.utils.NodeTlsManager;
+import org.onap.dmaap.datarouter.node.utils.NodeUtils;
 
 
 /**
@@ -56,8 +63,6 @@ public class NodeConfigManager implements DeliveryQueueHelper {
 
     private static final String NODE_CONFIG_MANAGER = "NodeConfigManager";
     private static final EELFLogger eelfLogger = EELFManager.getInstance().getLogger(NodeConfigManager.class);
-    private static NodeConfigManager base;
-
     private long maxfailuretimer;
     private long initfailuretimer;
     private long waitForFileProcessFailureTimer;
@@ -73,19 +78,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private final int intHttpPort;
     private final int intHttpsPort;
     private final int extHttpsPort;
-    private String[] enabledprotocols;
-    private final boolean cadiEnabled;
-    private String aafType;
-    private String aafInstance;
-    private String aafAction;
     private final boolean tlsEnabled;
-    private String kstype;
-    private String ksfile;
-    private String kspass;
-    private String kpass;
-    private String tstype;
-    private String tsfile;
-    private String tspass;
     private String myname;
     private final String nak;
     private final File quiesce;
@@ -103,8 +96,9 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     private final RedirManager rdmgr;
     private final Timer timer = new Timer("Node Configuration Timer", true);
     private final RateLimitedOperation pfetcher;
-    private NodeConfig config;
-    private NodeAafPropsUtils nodeAafPropsUtils;
+    private static NodeConfigManager base;
+    private static NodeTlsManager nodeTlsManager;
+    private NodeConfig nodeConfig;
     private static Properties drNodeProperties;
 
     public static Properties getDrNodeProperties() {
@@ -135,42 +129,24 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         }
         eelfLogger.debug("NODE0303 Provisioning server is at: " + provhost);
         provcheck = new IsFrom(provhost);
-
-        cadiEnabled = Boolean.parseBoolean(getDrNodeProperties().getProperty("CadiEnabled", "false"));
-        if (cadiEnabled) {
-            aafType = getDrNodeProperties().getProperty("AAFType", "org.onap.dmaap-dr.feed");
-            aafInstance = getDrNodeProperties().getProperty("AAFInstance", "legacy");
-            aafAction = getDrNodeProperties().getProperty("AAFAction", "publish");
-        }
         tlsEnabled = Boolean.parseBoolean(getDrNodeProperties().getProperty("TlsEnabled", "true"));
         if (isTlsEnabled()) {
             try {
-                kstype = getDrNodeProperties().getProperty("KeyStoreType", "PKCS12");
-                tstype = getDrNodeProperties().getProperty("TrustStoreType", "jks");
-                enabledprotocols = ((getDrNodeProperties().getProperty("NodeHttpsProtocols")).trim()).split("\\|");
-                nodeAafPropsUtils = new NodeAafPropsUtils(new File(getDrNodeProperties()
-                    .getProperty("AAFPropsFilePath", "/opt/app/osaaf/local/org.onap.dmaap-dr.props")));
-                getSslContextData();
-                if (tsfile != null && tsfile.length() > 0) {
-                    System.setProperty("javax.net.ssl.trustStoreType", tstype);
-                    System.setProperty("javax.net.ssl.trustStore", tsfile);
-                    System.setProperty("javax.net.ssl.trustStorePassword", tspass);
-                }
-                myname = NodeUtils.getCanonicalName(kstype, ksfile, kspass);
+                nodeTlsManager = new NodeTlsManager(getDrNodeProperties());
+                myname = nodeTlsManager.getMyNameFromCertificate();
                 if (myname == null) {
                     NodeUtils.setIpAndFqdnForEelf(NODE_CONFIG_MANAGER);
-                    eelfLogger.error(EelfMsgs.MESSAGE_KEYSTORE_FETCH_ERROR, ksfile);
-                    eelfLogger.error("NODE0309 Unable to fetch canonical name from keystore file " + ksfile);
+                    eelfLogger.error(EelfMsgs.MESSAGE_KEYSTORE_FETCH_ERROR, nodeTlsManager.getKeyStorefile());
+                    eelfLogger.error("NODE0309 Unable to fetch canonical name from keystore file {}", nodeTlsManager.getKeyStorefile());
                     exit(1);
                 }
-                eelfLogger.debug("NODE0304 My certificate says my name is " + myname);
+                eelfLogger.debug("NODE0304 My certificate says my name is {}", myname);
             } catch (Exception e) {
                 eelfLogger.error("NODE0314 Failed to load AAF props. Exiting", e);
                 exit(1);
             }
         }
         myname = "dmaap-dr-node";
-
         eventlogurl = getDrNodeProperties().getProperty("LogUploadURL", "https://feeds-drtr.web.att.com/internal/logs");
         intHttpPort = Integer.parseInt(getDrNodeProperties().getProperty("IntHttpPort", "80"));
         intHttpsPort = Integer.parseInt(getDrNodeProperties().getProperty("IntHttpsPort", "443"));
@@ -200,19 +176,11 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         pfetcher = new RateLimitedOperation(
             Long.parseLong(getDrNodeProperties().getProperty("MinProvFetchInterval", "10000")), timer) {
             public void run() {
-                fetchconfig();
+                fetchNodeConfigFromProv();
             }
         };
         eelfLogger.debug("NODE0305 Attempting to fetch configuration at " + provurl);
         pfetcher.request();
-    }
-
-    private void getSslContextData() {
-        ksfile = nodeAafPropsUtils.getPropAccess().getProperty("cadi_keystore");
-        kspass = nodeAafPropsUtils.getDecryptedPass("cadi_keystore_password");
-        kpass = nodeAafPropsUtils.getDecryptedPass("cadi_keystore_password");
-        tsfile = nodeAafPropsUtils.getPropAccess().getProperty("cadi_truststore");
-        tspass = nodeAafPropsUtils.getDecryptedPass("cadi_truststore_password");
     }
 
     /**
@@ -303,19 +271,19 @@ public class NodeConfigManager implements DeliveryQueueHelper {
         }
     }
 
-    private void fetchconfig() {
+    private void fetchNodeConfigFromProv() {
         try {
-            eelfLogger.debug("NodeConfigMan.fetchConfig: provurl:: " + provurl);
+            eelfLogger.debug("NodeConfigMan.fetchNodeConfigFromProv: provurl:: {}", provurl);
             URL url = new URL(provurl);
             Reader reader = new InputStreamReader(url.openStream());
-            config = new NodeConfig(new ProvData(reader), myname, spooldir, extHttpsPort, nak);
+            nodeConfig = new NodeConfig(new ProvData(reader), myname, spooldir, extHttpsPort, nak);
             localconfig();
             configtasks.startRun();
             runTasks();
         } catch (Exception e) {
-            NodeUtils.setIpAndFqdnForEelf("fetchconfigs");
+            NodeUtils.setIpAndFqdnForEelf("fetchNodeConfigFromProv");
             eelfLogger.error(EelfMsgs.MESSAGE_CONF_FAILED, e.toString());
-            eelfLogger.error("NODE0306 Configuration failed " + e + " - try again later", e);
+            eelfLogger.error("NODE0306 Configuration failed {} - try again later", e);
             pfetcher.request();
         }
     }
@@ -348,8 +316,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     /**
      * Am I configured.
      */
-    boolean isConfigured() {
-        return config != null;
+    public boolean isConfigured() {
+        return nodeConfig != null;
     }
 
     /**
@@ -366,7 +334,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @return array of targets
      */
     Target[] parseRouting(String routing) {
-        return config.parseRouting(routing);
+        return nodeConfig.parseRouting(routing);
     }
 
     /**
@@ -377,7 +345,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @return If the credentials and IP address are recognized, true, otherwise false.
      */
     boolean isAnotherNode(String credentials, String ip) {
-        return config.isAnotherNode(credentials, ip);
+        return nodeConfig.isAnotherNode(credentials, ip);
     }
 
     /**
@@ -389,18 +357,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @return True if the IP and credentials are valid for the specified feed.
      */
     String isPublishPermitted(String feedid, String credentials, String ip) {
-        return config.isPublishPermitted(feedid, credentials, ip);
-    }
-
-    /**
-     * Check whether publication is allowed for AAF Feed.
-     *
-     * @param feedid The ID of the feed being requested
-     * @param ip The requesting IP address
-     * @return True if the IP and credentials are valid for the specified feed.
-     */
-    String isPublishPermitted(String feedid, String ip) {
-        return config.isPublishPermitted(feedid, ip);
+        return nodeConfig.isPublishPermitted(feedid, credentials, ip);
     }
 
     /**
@@ -410,7 +367,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @return True if the delete file is permitted for the subscriber.
      */
     boolean isDeletePermitted(String subId) {
-        return config.isDeletePermitted(subId);
+        return nodeConfig.isDeletePermitted(subId);
     }
 
     /**
@@ -421,20 +378,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @return Null if the credentials are invalid or the user if they are valid.
      */
     String getAuthUser(String feedid, String credentials) {
-        return config.getAuthUser(feedid, credentials);
-    }
-
-    /**
-     * AAF changes: TDP EPIC US# 307413 Check AAF_instance for feed ID in NodeConfig.
-     *
-     * @param feedid The ID of the feed specified
-     */
-    String getAafInstance(String feedid) {
-        return config.getAafInstance(feedid);
-    }
-
-    String getAafInstance() {
-        return aafInstance;
+        return nodeConfig.getAuthUser(feedid, credentials);
     }
 
     /**
@@ -446,7 +390,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @return Null if the request should be accepted or the correct hostname if it should be sent to another node.
      */
     String getIngressNode(String feedid, String user, String ip) {
-        return config.getIngressNode(feedid, user, ip);
+        return nodeConfig.getIngressNode(feedid, user, ip);
     }
 
     /**
@@ -456,7 +400,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @return The value of the parameter or null if it is not defined.
      */
     private String getProvParam(String name) {
-        return config.getProvParam(name);
+        return nodeConfig.getProvParam(name);
     }
 
     /**
@@ -467,7 +411,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @return The value of the parameter or deflt if it is not defined.
      */
     private String getProvParam(String name, String defaultValue) {
-        name = config.getProvParam(name);
+        name = nodeConfig.getProvParam(name);
         if (name == null) {
             name = defaultValue;
         }
@@ -484,14 +428,14 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     /**
      * Get all the outbound spooling destinations. This will include both subscriptions and nodes.
      */
-    DestInfo[] getAllDests() {
-        return config.getAllDests();
+    public DestInfo[] getAllDests() {
+        return nodeConfig.getAllDests();
     }
 
     /**
      * Register a task to run whenever the configuration changes.
      */
-    void registerConfigTask(Runnable task) {
+    public void registerConfigTask(Runnable task) {
         configtasks.addTask(task);
     }
 
@@ -601,7 +545,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @return The targets this feed should be delivered to
      */
     Target[] getTargets(String feedid) {
-        return config.getTargets(feedid);
+        return nodeConfig.getTargets(feedid);
     }
 
     /**
@@ -616,7 +560,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      */
     String getSpoolDir(String subid, String remoteaddr) {
         if (provcheck.isFrom(remoteaddr)) {
-            String sdir = config.getSpoolDir(subid);
+            String sdir = nodeConfig.getSpoolDir(subid);
             if (sdir != null) {
                 eelfLogger.debug("NODE0310 Received subscription reset request for subscription " + subid
                         + " from provisioning server " + remoteaddr);
@@ -634,49 +578,8 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     /**
      * Get the base directory for spool directories.
      */
-    String getSpoolBase() {
+    public String getSpoolBase() {
         return spooldir;
-    }
-
-    /**
-     * Get the key store type.
-     */
-    String getKSType() {
-        return kstype;
-    }
-
-    /**
-     * Get the key store file.
-     */
-    String getKSFile() {
-        return ksfile;
-    }
-
-    /**
-     * Get the key store password.
-     */
-    String getKSPass() {
-        return kspass;
-    }
-
-    /**
-     * Get the key password.
-     */
-    String getKPass() {
-        return kpass;
-    }
-
-
-    String getTstype() {
-        return tstype;
-    }
-
-    String getTsfile() {
-        return tsfile;
-    }
-
-    String getTspass() {
-        return tspass;
     }
 
     /**
@@ -703,42 +606,42 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     /**
      * Get the external name of this machine.
      */
-    String getMyName() {
+    public String getMyName() {
         return myname;
     }
 
     /**
      * Get the number of threads to use for delivery.
      */
-    int getDeliveryThreads() {
+    public int getDeliveryThreads() {
         return deliverythreads;
     }
 
     /**
      * Get the URL for uploading the event log data.
      */
-    String getEventLogUrl() {
+    public String getEventLogUrl() {
         return eventlogurl;
     }
 
     /**
      * Get the prefix for the names of event log files.
      */
-    String getEventLogPrefix() {
+    public String getEventLogPrefix() {
         return eventlogprefix;
     }
 
     /**
      * Get the suffix for the names of the event log files.
      */
-    String getEventLogSuffix() {
+    public String getEventLogSuffix() {
         return eventlogsuffix;
     }
 
     /**
      * Get the interval between event log file rollovers.
      */
-    String getEventLogInterval() {
+    public String getEventLogInterval() {
         return eventloginterval;
     }
 
@@ -752,14 +655,14 @@ public class NodeConfigManager implements DeliveryQueueHelper {
     /**
      * Get the directory where the event and node log files live.
      */
-    String getLogDir() {
+    public String getLogDir() {
         return logdir;
     }
 
     /**
      * How long do I keep log files (in milliseconds).
      */
-    long getLogRetention() {
+    public long getLogRetention() {
         return logretention;
     }
 
@@ -777,7 +680,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * @return The feed ID
      */
     public String getFeedId(String subid) {
-        return config.getFeedId(subid);
+        return nodeConfig.getFeedId(subid);
     }
 
     /**
@@ -785,15 +688,15 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      *
      * @return The Authorization string for this node
      */
-    String getMyAuth() {
-        return config.getMyAuth();
+    public String getMyAuth() {
+        return nodeConfig.getMyAuth();
     }
 
     /**
      * Get the fraction of free spool disk space where we start throwing away undelivered files.  This is
      * FREE_DISK_RED_PERCENT / 100.0.  Default is 0.05.  Limited by 0.01 <= FreeDiskStart <= 0.5.
      */
-    double getFreeDiskStart() {
+    public double getFreeDiskStart() {
         return fdpstart;
     }
 
@@ -801,54 +704,138 @@ public class NodeConfigManager implements DeliveryQueueHelper {
      * Get the fraction of free spool disk space where we stop throwing away undelivered files.  This is
      * FREE_DISK_YELLOW_PERCENT / 100.0.  Default is 0.2.  Limited by FreeDiskStart <= FreeDiskStop <= 0.5.
      */
-    double getFreeDiskStop() {
+    public double getFreeDiskStop() {
         return fdpstop;
-    }
-
-    /**
-     * Disable and enable protocols.
-     */
-    String[] getEnabledprotocols() {
-        return enabledprotocols;
-    }
-
-    String getAafType() {
-        return aafType;
-    }
-
-    String getAafAction() {
-        return aafAction;
     }
 
     protected boolean isTlsEnabled() {
         return tlsEnabled;
     }
 
-    boolean getCadiEnabled() {
-        return cadiEnabled;
-    }
-
-    NodeAafPropsUtils getNodeAafPropsUtils() {
-        return nodeAafPropsUtils;
+    public static NodeTlsManager getNodeTlsManager() {
+        return nodeTlsManager;
     }
 
     /**
-     * Builds the permissions string to be verified.
-     *
-     * @param aafInstance The aaf instance
-     * @return The permissions
+     * Generate publish IDs.
      */
-    String getPermission(String aafInstance) {
-        try {
-            String type = getAafType();
-            String action = getAafAction();
-            if ("".equals(aafInstance)) {
-                aafInstance = getAafInstance();
-            }
-            return type + "|" + aafInstance + "|" + action;
-        } catch (Exception e) {
-            eelfLogger.error("NODE0543 NodeConfigManager.getPermission: ", e);
+    static class PublishId {
+
+        private long nextuid;
+        private final String myname;
+
+        /**
+         * Generate publish IDs for the specified name.
+         *
+         * @param myname Unique identifier for this publish ID generator (usually fqdn of server)
+         */
+        public PublishId(String myname) {
+            this.myname = myname;
         }
-        return null;
+
+        /**
+         * Generate a Data Router Publish ID that uniquely identifies the particular invocation of the Publish API for log
+         * correlation purposes.
+         */
+        public synchronized String next() {
+            long now = System.currentTimeMillis();
+            if (now < nextuid) {
+                now = nextuid;
+            }
+            nextuid = now + 1;
+            return (now + "." + myname);
+        }
+    }
+
+    /**
+     * Manage a list of tasks to be executed when an event occurs. This makes the following guarantees:
+     * <ul>
+     * <li>Tasks can be safely added and removed in the middle of a run.</li>
+     * <li>No task will be returned more than once during a run.</li>
+     * <li>No task will be returned when it is not, at that moment, in the list of tasks.</li>
+     * <li>At the moment when next() returns null, all tasks on the list have been returned during the run.</li>
+     * <li>Initially and once next() returns null during a run, next() will continue to return null until startRun() is
+     * called.
+     * </ul>
+     */
+    static class TaskList {
+
+        private Iterator<Runnable> runlist;
+        private final HashSet<Runnable> tasks = new HashSet<>();
+        private HashSet<Runnable> togo;
+        private HashSet<Runnable> sofar;
+        private HashSet<Runnable> added;
+        private HashSet<Runnable> removed;
+
+        /**
+         * Start executing the sequence of tasks.
+         */
+        synchronized void startRun() {
+            sofar = new HashSet<>();
+            added = new HashSet<>();
+            removed = new HashSet<>();
+            togo = new HashSet<>(tasks);
+            runlist = togo.iterator();
+        }
+
+        /**
+         * Get the next task to execute.
+         */
+        synchronized Runnable next() {
+            while (runlist != null) {
+                if (runlist.hasNext()) {
+                    Runnable task = runlist.next();
+                    if (addTaskToSoFar(task)) {
+                        return task;
+                    }
+                }
+                if (!added.isEmpty()) {
+                    togo = added;
+                    added = new HashSet<>();
+                    removed.clear();
+                    runlist = togo.iterator();
+                    continue;
+                }
+                togo = null;
+                added = null;
+                removed = null;
+                sofar = null;
+                runlist = null;
+            }
+            return (null);
+        }
+
+        /**
+         * Add a task to the list of tasks to run whenever the event occurs.
+         */
+        synchronized void addTask(Runnable task) {
+            if (runlist != null) {
+                added.add(task);
+                removed.remove(task);
+            }
+            tasks.add(task);
+        }
+
+        /**
+         * Remove a task from the list of tasks to run whenever the event occurs.
+         */
+        synchronized void removeTask(Runnable task) {
+            if (runlist != null) {
+                removed.add(task);
+                added.remove(task);
+            }
+            tasks.remove(task);
+        }
+
+        private boolean addTaskToSoFar(Runnable task) {
+            if (removed.contains(task)) {
+                return false;
+            }
+            if (sofar.contains(task)) {
+                return false;
+            }
+            sofar.add(task);
+            return true;
+        }
     }
 }

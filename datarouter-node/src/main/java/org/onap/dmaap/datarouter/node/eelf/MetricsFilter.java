@@ -36,8 +36,6 @@ public class MetricsFilter extends Filter<ILoggingEvent> {
                     "PBF|") && !event.getMessage().contains("EXP|") && !event.getMessage().contains("DLX|")) {
                 return FilterReply.ACCEPT;
             }
-        } else {
-            return FilterReply.DENY;
         }
         return FilterReply.DENY;
     }

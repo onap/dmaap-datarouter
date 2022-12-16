@@ -22,9 +22,6 @@ package org.onap.dmaap.datarouter.node;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-import java.util.EnumSet;
-import javax.servlet.DispatcherType;
-import javax.servlet.ServletException;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -33,11 +30,11 @@ import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jetbrains.annotations.NotNull;
+import org.onap.dmaap.datarouter.node.delivery.Delivery;
 
 
 public class NodeServer {
@@ -47,8 +44,7 @@ public class NodeServer {
     private static Server server;
     private static Delivery delivery;
 
-    private NodeServer(){
-    }
+    private NodeServer(){}
 
     static Server getServerInstance(NodeConfigManager nodeConfigManager) {
         if (server == null) {
@@ -77,7 +73,7 @@ public class NodeServer {
             servletContextHandler.addServlet(new ServletHolder(new NodeServlet(delivery, nodeConfigManager)), "/*");
 
             if (nodeConfigManager.isTlsEnabled()) {
-                initialiseHttpsConnector(nodeConfigManager, httpConfiguration, httpServerConnector, servletContextHandler);
+                initialiseHttpsConnector(nodeConfigManager, httpConfiguration, httpServerConnector);
             } else {
                 eelfLogger.info("NODE0005 Adding HTTP Connector");
                 server.setConnectors(new Connector[]{httpServerConnector});
@@ -88,7 +84,7 @@ public class NodeServer {
     }
 
     private static void initialiseHttpsConnector(NodeConfigManager nodeConfigManager, HttpConfiguration httpConfiguration,
-        ServerConnector httpServerConnector, ServletContextHandler servletContextHandler) {
+        ServerConnector httpServerConnector) {
         HttpConfiguration httpsConfiguration = new HttpConfiguration(httpConfiguration);
         httpsConfiguration.setRequestHeaderSize(8192);
 
@@ -99,9 +95,8 @@ public class NodeServer {
 
         // HTTPS connector
         try (ServerConnector httpsServerConnector = new ServerConnector(server,
-            new SslConnectionFactory(getSslContextFactory(nodeConfigManager), HttpVersion.HTTP_1_1.asString()),
+            new SslConnectionFactory(getSslContextFactory(), HttpVersion.HTTP_1_1.asString()),
             new HttpConnectionFactory(httpsConfiguration))) {
-
             httpsServerConnector.setPort(nodeConfigManager.getHttpsPort());
             httpsServerConnector.setIdleTimeout(3600000);
             httpsServerConnector.setAcceptQueueSize(2);
@@ -119,12 +114,16 @@ public class NodeServer {
 
 
     @NotNull
-    private static SslContextFactory.Server getSslContextFactory(NodeConfigManager nodeConfigManager) {
-        SslContextFactory sslContextFactory = new SslContextFactory.Server();
-        sslContextFactory.setKeyStoreType(nodeConfigManager.getKSType());
-        sslContextFactory.setKeyStorePath(nodeConfigManager.getKSFile());
-        sslContextFactory.setKeyStorePassword(nodeConfigManager.getKSPass());
-        sslContextFactory.setKeyManagerPassword(nodeConfigManager.getKPass());
+    private static SslContextFactory.Server getSslContextFactory() {
+        SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
+        sslContextFactory.setKeyStoreType(NodeConfigManager.getNodeTlsManager().getKeyStoreType());
+        sslContextFactory.setKeyStorePath(NodeConfigManager.getNodeTlsManager().getKeyStorefile());
+        sslContextFactory.setKeyStorePassword(NodeConfigManager.getNodeTlsManager().getKeyStorePassword());
+        sslContextFactory.setKeyManagerPassword(NodeConfigManager.getNodeTlsManager().getKeyManagerPassword());
+
+//        sslContextFactory.setTrustStoreType(NodeConfigManager.getNodeTlsManager().getTrustStoreType());
+//        sslContextFactory.setTrustStorePath(ProvRunner.getAafPropsUtils().getTruststorePathProperty());
+//        sslContextFactory.setTrustStorePassword(ProvRunner.getAafPropsUtils().getTruststorePassProperty());
 
         sslContextFactory.setExcludeCipherSuites(
             "SSL_RSA_WITH_DES_CBC_SHA",
@@ -135,12 +134,12 @@ public class NodeServer {
             "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
             "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA"
         );
-
         sslContextFactory.addExcludeProtocols("SSLv3");
+        sslContextFactory.setIncludeProtocols(NodeConfigManager.getNodeTlsManager().getEnabledProtocols());
         eelfLogger.info("Unsupported protocols: " + String.join(",", sslContextFactory.getExcludeProtocols()));
         eelfLogger.info("Supported protocols: " + String.join(",", sslContextFactory.getIncludeProtocols()));
         eelfLogger.info("Unsupported ciphers: " + String.join(",", sslContextFactory.getExcludeCipherSuites()));
         eelfLogger.info("Supported ciphers: " + String.join(",", sslContextFactory.getIncludeCipherSuites()));
-        return (SslContextFactory.Server) sslContextFactory;
+        return sslContextFactory;
     }
 }

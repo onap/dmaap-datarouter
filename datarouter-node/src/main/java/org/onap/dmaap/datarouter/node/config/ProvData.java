@@ -22,7 +22,7 @@
  ******************************************************************************/
 
 
-package org.onap.dmaap.datarouter.node;
+package org.onap.dmaap.datarouter.node.config;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
@@ -34,15 +34,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvFeed;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvFeedSubnet;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvFeedUser;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvForceEgress;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvForceIngress;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvHop;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvNode;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvParam;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvSubscription;
+import org.onap.dmaap.datarouter.node.utils.NodeUtils;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvFeed;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvFeedSubnet;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvFeedUser;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvForceEgress;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvForceIngress;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvHop;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvNode;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvParam;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvSubscription;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
 
 /**
@@ -245,16 +246,7 @@ public class ProvData {
         String fname = gvas(jfeed, "name");
         String fver = gvas(jfeed, "version");
         String createdDate = gvas(jfeed, "created_date");
-        /*
-         * START - AAF changes
-         * TDP EPIC US# 307413
-         * Passing aafInstance to ProvFeed from feeds json passed by prov to identify legacy/AAF feeds
-         */
-        String aafInstance = gvas(jfeed, "aaf_instance");
-        pfv.add(new ProvFeed(fid, fname + "//" + fver, stat, createdDate, aafInstance));
-        /*
-         * END - AAF changes
-         */
+        pfv.add(new ProvFeed(fid, fname + "//" + fver, stat, createdDate));
         addJSONFeedAuthArrays(pfuv, pfsnv, jfeed, fid);
     }
 

@@ -21,7 +21,7 @@
  * *
  ******************************************************************************/
 
-package org.onap.dmaap.datarouter.node;
+package org.onap.dmaap.datarouter.node.log;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
@@ -38,6 +38,11 @@ import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
+import org.onap.dmaap.datarouter.node.DestInfo;
+import org.onap.dmaap.datarouter.node.DestInfoBuilder;
+import org.onap.dmaap.datarouter.node.NodeConfigManager;
+import org.onap.dmaap.datarouter.node.delivery.DeliveryQueue;
+import org.onap.dmaap.datarouter.node.delivery.DeliveryQueueHelper;
 
 /**
  * Cleanup of old log files.
@@ -93,7 +98,7 @@ public class LogManager extends TimerTask {
         return worker;
     }
 
-    class Uploader extends Thread implements DeliveryQueueHelper {
+    public class Uploader extends Thread implements DeliveryQueueHelper {
 
         private static final String META = "/.meta";
         private EELFLogger logger = EELFManager.getInstance().getLogger(Uploader.class);

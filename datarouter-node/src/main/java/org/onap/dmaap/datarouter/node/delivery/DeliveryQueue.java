@@ -22,7 +22,7 @@
  ******************************************************************************/
 
 
-package org.onap.dmaap.datarouter.node;
+package org.onap.dmaap.datarouter.node.delivery;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
@@ -32,6 +32,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.jetbrains.annotations.Nullable;
+import org.onap.dmaap.datarouter.node.DestInfo;
+import org.onap.dmaap.datarouter.node.log.StatusLog;
 
 /**
  * Mechanism for monitoring and controlling delivery of files to a destination.
@@ -85,7 +87,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     /**
      * Create a delivery queue for a given destination info.
      */
-    DeliveryQueue(DeliveryQueueHelper deliveryQueueHelper, DestInfo destinationInfo) {
+    public DeliveryQueue(DeliveryQueueHelper deliveryQueueHelper, DestInfo destinationInfo) {
         this.deliveryQueueHelper = deliveryQueueHelper;
         this.destinationInfo = destinationInfo;
         dir = new File(destinationInfo.getSpool());
@@ -97,7 +99,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
      *
      * @return The length of the task in bytes or 0 if the task cannot be cancelled.
      */
-    synchronized long cancelTask(String pubid) {
+    public synchronized long cancelTask(String pubid) {
         if (working.get(pubid) != null) {
             return (0);
         }
@@ -197,7 +199,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     /**
      * Get the next task.
      */
-    synchronized DeliveryTask getNext() {
+    public synchronized DeliveryTask getNext() {
         DeliveryTask ret = peekNext();
         if (ret != null) {
             todoindex++;
@@ -209,7 +211,7 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     /**
      * Peek at the next task.
      */
-    synchronized DeliveryTask peekNext() {
+    public synchronized DeliveryTask peekNext() {
         long now = System.currentTimeMillis();
         long mindate = now - deliveryQueueHelper.getExpirationTimer();
         if (failed) {
@@ -364,14 +366,14 @@ public class DeliveryQueue implements Runnable, DeliveryTaskHelper {
     /**
      * Reset the retry timer.
      */
-    void resetQueue() {
+    public void resetQueue() {
         resumetime = System.currentTimeMillis();
     }
 
     /**
      * Get task if in queue and mark as success.
      */
-    boolean markTaskSuccess(String pubId) {
+    public boolean markTaskSuccess(String pubId) {
         DeliveryTask task = working.get(pubId);
         if (task != null) {
             markSuccess(task);

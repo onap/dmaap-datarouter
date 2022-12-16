@@ -22,7 +22,9 @@
  ******************************************************************************/
 
 
-package org.onap.dmaap.datarouter.node;
+package org.onap.dmaap.datarouter.node.delivery;
+
+import org.onap.dmaap.datarouter.node.DestInfo;
 
 /**
  * Interface to allow independent testing of the DeliveryTask code.

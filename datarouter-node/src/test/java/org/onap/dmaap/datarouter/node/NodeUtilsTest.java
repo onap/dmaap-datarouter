@@ -29,12 +29,13 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.onap.dmaap.datarouter.node.utils.NodeUtils;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.MDC;
 
 @RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"java.net.ssl", "javax.security.auth.x500.X500Principal", "com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
+@PowerMockIgnore({"java.net.ssl", "com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "javax.management.*"})
 public class NodeUtilsTest {
 
     @Mock
@@ -75,17 +76,5 @@ public class NodeUtilsTest {
         NodeUtils.setRequestIdAndInvocationId(request);
         Assert.assertEquals("123", MDC.get("RequestId"));
         Assert.assertEquals("456", MDC.get("InvocationId"));
-    }
-
-    @Test
-    public void Given_Get_CanonicalName_Called_Valid_CN_Returned_From_JKS() {
-        String canonicalName = NodeUtils.getCanonicalName("jks", "src/test/resources/org.onap.dmaap-dr-test-cert.jks", "WGxd2P6MDo*Bi4+UdzWs{?$8");
-        Assert.assertEquals("dmaap-dr-node", canonicalName);
-    }
-
-    @Test
-    public void Given_Get_CanonicalName_Called_Valid_CN_Returned_From_P12() {
-        String canonicalName = NodeUtils.getCanonicalName("PKCS12", "src/test/resources/aaf/org.onap.dmaap-dr.p12", "w7(O#.QV#kQ;L(8fsaoT7cY&");
-        Assert.assertEquals("dmaap-dr-node", canonicalName);
     }
 }
