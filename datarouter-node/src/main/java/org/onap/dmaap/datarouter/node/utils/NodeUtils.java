@@ -22,7 +22,7 @@
  ******************************************************************************/
 
 
-package org.onap.dmaap.datarouter.node;
+package org.onap.dmaap.datarouter.node.utils;
 
 import static com.att.eelf.configuration.Configuration.MDC_KEY_REQUEST_ID;
 import static com.att.eelf.configuration.Configuration.MDC_SERVER_FQDN;
@@ -109,51 +109,6 @@ public class NodeUtils {
                             exception);
             return (null);
         }
-    }
-
-    /**
-     * Given a keystore file and its password, return the value of the CN of the first private key entry with a
-     * certificate.
-     *
-     * @param kstype The type of keystore
-     * @param ksfile The file name of the keystore
-     * @param kspass The password of the keystore
-     * @return CN of the certificate subject or null
-     */
-    public static String getCanonicalName(String kstype, String ksfile, String kspass) {
-        KeyStore ks;
-        try {
-            ks = KeyStore.getInstance(kstype);
-            if (loadKeyStore(ksfile, kspass, ks)) {
-                return (null);
-            }
-        } catch (Exception e) {
-            setIpAndFqdnForEelf("getCanonicalName");
-            eelfLogger.error(EelfMsgs.MESSAGE_KEYSTORE_LOAD_ERROR, e, ksfile);
-            return (null);
-        }
-        return (getCanonicalName(ks));
-    }
-
-    /**
-     * Given a keystore, return the value of the CN of the first private key entry with a certificate.
-     *
-     * @param ks The KeyStore
-     * @return CN of the certificate subject or null
-     */
-    public static String getCanonicalName(KeyStore ks) {
-        try {
-            Enumeration<String> aliases = ks.aliases();
-            while (aliases.hasMoreElements()) {
-                String name = getNameFromSubject(ks, aliases);
-                if (name != null) {
-                    return name;
-                }
-            }
-        } catch (Exception e) {
-            eelfLogger.error("NODE0402 Error extracting my name from my keystore file " + e.toString(), e);
-        }
-        return (null);
     }
 
     /**
@@ -281,54 +236,18 @@ public class NodeUtils {
     }
 
     /**
-     * Method to check to see if file is of type gzip.
+     * If file is of type gzip.
      *
      * @param file The name of the file to be checked
      * @return True if the file is of type gzip
      */
     public static boolean isFiletypeGzip(File file) {
         try (FileInputStream fileInputStream = new FileInputStream(file);
-                GZIPInputStream gzip = new GZIPInputStream(fileInputStream)) {
-
+                GZIPInputStream ignored = new GZIPInputStream(fileInputStream)) {
             return true;
         } catch (IOException e) {
-            eelfLogger.error("NODE0403 " + file.toString() + " Not in gzip(gz) format: " + e.toString() + e);
+            eelfLogger.error("NODE0403 " + file + " Not in gzip(gz) format: " + e + e);
             return false;
         }
-    }
-
-
-    private static boolean loadKeyStore(String ksfile, String kspass, KeyStore ks)
-            throws NoSuchAlgorithmException, CertificateException {
-        try (FileInputStream fileInputStream = new FileInputStream(ksfile)) {
-            ks.load(fileInputStream, kspass.toCharArray());
-        } catch (IOException ioException) {
-            eelfLogger.error("IOException occurred while opening FileInputStream: " + ioException.getMessage(),
-                    ioException);
-            return true;
-        }
-        return false;
-    }
-
-
-    private static String getNameFromSubject(KeyStore ks, Enumeration<String> aliases) throws KeyStoreException {
-        String alias = aliases.nextElement();
-        if (ks.entryInstanceOf(alias, KeyStore.PrivateKeyEntry.class)) {
-            X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
-            if (cert != null) {
-                String subject = cert.getSubjectX500Principal().getName();
-                try {
-                    LdapName ln = new LdapName(subject);
-                    for (Rdn rdn : ln.getRdns()) {
-                        if (rdn.getType().equalsIgnoreCase("CN")) {
-                            return rdn.getValue().toString();
-                        }
-                    }
-                } catch (InvalidNameException e) {
-                    eelfLogger.error("No valid CN not found for dr-node cert", e);
-                }
-            }
-        }
-        return null;
     }
 }

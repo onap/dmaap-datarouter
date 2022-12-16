@@ -66,7 +66,7 @@ public class DestInfoBuilder {
         return destInfoLogData;
     }
 
-    DestInfoBuilder setLogdata(String logdata) {
+    public DestInfoBuilder setLogdata(String logdata) {
         this.destInfoLogData = logdata;
         return this;
     }
@@ -84,7 +84,7 @@ public class DestInfoBuilder {
         return destInfoAuthUser;
     }
 
-    DestInfoBuilder setAuthuser(String authuser) {
+    public DestInfoBuilder setAuthuser(String authuser) {
         this.destInfoAuthUser = authuser;
         return this;
     }
@@ -93,7 +93,7 @@ public class DestInfoBuilder {
         return destInfoAuthentication;
     }
 
-    DestInfoBuilder setAuthentication(String authentication) {
+    public DestInfoBuilder setAuthentication(String authentication) {
         this.destInfoAuthentication = authentication;
         return this;
     }
@@ -102,7 +102,7 @@ public class DestInfoBuilder {
         return destInfoMetaOnly;
     }
 
-    DestInfoBuilder setMetaonly(boolean metaonly) {
+    public DestInfoBuilder setMetaonly(boolean metaonly) {
         this.destInfoMetaOnly = metaonly;
         return this;
     }
@@ -111,7 +111,7 @@ public class DestInfoBuilder {
         return destInfoUse100;
     }
 
-    DestInfoBuilder setUse100(boolean use100) {
+    public DestInfoBuilder setUse100(boolean use100) {
         this.destInfoUse100 = use100;
         return this;
     }
@@ -120,7 +120,7 @@ public class DestInfoBuilder {
         return destInfoPrivilegedSubscriber;
     }
 
-    DestInfoBuilder setPrivilegedSubscriber(boolean privilegedSubscriber) {
+    public DestInfoBuilder setPrivilegedSubscriber(boolean privilegedSubscriber) {
         this.destInfoPrivilegedSubscriber = privilegedSubscriber;
         return this;
     }
@@ -129,7 +129,7 @@ public class DestInfoBuilder {
         return destInfoFollowRedirects;
     }
 
-    DestInfoBuilder setFollowRedirects(boolean followRedirects) {
+    public DestInfoBuilder setFollowRedirects(boolean followRedirects) {
         this.destInfoFollowRedirects = followRedirects;
         return this;
     }
@@ -138,12 +138,12 @@ public class DestInfoBuilder {
         return destInfoDecompress;
     }
 
-    DestInfoBuilder setDecompress(boolean decompress) {
+    public DestInfoBuilder setDecompress(boolean decompress) {
         this.destInfoDecompress = decompress;
         return this;
     }
 
-    DestInfo createDestInfo() {
+    public DestInfo createDestInfo() {
         return new DestInfo(this);
     }
 }

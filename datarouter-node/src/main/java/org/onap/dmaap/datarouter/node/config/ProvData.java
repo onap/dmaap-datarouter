@@ -22,7 +22,7 @@
  ******************************************************************************/
 
 
-package org.onap.dmaap.datarouter.node;
+package org.onap.dmaap.datarouter.node.config;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
@@ -34,16 +34,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvFeed;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvFeedSubnet;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvFeedUser;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvForceEgress;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvForceIngress;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvHop;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvNode;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvParam;
-import org.onap.dmaap.datarouter.node.NodeConfig.ProvSubscription;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvFeed;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvFeedSubnet;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvFeedUser;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvForceEgress;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvForceIngress;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvHop;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvNode;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvParam;
+import org.onap.dmaap.datarouter.node.config.NodeConfig.ProvSubscription;
 import org.onap.dmaap.datarouter.node.eelf.EelfMsgs;
+import org.onap.dmaap.datarouter.node.utils.NodeUtils;
 
 /**
  * Parser for provisioning data from the provisioning server.
@@ -55,16 +56,16 @@ public class ProvData {
 
     private static final String FEED_ID = "feedid";
 
-    private static EELFLogger eelfLogger = EELFManager.getInstance().getLogger(ProvData.class);
-    private NodeConfig.ProvNode[] pn;
-    private NodeConfig.ProvParam[] pp;
-    private NodeConfig.ProvFeed[] pf;
-    private NodeConfig.ProvFeedUser[] pfu;
-    private NodeConfig.ProvFeedSubnet[] pfsn;
-    private NodeConfig.ProvSubscription[] ps;
-    private NodeConfig.ProvForceIngress[] pfi;
-    private NodeConfig.ProvForceEgress[] pfe;
-    private NodeConfig.ProvHop[] ph;
+    private static final EELFLogger eelfLogger = EELFManager.getInstance().getLogger(ProvData.class);
+    private final NodeConfig.ProvNode[] provNodes;
+    private final NodeConfig.ProvParam[] provParams;
+    private final NodeConfig.ProvFeed[] provFeeds;
+    private final NodeConfig.ProvFeedUser[] provFeedUsers;
+    private final NodeConfig.ProvFeedSubnet[] provFeedSubnets;
+    private final NodeConfig.ProvSubscription[] provSubscriptions;
+    private final NodeConfig.ProvForceIngress[] provForceIngresses;
+    private final NodeConfig.ProvForceEgress[] provForceEgresses;
+    private final NodeConfig.ProvHop[] provHops;
 
     /**
      * Construct raw provisioing data entries from the text (JSON) provisioning document received from the provisioning
@@ -73,27 +74,27 @@ public class ProvData {
      * @param reader The reader for the JSON text.
      */
     public ProvData(Reader reader) throws IOException {
-        ArrayList<ProvNode> pnv = new ArrayList<>();
-        ArrayList<NodeConfig.ProvParam> ppv = new ArrayList<>();
-        ArrayList<NodeConfig.ProvFeed> pfv = new ArrayList<>();
-        ArrayList<NodeConfig.ProvFeedUser> pfuv = new ArrayList<>();
-        ArrayList<NodeConfig.ProvFeedSubnet> pfsnv = new ArrayList<>();
-        ArrayList<NodeConfig.ProvSubscription> psv = new ArrayList<>();
-        ArrayList<NodeConfig.ProvForceIngress> pfiv = new ArrayList<>();
-        ArrayList<NodeConfig.ProvForceEgress> pfev = new ArrayList<>();
-        ArrayList<NodeConfig.ProvHop> phv = new ArrayList<>();
+        ArrayList<ProvNode> provNodeArrayList = new ArrayList<>();
+        ArrayList<NodeConfig.ProvParam> provParamArrayList = new ArrayList<>();
+        ArrayList<NodeConfig.ProvFeed> provFeedArrayList = new ArrayList<>();
+        ArrayList<NodeConfig.ProvFeedUser> provFeedUserArrayList = new ArrayList<>();
+        ArrayList<NodeConfig.ProvFeedSubnet> provFeedSubnetArrayList = new ArrayList<>();
+        ArrayList<NodeConfig.ProvSubscription> provSubscriptionArrayList = new ArrayList<>();
+        ArrayList<NodeConfig.ProvForceIngress> provForceIngressArrayList = new ArrayList<>();
+        ArrayList<NodeConfig.ProvForceEgress> provForceEgressArrayList = new ArrayList<>();
+        ArrayList<NodeConfig.ProvHop> provHopArrayList = new ArrayList<>();
         try {
-            JSONTokener jtx = new JSONTokener(reader);
-            JSONObject jcfg = new JSONObject(jtx);
-            char cch = jtx.nextClean();
-            if (cch != '\0') {
+            JSONTokener jsonTokener = new JSONTokener(reader);
+            JSONObject jsonObject = new JSONObject(jsonTokener);
+            char nextCleanChar = jsonTokener.nextClean();
+            if (nextCleanChar != '\0') {
                 throw new JSONException("Spurious characters following configuration");
             }
             reader.close();
-            addJSONFeeds(pfv, pfuv, pfsnv, jcfg);
-            addJSONSubs(psv, jcfg);
-            addJSONParams(pnv, ppv, jcfg);
-            addJSONRoutingInformation(pfiv, pfev, phv, jcfg);
+            addJSONFeeds(provFeedArrayList, provFeedUserArrayList, provFeedSubnetArrayList, jsonObject);
+            addJSONSubs(provSubscriptionArrayList, jsonObject);
+            addJSONParams(provNodeArrayList, provParamArrayList, jsonObject);
+            addJSONRoutingInformation(provForceIngressArrayList, provForceEgressArrayList, provHopArrayList, jsonObject);
         } catch (JSONException jse) {
             NodeUtils.setIpAndFqdnForEelf("ProvData");
             eelfLogger.error(EelfMsgs.MESSAGE_PARSING_ERROR, jse.toString());
@@ -101,15 +102,15 @@ public class ProvData {
                     .error("NODE0201 Error parsing configuration data from provisioning server " + jse.toString(), jse);
             throw new IOException(jse.toString(), jse);
         }
-        pn = pnv.toArray(new NodeConfig.ProvNode[pnv.size()]);
-        pp = ppv.toArray(new NodeConfig.ProvParam[ppv.size()]);
-        pf = pfv.toArray(new NodeConfig.ProvFeed[pfv.size()]);
-        pfu = pfuv.toArray(new NodeConfig.ProvFeedUser[pfuv.size()]);
-        pfsn = pfsnv.toArray(new NodeConfig.ProvFeedSubnet[pfsnv.size()]);
-        ps = psv.toArray(new NodeConfig.ProvSubscription[psv.size()]);
-        pfi = pfiv.toArray(new NodeConfig.ProvForceIngress[pfiv.size()]);
-        pfe = pfev.toArray(new NodeConfig.ProvForceEgress[pfev.size()]);
-        ph = phv.toArray(new NodeConfig.ProvHop[phv.size()]);
+        provNodes = provNodeArrayList.toArray(new ProvNode[0]);
+        provParams = provParamArrayList.toArray(new ProvParam[0]);
+        provFeeds = provFeedArrayList.toArray(new ProvFeed[0]);
+        provFeedUsers = provFeedUserArrayList.toArray(new ProvFeedUser[0]);
+        provFeedSubnets = provFeedSubnetArrayList.toArray(new ProvFeedSubnet[0]);
+        provSubscriptions = provSubscriptionArrayList.toArray(new ProvSubscription[0]);
+        provForceIngresses = provForceIngressArrayList.toArray(new ProvForceIngress[0]);
+        provForceEgresses = provForceEgressArrayList.toArray(new ProvForceEgress[0]);
+        provHops = provHopArrayList.toArray(new ProvHop[0]);
     }
 
     private static String[] gvasa(JSONObject object, String key) {
@@ -156,63 +157,63 @@ public class ProvData {
      * Get the raw node configuration entries.
      */
     public NodeConfig.ProvNode[] getNodes() {
-        return (pn);
+        return (provNodes);
     }
 
     /**
      * Get the raw parameter configuration entries.
      */
     public NodeConfig.ProvParam[] getParams() {
-        return (pp);
+        return (provParams);
     }
 
     /**
      * Ge the raw feed configuration entries.
      */
     public NodeConfig.ProvFeed[] getFeeds() {
-        return (pf);
+        return (provFeeds);
     }
 
     /**
      * Get the raw feed user configuration entries.
      */
     public NodeConfig.ProvFeedUser[] getFeedUsers() {
-        return (pfu);
+        return (provFeedUsers);
     }
 
     /**
      * Get the raw feed subnet configuration entries.
      */
     public NodeConfig.ProvFeedSubnet[] getFeedSubnets() {
-        return (pfsn);
+        return (provFeedSubnets);
     }
 
     /**
      * Get the raw subscription entries.
      */
     public NodeConfig.ProvSubscription[] getSubscriptions() {
-        return (ps);
+        return (provSubscriptions);
     }
 
     /**
      * Get the raw forced ingress entries.
      */
     public NodeConfig.ProvForceIngress[] getForceIngress() {
-        return (pfi);
+        return (provForceIngresses);
     }
 
     /**
      * Get the raw forced egress entries.
      */
     public NodeConfig.ProvForceEgress[] getForceEgress() {
-        return (pfe);
+        return (provForceEgresses);
     }
 
     /**
      * Get the raw next hop entries.
      */
     public NodeConfig.ProvHop[] getHops() {
-        return (ph);
+        return (provHops);
     }
 
     @Nullable
@@ -245,16 +246,7 @@ public class ProvData {
         String fname = gvas(jfeed, "name");
         String fver = gvas(jfeed, "version");
         String createdDate = gvas(jfeed, "created_date");
-        /*
-         * START - AAF changes
-         * TDP EPIC US# 307413
-         * Passing aafInstance to ProvFeed from feeds json passed by prov to identify legacy/AAF feeds
-         */
-        String aafInstance = gvas(jfeed, "aaf_instance");
-        pfv.add(new ProvFeed(fid, fname + "//" + fver, stat, createdDate, aafInstance));
-        /*
-         * END - AAF changes
-         */
+        pfv.add(new ProvFeed(fid, fname + "//" + fver, stat, createdDate));
         addJSONFeedAuthArrays(pfuv, pfsnv, jfeed, fid);
     }
 

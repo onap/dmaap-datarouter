@@ -28,6 +28,9 @@ import static java.lang.System.exit;
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
 import org.eclipse.jetty.server.Server;
+import org.onap.dmaap.datarouter.node.log.LogManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The main starting point for the Data Router node.
@@ -49,7 +52,7 @@ public class NodeRunner {
         nodeMainLogger.debug("NODE0001 Data Router Node Starting");
         IsFrom.setDNSCache();
         NodeConfigManager nodeConfigManager = NodeConfigManager.getInstance();
-        nodeMainLogger.debug("NODE0002 I am " + nodeConfigManager.getMyName());
+        nodeMainLogger.debug("NODE0002 I am {}", nodeConfigManager.getMyName());
         (new WaitForConfig(nodeConfigManager)).waitForConfig();
         new LogManager(nodeConfigManager);
         try {
@@ -58,8 +61,7 @@ public class NodeRunner {
             server.join();
             nodeMainLogger.debug("NODE0006 Node Server started-" + server.getState());
         } catch (Exception e) {
-            nodeMainLogger.error("NODE0006 Jetty failed to start. Reporting will we be unavailable: "
-                                         + e.getMessage(), e);
+            nodeMainLogger.error("NODE0006 Jetty failed to start. Reporting will we be unavailable: {}", e.getMessage());
             exit(1);
         }
         nodeMainLogger.debug("NODE0007 Node Server joined");

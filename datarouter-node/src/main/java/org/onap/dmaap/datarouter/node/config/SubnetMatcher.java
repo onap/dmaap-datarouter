@@ -22,7 +22,9 @@
  ******************************************************************************/
 
 
-package org.onap.dmaap.datarouter.node;
+package org.onap.dmaap.datarouter.node.config;
+
+import org.onap.dmaap.datarouter.node.utils.NodeUtils;
 
 /**
  * Compare IP addresses as byte arrays to a subnet specified as a CIDR.

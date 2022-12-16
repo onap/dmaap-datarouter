@@ -24,6 +24,8 @@
 
 package org.onap.dmaap.datarouter.node;
 
+import org.onap.dmaap.datarouter.node.config.NodeConfig;
+
 /**
  * Information for a delivery destination that doesn't change from message to message.
  */

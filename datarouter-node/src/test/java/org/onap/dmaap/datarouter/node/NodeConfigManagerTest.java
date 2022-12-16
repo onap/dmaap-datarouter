@@ -45,6 +45,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.onap.dmaap.datarouter.node.config.NodeConfig;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
@@ -95,10 +96,8 @@ public class NodeConfigManagerTest {
     @Test
     public void Verify_NodeConfigMan_Getters_Secure() {
         NodeConfigManager nodeConfigManager = NodeConfigManager.getInstance();
-        Assert.assertEquals("legacy", nodeConfigManager.getAafInstance());
         Assert.assertEquals("src/test/resources/spool/f", nodeConfigManager.getSpoolDir());
         Assert.assertEquals("src/test/resources/spool", nodeConfigManager.getSpoolBase());
-        Assert.assertEquals("PKCS12", nodeConfigManager.getKSType());
         Assert.assertEquals(8080, nodeConfigManager.getHttpPort());
         Assert.assertEquals(8443, nodeConfigManager.getHttpsPort());
         Assert.assertEquals(443, nodeConfigManager.getExtHttpsPort());
@@ -108,12 +107,8 @@ public class NodeConfigManagerTest {
         Assert.assertEquals(".log", nodeConfigManager.getEventLogSuffix());
         Assert.assertEquals("src/test/resources/logs", nodeConfigManager.getLogDir());
         Assert.assertEquals((86400000L * 30), nodeConfigManager.getLogRetention());
-        Assert.assertEquals(new String[] {"TLSv1.1", "TLSv1.2"}, nodeConfigManager.getEnabledprotocols());
-        Assert.assertEquals("org.onap.dmaap-dr.feed", nodeConfigManager.getAafType());
-        Assert.assertEquals("publish", nodeConfigManager.getAafAction());
-        Assert.assertTrue(nodeConfigManager.getCadiEnabled());
         Assert.assertFalse(nodeConfigManager.isShutdown());
-        Assert.assertTrue(nodeConfigManager.isTlsEnabled());
+        Assert.assertFalse(nodeConfigManager.isTlsEnabled());
         Assert.assertTrue(nodeConfigManager.isConfigured());
         Assert.assertNotNull(nodeConfigManager.getPublishId());
         Assert.assertNotNull(nodeConfigManager.getAllDests());
@@ -126,9 +121,6 @@ public class NodeConfigManagerTest {
         Assert.assertEquals(60000, nodeConfigManager.getFairTimeLimit());
         Assert.assertNotNull(nodeConfigManager.getTargets("1"));
         Assert.assertEquals("src/test/resources/spool/f", nodeConfigManager.getSpoolDir());
-        Assert.assertEquals("src/test/resources/aaf/org.onap.dmaap-dr.p12", nodeConfigManager.getKSFile());
-        Assert.assertEquals("jks", nodeConfigManager.getTstype());
-        Assert.assertEquals("src/test/resources/aaf/org.onap.dmaap-dr.trust.jks", nodeConfigManager.getTsfile());
         Assert.assertEquals(40, nodeConfigManager.getDeliveryThreads());
         Assert.assertEquals("30", nodeConfigManager.getEventLogInterval());
         Assert.assertFalse(nodeConfigManager.isFollowRedirects());
@@ -137,7 +129,6 @@ public class NodeConfigManagerTest {
         Assert.assertEquals("Basic ZG1hYXAtZHItbm9kZTp2OStFanZpWVBXSURrazVxRlF5ZkoxSC9LdHBuYWo4K0NVTXlNL0lRRUp2UGdjOUxpU2s5ZnpKTjdFazl3SzZkaG11S1E4S3RtcC9kelpBU3BRUGZCdz09", nodeConfigManager.getMyAuth());
         Assert.assertEquals(0.05, nodeConfigManager.getFreeDiskStart(), 0.0);
         Assert.assertEquals(0.2, nodeConfigManager.getFreeDiskStop(), 0.0);
-        Assert.assertEquals("org.onap.dmaap-dr.feed|legacy|publish", nodeConfigManager.getPermission("legacy"));
     }
 
     /**
