@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0236951f_edcc4e51",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 7617
+      },
+      "writtenOn": "2022-12-16T13:33:01Z",
+      "side": 1,
+      "message": "clean!",
+      "range": {
+        "startLine": 136,
+        "startChar": 65,
+        "endLine": 136,
+        "endChar": 66
+      },
+      "revId": "63455d7459094253588b8b2b9592210ec3200598",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1c9b31a0_a58201c7",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 7617
+      },
+      "writtenOn": "2022-12-16T13:33:01Z",
+      "side": 1,
+      "message": "You were great for adding public/private on loads of methods, but missed it on others! 😄",
+      "range": {
+        "startLine": 359,
+        "startChar": 4,
+        "endLine": 359,
+        "endChar": 10
+      },
+      "revId": "63455d7459094253588b8b2b9592210ec3200598",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fee2f64b_5ffa1074",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 560,
+      "author": {
+        "id": 7617
+      },
+      "writtenOn": "2022-12-16T13:33:01Z",
+      "side": 1,
+      "message": "These hurt my head 💔",
+      "range": {
+        "startLine": 560,
+        "startChar": 25,
+        "endLine": 560,
+        "endChar": 26
+      },
+      "revId": "63455d7459094253588b8b2b9592210ec3200598",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f3f2021c_264d0417",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/utils/NodeTlsManager.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 7617
+      },
+      "writtenOn": "2022-12-16T13:33:01Z",
+      "side": 1,
+      "message": "2022",
+      "range": {
+        "startLine": 3,
+        "startChar": 18,
+        "endLine": 3,
+        "endChar": 22
+      },
+      "revId": "63455d7459094253588b8b2b9592210ec3200598",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ba32d2e3_004ac25d",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/utils/NodeTlsManager.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 7617
+      },
+      "writtenOn": "2022-12-16T13:33:01Z",
+      "side": 1,
+      "message": "Why extract this?",
+      "range": {
+        "startLine": 103,
+        "startChar": 15,
+        "endLine": 103,
+        "endChar": 31
+      },
+      "revId": "63455d7459094253588b8b2b9592210ec3200598",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}

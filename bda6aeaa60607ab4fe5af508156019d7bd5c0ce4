@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9d03d8df_f1ee5424",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/MetricsFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 7617
+      },
+      "writtenOn": "2022-12-16T13:33:01Z",
+      "side": 0,
+      "message": "Delightful change. 😊\nStreamlined code is my kinda jam!! 😄",
+      "range": {
+        "startLine": 40,
+        "startChar": 31,
+        "endLine": 40,
+        "endChar": 35
+      },
+      "revId": "bda6aeaa60607ab4fe5af508156019d7bd5c0ce4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}

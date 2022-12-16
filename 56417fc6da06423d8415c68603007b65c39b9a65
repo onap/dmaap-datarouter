@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "457a0cd7_71435bd1",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/config/ProvData.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 7617
+      },
+      "writtenOn": "2022-12-16T13:33:01Z",
+      "side": 1,
+      "message": "Nothing to do with your change, but god I hate some of these variable and method names! 😆",
+      "range": {
+        "startLine": 248,
+        "startChar": 29,
+        "endLine": 248,
+        "endChar": 33
+      },
+      "revId": "56417fc6da06423d8415c68603007b65c39b9a65",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    }
+  ]
+}
