@@ -22,6 +22,30 @@
       "revId": "bda6aeaa60607ab4fe5af508156019d7bd5c0ce4",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f4dc37a8_42e932c9",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/eelf/MetricsFilter.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-12-19T23:54:19Z",
+      "side": 0,
+      "message": "Djubly!",
+      "parentUuid": "9d03d8df_f1ee5424",
+      "range": {
+        "startLine": 40,
+        "startChar": 31,
+        "endLine": 40,
+        "endChar": 35
+      },
+      "revId": "bda6aeaa60607ab4fe5af508156019d7bd5c0ce4",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }

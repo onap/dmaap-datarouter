@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "de04b38f_617d994c",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-12-19T23:54:19Z",
+      "side": 1,
+      "message": "I like!!",
+      "parentUuid": "0236951f_edcc4e51",
+      "range": {
+        "startLine": 136,
+        "startChar": 65,
+        "endLine": 136,
+        "endChar": 66
+      },
+      "revId": "63455d7459094253588b8b2b9592210ec3200598",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1c9b31a0_a58201c7",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
         "patchSetId": 2
@@ -36,6 +60,30 @@
       "writtenOn": "2022-12-16T13:33:01Z",
       "side": 1,
       "message": "You were great for adding public/private on loads of methods, but missed it on others! 😄",
+      "range": {
+        "startLine": 359,
+        "startChar": 4,
+        "endLine": 359,
+        "endChar": 10
+      },
+      "revId": "63455d7459094253588b8b2b9592210ec3200598",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f20aee5e_9bd5ffcb",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeConfigManager.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-12-19T23:54:19Z",
+      "side": 1,
+      "message": "Is package private not ok here?",
+      "parentUuid": "1c9b31a0_a58201c7",
       "range": {
         "startLine": 359,
         "startChar": 4,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "ed8e55e1_16b76121",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/NodeServlet.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 560,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-12-19T23:54:19Z",
+      "side": 1,
+      "message": "I shall try",
+      "parentUuid": "fee2f64b_5ffa1074",
+      "range": {
+        "startLine": 560,
+        "startChar": 25,
+        "endLine": 560,
+        "endChar": 26
+      },
+      "revId": "63455d7459094253588b8b2b9592210ec3200598",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f3f2021c_264d0417",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/utils/NodeTlsManager.java",
         "patchSetId": 2
@@ -94,6 +166,30 @@
     },
     {
       "key": {
+        "uuid": "6340e2d4_5c379d73",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/utils/NodeTlsManager.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-12-19T23:54:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f3f2021c_264d0417",
+      "range": {
+        "startLine": 3,
+        "startChar": 18,
+        "endLine": 3,
+        "endChar": 22
+      },
+      "revId": "63455d7459094253588b8b2b9592210ec3200598",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba32d2e3_004ac25d",
         "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/utils/NodeTlsManager.java",
         "patchSetId": 2
@@ -105,6 +201,30 @@
       "writtenOn": "2022-12-16T13:33:01Z",
       "side": 1,
       "message": "Why extract this?",
+      "range": {
+        "startLine": 103,
+        "startChar": 15,
+        "endLine": 103,
+        "endChar": 31
+      },
+      "revId": "63455d7459094253588b8b2b9592210ec3200598",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6034953d_fb996ba2",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/utils/NodeTlsManager.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-12-19T23:54:19Z",
+      "side": 1,
+      "message": "Gets the common name CN from the cert and assigns it to the dr-node. Prob way more relevant ir there are many dr-nodes. Not so useful here..",
+      "parentUuid": "ba32d2e3_004ac25d",
       "range": {
         "startLine": 103,
         "startChar": 15,

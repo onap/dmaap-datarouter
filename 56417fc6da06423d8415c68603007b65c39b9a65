@@ -22,6 +22,30 @@
       "revId": "56417fc6da06423d8415c68603007b65c39b9a65",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6ea2c434_3e66d29a",
+        "filename": "datarouter-node/src/main/java/org/onap/dmaap/datarouter/node/config/ProvData.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2022-12-19T23:54:19Z",
+      "side": 1,
+      "message": "They are prob some of the worst I\u0027ve seen in a while.\nMade a stab at updating some, more to do.",
+      "parentUuid": "457a0cd7_71435bd1",
+      "range": {
+        "startLine": 248,
+        "startChar": 29,
+        "endLine": 248,
+        "endChar": 33
+      },
+      "revId": "56417fc6da06423d8415c68603007b65c39b9a65",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": false
     }
   ]
 }
