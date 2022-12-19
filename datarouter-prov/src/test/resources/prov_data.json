@@ -22,7 +22,6 @@
       "feedid": 1,
       "name": "Default PM Feed",
       "business_description": "Default Feed",
-      "aaf_instance": "legacy",
       "publisher": "dradmin",
       "links": {
         "subscribe": "http://dmaap-dr-prov/subscribe/1",
@@ -60,7 +59,6 @@
       "feedid": 1,
       "follow_redirect": false,
       "decompress": true,
-      "aaf_instance": "legacy",
       "links": {
         "feed": "http://dmaap-dr-prov/feed/1",
         "log": "http://dmaap-dr-prov/sublog/1",

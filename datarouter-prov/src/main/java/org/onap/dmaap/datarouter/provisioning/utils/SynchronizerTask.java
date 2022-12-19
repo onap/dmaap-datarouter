@@ -140,33 +140,7 @@ public class SynchronizerTask extends TimerTask {
         try (AbstractHttpClient hc = new DefaultHttpClient()) {
             Scheme sch;
             if (Boolean.TRUE.equals(ProvRunner.getTlsEnabled())) {
-                // Set up keystore
-                String type = AafPropsUtils.KEYSTORE_TYPE_PROPERTY;
-                String store = ProvRunner.getAafPropsUtils().getKeystorePathProperty();
-                String pass = ProvRunner.getAafPropsUtils().getKeystorePassProperty();
-                KeyStore keyStore = KeyStore.getInstance(type);
-                try (FileInputStream instream = new FileInputStream(store)) {
-                    keyStore.load(instream, pass.toCharArray());
-
-                }
-                // Set up truststore
-                store = ProvRunner.getAafPropsUtils().getTruststorePathProperty();
-                pass = ProvRunner.getAafPropsUtils().getTruststorePassProperty();
-                KeyStore trustStore = null;
-                if (store != null && store.length() > 0) {
-                    trustStore = KeyStore.getInstance(AafPropsUtils.TRUESTSTORE_TYPE_PROPERTY);
-                    try (FileInputStream instream = new FileInputStream(store)) {
-                        trustStore.load(instream, pass.toCharArray());
-
-                    }
-                }
-                // We are connecting with the node name, but the certificate will have the CNAME
-                // So we need to accept a non-matching certificate name
-                String keystorepass = ProvRunner.getAafPropsUtils().getKeystorePassProperty();
-                SSLSocketFactory socketFactory =
-                        (trustStore == null)
-                                ? new SSLSocketFactory(keyStore, keystorepass)
-                                : new SSLSocketFactory(keyStore, keystorepass, trustStore);
+                SSLSocketFactory socketFactory = ProvRunner.getProvTlsManager().getSslSocketFactory();
                 socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
                 sch = new Scheme("https", 443, socketFactory);
             } else {
@@ -180,6 +154,7 @@ public class SynchronizerTask extends TimerTask {
         } catch (Exception e) {
             logger.warn("PROV5005: Problem starting the synchronizer: " + e);
         }
+        logger.info("PROV5000: SynchronizerTask started");
     }
 
     private void setSynchTimer(String strInterval) {

@@ -98,8 +98,8 @@ public class FeedTest {
 
     @Test
     public void Given_doDelete_Succeeds_Then_doInsert_To_Put_Feed_Back_And_Bool_Is_True() throws SQLException {
-        Boolean bool = feed.doDelete(provDbUtils.getConnection());
-        Assert.assertEquals(true, bool);
+        boolean bool = feed.doDelete(provDbUtils.getConnection());
+        Assert.assertTrue(bool);
         JSONObject jo = new JSONObject();
         jo.put("self","self_link");
         jo.put("publish","publish_link");
@@ -107,7 +107,7 @@ public class FeedTest {
         jo.put("log","log_link");
         feed.setLinks(new FeedLinks(jo));
         bool = feed.doInsert(provDbUtils.getConnection());
-        Assert.assertEquals(true, bool);
+        Assert.assertTrue(bool);
     }
 
     @Test
@@ -133,7 +133,7 @@ public class FeedTest {
     public void Given_doDelete_Throws_SQLException_Then_Returns_False() throws SQLException {
         Connection spyConnection = CreateSpyForDbConnection();
         Mockito.doThrow(new SQLException()).when(spyConnection).prepareStatement(anyString());
-        Assert.assertEquals(feed.doDelete(spyConnection), false);
+        Assert.assertFalse(feed.doDelete(spyConnection));
     }
 
     @Test
@@ -147,7 +147,7 @@ public class FeedTest {
         fa.setEndpointIDS(setA);
         fa.setEndpointAddrs(setB);
         feed.setAuthorization(fa);
-        Assert.assertEquals(feed.doInsert(connection), false);
+        Assert.assertFalse(feed.doInsert(connection));
 
     }
 
@@ -155,7 +155,7 @@ public class FeedTest {
     public void Given_doUpdate_Throws_SQLException_Then_Returns_False() throws SQLException {
         Connection spyConnection = CreateSpyForDbConnection();
         Mockito.doThrow(new SQLException()).when(spyConnection).prepareStatement(anyString());
-        Assert.assertEquals(feed.doUpdate(spyConnection), false);
+        Assert.assertFalse(feed.doUpdate(spyConnection));
 
     }
 
@@ -174,7 +174,7 @@ public class FeedTest {
         Assert.assertEquals(feed.getGroupid(), 1);
         Assert.assertEquals(feed.getDescription(), "test feed");
         Assert.assertEquals(feed.getBusinessDescription(), "test feed");
-        Assert.assertEquals(feed.isSuspended(), false);
+        Assert.assertFalse(feed.isSuspended());
         Assert.assertEquals(feed.getPublisher(), "publish");
     }
 

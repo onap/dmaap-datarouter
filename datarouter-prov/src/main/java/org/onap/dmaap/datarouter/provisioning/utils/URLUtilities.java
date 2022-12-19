@@ -161,7 +161,8 @@ public class URLUtilities {
 
     private static String getAppropriateUrlPort() {
         if (Boolean.TRUE.equals(ProvRunner.getTlsEnabled())) {
-            return "";
+            return ":" + ProvRunner.getProvProperties()
+                .getProperty("org.onap.dmaap.datarouter.provserver.https.port", "8443");
         }
         return ":" + ProvRunner.getProvProperties()
             .getProperty("org.onap.dmaap.datarouter.provserver.http.port", "8080");

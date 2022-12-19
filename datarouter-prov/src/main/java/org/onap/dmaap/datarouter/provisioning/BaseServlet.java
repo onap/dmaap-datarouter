@@ -85,23 +85,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
 
     public static final String BEHALF_HEADER = "X-DMAAP-DR-ON-BEHALF-OF";
 
-    public static final String EXCLUDE_AAF_HEADER = "X-EXCLUDE-AAF";
-
-    private static final String AAF_CADI_FEED_TYPE = "org.onap.dmaap.datarouter.provserver.aaf.feed.type";
-    private static final String AAF_CADI_SUB_TYPE = "org.onap.dmaap.datarouter.provserver.aaf.sub.type";
-    private static final String AAF_INSTANCE = "org.onap.dmaap.datarouter.provserver.aaf.instance";
-    private static final String AAF_CADI_FEED = "org.onap.dmaap-dr.feed";
-    private static final String AAF_CADI_SUB = "org.onap.dmaap-dr.sub";
-
-    static final String CREATE_PERMISSION = "create";
-    static final String EDIT_PERMISSION = "edit";
-    static final String DELETE_PERMISSION = "delete";
-    private static final String PUBLISH_PERMISSION = "publish";
-    private static final String SUSPEND_PERMISSION = "suspend";
-    private static final String RESTORE_PERMISSION = "restore";
-    private static final String SUBSCRIBE_PERMISSION = "subscribe";
-    static final String APPROVE_SUB_PERMISSION = "approveSub";
-
     static final String FEED_BASECONTENT_TYPE = "application/vnd.dmaap-dr.feed";
     public static final String FEED_CONTENT_TYPE = "application/vnd.dmaap-dr.feed; version=2.0";
     public static final String FEEDFULL_CONTENT_TYPE = "application/vnd.dmaap-dr.feed-full; version=2.0";
@@ -260,9 +243,6 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
     //DMAAP-597 (Tech Dept) REST request source IP auth relaxation to accommodate OOM kubernetes deploy
     private static String isAddressAuthEnabled = ProvRunner.getProvProperties()
         .getProperty("org.onap.dmaap.datarouter.provserver.isaddressauthenabled", "false");
-
-    static String isCadiEnabled = ProvRunner.getProvProperties()
-        .getProperty("org.onap.dmaap.datarouter.provserver.cadi.enabled", "false");
 
     /**
      * Initialize data common to all the provisioning server servlets.
@@ -958,97 +938,5 @@ public class BaseServlet extends HttpServlet implements ProvDataProvider {
             intlogger.error("Exception: " + e.getMessage(), e);
         }
 
-    }
-
-    /*
-     * AAF changes: TDP EPIC US# 307413
-     * @Method - getFeedPermission - Forming permission string for feed part to check AAF access in CADI Framework
-     * @Params - aafInstance Passing aafInstance as it's used in permission string
-     * @Params - userAction Passing CONST values to set different actions in permission string
-     */
-    String getFeedPermission(String aafInstance, String userAction) {
-        try {
-            Properties props = ProvRunner.getProvProperties();
-            String type = props.getProperty(AAF_CADI_FEED_TYPE, AAF_CADI_FEED);
-            String action;
-            switch (userAction) {
-                case CREATE_PERMISSION:
-                    action = CREATE_PERMISSION;
-                    break;
-                case EDIT_PERMISSION:
-                    action = EDIT_PERMISSION;
-                    break;
-                case DELETE_PERMISSION:
-                    action = DELETE_PERMISSION;
-                    break;
-                case PUBLISH_PERMISSION:
-                    action = PUBLISH_PERMISSION;
-                    break;
-                case SUSPEND_PERMISSION:
-                    action = SUSPEND_PERMISSION;
-                    break;
-                case RESTORE_PERMISSION:
-                    action = RESTORE_PERMISSION;
-                    break;
-                default:
-                    action = "*";
-            }
-            if (aafInstance == null || "".equals(aafInstance)) {
-                aafInstance = props.getProperty(AAF_INSTANCE, "org.onap.dmaap-dr.NoInstanceDefined");
-            }
-            return type + "|" + aafInstance + "|" + action;
-        } catch (Exception e) {
-            intlogger.error("PROV7005 BaseServlet.getFeedPermission: " + e.getMessage(), e);
-        }
-        return null;
-    }
-
-    /*
-     * AAF changes: TDP EPIC US# 307413
-     * @Method - getSubscriberPermission - Forming permission string for subscription part to check
-     * AAF access in CADI Framework
-     * @Params - aafInstance Passing aafInstance as it's used in permission string
-     * @Params - userAction Passing CONST values to set different actions in permission string
-     */
-    String getSubscriberPermission(String aafInstance, String userAction) {
-        try {
-            Properties props = ProvRunner.getProvProperties();
-            String type = props.getProperty(AAF_CADI_SUB_TYPE, AAF_CADI_SUB);
-            String action;
-            switch (userAction) {
-                case SUBSCRIBE_PERMISSION:
-                    action = SUBSCRIBE_PERMISSION;
-                    type = props.getProperty(AAF_CADI_FEED_TYPE, AAF_CADI_FEED);
-                    break;
-                case EDIT_PERMISSION:
-                    action = EDIT_PERMISSION;
-                    break;
-                case DELETE_PERMISSION:
-                    action = DELETE_PERMISSION;
-                    break;
-                case RESTORE_PERMISSION:
-                    action = RESTORE_PERMISSION;
-                    break;
-                case SUSPEND_PERMISSION:
-                    action = SUSPEND_PERMISSION;
-                    break;
-                case PUBLISH_PERMISSION:
-                    action = PUBLISH_PERMISSION;
-                    break;
-                case APPROVE_SUB_PERMISSION:
-                    action = APPROVE_SUB_PERMISSION;
-                    type = props.getProperty(AAF_CADI_FEED_TYPE, AAF_CADI_FEED);
-                    break;
-                default:
-                    action = "*";
-            }
-            if (aafInstance == null || "".equals(aafInstance)) {
-                aafInstance = props.getProperty(AAF_INSTANCE, "org.onap.dmaap-dr.NoInstanceDefined");
-            }
-            return type + "|" + aafInstance + "|" + action;
-        } catch (Exception e) {
-            intlogger.error("PROV7005 BaseServlet.getSubscriberPermission: " + e.getMessage(), e);
-        }
-        return null;
     }
 }

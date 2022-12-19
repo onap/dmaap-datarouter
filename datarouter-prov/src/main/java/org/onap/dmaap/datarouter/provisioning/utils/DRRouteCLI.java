@@ -108,6 +108,7 @@ public class DRRouteCLI {
     private int width = 120;        // screen width (for list)
     private AbstractHttpClient httpclient;
 
+    @SuppressWarnings("deprecation")
     /**
      * Create a DRRouteCLI object connecting to the specified server.
      *
@@ -117,20 +118,18 @@ public class DRRouteCLI {
     public DRRouteCLI(String server) throws Exception {
         this.server = server;
         this.httpclient = new DefaultHttpClient();
-        AafPropsUtils aafPropsUtils = null;
+        ProvTlsManager provTlsManager = null;
 
         Properties provProperties = ProvRunner.getProvProperties();
         try {
-            aafPropsUtils = new AafPropsUtils(new File(provProperties.getProperty(
-                "org.onap.dmaap.datarouter.provserver.aafprops.path",
-                "/opt/app/osaaf/local/org.onap.dmaap-dr.props")));
-        } catch (IOException e) {
-            intlogger.error("NODE0314 Failed to load AAF props. Exiting", e);
+            provTlsManager = new ProvTlsManager(provProperties, false);
+        } catch (Exception e) {
+            intlogger.error("NODE0314 Failed to load TLS config. Exiting", e);
             exit(1);
         }
 
-        String truststoreFile = aafPropsUtils.getTruststorePathProperty();
-        String truststorePw = aafPropsUtils.getTruststorePassProperty();
+        String truststoreFile = provTlsManager.getTrustStoreFile();
+        String truststorePw = provTlsManager.getTrustStorePassword();
 
         KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
         if (truststoreFile == null || truststoreFile.equals("")) {

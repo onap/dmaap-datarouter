@@ -188,10 +188,10 @@ public class SubscribeServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_POST_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated() throws Exception {
-        setAuthoriserToReturnRequestNotAuthorized();
+    public void Given_Request_Is_HTTP_POST_And_Password_Is_Too_Long_Then_Bad_Request_Response_Is_Generated() throws Exception {
         when(request.getPathInfo()).thenReturn("/1");
         JSONObject JSObject = buildRequestJsonObject();
+        JSObject.put("password", "aervaervaervgaervaestbnswtrnsrnsrdtnsrtnsrtnydstyndtrynsrnsrtnsrtnsrtnswtrnswtrn");
         SubscribeServlet subscribeServlet = new SubscribeServlet() {
              public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
@@ -203,115 +203,10 @@ public class SubscribeServletTest extends DrServletTestBase {
                 jo.put("sync", false);
                 return jo;
             }
-            @Override
-            protected boolean doInsert(Insertable bean) {
-                return false;
-            }
+
         };
         subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_POST_And_AAF_Subscriber_Added_To_Legacy_Feed_Then_Forbidden_Response_Is_Generated() throws Exception {
-        when(request.getPathInfo()).thenReturn("/1");
-        JSONObject JSObject = buildRequestJsonObject();
-        SubscribeServlet subscribeServlet = new SubscribeServlet() {
-            public JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                jo.put("name", "stub_name");
-                jo.put("version", "2.0");
-                jo.put("metadataOnly", true);
-                jo.put("suspend", true);
-                jo.put("delivery", JSObject);
-                jo.put("aaf_instance", "*");
-                jo.put("follow_redirect", false);
-                jo.put("sync", false);
-                return jo;
-            }
-            @Override
-            protected boolean doInsert(Insertable bean) {
-                return false;
-            }
-        };
-        subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), contains("AAF Subscriber can not be added to legacy Feed"));
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_POST_And_Legacy_Subscriber_Added_To_AAF_Feed_And_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated() throws Exception {
-        setAuthoriserToReturnRequestNotAuthorized();
-        when(request.getPathInfo()).thenReturn("/2");
-        JSONObject JSObject = buildRequestJsonObject();
-        SubscribeServlet subscribeServlet = new SubscribeServlet() {
-            public JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                jo.put("name", "stub_name");
-                jo.put("version", "2.0");
-                jo.put("metadataOnly", true);
-                jo.put("suspend", true);
-                jo.put("delivery", JSObject);
-                jo.put("aaf_instance", "legacy");
-                jo.put("follow_redirect", false);
-                jo.put("sync", false);
-                return jo;
-            }
-        };
-        subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), contains("Policy Engine disallows access."));
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_POST_And_AAF_Subscriber_Added_To_AAF_Feed_Without_Permissions_Then_Forbidden_Response_Is_Generated() throws Exception {
-        when(request.getPathInfo()).thenReturn("/2");
-        JSONObject JSObject = buildRequestJsonObject();
-        SubscribeServlet subscribeServlet = new SubscribeServlet() {
-            public JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                jo.put("name", "stub_name");
-                jo.put("version", "2.0");
-                jo.put("metadataOnly", true);
-                jo.put("suspend", true);
-                jo.put("delivery", JSObject);
-                jo.put("aaf_instance", "*");
-                jo.put("follow_redirect", false);
-                jo.put("sync", false);
-                return jo;
-            }
-        };
-        subscribeServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), contains("AAF disallows access to permission"));
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_POST_And_AAF_Subscriber_Added_To_AAF_Feed_With_Permissions_Then_OK_Response_Is_Generated() throws Exception {
-        ServletOutputStream outStream = mock(ServletOutputStream.class);
-        when(response.getOutputStream()).thenReturn(outStream);
-        when(request.getPathInfo()).thenReturn("/2");
-        when(request.isUserInRole("org.onap.dmaap-dr.feed|*|approveSub")).thenReturn(true);
-        JSONObject JSObject = buildRequestJsonObject();
-        SubscribeServlet subscribeServlet = new SubscribeServlet() {
-            public JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                jo.put("name", "stub_name");
-                jo.put("version", "2.0");
-                jo.put("metadataOnly", true);
-                jo.put("suspend", true);
-                jo.put("delivery", JSObject);
-                jo.put("aaf_instance", "*");
-                jo.put("follow_redirect", false);
-                jo.put("sync", false);
-                return jo;
-            }
-
-            @Override
-            protected boolean doInsert(Insertable bean) {
-                return true;
-            }
-        };
-        subscribeServlet.doPost(request, response);
-        verify(response).setStatus(eq(HttpServletResponse.SC_CREATED));
-        verifyEnteringExitCalled(listAppender);
+        verify(response).sendError(eq(HttpServletResponse.SC_BAD_REQUEST), anyString());
     }
 
     @Test
@@ -345,7 +240,7 @@ public class SubscribeServletTest extends DrServletTestBase {
 
     @Test
     public void Given_Request_Is_HTTP_POST_And_POST_Fails_Bad_Request_Response_Is_Generated() throws Exception {
-        when(request.getPathInfo()).thenReturn("/2");
+        when(request.getPathInfo()).thenReturn("/1");
         JSONObject JSObject = buildRequestJsonObject();
         SubscribeServlet subscribeServlet = new SubscribeServlet() {
             public JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -355,7 +250,6 @@ public class SubscribeServletTest extends DrServletTestBase {
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
                 jo.put("delivery", JSObject);
-                jo.put("aaf_instance", "legacy");
                 jo.put("follow_redirect", false);
                 jo.put("sync", false);
                 return jo;

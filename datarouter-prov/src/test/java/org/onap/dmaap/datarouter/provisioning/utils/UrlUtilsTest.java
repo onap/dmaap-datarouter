@@ -18,19 +18,22 @@
  * ============LICENSE_END=========================================================
  */
 
-package org.onap.dmaap.datarouter.provisioning;
+package org.onap.dmaap.datarouter.provisioning.utils;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.onap.dmaap.datarouter.provisioning.BaseServlet;
+import org.onap.dmaap.datarouter.provisioning.ProvRunner;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"com.sun.org.apache.xerces.*", "javax.xml.*", "org.xml.*", "org.w3c.*"})
-public class ProvServerTest {
+public class UrlUtilsTest {
 
     @BeforeClass
     public static void init() {
@@ -39,9 +42,21 @@ public class ProvServerTest {
             "src/test/resources/h2Database.properties");
     }
 
-    @Test
-    public void Verify_Prov_Server_Is_Configured_Correctly() throws IllegalAccessException {
+    @Before
+    public void setUp() throws Exception {
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "initialActivePod", "mypod1", true);
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "initialStandbyPod", "mypod2", true);
         FieldUtils.writeDeclaredStaticField(ProvRunner.class, "tlsEnabled", false, true);
-        Assert.assertNotNull(ProvServer.getServerInstance());
     }
+
+    @Test
+    public void Verify_UrlUtils_generatePeerProvURL_Returns_Valid_Http_Url() {
+        Assert.assertEquals(URLUtilities.generatePeerProvURL(), "http://mypod2:8080/internal/prov");
+    }
+
+    @Test
+    public void Verify_UrlUtils_generatePeerLogsURL_Returns_Valid_Http_Url() {
+        Assert.assertEquals(URLUtilities.generatePeerLogsURL(), "http://mypod2:8080/internal/drlogs/");
+    }
+
 }

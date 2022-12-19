@@ -88,7 +88,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         em = emf.createEntityManager();
         System.setProperty(
             "org.onap.dmaap.datarouter.provserver.properties",
-            "src/test/resources/h2DatabaseTlsDisabled.properties");
+            "src/test/resources/h2Database.properties");
     }
 
     @AfterClass
@@ -140,6 +140,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated() throws Exception {
         setAuthoriserToReturnRequestNotAuthorized();
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", true, true);
         subscriptionServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
     }
@@ -153,17 +154,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
         };
         subscriptionServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_INTERNAL_SERVER_ERROR), anyString());
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_DELETE_And_AAF_CADI_Is_Enabled_With_Permissions_Then_A_NO_CONTENT_Response_Is_Generated() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
-        when(request.getPathInfo()).thenReturn("/2");
-        when(request.isUserInRole("org.onap.dmaap-dr.sub|*|delete")).thenReturn(true);
-        subscriptionServlet.doDelete(request, response);
-        verify(response).setStatus(eq(HttpServletResponse.SC_NO_CONTENT));
-        verifyEnteringExitCalled(listAppender);
-        resetAafSubscriptionInDB();
     }
 
     @Test
@@ -244,6 +234,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
     public void Given_Request_Is_HTTP_PUT_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated() throws Exception {
         setAuthoriserToReturnRequestNotAuthorized();
         when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", true, true);
         JSONObject JSObject = buildRequestJsonObject();
         SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
             public JSONObject getJSONfromInput(HttpServletRequest req) {
@@ -253,7 +244,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("metadataOnly", true);
                 jo.put("suspend", true);
                 jo.put("delivery", JSObject);
-                jo.put("aaf_instance", "legacy");
                 jo.put("follow_redirect", false);
                 jo.put("decompress", true);
                 jo.put("sync", true);
@@ -263,60 +253,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
         };
         subscriptionServlet.doPut(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_PUT_And_AAF_CADI_Is_Enabled_Without_Permissions_Then_Forbidden_Response_Is_Generated() throws Exception {
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
-        when(request.getPathInfo()).thenReturn("/3");
-        JSONObject JSObject = buildRequestJsonObject();
-        SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
-            public JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                jo.put("name", "stub_name");
-                jo.put("version", "2.0");
-                jo.put("metadataOnly", true);
-                jo.put("suspend", true);
-                jo.put("delivery", JSObject);
-                jo.put("aaf_instance", "*");
-                jo.put("follow_redirect", false);
-                jo.put("sync", true);
-                jo.put("changeowner", true);
-                return jo;
-            }
-        };
-        subscriptionServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), contains("AAF disallows access"));
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_PUT_And_AAF_CADI_Is_Enabled_With_Permissions_Then_OK_Response_Is_Generated() throws Exception {
-        ServletOutputStream outStream = mock(ServletOutputStream.class);
-        when(response.getOutputStream()).thenReturn(outStream);
-        when(request.getHeader("X-DMAAP-DR-ON-BEHALF-OF-GROUP")).thenReturn("stub_subjectGroup");
-        when(request.getHeader("Content-Type")).thenReturn("application/vnd.dmaap-dr.subscription; version=1.0");
-        when(request.getPathInfo()).thenReturn("/3");
-        when(request.isUserInRole("org.onap.dmaap-dr.sub|*|edit")).thenReturn(true);
-        JSONObject JSObject = buildRequestJsonObject();
-        SubscriptionServlet subscriptionServlet = new SubscriptionServlet() {
-            public JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                jo.put("name", "stub_name");
-                jo.put("version", "2.0");
-                jo.put("metadataOnly", true);
-                jo.put("suspend", true);
-                jo.put("delivery", JSObject);
-                jo.put("aaf_instance", "*");
-                jo.put("follow_redirect", false);
-                jo.put("sync", true);
-                return jo;
-            }
-        };
-        subscriptionServlet.doPut(request, response);
-        verify(response).setStatus(eq(HttpServletResponse.SC_OK));
-        resetAafSubscriptionInDB();
-        addNewSubscriptionInDB();
-        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -363,7 +299,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("privilegedSubscriber", true);
                 jo.put("decompress", true);
                 jo.put("delivery", JSObject);
-                jo.put("aaf_instance", "legacy");
                 jo.put("follow_redirect", false);
                 jo.put("subscriber", "differentSubscriber");
                 jo.put("sync", true);
@@ -388,7 +323,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("suspend", true);
                 jo.put("privilegedSubscriber", true);
                 jo.put("delivery", JSObject);
-                jo.put("aaf_instance", "legacy");
                 jo.put("decompress", true);
                 jo.put("follow_redirect", false);
                 jo.put("sync", true);
@@ -421,7 +355,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("privilegedSubscriber", true);
                 jo.put("decompress", true);
                 jo.put("delivery", JSObject);
-                jo.put("aaf_instance", "legacy");
                 jo.put("follow_redirect", false);
                 jo.put("sync", true);
                 jo.put("changeowner", true);
@@ -430,7 +363,7 @@ public class SubscriptionServletTest extends DrServletTestBase {
         };
         subscriptionServlet.doPut(request, response);
         verify(response).setStatus(eq(HttpServletResponse.SC_OK));
-        changeSubscriptionBackToNormal();
+        //changeSubscriptionBackToNormal();
         verifyEnteringExitCalled(listAppender);
     }
 
@@ -523,7 +456,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
                 jo.put("suspend", true);
                 jo.put("delivery", JSObject);
                 jo.put("privilegedSubscriber", false);
-                jo.put("aaf_instance", "legacy");
                 jo.put("follow_redirect", false);
                 jo.put("decompress", false);
                 jo.put("failed", false);
@@ -616,7 +548,6 @@ public class SubscriptionServletTest extends DrServletTestBase {
         subscription.setGroupid(1);
         subscription.setMetadataOnly(false);
         subscription.setSuspended(false);
-        subscription.setAafInstance("https://aaf-onap-test.osaaf.org:8095");
         subscription.setDecompress(false);
         subscription.setPrivilegedSubscriber(false);
         try (Connection conn = ProvDbUtils.getInstance().getConnection()) {

@@ -72,7 +72,6 @@ public class Subscription extends Syncable {
     private Date lastMod;
     private Date createdDate;
     private boolean privilegedSubscriber;
-    private String aafInstance;
     private boolean decompress;
 
     public Subscription() {
@@ -98,7 +97,6 @@ public class Subscription extends Syncable {
         this.lastMod = new Date();
         this.createdDate = new Date();
         this.privilegedSubscriber = false;
-        this.aafInstance = "";
         this.decompress = false;
     }
 
@@ -121,7 +119,6 @@ public class Subscription extends Syncable {
         this.lastMod = rs.getDate("LAST_MOD");
         this.createdDate = rs.getDate("CREATED_DATE");
         this.privilegedSubscriber = rs.getBoolean("PRIVILEGED_SUBSCRIBER");
-        this.aafInstance = rs.getString("AAF_INSTANCE");
         this.decompress  = rs.getBoolean("DECOMPRESS");
     }
 
@@ -137,10 +134,6 @@ public class Subscription extends Syncable {
             this.subid = jo.optInt(SUBID_KEY, -1);
             this.feedid = jo.optInt(FEEDID_KEY, -1);
             this.groupid = jo.optInt(GROUPID_KEY, -1); //New field is added - Groups feature Rally:US708115 - 1610
-            this.aafInstance = jo.optString("aaf_instance", "legacy");
-            if (!(aafInstance.equalsIgnoreCase("legacy")) && aafInstance.length() > 255) {
-                throw new InvalidObjectException("aaf_instance field is too long");
-            }
             JSONObject jdeli = jo.getJSONObject("delivery");
             String url = jdeli.getString("url");
             String user = jdeli.getString("user");
@@ -334,14 +327,6 @@ public class Subscription extends Syncable {
         sl.setFeed(URLUtilities.generateFeedURL(feedid));
     }
 
-    public String getAafInstance() {
-        return aafInstance;
-    }
-
-    public void setAafInstance(String aafInstance) {
-        this.aafInstance = aafInstance;
-    }
-
     //New getter setters for Groups feature Rally:US708115 - 1610
     public int getGroupid() {
         return groupid;
@@ -439,7 +424,6 @@ public class Subscription extends Syncable {
         jo.put(LAST_MOD_KEY, lastMod.getTime());
         jo.put(CREATED_DATE, createdDate.getTime());
         jo.put("privilegedSubscriber", privilegedSubscriber);
-        jo.put("aaf_instance", aafInstance);
         jo.put("decompress", decompress);
         return jo;
     }
@@ -490,8 +474,8 @@ public class Subscription extends Syncable {
             // Create the SUBSCRIPTIONS row
             String sql = "insert into SUBSCRIPTIONS (SUBID, FEEDID, DELIVERY_URL, DELIVERY_USER, DELIVERY_PASSWORD, "
                 + "DELIVERY_USE100, METADATA_ONLY, SUBSCRIBER, SUSPENDED, GROUPID, "
-                + "PRIVILEGED_SUBSCRIBER, FOLLOW_REDIRECTS, DECOMPRESS, AAF_INSTANCE) "
-                + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "PRIVILEGED_SUBSCRIBER, FOLLOW_REDIRECTS, DECOMPRESS) "
+                + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             ps = conn.prepareStatement(sql, new String[]{SUBID_COL});
             ps.setInt(1, subid);
             ps.setInt(2, feedid);
@@ -506,7 +490,6 @@ public class Subscription extends Syncable {
             ps.setBoolean(11, isPrivilegedSubscriber());
             ps.setInt(12, isFollowRedirect() ? 1 : 0);
             ps.setBoolean(13, isDecompress());
-            ps.setString(14, getAafInstance());
             ps.execute();
             ps.close();
             // Update the row to set the URLs
@@ -628,9 +611,6 @@ public class Subscription extends Syncable {
             return false;
         }
         if (suspended != os.suspended) {
-            return false;
-        }
-        if (!aafInstance.equals(os.aafInstance)) {
             return false;
         }
         return true;

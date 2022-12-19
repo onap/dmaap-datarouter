@@ -42,7 +42,6 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.jetbrains.annotations.NotNull;
-import org.onap.dmaap.datarouter.provisioning.utils.AafPropsUtils;
 
 
 public class ProvServer {
@@ -106,14 +105,16 @@ public class ProvServer {
                 httpsConfiguration.setRequestHeaderSize(8192);
                 // HTTPS connector
                 try (ServerConnector httpsServerConnector = new ServerConnector(server,
-                    new SslConnectionFactory(getSslContextFactory(provProps), HttpVersion.HTTP_1_1.asString()),
+                    new SslConnectionFactory(getSslContextFactory(), HttpVersion.HTTP_1_1.asString()),
                     new HttpConnectionFactory(httpsConfiguration))) {
                     httpsServerConnector.setPort(httpsPort);
                     httpsServerConnector.setIdleTimeout(30000);
                     httpsServerConnector.setAcceptQueueSize(2);
+                    intlogger.info("ProvServer: TLS enabled. Setting up both HTTP/S connectors.");
                     server.setConnectors(new Connector[]{httpServerConnector, httpsServerConnector});
                 }
             } else {
+                intlogger.info("ProvServer: TLS disabled. Setting up HTTP connector only.");
                 server.setConnectors(new Connector[]{httpServerConnector});
             }
             server.setHandler(handlerCollection);
@@ -132,18 +133,9 @@ public class ProvServer {
     }
 
     @NotNull
-    private static SslContextFactory.Server getSslContextFactory(Properties provProps) {
-        SslContextFactory sslContextFactory = new SslContextFactory.Server();
-        sslContextFactory.setKeyStoreType(AafPropsUtils.KEYSTORE_TYPE_PROPERTY);
-        sslContextFactory.setKeyStorePath(ProvRunner.getAafPropsUtils().getKeystorePathProperty());
-        sslContextFactory.setKeyStorePassword(ProvRunner.getAafPropsUtils().getKeystorePassProperty());
-        sslContextFactory.setKeyManagerPassword(ProvRunner.getAafPropsUtils().getKeystorePassProperty());
-
-        sslContextFactory.setTrustStoreType(AafPropsUtils.TRUESTSTORE_TYPE_PROPERTY);
-        sslContextFactory.setTrustStorePath(ProvRunner.getAafPropsUtils().getTruststorePathProperty());
-        sslContextFactory.setTrustStorePassword(ProvRunner.getAafPropsUtils().getTruststorePassProperty());
-
-        sslContextFactory.setExcludeCipherSuites(
+    private static SslContextFactory.Server getSslContextFactory() {
+        SslContextFactory.Server sslContextFactoryServer = ProvRunner.getProvTlsManager().getSslContextFactoryServer();
+        sslContextFactoryServer.setExcludeCipherSuites(
             "SSL_RSA_WITH_DES_CBC_SHA",
             "SSL_DHE_RSA_WITH_DES_CBC_SHA",
             "SSL_DHE_DSS_WITH_DES_CBC_SHA",
@@ -152,17 +144,12 @@ public class ProvServer {
             "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
             "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA"
         );
-        sslContextFactory.addExcludeProtocols("SSLv3");
-        sslContextFactory.setIncludeProtocols(provProps.getProperty(
-            "org.onap.dmaap.datarouter.provserver.https.include.protocols",
-            "TLSv1.1|TLSv1.2").trim().split("\\|"));
-
-        intlogger.info("Unsupported protocols: " + String.join(",", sslContextFactory.getExcludeProtocols()));
-        intlogger.info("Supported protocols: " + String.join(",", sslContextFactory.getIncludeProtocols()));
-        intlogger.info("Unsupported ciphers: " + String.join(",", sslContextFactory.getExcludeCipherSuites()));
-        intlogger.info("Supported ciphers: " + String.join(",", sslContextFactory.getIncludeCipherSuites()));
-
-        return (SslContextFactory.Server) sslContextFactory;
+        sslContextFactoryServer.addExcludeProtocols("SSLv3");
+        intlogger.info("Unsupported protocols: " + String.join(",", sslContextFactoryServer.getExcludeProtocols()));
+        intlogger.info("Supported protocols: " + String.join(",", sslContextFactoryServer.getIncludeProtocols()));
+        intlogger.info("Unsupported ciphers: " + String.join(",", sslContextFactoryServer.getExcludeCipherSuites()));
+        intlogger.info("Supported ciphers: " + String.join(",", sslContextFactoryServer.getIncludeCipherSuites()));
+        return sslContextFactoryServer;
     }
 
     @NotNull

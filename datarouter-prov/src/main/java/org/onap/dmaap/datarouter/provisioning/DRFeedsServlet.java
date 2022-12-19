@@ -28,11 +28,11 @@ import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.send
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.util.List;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 import org.onap.dmaap.datarouter.authz.AuthorizationResponse;
 import org.onap.dmaap.datarouter.provisioning.beans.EventLogRecord;
@@ -288,61 +288,6 @@ public class DRFeedsServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
-
-            /*
-             * START - AAF changes
-             * TDP EPIC US# 307413
-             * CADI code - No legacy user check as all new users will be AAF users
-             */
-            String aafInstance = feed.getAafInstance();
-            if (Boolean.parseBoolean(isCadiEnabled)) {
-                if ((aafInstance == null || "".equals(aafInstance) || ("legacy".equalsIgnoreCase(aafInstance))
-                     && "true".equalsIgnoreCase(req.getHeader(EXCLUDE_AAF_HEADER)))) {
-                    // Check with the Authorizer
-                    AuthorizationResponse aresp = authz.decide(req);
-                    if (!aresp.isAuthorized()) {
-                        message = POLICY_ENGINE;
-                        elr.setMessage(message);
-                        elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                        eventlogger.error(elr.toString());
-                        sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                        return;
-                    }
-                } else {
-                    if ("true".equalsIgnoreCase(req.getHeader(EXCLUDE_AAF_HEADER))) {
-                        message = "DRFeedsServlet.doPost() -Invalid request exclude_AAF should not be true if passing "
-                                          + "AAF_Instance value= " + aafInstance;
-                        elr.setMessage(message);
-                        elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                        eventlogger.error(elr.toString());
-                        sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                        return;
-                    }
-                    String permission = getFeedPermission(aafInstance, BaseServlet.CREATE_PERMISSION);
-                    eventlogger.info("DRFeedsServlet.doPost().. Permission String - " + permission);
-                    if (!req.isUserInRole(permission)) {
-                        message = "AAF disallows access to permission - " + permission;
-                        elr.setMessage(message);
-                        elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                        eventlogger.error(elr.toString());
-                        sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                        return;
-                    }
-                }
-            } else {
-                AuthorizationResponse aresp = authz.decide(req);
-                if (!aresp.isAuthorized()) {
-                    message = POLICY_ENGINE;
-                    elr.setMessage(message);
-                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                    eventlogger.error(elr.toString());
-                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                    return;
-                }
-            }
-            /*
-             * END - AAF changes
-             */
 
             feed.setPublisher(bhdr);    // set from X-DMAAP-DR-ON-BEHALF-OF header
 
