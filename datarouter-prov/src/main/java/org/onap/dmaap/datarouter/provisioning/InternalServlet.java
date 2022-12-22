@@ -162,7 +162,7 @@ public class InternalServlet extends ProxyServlet {
     private static final Object lock = new Object();
     private static Integer logseq = 0; // another piece of info to make log spool file names unique
     //Adding EELF Logger Rally:US664892
-    private static EELFLogger eelfLogger = EELFManager.getInstance()
+    private static final EELFLogger eelfLogger = EELFManager.getInstance()
         .getLogger(InternalServlet.class);
 
     /**

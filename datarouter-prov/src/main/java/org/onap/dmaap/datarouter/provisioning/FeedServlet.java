@@ -28,7 +28,6 @@ import static org.onap.dmaap.datarouter.provisioning.utils.HttpServletUtils.send
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -108,37 +107,6 @@ public class FeedServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
                 return;
             }
-            /*
-             * START - AAF changes
-             * TDP EPIC US# 307413
-             * CADI code - check on permissions based on Legacy/AAF users to allow to delete/remove feed
-             */
-            String aafInstance = feed.getAafInstance();
-            if (aafInstance == null || "".equals(aafInstance) || "legacy".equalsIgnoreCase(aafInstance)) {
-                AuthorizationResponse aresp = authz.decide(req);
-                if (! aresp.isAuthorized()) {
-                    message = POLICY_ENGINE;
-                    elr.setMessage(message);
-                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                    eventlogger.error(elr.toString());
-                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                    return;
-                }
-            } else {
-                String permission = getFeedPermission(aafInstance, BaseServlet.DELETE_PERMISSION);
-                eventlogger.info("FeedServlet.doDelete().. Permission String - " + permission);
-                if (!req.isUserInRole(permission)) {
-                    message = "AAF disallows access to permission - " + permission;
-                    elr.setMessage(message);
-                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                    eventlogger.error(elr.toString());
-                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                    return;
-                }
-            }
-            /*
-             * END - AAF changes
-             */
             // Delete FEED table entry (set DELETED flag)
             feed.setDeleted(true);
             if (doUpdate(feed)) {
@@ -351,39 +319,6 @@ public class FeedServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
-
-            /*
-             * START - AAF changes
-             * TDP EPIC US# 307413
-             * CADI code - check on permissions based on Legacy/AAF users to allow feed edit/update/modify
-             */
-            String aafInstance = feed.getAafInstance();
-            if (aafInstance == null || "".equals(aafInstance) || "legacy".equalsIgnoreCase(aafInstance)) {
-                // Check with the Authorizer
-                AuthorizationResponse aresp = authz.decide(req);
-                if (!aresp.isAuthorized()) {
-                    message = POLICY_ENGINE;
-                    elr.setMessage(message);
-                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                    eventlogger.error(elr.toString());
-                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                    return;
-                }
-            } else {
-                String permission = getFeedPermission(aafInstance, BaseServlet.EDIT_PERMISSION);
-                eventlogger.info("FeedServlet.doPut().. Permission String - " + permission);
-                if (!req.isUserInRole(permission)) {
-                    message = "AAF disallows access to permission - " + permission;
-                    elr.setMessage(message);
-                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                    eventlogger.error(elr.toString());
-                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                    return;
-                }
-            }
-            /*
-             * END - AAF changes
-             */
 
             // Update FEEDS table entries
             if (doUpdate(feed)) {

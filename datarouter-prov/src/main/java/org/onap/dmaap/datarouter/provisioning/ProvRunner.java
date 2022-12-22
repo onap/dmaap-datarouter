@@ -29,16 +29,15 @@ import static java.lang.System.getProperty;
 
 import com.att.eelf.configuration.EELFLogger;
 import com.att.eelf.configuration.EELFManager;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Timer;
 import org.eclipse.jetty.server.Server;
-import org.onap.dmaap.datarouter.provisioning.utils.AafPropsUtils;
 import org.onap.dmaap.datarouter.provisioning.utils.LogfileLoader;
 import org.onap.dmaap.datarouter.provisioning.utils.Poker;
 import org.onap.dmaap.datarouter.provisioning.utils.ProvDbUtils;
+import org.onap.dmaap.datarouter.provisioning.utils.ProvTlsManager;
 import org.onap.dmaap.datarouter.provisioning.utils.PurgeLogDirTask;
 import org.onap.dmaap.datarouter.provisioning.utils.SynchronizerTask;
 
@@ -76,7 +75,7 @@ public class ProvRunner {
     public static final EELFLogger intlogger = EELFManager.getInstance().getLogger("org.onap.dmaap.datarouter.provisioning.internal");
 
     private static Server provServer;
-    private static AafPropsUtils aafPropsUtils;
+    private static ProvTlsManager provTlsManager;
     private static Properties provProperties;
     private static Boolean tlsEnabled;
 
@@ -92,13 +91,11 @@ public class ProvRunner {
             exit(1);
         }
         if (Boolean.TRUE.equals(getTlsEnabled())) {
-            // Set up AAF properties
+            // Set up TLS Manager
             try {
-                aafPropsUtils = new AafPropsUtils(new File(getProvProperties().getProperty(
-                    "org.onap.dmaap.datarouter.provserver.aafprops.path",
-                    "/opt/app/osaaf/local/org.onap.dmaap-dr.props")));
-            } catch (IOException e) {
-                intlogger.error("NODE0314 Failed to load AAF props. Exiting", e);
+                provTlsManager = new ProvTlsManager(ProvRunner.getProvProperties(), true);
+            } catch (Exception e) {
+                intlogger.error("NODE0314 Failed to load TLS config. Exiting", e);
                 exit(1);
             }
         }
@@ -153,15 +150,15 @@ public class ProvRunner {
         return provProperties;
     }
 
-    public static AafPropsUtils getAafPropsUtils() {
-        return aafPropsUtils;
-    }
-
     public static Boolean getTlsEnabled() {
         if (tlsEnabled == null) {
             tlsEnabled = Boolean.parseBoolean(getProvProperties()
                 .getProperty("org.onap.dmaap.datarouter.provserver.tlsenabled", "true"));
         }
         return tlsEnabled;
+    }
+
+    public static ProvTlsManager getProvTlsManager() {
+        return provTlsManager;
     }
 }

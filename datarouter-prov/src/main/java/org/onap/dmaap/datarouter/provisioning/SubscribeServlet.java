@@ -263,66 +263,6 @@ public class SubscribeServlet extends ProxyServlet {
             }
             sub.setFeedid(feedid);
             sub.setSubscriber(bhdr);    // set from X-DMAAP-DR-ON-BEHALF-OF header
-            /*
-             * START - AAF changes
-             * TDP EPIC US# 307413
-             * CADI code - check on permissions based on Legacy/AAF users to allow to create/add subscription
-             */
-            String feedAafInstance = feed.getAafInstance();
-            String subAafInstance = sub.getAafInstance();
-            boolean subAafLegacyEmptyOrNull = (subAafInstance == null
-                                         || "".equals(subAafInstance) || "legacy".equalsIgnoreCase(subAafInstance));
-
-            // This extra check added to verify AAF feed with AAF subscriber having empty aaf instance check
-            if (feedAafInstance == null || "".equals(feedAafInstance) || "legacy".equalsIgnoreCase(feedAafInstance)) {
-                if (subAafLegacyEmptyOrNull) {
-                    AuthorizationResponse aresp = authz.decide(req);
-                    if (!aresp.isAuthorized()) {
-                        message = POLICY_ENGINE;
-                        elr.setMessage(message);
-                        elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                        eventlogger.error(elr.toString());
-                        sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                        return;
-                    }
-                } else {
-                    //If Legacy Feed and AAF instance provided in Subscriber JSON
-                    message = "AAF Subscriber can not be added to legacy Feed- " + feedid;
-                    elr.setMessage(message);
-                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                    eventlogger.error(elr.toString());
-                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                    return;
-                }
-            } else {
-                //New AAF Requirement to add legacy subscriber to AAF Feed
-                if (subAafLegacyEmptyOrNull) {
-                    AuthorizationResponse aresp = authz.decide(req);
-                    if (!aresp.isAuthorized()) {
-                        message = POLICY_ENGINE;
-                        elr.setMessage(message);
-                        elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                        eventlogger.error(elr.toString());
-                        sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                        return;
-                    }
-                } else {
-                    //New AAF Requirement to add subscriber by publisher on publisher approval only
-                    String permission = getSubscriberPermission(subAafInstance, BaseServlet.APPROVE_SUB_PERMISSION);
-                    eventlogger.info("SubscribeServlet.doPost().. Permission String - " + permission);
-                    if (!req.isUserInRole(permission)) {
-                        message = "AAF disallows access to permission - " + permission;
-                        elr.setMessage(message);
-                        elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                        eventlogger.error(elr.toString());
-                        sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                        return;
-                    }
-                }
-            }
-            /*
-             * END - AAF changes
-             */
             // Check if this subscription already exists; not an error (yet), just warn
             Subscription sub2 = Subscription.getSubscriptionMatching(sub);
             if (sub2 != null) {

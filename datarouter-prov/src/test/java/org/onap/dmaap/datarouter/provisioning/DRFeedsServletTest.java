@@ -220,114 +220,6 @@ public class DRFeedsServletTest extends DrServletTestBase {
     }
 
     @Test
-    public void Given_Request_Is_HTTP_POST_And_CadiEnabled_Is_True_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated()
-        throws Exception {
-        setAuthoriserToReturnRequestNotAuthorized();
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isCadiEnabled", "true", true);
-        when(request.getHeader(DRFeedsServlet.EXCLUDE_AAF_HEADER)).thenReturn("true");
-        JSONObject JSObject = buildRequestJsonObject();
-        DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
-            public JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                jo.put("name", "not_stub_name");
-                jo.put("version", "1.0");
-                jo.put("authorization", JSObject);
-                jo.put("aaf_instance", "legacy");
-                return jo;
-            }
-        };
-        drfeedsServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_POST_And_CadiEnabled_Is_False_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated()
-            throws Exception {
-        setAuthoriserToReturnRequestNotAuthorized();
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isCadiEnabled", "false", true);
-        when(request.getHeader(DRFeedsServlet.EXCLUDE_AAF_HEADER)).thenReturn("true");
-        JSONObject JSObject = buildRequestJsonObject();
-        DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
-            public JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                jo.put("name", "not_stub_name");
-                jo.put("version", "1.0");
-                jo.put("authorization", JSObject);
-                jo.put("aaf_instance", "legacy");
-                return jo;
-            }
-        };
-        drfeedsServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_POST_And_AAF_DRFeed_And_Exclude_AAF_Is_True_Then_Forbidden_Response_Is_Generated() throws Exception {
-        when(request.getHeader(DRFeedsServlet.EXCLUDE_AAF_HEADER)).thenReturn("true");
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isCadiEnabled", "true", true);
-        JSONObject JSObject = buildRequestJsonObject();
-        DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
-            public JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                jo.put("name", "not_stub_name");
-                jo.put("version", "1.0");
-                jo.put("authorization", JSObject);
-                jo.put("aaf_instance", "https://aaf-onap-test.osaaf.org:8095");
-                return jo;
-            }
-        };
-        drfeedsServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), contains("Invalid request exclude_AAF"));
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_POST_And_AAF_DRFeed_And_Exclude_AAF_Is_False_Without_Permissions_Then_Forbidden_Response_Is_Generated() throws Exception {
-        when(request.getHeader(DRFeedsServlet.EXCLUDE_AAF_HEADER)).thenReturn("false");
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isCadiEnabled", "true", true);
-        JSONObject JSObject = buildRequestJsonObject();
-        DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
-            public JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                jo.put("name", "not_stub_name");
-                jo.put("version", "1.0");
-                jo.put("authorization", JSObject);
-                jo.put("aaf_instance", "*");
-                return jo;
-            }
-        };
-        drfeedsServlet.doPost(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), contains("AAF disallows access to permission"));
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_POST_And_AAF_DRFeed_And_Exclude_AAF_Is_False_With_Permissions_Then_Created_OK_Response_Is_Generated() throws Exception {
-        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "isCadiEnabled", "true", true);
-        ServletOutputStream outStream = mock(ServletOutputStream.class);
-        when(response.getOutputStream()).thenReturn(outStream);
-        when(request.getHeader(DRFeedsServlet.EXCLUDE_AAF_HEADER)).thenReturn("false");
-        JSONObject JSObject = buildRequestJsonObject();
-        when(request.isUserInRole("org.onap.dmaap-dr.feed|*|create")).thenReturn(true);
-        DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
-            public JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                jo.put("name", "not_stub_name");
-                jo.put("version", "1.0");
-                jo.put("authorization", JSObject);
-                jo.put("aaf_instance", "*");
-                return jo;
-            }
-
-            @Override
-            protected boolean doInsert(Insertable bean) {
-                return true;
-            }
-        };
-        drfeedsServlet.doPost(request, response);
-        verify(response).setStatus(eq(HttpServletResponse.SC_CREATED));
-        verifyEnteringExitCalled(listAppender);
-    }
-
-    @Test
     public void Given_Request_Is_HTTP_POST_And_Request_Contains_Badly_Formed_JSON_Then_Bad_Request_Response_Is_Generated()
         throws Exception {
         drfeedsServlet.doPost(request, response);
@@ -363,18 +255,15 @@ public class DRFeedsServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_POST_And_Feed_Already_Exists_Bad_Request_Response_Is_Generated()
         throws Exception {
-        when(request.getParameter("name")).thenReturn("AafFeed");
+        when(request.getParameter("name")).thenReturn("Feed1");
         when(request.getParameter("version")).thenReturn("v0.1");
-        when(request.getHeader(DRFeedsServlet.EXCLUDE_AAF_HEADER)).thenReturn("false");
-        when(request.isUserInRole("org.onap.dmaap-dr.feed|*|create")).thenReturn(true);
         JSONObject JSObject = buildRequestJsonObject();
         DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
             public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
-                jo.put("name", "AafFeed");
+                jo.put("name", "Feed1");
                 jo.put("version", "v0.1");
                 jo.put("authorization", JSObject);
-                jo.put("aaf_instance", "*");
                 return jo;
             }
         };
@@ -385,14 +274,12 @@ public class DRFeedsServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_POST_And_POST_Fails_Bad_Request_Response_Is_Generated() throws Exception {
         JSONObject JSObject = buildRequestJsonObject();
-        when(request.getHeader(DRFeedsServlet.EXCLUDE_AAF_HEADER)).thenReturn("true");
         DRFeedsServlet drfeedsServlet = new DRFeedsServlet() {
             public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
                 jo.put("name", "stub_name");
                 jo.put("version", "2.0");
                 jo.put("authorization", JSObject);
-                jo.put("aaf_instance", "legacy");
                 return jo;
             }
 

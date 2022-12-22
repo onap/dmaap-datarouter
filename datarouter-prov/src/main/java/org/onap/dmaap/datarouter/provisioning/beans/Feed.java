@@ -77,7 +77,6 @@ public class Feed extends Syncable {
     private boolean suspended;
     private Date lastMod;
     private Date createdDate;
-    private String aafInstance;
 
     public Feed() {
         this("", "", "", "");
@@ -104,7 +103,6 @@ public class Feed extends Syncable {
         this.suspended = false;
         this.lastMod = new Date();
         this.createdDate = new Date();
-        this.aafInstance = "";
     }
 
     /**
@@ -133,7 +131,6 @@ public class Feed extends Syncable {
         this.suspended = rs.getBoolean("SUSPENDED");
         this.lastMod = rs.getDate("LAST_MOD");
         this.createdDate = rs.getTimestamp("CREATED_DATE");
-        this.aafInstance = rs.getString("AAF_INSTANCE");
     }
 
     /**
@@ -148,10 +145,6 @@ public class Feed extends Syncable {
             this.feedid = jo.optInt(FEED_ID, -1);
             this.groupid = jo.optInt("groupid");
             this.name = jo.getString("name");
-            this.aafInstance = jo.optString("aaf_instance", "legacy");
-            if (!("legacy".equalsIgnoreCase(aafInstance)) && aafInstance.length() > 255) {
-                throw new InvalidObjectException("aaf_instance field is too long");
-            }
             if (name.length() > 255) {
                 throw new InvalidObjectException("name field is too long");
             }
@@ -440,10 +433,6 @@ public class Feed extends Syncable {
         fl.setLog(URLUtilities.generateFeedLogURL(feedid));
     }
 
-    public String getAafInstance() {
-        return aafInstance;
-    }
-
     //new getter setters for groups- Rally:US708115 - 1610
     public int getGroupid() {
         return groupid;
@@ -553,7 +542,6 @@ public class Feed extends Syncable {
         jo.put("suspend", suspended);
         jo.put(LAST_MOD, lastMod.getTime());
         jo.put(CREATED_DATE, createdDate.getTime());
-        jo.put("aaf_instance", aafInstance);
         return jo;
     }
 
@@ -634,8 +622,8 @@ public class Feed extends Syncable {
             try (PreparedStatement ps = conn.prepareStatement(
                 "insert into FEEDS (FEEDID, NAME, VERSION, DESCRIPTION, AUTH_CLASS, PUBLISHER, SELF_LINK, "
                     + "PUBLISH_LINK, SUBSCRIBE_LINK, LOG_LINK, DELETED, SUSPENDED,"
-                    + "BUSINESS_DESCRIPTION, GROUPID, AAF_INSTANCE) "
-                    + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                    + "BUSINESS_DESCRIPTION, GROUPID) "
+                    + "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
                 ps.setInt(1, feedid);
                 ps.setString(2, getName());
                 ps.setString(3, getVersion());
@@ -650,7 +638,6 @@ public class Feed extends Syncable {
                 ps.setBoolean(12, isSuspended());
                 ps.setString(13, getBusinessDescription());
                 ps.setInt(14, groupid);
-                ps.setString(15, getAafInstance());
                 ps.executeUpdate();
             }
         } catch (SQLException e) {
@@ -797,9 +784,6 @@ public class Feed extends Syncable {
             return false;
         }
         if (suspended != of.suspended) {
-            return false;
-        }
-        if (!aafInstance.equals(of.aafInstance)) {
             return false;
         }
         return true;

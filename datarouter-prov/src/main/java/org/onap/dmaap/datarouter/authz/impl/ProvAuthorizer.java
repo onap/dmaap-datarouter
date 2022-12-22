@@ -106,7 +106,6 @@ public class ProvAuthorizer implements Authorizer {
                     decision = allowSubAccess(resource, method, subject, subjectgroup);
                     break;
                 default:
-                    decision = false;
                     break;
             }
         }

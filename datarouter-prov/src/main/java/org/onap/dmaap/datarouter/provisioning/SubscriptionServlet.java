@@ -111,37 +111,6 @@ public class SubscriptionServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_NOT_FOUND, message, eventlogger);
                 return;
             }
-            /*
-             * START - AAF changes
-             * TDP EPIC US# 307413
-             * CADI code - check on permissions based on Legacy/AAF users to allow to delete/remove subscription
-             */
-            String aafInstance = sub.getAafInstance();
-            if (aafInstance == null || "".equals(aafInstance) || "legacy".equalsIgnoreCase(aafInstance)) {
-                AuthorizationResponse aresp = authz.decide(req);
-                if (!aresp.isAuthorized()) {
-                    message = POLICY_ENGINE;
-                    elr.setMessage(message);
-                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                    eventlogger.error(elr.toString());
-                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                    return;
-                }
-            } else {
-                String permission = getSubscriberPermission(aafInstance, BaseServlet.DELETE_PERMISSION);
-                eventlogger.info("SubscriptionServlet.doDelete().. Permission String - " + permission);
-                if (!req.isUserInRole(permission)) {
-                    message = "AAF disallows access to permission - " + permission;
-                    elr.setMessage(message);
-                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                    eventlogger.error(elr.toString());
-                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                    return;
-                }
-            }
-            /*
-             * END - AAF changes
-             */
             // Delete Subscription
             if (doDelete(sub)) {
                 activeSubs--;
@@ -321,38 +290,6 @@ public class SubscriptionServlet extends ProxyServlet {
                 sendResponseError(resp, HttpServletResponse.SC_BAD_REQUEST, message, eventlogger);
                 return;
             }
-
-            /*
-             * START - AAF changes
-             * TDP EPIC US# 307413
-             * CADI code - check on permissions based on Legacy/AAF users to allow to delete/remove subscription
-             */
-            String aafInstance = sub.getAafInstance();
-            if (aafInstance == null || "".equals(aafInstance) || "legacy".equalsIgnoreCase(aafInstance)) {
-                AuthorizationResponse aresp = authz.decide(req);
-                if (!aresp.isAuthorized()) {
-                    message = POLICY_ENGINE;
-                    elr.setMessage(message);
-                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                    eventlogger.error(elr.toString());
-                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                    return;
-                }
-            } else {
-                String permission = getSubscriberPermission(aafInstance, BaseServlet.EDIT_PERMISSION);
-                eventlogger.info("SubscriptionServlet.doDelete().. Permission String - " + permission);
-                if (!req.isUserInRole(permission)) {
-                    message = "AAF disallows access to permission - " + permission;
-                    elr.setMessage(message);
-                    elr.setResult(HttpServletResponse.SC_FORBIDDEN);
-                    eventlogger.error(elr.toString());
-                    sendResponseError(resp, HttpServletResponse.SC_FORBIDDEN, message, eventlogger);
-                    return;
-                }
-            }
-            /*
-             * END - AAF changes
-             */
             sub.setSubid(oldsub.getSubid());
             sub.setFeedid(oldsub.getFeedid());
             sub.setSubscriber(bhdr);    // set from X-DMAAP-DR-ON-BEHALF-OF header

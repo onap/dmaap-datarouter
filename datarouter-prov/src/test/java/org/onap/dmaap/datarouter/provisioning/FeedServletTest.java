@@ -34,6 +34,8 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -41,8 +43,6 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -138,24 +138,9 @@ public class FeedServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_DELETE_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated() throws Exception {
         setAuthoriserToReturnRequestNotAuthorized();
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", true, true);
         feedServlet.doDelete(request, response);
         verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), anyString());
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_DELETE_And_AAF_Feed_Without_Permissions_Then_Forbidden_Response_Is_Generated() throws Exception {
-        when(request.getPathInfo()).thenReturn("/2");
-        feedServlet.doDelete(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), contains("AAF disallows access to permission"));
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_DELETE_And_AAF_Feed_With_Permissions_Then_A_NO_CONTENT_Response_Is_Generated() {
-        when(request.getPathInfo()).thenReturn("/3");
-        when(request.isUserInRole("org.onap.dmaap-dr.feed|*|delete")).thenReturn(true);
-        feedServlet.doDelete(request, response);
-        verify(response).setStatus(eq(HttpServletResponse.SC_NO_CONTENT));
-        verifyEnteringExitCalled(listAppender);
     }
 
     @Test
@@ -343,7 +328,7 @@ public class FeedServletTest extends DrServletTestBase {
         FeedServlet feedServlet = new FeedServlet() {
             public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
-                jo.put("name", "AafFeed");
+                jo.put("name", "Feed22");
                 jo.put("version", "v0.2");
                 jo.put("authorization", JSObject);
                 return jo;
@@ -356,64 +341,20 @@ public class FeedServletTest extends DrServletTestBase {
     @Test
     public void Given_Request_Is_HTTP_PUT_And_Request_Is_Not_Authorized_Then_Forbidden_Response_Is_Generated() throws Exception {
         setAuthoriserToReturnRequestNotAuthorized();
+        FieldUtils.writeDeclaredStaticField(BaseServlet.class, "requireCert", true, true);
         when(request.getPathInfo()).thenReturn("/2");
         JSONObject JSObject = buildRequestJsonObject();
         FeedServlet feedServlet = new FeedServlet() {
             public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
-                jo.put("name", "AafFeed");
+                jo.put("name", "Feed22");
                 jo.put("version", "v0.1");
                 jo.put("authorization", JSObject);
                 return jo;
             }
         };
         feedServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), contains("Policy Engine disallows access"));
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_PUT_And_AAF_Feed_Without_Permissions_Then_Forbidden_Response_Is_Generated() throws Exception {
-        when(request.getPathInfo()).thenReturn("/2");
-        JSONObject JSObject = buildRequestJsonObject();
-        FeedServlet feedServlet = new FeedServlet() {
-            public JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                jo.put("name", "AafFeed");
-                jo.put("version", "v0.1");
-                jo.put("authorization", JSObject);
-                jo.put("aaf_instance", "https://aaf-onap-test.osaaf.org:8095");
-                return jo;
-            }
-        };
-        feedServlet.doPut(request, response);
-        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), contains("AAF disallows access to permission"));
-    }
-
-    @Test
-    public void Given_Request_Is_HTTP_PUT_And_AAF_Feed_With_Permissions_Then_STATUS_OK__Response_Is_Generated() throws Exception {
-        ServletOutputStream outStream = mock(ServletOutputStream.class);
-        when(response.getOutputStream()).thenReturn(outStream);
-        when(request.getPathInfo()).thenReturn("/2");
-        when(request.isUserInRole("org.onap.dmaap-dr.feed|*|edit")).thenReturn(true);
-        JSONObject JSObject = buildRequestJsonObject();
-        FeedServlet feedServlet = new FeedServlet() {
-            public JSONObject getJSONfromInput(HttpServletRequest req) {
-                JSONObject jo = new JSONObject();
-                jo.put("name", "AafFeed");
-                jo.put("version", "v0.1");
-                jo.put("authorization", JSObject);
-                jo.put("aaf_instance", "*");
-                return jo;
-            }
-            @Override
-            protected boolean doUpdate(Updateable bean) {
-                return true;
-            }
-
-        };
-        feedServlet.doPut(request, response);
-        verify(response).setStatus(eq(HttpServletResponse.SC_OK));
-        verifyEnteringExitCalled(listAppender);
+        verify(response).sendError(eq(HttpServletResponse.SC_FORBIDDEN), contains("Client certificate is missing."));
     }
 
     @Test
@@ -425,7 +366,7 @@ public class FeedServletTest extends DrServletTestBase {
         FeedServlet feedServlet = new FeedServlet() {
             public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
-                jo.put("name", "AafFeed");
+                jo.put("name", "Feed22");
                 jo.put("version", "v0.1");
                 jo.put("authorization", JSObject);
                 return jo;
@@ -449,7 +390,7 @@ public class FeedServletTest extends DrServletTestBase {
         FeedServlet feedServlet = new FeedServlet() {
             public JSONObject getJSONfromInput(HttpServletRequest req) {
                 JSONObject jo = new JSONObject();
-                jo.put("name", "AafFeed");
+                jo.put("name", "Feed22");
                 jo.put("version", "v0.1");
                 jo.put("authorization", JSObject);
                 return jo;

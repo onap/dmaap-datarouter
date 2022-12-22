@@ -30,14 +30,9 @@ import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
 import java.util.Collections;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
@@ -53,7 +48,6 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.BasicHttpEntity;
 import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.onap.dmaap.datarouter.provisioning.utils.AafPropsUtils;
 import org.onap.dmaap.datarouter.provisioning.utils.SynchronizerTask;
 import org.onap.dmaap.datarouter.provisioning.utils.URLUtilities;
 
@@ -81,20 +75,7 @@ public class ProxyServlet extends BaseServlet {
         super.init(config);
         try {
             if (Boolean.TRUE.equals(ProvRunner.getTlsEnabled())) {
-                // Set up keystore
-                String type = AafPropsUtils.KEYSTORE_TYPE_PROPERTY;
-                String store = ProvRunner.getAafPropsUtils().getKeystorePathProperty();
-                String pass = ProvRunner.getAafPropsUtils().getKeystorePassProperty();
-                KeyStore keyStore = readStore(store, pass, type);
-                // Set up truststore
-                store = ProvRunner.getAafPropsUtils().getTruststorePathProperty();
-                pass = ProvRunner.getAafPropsUtils().getTruststorePassProperty();
-                KeyStore trustStore = readStore(store, pass, AafPropsUtils.TRUESTSTORE_TYPE_PROPERTY);
-
-                // We are connecting with the node name, but the certificate will have the CNAME
-                // So we need to accept a non-matching certificate name
-                SSLSocketFactory socketFactory = new SSLSocketFactory(keyStore,
-                    ProvRunner.getAafPropsUtils().getKeystorePassProperty(), trustStore);
+                SSLSocketFactory socketFactory = ProvRunner.getProvTlsManager().getSslSocketFactory();
                 socketFactory.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
                 sch = new Scheme("https", 443, socketFactory);
             } else {
@@ -106,18 +87,6 @@ public class ProxyServlet extends BaseServlet {
             intlogger.error("ProxyServlet.init: " + e.getMessage(), e);
         }
         intlogger.info("ProxyServlet: inited = " + inited);
-    }
-
-    private KeyStore readStore(String store, String pass, String type) throws KeyStoreException {
-        KeyStore ks = KeyStore.getInstance(type);
-        try (FileInputStream instream = new FileInputStream(new File(store))) {
-            ks.load(instream, pass.toCharArray());
-        } catch (FileNotFoundException fileNotFoundException) {
-            intlogger.error("ProxyServlet.readStore: " + fileNotFoundException.getMessage(), fileNotFoundException);
-        } catch (Exception x) {
-            intlogger.error("READING TRUSTSTORE: " + x);
-        }
-        return ks;
     }
 
     /**

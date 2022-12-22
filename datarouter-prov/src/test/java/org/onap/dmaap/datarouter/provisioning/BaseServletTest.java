@@ -257,24 +257,4 @@ public class BaseServletTest extends DrServletTestBase {
         assertNotEquals(hashed_sub_pass.getJSONObject("delivery").get("password").toString(), "PASSWORD");
 
     }
-
-    @Test
-    public void Given_BaseServlet_Verify_Cadi_Feed_Permission() {
-        assertEquals("org.onap.dmaap-dr.feed|legacy|publish", baseServlet.getFeedPermission("legacy", "publish"));
-        assertEquals("org.onap.dmaap-dr.feed|legacy|suspend", baseServlet.getFeedPermission("legacy", "suspend"));
-        assertEquals("org.onap.dmaap-dr.feed|legacy|restore", baseServlet.getFeedPermission("legacy", "restore"));
-        assertEquals("org.onap.dmaap-dr.feed|org.onap.dmaap-dr.NoInstanceDefined|restore", baseServlet.getFeedPermission(null, "restore"));
-        assertEquals("org.onap.dmaap-dr.feed|legacy|*", baseServlet.getFeedPermission("legacy", "default"));
-    }
-
-    @Test
-    public void Given_BaseServlet_Verify_Cadi_Sub_Permission() {
-        assertEquals("org.onap.dmaap-dr.feed|legacy|subscribe", baseServlet.getSubscriberPermission("legacy", "subscribe"));
-        assertEquals("org.onap.dmaap-dr.sub|legacy|suspend", baseServlet.getSubscriberPermission("legacy", "suspend"));
-        assertEquals("org.onap.dmaap-dr.sub|legacy|restore", baseServlet.getSubscriberPermission("legacy", "restore"));
-        assertEquals("org.onap.dmaap-dr.sub|legacy|publish", baseServlet.getSubscriberPermission("legacy", "publish"));
-        assertEquals("org.onap.dmaap-dr.sub|org.onap.dmaap-dr.NoInstanceDefined|restore", baseServlet.getSubscriberPermission(null, "restore"));
-        assertEquals("org.onap.dmaap-dr.sub|legacy|*", baseServlet.getSubscriberPermission("legacy", "default"));
-    }
-
 }
