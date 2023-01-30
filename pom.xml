@@ -36,7 +36,7 @@
     </parent>
     <properties>
         <!--revision must also be set in the version.properties file at project root-->
-        <revision>2.1.12-SNAPSHOT</revision>
+        <revision>2.1.13-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
