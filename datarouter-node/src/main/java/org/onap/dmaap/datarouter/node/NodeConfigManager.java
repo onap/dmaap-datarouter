@@ -142,7 +142,7 @@ public class NodeConfigManager implements DeliveryQueueHelper {
                 }
                 eelfLogger.debug("NODE0304 My certificate says my name is {}", myname);
             } catch (Exception e) {
-                eelfLogger.error("NODE0314 Failed to load AAF props. Exiting", e);
+                eelfLogger.error("NODE0314 Failed to set up TLS config. Exiting", e);
                 exit(1);
             }
         }
