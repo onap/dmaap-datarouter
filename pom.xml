@@ -4,6 +4,7 @@
   * ===========================================================================
   * Copyright © 2017 AT&T Intellectual Property. All rights reserved.
   * Modifications Copyright (C) 2018 Nokia. All rights reserved.
+  * Copyright (d) 2023 J. F. Lucas.  All rights reserved.
   * ===========================================================================
   * Licensed under the Apache License, Version 2.0 (the "License");
   * you may not use this file except in compliance with the License.
@@ -17,10 +18,7 @@
   * See the License for the specific language governing permissions and
   * limitations under the License.
   * ============LICENSE_END====================================================
-  *
-  * ECOMP is a trademark and service mark of AT&T Intellectual Property.
-  *
--->
+  -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.onap.dmaap.datarouter</groupId>
@@ -86,6 +84,7 @@
     </properties>
     <modules>
         <module>datarouter-prov</module>
+        <module>datarouter-prov-client</module>
         <module>datarouter-node</module>
         <module>datarouter-subscriber</module>
         <module>datarouter-docker-compose</module>
@@ -442,6 +441,7 @@
                     <groupId>io.fabric8</groupId>
                     <artifactId>docker-maven-plugin</artifactId>
                     <version>${io.fabric8.version}</version>
+                    <extensions>true</extensions>
                     <configuration>
                         <skipBuild>${docker.skip.build}</skipBuild>
                         <verbose>${docker.verbose}</verbose>
