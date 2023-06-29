@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<!--
+  ============LICENSE_START==========================================
+   Copyright (c) J. F. Lucas. All rights reserved.
+  ===================================================================
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  ============LICENSE_END============================================
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>datarouter-prov-client</artifactId>
+  <name>datarouter-prov-client</name>
+  <parent>
+    <groupId>org.onap.dmaap.datarouter</groupId>
+    <artifactId>parent</artifactId>
+    <version>${revision}</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <description>Init container for provisioning Data Router feeds, publishers, and subscribers.</description>
+  <properties>
+    <docker.location>${basedir}/target/${project.artifactId}</docker.location>
+    <dmaapdrprovclient.image.name>${docker.image.root}${project.artifactId}</dmaapdrprovclient.image.name>
+    <sitePath>/content/sites/site/org/onap/dmaap/drprov-client/${project.version}</sitePath>
+  </properties>
+  <build>
+    <finalName>datarouter-prov-client</finalName>
+    <!-- Copy files to docker-stage to be included in image -->
+    <resources>
+      <resource>
+        <targetPath>${basedir}/target/docker-stage</targetPath>
+        <directory>${basedir}/src/main/resources</directory>
+        <includes>
+          <include>Dockerfile</include>
+        </includes>
+      </resource>
+      <resource>
+        <targetPath>${basedir}/target/docker-stage/opt/app/drprov-client/bin</targetPath>
+        <directory>${basedir}/misc</directory>
+        <includes>
+          <include>drprov-client.sh</include>
+        </includes>
+      </resource>
+    </resources>
+  </build>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <properties>
+        <skipDockerBuild>${skip.docker.build}</skipDockerBuild>
+        <skipTests>true</skipTests>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.gmaven</groupId>
+            <artifactId>gmaven-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <extensions>true</extensions>
+            <configuration>
+              <images>
+                <image>
+                  <name>${dmaapdrprovclient.image.name}</name>
+                  <build>
+                    <cleanup>try</cleanup>
+                    <noCache>true</noCache>
+                    <optimise>true</optimise>
+                    <contextDir>${basedir}/target/docker-stage</contextDir>
+                    <dockerFile>Dockerfile</dockerFile>
+                    <tags>
+                      <tag>${dockertag1}</tag>
+                      <tag>${dockertag2}</tag>
+                    </tags>
+                  </build>
+                </image>
+              </images>
+            </configuration>
+            <executions>
+              <execution>
+                <id>generate-images</id>
+                <phase>install</phase>
+                <goals>
+                  <goal>build</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>push-images</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>push</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
