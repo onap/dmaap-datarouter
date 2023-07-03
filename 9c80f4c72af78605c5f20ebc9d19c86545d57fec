@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2802b48e_7d02525f",
+        "filename": "datarouter-prov-client/misc/drprov-client.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2023-07-03T13:34:28Z",
+      "side": 1,
+      "message": "I guess the default user will be dcae but should this be more generic or configurable?",
+      "range": {
+        "startLine": 5,
+        "startChar": 38,
+        "endLine": 5,
+        "endChar": 44
+      },
+      "revId": "9c80f4c72af78605c5f20ebc9d19c86545d57fec",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5eea4eba_edfec7b1",
+        "filename": "datarouter-prov-client/misc/drprov-client.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2023-07-03T13:34:28Z",
+      "side": 1,
+      "message": "Do we need to provision publishers also?",
+      "range": {
+        "startLine": 237,
+        "startChar": 18,
+        "endLine": 237,
+        "endChar": 21
+      },
+      "revId": "9c80f4c72af78605c5f20ebc9d19c86545d57fec",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    }
+  ]
+}
