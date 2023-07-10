@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "aef1479b_d24053a3",
+        "filename": "datarouter-prov-client/misc/drprov-client.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2023-07-10T13:55:38Z",
+      "side": 1,
+      "message": "Yep, agreed. I think option 1 or 3 is fine here as long as the pub/sub apps can refernece it somehow. It still leads to some hardcoding for these particular feeds but for this use case it\u0027s prob fine.",
+      "parentUuid": "81f78e7e_2be784ba",
+      "range": {
+        "startLine": 5,
+        "startChar": 38,
+        "endLine": 5,
+        "endChar": 44
+      },
+      "revId": "9c80f4c72af78605c5f20ebc9d19c86545d57fec",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5eea4eba_edfec7b1",
         "filename": "datarouter-prov-client/misc/drprov-client.sh",
         "patchSetId": 1
@@ -84,6 +108,30 @@
       "side": 1,
       "message": "DR does not have a separate notion of feed and publisher.  A feed has a list of associated \"endpoints\" (username/password pairs, created by the client, not the DR provisioning system).  The bus controller simulated the distinction between feeds and publishers by creating a feed with a dummy endpoint, and then created publishers by updating the feed with a new endpoint.  I did not want to add this complexity to the drprov-client script.   (After you made your comment, but before I read it, I added a(n incomplete) README that includes a discussion of this and its implications.",
       "parentUuid": "5eea4eba_edfec7b1",
+      "range": {
+        "startLine": 237,
+        "startChar": 18,
+        "endLine": 237,
+        "endChar": 21
+      },
+      "revId": "9c80f4c72af78605c5f20ebc9d19c86545d57fec",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bbaa6d23_dea64605",
+        "filename": "datarouter-prov-client/misc/drprov-client.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2023-07-10T13:55:38Z",
+      "side": 1,
+      "message": "Of course, I\u0027m so long away from it I had forgotten about the endpoints mech",
+      "parentUuid": "ecfcad4b_daf517a7",
       "range": {
         "startLine": 237,
         "startChar": 18,
