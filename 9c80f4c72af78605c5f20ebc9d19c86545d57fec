@@ -1,6 +1,7 @@
 {
   "comments": [
     {
+      "unresolved": true,
       "key": {
         "uuid": "2802b48e_7d02525f",
         "filename": "datarouter-prov-client/misc/drprov-client.sh",
@@ -20,10 +21,10 @@
         "endChar": 44
       },
       "revId": "9c80f4c72af78605c5f20ebc9d19c86545d57fec",
-      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
-      "unresolved": true
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "81f78e7e_2be784ba",
         "filename": "datarouter-prov-client/misc/drprov-client.sh",
@@ -44,10 +45,10 @@
         "endChar": 44
       },
       "revId": "9c80f4c72af78605c5f20ebc9d19c86545d57fec",
-      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
-      "unresolved": true
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "aef1479b_d24053a3",
         "filename": "datarouter-prov-client/misc/drprov-client.sh",
@@ -68,10 +69,34 @@
         "endChar": 44
       },
       "revId": "9c80f4c72af78605c5f20ebc9d19c86545d57fec",
-      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
-      "unresolved": true
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2840aaf5_30763b11",
+        "filename": "datarouter-prov-client/misc/drprov-client.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 511
+      },
+      "writtenOn": "2023-07-13T13:57:41Z",
+      "side": 1,
+      "message": "I\u0027ve gone for the first option, a fixed generic name.",
+      "parentUuid": "aef1479b_d24053a3",
+      "range": {
+        "startLine": 5,
+        "startChar": 38,
+        "endLine": 5,
+        "endChar": 44
+      },
+      "revId": "9c80f4c72af78605c5f20ebc9d19c86545d57fec",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": true,
       "key": {
         "uuid": "5eea4eba_edfec7b1",
         "filename": "datarouter-prov-client/misc/drprov-client.sh",
@@ -91,10 +116,10 @@
         "endChar": 21
       },
       "revId": "9c80f4c72af78605c5f20ebc9d19c86545d57fec",
-      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
-      "unresolved": true
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "ecfcad4b_daf517a7",
         "filename": "datarouter-prov-client/misc/drprov-client.sh",
@@ -115,10 +140,10 @@
         "endChar": 21
       },
       "revId": "9c80f4c72af78605c5f20ebc9d19c86545d57fec",
-      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
-      "unresolved": true
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     },
     {
+      "unresolved": true,
       "key": {
         "uuid": "bbaa6d23_dea64605",
         "filename": "datarouter-prov-client/misc/drprov-client.sh",
@@ -139,8 +164,31 @@
         "endChar": 21
       },
       "revId": "9c80f4c72af78605c5f20ebc9d19c86545d57fec",
-      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a",
-      "unresolved": true
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13f38389_a6866c12",
+        "filename": "datarouter-prov-client/misc/drprov-client.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 511
+      },
+      "writtenOn": "2023-07-13T13:57:41Z",
+      "side": 1,
+      "message": "Documented in the README.",
+      "parentUuid": "bbaa6d23_dea64605",
+      "range": {
+        "startLine": 237,
+        "startChar": 18,
+        "endLine": 237,
+        "endChar": 21
+      },
+      "revId": "9c80f4c72af78605c5f20ebc9d19c86545d57fec",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     }
   ]
 }
