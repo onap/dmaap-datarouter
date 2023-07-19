@@ -19,7 +19,7 @@
 #  limitations under the License.
 #  ============LICENSE_END====================================================
 #
-FROM nexus3.onap.org:10001/onap/integration-java11:10.0.0
+FROM nexus3.onap.org:10001/onap/integration-java17:12.0.0
 
 COPY /opt /opt
 

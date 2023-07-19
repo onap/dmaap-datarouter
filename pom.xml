@@ -5,6 +5,7 @@
   * Copyright © 2017 AT&T Intellectual Property. All rights reserved.
   * Modifications Copyright (C) 2018 Nokia. All rights reserved.
   * Copyright (d) 2023 J. F. Lucas.  All rights reserved.
+  * Copyright © 2023 Nordix Foundation Property. All rights reserved.
   * ===========================================================================
   * Licensed under the Apache License, Version 2.0 (the "License");
   * you may not use this file except in compliance with the License.
@@ -34,10 +35,10 @@
     </parent>
     <properties>
         <!--revision must also be set in the version.properties file at project root-->
-        <revision>2.1.14-SNAPSHOT</revision>
+        <revision>2.1.15-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
 
         <snapshotNexusPath>/content/repositories/snapshots/</snapshotNexusPath>
         <releaseNexusPath>/content/repositories/releases/</releaseNexusPath>
@@ -294,7 +295,17 @@
                         <exclude>IntegrationSuite.java</exclude>
                     </excludes>
                     <argLine>
-                        ${surefireArgLine} --illegal-access=permit
+                        --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+                        --add-opens=java.base/sun.security.util=ALL-UNNAMED
+                        --add-opens=java.base/sun.security.jca=ALL-UNNAMED
+                        --add-opens=java.base/java.util.regex=ALL-UNNAMED
+                        --add-opens=java.base/java.nio.file=ALL-UNNAMED
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                        --add-opens=java.base/java.util=ALL-UNNAMED
+                        --add-opens=java.base/java.text=ALL-UNNAMED
+                        --add-opens=java.base/java.net=ALL-UNNAMED
+                        --add-opens=java.base/java.nio=ALL-UNNAMED
+                        --add-opens=java.base/java.io=ALL-UNNAMED
                     </argLine>
                 </configuration>
             </plugin>
@@ -303,7 +314,17 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <argLine>
-                        --illegal-access=permit
+                        --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+                        --add-opens=java.base/sun.security.util=ALL-UNNAMED
+                        --add-opens=java.base/sun.security.jca=ALL-UNNAMED
+                        --add-opens=java.base/java.util.regex=ALL-UNNAMED
+                        --add-opens=java.base/java.nio.file=ALL-UNNAMED
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                        --add-opens=java.base/java.util=ALL-UNNAMED
+                        --add-opens=java.base/java.text=ALL-UNNAMED
+                        --add-opens=java.base/java.net=ALL-UNNAMED
+                        --add-opens=java.base/java.nio=ALL-UNNAMED
+                        --add-opens=java.base/java.io=ALL-UNNAMED
                     </argLine>
                 </configuration>
             </plugin>
