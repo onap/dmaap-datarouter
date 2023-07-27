@@ -1,3 +1,22 @@
+<!---
+ ============LICENSE_START===============================================
+ org.onap.dmaap
+ ========================================================================
+ Copyright (c) 2023 J. F. Lucas. All rights reserved.
+ ========================================================================
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ ============LICENSE_END=================================================
+--->
 # Data Router provisioning client
 
 ## Overview
@@ -54,6 +73,12 @@ The bus controller also had a notion of "location" which has no corresponding no
 
 ### Owner
 The bus controller interface included a field called "owner" for a feed.  This may have had some function within the bus controller.  It had a minor effect on the bus controller's invocation of the DR provisioning API (setting the `X-DMAAP-DR-ON-BEHALF-OF` header in the API requests associated with the feed).  It adds no real value.  Maintaining it would add complexity to the drprov-client script and would complicate debugging DR provisioning issues.
+
+Note that the drprov-client.sh script uses "drprovcl" by default as the value in the `X-DMAAP-DR-ON-BEHALF-OF`.  This can be overriden by setting the environment
+variable `ONBEHALFHDR` in the [common DMaaP provisioning template](https://git.onap.org/oom/tree/kubernetes/common/common/templates/_dmaapProvisioning.tpl).
+
+`X-DMAAP-DR-ON-BEHALF-OF` forms the basis of a simple authorization mechanism used by the DR provisioning API.  The value passed in this header when creating a
+feed or a subscription is stored by the DR provisioning server.  When the DR API receives a request to retrieve the data for a specific feed or a specific subscription, the API checks that the value in the `X-DMAAP-DR-ON-BEHALF-OF` header in the incoming request matches the stored value for the target feed or subscription.   Sometimes during testing or debugging, it is useful to query the DR provisioning API about a specific feed or subscription using a tool like `curl`.  Using `X-DMAAP-DR-ON-BEHALF-OF: drprovcl` will allow access to the feeds and subscription created by the drprov-client.sh script.
 
 ### Classification
 The bus controller interface included a field called "asprClassification" for a feed.  The field is required by DR and indicates the sensitivity of the information transmitted in a feed.  This has not been used in ONAP, but it is a required field. "aspr" is an internal acronym at the company where DR was originally developed. The field has been renamed "classification".  "unclassified" is a reasonable value to use in ONAP.
