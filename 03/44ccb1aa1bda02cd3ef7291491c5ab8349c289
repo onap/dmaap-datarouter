@@ -1,0 +1,8 @@
+Verified+1: ONAP Required GHA <releng+onap.required.gha@linuxfoundation.org>
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Code-Review+2: Fiachra Corcoran <fiachra.corcoran@est.tech>
+Submitted-by: Fiachra Corcoran <fiachra.corcoran@est.tech>
+Submitted-at: Fri, 28 Jul 2023 15:25:31 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/dmaap/datarouter/+/135584
+Project: dmaap/datarouter
+Branch: refs/heads/master
