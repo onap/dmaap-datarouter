@@ -16,6 +16,29 @@
       "message": "recheck",
       "revId": "0344ccb1aa1bda02cd3ef7291491c5ab8349c289",
       "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8f5bc16_b3f3598f",
+        "filename": "datarouter-prov-client/misc/drprov-client.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4405
+      },
+      "writtenOn": "2023-07-28T15:25:24Z",
+      "side": 1,
+      "message": "Not sure why it was limited to 8 chars. We never really considered why, just left it as is.",
+      "range": {
+        "startLine": 23,
+        "startChar": 38,
+        "endLine": 23,
+        "endChar": 46
+      },
+      "revId": "0344ccb1aa1bda02cd3ef7291491c5ab8349c289",
+      "serverId": "14b4e41f-c4e3-4fb9-9955-6a9b5656895a"
     }
   ]
 }
