@@ -66,6 +66,7 @@
         <commons-codec.version>1.15</commons-codec.version>
         <gmaven-plugin.version>1.5</gmaven-plugin.version>
         <gmavenplus-plugin.version>3.0.0</gmavenplus-plugin.version>
+        <groovy.version>4.0.13</groovy.version>
         <io.fabric8.version>0.33.0</io.fabric8.version>
         <docker.apiVersion>2.2.54</docker.apiVersion>
         <commons-lang.version>2.4</commons-lang.version>
@@ -432,6 +433,14 @@
                     <groupId>org.codehaus.gmavenplus</groupId>
                     <artifactId>gmavenplus-plugin</artifactId>
                     <version>${gmavenplus-plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.groovy</groupId>
+                            <artifactId>groovy-all</artifactId>
+                            <version>${groovy.version}</version>
+                            <type>pom</type>
+                        </dependency>
+                    </dependencies>
                     <executions>
                         <execution>
                             <phase>validate</phase>
@@ -443,18 +452,20 @@
                                     <ver>${project.version}</ver>
                                 </properties>
                                 <!-- Setup image tags per https://wiki.onap.org/display/DW/Independent+Versioning+and+Release+Process#IndependentVersioningandReleaseProcess-StandardizedDockerTagging -->
-                                <source>
-                                    println 'ver: ' + project.properties['ver'];
-                                    if ( project.properties['ver'].endsWith("-SNAPSHOT") ) {
-                                        project.properties['dockertag1']=project.properties['ver'] + "-latest";
-                                        project.properties['dockertag2']=project.properties['ver'] + "-" + project.properties['timestamp'];
-                                    } else {
-                                        project.properties['dockertag1']=project.properties['ver'] + "-STAGING-latest";
-                                        project.properties['dockertag2']=project.properties['ver'] + "-STAGING-" + project.properties['timestamp'];
-                                    }
-                                    println 'docker tag 1: ' + project.properties['dockertag1'];
-                                    println 'docker tag 2: ' + project.properties['dockertag2'];
-                                </source>
+                                <scripts>
+                                    <script>
+                                        println 'ver: ' + project.properties['revision'];
+                                        if ( project.properties['revision'].endsWith("-SNAPSHOT") ) {
+                                            project.properties['dockertag1']=project.properties['revision'] + "-latest";
+                                            project.properties['dockertag2']=project.properties['revision'] + "-" + project.properties['timestamp'];
+                                        } else {
+                                            project.properties['dockertag1']=project.properties['revision'] + "-STAGING-latest";
+                                            project.properties['dockertag2']=project.properties['revision'] + "-STAGING-" + project.properties['timestamp'];
+                                        }
+                                        println 'docker tag 1: ' + project.properties['dockertag1'];
+                                        println 'docker tag 2: ' + project.properties['dockertag2'];
+                                    </script>
+                                </scripts>
                             </configuration>
                         </execution>
                     </executions>
