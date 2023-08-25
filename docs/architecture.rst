@@ -17,22 +17,42 @@ Once created, DR sub clients can then subscribe to the feed to receive all data 
 
    .. image:: images/dr_pub_flow.png
 
-
-The DR provisioning API is not meant to be used directly by DR end users (publishers and subscribers)
-for feed / subscription CRUD (create, read, update, delete) operations.
-
-Instead, prospective publishers and subscribers should use the DMaaP Bus Controller API, which will call
+Previously, prospective publishers and subscribers would use the DMaaP Bus Controller API, which would call
 the DR provisioning API to manage feeds and subscriptions.
 
-   .. image:: images/dr_bc_prov.png
+However, with the deprecation of Message Router, the DMaaP Bus Controller API has also been deprecated and
+DR provisioning has been brought into DR itself. This will be performed through the
+Data Router (DR) provisioning client.
 
+The Data Router (DR) provisioning client runs as a Kubernetes initContainer for ONAP DCAE applications
+that use DR feeds to transfer data between applications. The logic for the client is contained in a script
+that makes requests to the DR provisioning node using the DR provisioning API.
+(See the `API documentation <https://docs.onap.org/projects/onap-dmaap-datarouter/en/london/apis/data-router-api.html#dmaap-data-router-api>`_ for details.)
 
-See DMaaP Bus Controller API docs for more information:
+The DR provisioning client (drprov-client) replaces the DMaaP Bus Controller client (dbc-client).
+The dbc-client used the DMaaP Bus Controller to provision data router feeds and subscribers and
+DMaaP Message Router topics and clients. The Message Router provisioning functionality is no longer needed,
+and Bus Controller will be deprecated and removed from the ONAP tree.
 
-`Bus Controller Feeds API <https://docs.onap.org/projects/onap-dmaap-buscontroller/en/latest/apis/api.html#feeds>`_
+The provisioning logic is in a script called drprov-client.sh.  This script is set as the
+entrypoint for the initContainer.
 
-`Bus Controller Subs API <https://docs.onap.org/projects/onap-dmaap-buscontroller/en/latest/apis/api.html#dr-subs>`_
+The drprov-client performs two high-level tasks:
 
+- Makes requests to the DR provisioning API to create feeds and subscriptions and captures the API's responses.
+- Uses the API's response to update a component's configuration file by replacing placeholders in the file
+  (in the form of environment variable names) with values from the API responses.
+
+The drprov-client script queries the DR provisioning API to determine if a feed already exists (based on the feed
+name and feed version) and does not attempt to create the feed again.  Instead, it retrieves the feed information
+for the existing feed and supplies that information to a component.
+
+Similarly, the drprov-client script queries the DR provisioning API to determine if a subscription already exists
+(based on the username, password, and delivery URL for the subscription).  If one exists, the script does not create
+a new subscription.
+
+Refer to `README file <https://gerrit.onap.org/r/gitweb?p=dmaap/datarouter.git;a=blob;f=datarouter-prov-client/README.md>`_
+in drprov-client in the datarouter repo for full details.
 
 High level Architecture
 -----------------------
