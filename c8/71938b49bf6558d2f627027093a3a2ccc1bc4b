@@ -1,0 +1,8 @@
+Verified+1: ONAP Required GHA <releng+onap.required.gha@linuxfoundation.org>
+Code-Review+2: David McWeeney <david.mcweeney@est.tech>
+Verified+1: ONAP Jobbuilder <onap-jobbuilder@jenkins.onap.org>
+Submitted-by: Thomas Kulik <thomas.kulik@telekom.de>
+Submitted-at: Wed, 28 Feb 2024 08:27:33 +0000
+Reviewed-on: https://gerrit.onap.org/r/c/dmaap/datarouter/+/137399
+Project: dmaap/datarouter
+Branch: refs/heads/master
