@@ -1,8 +1,15 @@
-sphinx>=4.2.0  # BSD
-sphinx-rtd-theme>=1.0.0  # MIT
-sphinxcontrib-blockdiag  # BSD
-sphinxcontrib-seqdiag # BSD
-sphinxcontrib-swaggerdoc
-sphinxcontrib-spelling
-sphinxcontrib-plantuml
-six
+# Compatibility
+setuptools>=65.0.0
+Pillow>=10.1.0
+
+# Core Sphinx
+sphinx>=7.1.2
+sphinx-rtd-theme>=2.0.0
+
+# Diagram extensions
+sphinxcontrib-blockdiag>=3.0.0
+sphinxcontrib-seqdiag>=3.0.0
+sphinxcontrib-plantuml>=0.27
+
+# Quality & tooling
+sphinxcontrib-spelling>=8.0.0
