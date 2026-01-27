@@ -564,17 +564,16 @@ Security Issues:
 
 *Known Security Issues*
 
-- In default deployment DMAAP (dmaap-dr-prov) exposes HTTP port 30259 outside of cluster. [`OJSI-158 <https://jira.onap.org/browse/OJSI-158>`_]
+- In default deployment DMAAP (dmaap-dr-prov) exposes HTTP port 30259 outside of cluster. [`OJSI-158 <https://jira.onap.org/>`_]
 
 *Known Vulnerabilities in Used Modules*
 
 DMAAP code has been formally scanned during build time using NexusIQ and all Critical vulnerabilities have been
 addressed, items that remain open have been assessed for risk and determined to be false positive. The DMAAP open
-Critical security vulnerabilities and their risk assessment have been documented as part of the `project <https://wiki.onap.org/pages/viewpage.action?pageId=42598688>`_.
+Critical security vulnerabilities and their risk assessment have been documented as part of the project.
 
 - `DMAAP Project Page <https://wiki.onap.org/display/DW/DMaaP+Planning>`_
 - `Passing Badge information for DMAAP DataRouter <https://bestpractices.coreinfrastructure.org/en/projects/2192>`_
-- `Project Vulnerability Review Table for DMAAP <https://wiki.onap.org/pages/viewpage.action?pageId=42598688>`_
 
 Upgrade Notes:
 N/A
@@ -615,11 +614,10 @@ N/A
 Security Issues:
 DMAAP code has been formally scanned during build time using NexusIQ and all Critical vulnerabilities have been
 addressed, items that remain open have been assessed for risk and determined to be false positive. The DMAAP open
-Critical security vulnerabilities and their risk assessment have been documented as part of the `project <https://wiki.onap.org/pages/viewpage.action?pageId=42598688>`_.
+Critical security vulnerabilities and their risk assessment have been documented as part of the project.
 
 - `DMAAP Project Page <https://wiki.onap.org/display/DW/DMaaP+Planning>`_
 - `Passing Badge information for DMAAP DataRouter <https://bestpractices.coreinfrastructure.org/en/projects/2192>`_
-- `Project Vulnerability Review Table for DMAAP <https://wiki.onap.org/pages/viewpage.action?pageId=42598688>`_
 
 Upgrade Notes:
 N/A
@@ -669,11 +667,10 @@ N/A
 Security Issues:
 DMAAP code has been formally scanned during build time using NexusIQ and all Critical vulnerabilities have been
 addressed, items that remain open have been assessed for risk and determined to be false positive. The DMAAP open
-Critical security vulnerabilities and their risk assessment have been documented as part of the `project <https://wiki.onap.org/pages/viewpage.action?pageId=42598688>`_.
+Critical security vulnerabilities and their risk assessment have been documented as part of the project.
 
 - `DMAAP Project Page <https://wiki.onap.org/display/DW/DMaaP+Planning>`_
 - `Passing Badge information for DMAAP DataRouter <https://bestpractices.coreinfrastructure.org/en/projects/2192>`_
-- `Project Vulnerability Review Table for DMAAP <https://wiki.onap.org/pages/viewpage.action?pageId=42598688>`_
 
 Upgrade Notes:
 N/A
