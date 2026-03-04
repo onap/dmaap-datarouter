@@ -20,6 +20,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.graphviz',
     'sphinxcontrib.blockdiag',
+    'sphinxcontrib.mermaid',
     'sphinxcontrib.seqdiag',
     'sphinxcontrib.plantuml'
 ]
