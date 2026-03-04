@@ -4,6 +4,7 @@ sphinx-rtd-theme>=2.0.0
 
 # Diagram extensions
 sphinxcontrib-blockdiag>=3.0.0
+sphinxcontrib-mermaid>=1.0.0
 sphinxcontrib-seqdiag>=3.0.0
 sphinxcontrib-plantuml>=0.27
 
