@@ -51,7 +51,7 @@ Similarly, the drprov-client script queries the DR provisioning API to determine
 (based on the username, password, and delivery URL for the subscription).  If one exists, the script does not create
 a new subscription.
 
-Refer to `README file <https://gerrit.onap.org/r/gitweb?p=dmaap/datarouter.git;a=blob;f=datarouter-prov-client/README.md>`_
+Refer to `README file <https://github.com/onap/dmaap-datarouter/blob/master/datarouter-prov-client/README.md>`_
 in drprov-client in the datarouter repo for full details.
 
 High level Architecture
